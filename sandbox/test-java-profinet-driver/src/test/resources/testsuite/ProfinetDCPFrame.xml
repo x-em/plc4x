@@ -22,10 +22,10 @@
   <name>Profinet DCP Frame</name>
 
   <testcase>
-    <name>Profinet: DCP Identify Multicast Request (with padding=len 40)</name>
-    <raw>fefe05000000000100010004ffff00000000000000000000000000000000000000000000000000000000</raw>
-<!--    Whithout padding:-->
-<!--    <raw>fefe05000000000100010004ffff0000</raw>-->
+    <name>Profinet: DCP Identify Multicast Request payload</name>
+    <raw>fefe05000000000100010004ffff0000</raw>
+    <!--    Whithout padding:-->
+    <!--    <raw>fefe05000000000100010004ffff0000</raw>-->
     <root-type>ProfinetFrame</root-type>
     <xml>
       <ProfinetFrame className="org.apache.plc4x.java.profinet.dcp.readwrite.ProfinetFrame">
@@ -35,7 +35,6 @@
           <serviceType>REQUEST</serviceType>
           <xid>1</xid>
           <responseDelay>1</responseDelay>
-          <dcpDataLength>4</dcpDataLength>
           <blocks>
             <blocks className="org.apache.plc4x.java.profinet.dcp.readwrite.AllSelector">
               <blockType>ALL_SELECTOR</blockType>
@@ -47,7 +46,48 @@
   </testcase>
 
   <testcase>
-    <name>Profinet: TaggedFrame with payload: DCP Identify Multicast Request</name>
+    <name>Profinet: DCP Identify Multicast Request (ether type 0x8892)</name>
+    <raw>010ecf0000005065f3b8cda38892fefe05000000000100010004ffff0000000000000000000000000000000000000000000000000000000000000000</raw>
+    <root-type>BaseEthernetFrame</root-type>
+    <xml>
+      <EthernetFrame className="org.apache.plc4x.java.profinet.dcp.readwrite.EthernetFrame">
+        <destination className="org.apache.plc4x.java.profinet.dcp.readwrite.MacAddress">
+          <octet1>1</octet1>
+          <octet2>14</octet2>
+          <octet3>207</octet3>
+          <octet4>0</octet4>
+          <octet5>0</octet5>
+          <octet6>0</octet6>
+        </destination>
+        <source className="org.apache.plc4x.java.profinet.dcp.readwrite.MacAddress">
+          <octet1>80</octet1>
+          <octet2>101</octet2>
+          <octet3>243</octet3>
+          <octet4>184</octet4>
+          <octet5>205</octet5>
+          <octet6>163</octet6>
+        </source>
+        <etherType>34962</etherType>
+        <payload className="org.apache.plc4x.java.profinet.dcp.readwrite.ProfinetFrame">
+          <frameType>IDENTIFY_MULTICAST_REQUEST</frameType>
+          <frame className="org.apache.plc4x.java.profinet.dcp.readwrite.DcpIdentRequestPDU">
+            <serviceId>IDENTIFY</serviceId>
+            <serviceType>REQUEST</serviceType>
+            <xid>1</xid>
+            <responseDelay>1</responseDelay>
+            <blocks>
+              <blocks className="org.apache.plc4x.java.profinet.dcp.readwrite.AllSelector">
+                <blockType>ALL_SELECTOR</blockType>
+              </blocks>
+            </blocks>
+          </frame>
+        </payload>
+      </EthernetFrame>
+    </xml>
+  </testcase>
+
+  <testcase>
+    <name>Profinet: TaggedFrame with payload: DCP Identify Multicast Request (ether type 0x8100/0x8892)</name>
     <raw>010ecf0000005065f3b8cda3810000008892fefe05000000000100010004ffff00000000000000000000000000000000000000000000000000000000</raw>
     <root-type>BaseEthernetFrame</root-type>
     <xml>
@@ -77,7 +117,6 @@
             <serviceType>REQUEST</serviceType>
             <xid>1</xid>
             <responseDelay>1</responseDelay>
-            <dcpDataLength>4</dcpDataLength>
             <blocks>
               <blocks className="org.apache.plc4x.java.profinet.dcp.readwrite.AllSelector">
                 <blockType>ALL_SELECTOR</blockType>

@@ -219,8 +219,12 @@ public class RawSocketChannel extends OioByteStreamChannel {
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
             try {
-                handle.sendPacket(EthernetPacket.newPacket(b, off, len));
-            } catch (IllegalRawDataException | NotOpenException | PcapNativeException e) {
+                // get only a chunk of data which is relevant, otherwise constructed packet will take entire array
+                // which is not what we want and need
+                byte[] packet = new byte[len];
+                System.arraycopy(b, off, packet, 0, len);
+                handle.sendPacket(packet);
+            } catch (NotOpenException | PcapNativeException e) {
                 throw new IOException(e);
             }
         }

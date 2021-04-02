@@ -31,15 +31,18 @@
         ['0x8892' EthernetFrame
         ]
     ]
-    [simple        ProfinetFrame 'payload'     ]
+    [simple        ProfinetFrame 'payload'    ]
+    // expression parser does not like 0x8892 here and it causes short vs int issues, to avoid fights with mspec
+    // it is shifted to simplistic helper method
+    [padding uint 8 'alignment' '0x00' 'STATIC_CALL("org.apache.plc4x.java.profinet.dcp.DCPUtil.padding", etherType, payload.lengthInBytes)']
 ]
+
 // 60 is considered minimum length size for any profinet dcp frame
 // 26 bytes fixed size = 10 profinet overhead + 16 ethernet header
 // 40 is only valid for when Vlan Tagged
 [type 'ProfinetFrame'
     [enum FrameType 'frameType'                ]
     [simple ProfinetData 'frame'  ['frameType']]
-    [padding uint 8 'alignment' '0x00' '44 - frame.lengthInBytes']
 ]
 
 [discriminatedType 'ProfinetData' [FrameType 'frameType']

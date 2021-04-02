@@ -19,6 +19,7 @@
 
 package org.apache.plc4x.java.profinet.dcp;
 
+import org.apache.plc4x.java.profinet.dcp.protocol.ProfinetDCPProtocolLogic;
 import org.apache.plc4x.java.profinet.dcp.readwrite.Text;
 import org.apache.plc4x.java.spi.generation.ParseException;
 import org.apache.plc4x.java.spi.generation.ReadBuffer;
@@ -43,6 +44,10 @@ public class DCPUtil {
 
     public static int length(String text) {
         return text.length();
+    }
+
+    public static int padding(int etherType, int payloadSize) {
+        return ((short) etherType == ProfinetDCPProtocolLogic.PN_DCP ? -14 : -18) + 60 - payloadSize;
     }
 
 }
