@@ -30,6 +30,8 @@ import org.apache.plc4x.java.utils.pcap.netty.exception.PcapException;
 import org.apache.plc4x.java.utils.rawsockets.netty.address.RawSocketAddress;
 import org.apache.plc4x.java.utils.rawsockets.netty.config.RawSocketChannelConfig;
 import org.pcap4j.core.*;
+import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,8 +219,8 @@ public class RawSocketChannel extends OioByteStreamChannel {
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
             try {
-                handle.sendPacket(b);
-            } catch (NotOpenException | PcapNativeException e) {
+                handle.sendPacket(EthernetPacket.newPacket(b, off, len));
+            } catch (IllegalRawDataException | NotOpenException | PcapNativeException e) {
                 throw new IOException(e);
             }
         }

@@ -89,9 +89,8 @@ public class ProfinetDCPProtocolLogic extends Plc4xProtocolBase<BaseEthernetFram
         long xid = invokeId.incrementAndGet();
         int responseDelay = 1000;
         DCPBlock[] blocks = new DCPBlock[] { new AllSelector(DCPBlockOption.ALL_SELECTOR)};
-        int dcpDataLength = blocks[0].getLengthInBytes();
 
-        DcpIdentRequestPDU requestPDU = new DcpIdentRequestPDU(serviceId, serviceType, xid, responseDelay, dcpDataLength, blocks);
+        DcpIdentRequestPDU requestPDU = new DcpIdentRequestPDU(serviceId, serviceType, xid, responseDelay, blocks);
         ProfinetFrame profiFrame = new ProfinetFrame(FrameType.IDENTIFY_MULTICAST_REQUEST, requestPDU);
         EthernetFrame ethernetFrame = new EthernetFrame(PROFINET_BROADCAST, configuration.getSender(), PN_DCP,
             profiFrame);
