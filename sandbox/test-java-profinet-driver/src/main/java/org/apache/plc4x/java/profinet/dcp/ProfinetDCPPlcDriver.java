@@ -94,9 +94,7 @@ public class ProfinetDCPPlcDriver extends GeneratedDriverBase<BaseEthernetFrame>
             int bufferSize = buffer.readableBytes();
             if (protocol == ProfinetDCPProtocolLogic.VLAN && bufferSize >= 26) {
                 return size(4, buffer);
-            }
-
-            if (protocol == ProfinetDCPProtocolLogic.PN_DCP && bufferSize >= 24) {
+            } else if (protocol == ProfinetDCPProtocolLogic.PN_DCP && bufferSize >= 24) {
                 return size(0, buffer);
             }
             LOG.debug("SIZE NOT CALLED; buffer.getShort(12)= {} and size= {}",protocol,bufferSize);
@@ -117,6 +115,7 @@ public class ProfinetDCPPlcDriver extends GeneratedDriverBase<BaseEthernetFrame>
             // less than 60 will contain 0x00 padding to match min 60 length
             if (val < 60) val=60;
             LOG.info("DCPDataLen= {} and total len(+26)= {}",DCPDataLeng,val);
+            LOG.info("Buffer capacity= {}",buffer.capacity());
             return val;
         }
     }
