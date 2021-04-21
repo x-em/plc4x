@@ -43,6 +43,7 @@
     <module>firmata</module>
     <module>knxnetip</module>
     <module>modbus</module>
+    <module>modbus-rtu</module>
     <module>opcua</module>
     <module>plc4x</module>
     <module>s7</module>

@@ -16,23 +16,23 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.plc4x.java.modbus.protocol;
+package org.apache.plc4x.java.modbusrtu.protocol;
 
 import org.apache.plc4x.java.api.exceptions.PlcRuntimeException;
 import org.apache.plc4x.java.api.messages.*;
 import org.apache.plc4x.java.api.value.*;
 import org.apache.plc4x.java.api.model.PlcField;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
-import org.apache.plc4x.java.modbus.config.ModbusConfiguration;
-import org.apache.plc4x.java.modbus.field.ModbusField;
-import org.apache.plc4x.java.modbus.field.ModbusFieldCoil;
-import org.apache.plc4x.java.modbus.field.ModbusFieldDiscreteInput;
-import org.apache.plc4x.java.modbus.field.ModbusFieldHoldingRegister;
-import org.apache.plc4x.java.modbus.field.ModbusFieldInputRegister;
-import org.apache.plc4x.java.modbus.field.ModbusExtendedRegister;
-import org.apache.plc4x.java.modbus.readwrite.*;
-import org.apache.plc4x.java.modbus.readwrite.types.*;
-import org.apache.plc4x.java.modbus.readwrite.io.DataItemIO;
+import org.apache.plc4x.java.modbusrtu.config.ModbusRtuConfiguration;
+import org.apache.plc4x.java.modbusrtu.field.ModbusField;
+import org.apache.plc4x.java.modbusrtu.field.ModbusFieldCoil;
+import org.apache.plc4x.java.modbusrtu.field.ModbusFieldDiscreteInput;
+import org.apache.plc4x.java.modbusrtu.field.ModbusFieldHoldingRegister;
+import org.apache.plc4x.java.modbusrtu.field.ModbusFieldInputRegister;
+import org.apache.plc4x.java.modbusrtu.field.ModbusExtendedRegister;
+import org.apache.plc4x.java.modbusrtu.readwrite.*;
+import org.apache.plc4x.java.modbusrtu.readwrite.io.DataItemIO;
+import org.apache.plc4x.java.modbusrtu.readwrite.types.ModbusDataType;
 import org.apache.plc4x.java.spi.ConversationContext;
 import org.apache.plc4x.java.spi.Plc4xProtocolBase;
 import org.apache.plc4x.java.spi.configuration.HasConfiguration;
@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ModbusProtocolLogic extends Plc4xProtocolBase<ModbusTcpADU> implements HasConfiguration<ModbusConfiguration> {
+public class ModbusRtuProtocolLogic extends Plc4xProtocolBase<ModbusRtuADU> implements HasConfiguration<ModbusRtuConfiguration> {
 
     private Duration requestTimeout;
     private short unitIdentifier;
@@ -66,14 +66,14 @@ public class ModbusProtocolLogic extends Plc4xProtocolBase<ModbusTcpADU> impleme
     private final static int FC_EXTENDED_REGISTERS_FILE_RECORD_LENGTH = 10000;
 
     @Override
-    public void setConfiguration(ModbusConfiguration configuration) {
+    public void setConfiguration(ModbusRtuConfiguration configuration) {
         this.requestTimeout = Duration.ofMillis(configuration.getRequestTimeout());
         this.unitIdentifier = (short) configuration.getUnitIdentifier();
         this.tm = new RequestTransactionManager(1);
     }
 
     @Override
-    public void close(ConversationContext<ModbusTcpADU> context) {
+    public void close(ConversationContext<ModbusRtuADU> context) {
         // Nothing to do here ...
     }
 
@@ -101,15 +101,16 @@ public class ModbusProtocolLogic extends Plc4xProtocolBase<ModbusTcpADU> impleme
             if (transactionIdentifierGenerator.get() == 0xFFFF) {
                 transactionIdentifierGenerator.set(1);
             }
-            ModbusTcpADU modbusTcpADU = new ModbusTcpADU(transactionIdentifier, unitIdentifier, requestPdu);
+            // TODO: Have a look at this ... I added the "1, (short) 1," to make it compile
+            ModbusRtuADU modbusRtuADU = new ModbusRtuADU(transactionIdentifier, unitIdentifier, 1, (short) 1, requestPdu);
             RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
-            transaction.submit(() -> context.sendRequest(modbusTcpADU)
-                .expectResponse(ModbusTcpADU.class, requestTimeout)
+            transaction.submit(() -> context.sendRequest(modbusRtuADU)
+                .expectResponse(ModbusRtuADU.class, requestTimeout)
                 .onTimeout(future::completeExceptionally)
                 .onError((p, e) -> future.completeExceptionally(e))
                 .check(p -> ((p.getTransactionIdentifier() == transactionIdentifier) &&
                     (p.getUnitIdentifier() == unitIdentifier)))
-                .unwrap(ModbusTcpADU::getPdu)
+                .unwrap(ModbusRtuADU::getPdu)
                 .handle(responsePdu -> {
                     // Try to decode the response data based on the corresponding request.
                     PlcValue plcValue = null;
@@ -145,7 +146,7 @@ public class ModbusProtocolLogic extends Plc4xProtocolBase<ModbusTcpADU> impleme
     }
 
     @Override
-    protected void decode(ConversationContext<ModbusTcpADU> context, ModbusTcpADU msg) throws Exception {
+    protected void decode(ConversationContext<ModbusRtuADU> context, ModbusRtuADU msg) throws Exception {
         super.decode(context, msg);
     }
 
@@ -199,14 +200,15 @@ public class ModbusProtocolLogic extends Plc4xProtocolBase<ModbusTcpADU> impleme
             if (transactionIdentifierGenerator.get() == 0xFFFF) {
                 transactionIdentifierGenerator.set(1);
             }
-            ModbusTcpADU modbusTcpADU = new ModbusTcpADU(transactionIdentifier, unitIdentifier, requestPdu);
+            // TODO: Have a look at this ... I added the "1, (short) 1," to make it compile
+            ModbusRtuADU modbusRtuADU = new ModbusRtuADU(transactionIdentifier, unitIdentifier, 1, (short) 1, requestPdu);
             RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
-            transaction.submit(() -> context.sendRequest(modbusTcpADU)
-                .expectResponse(ModbusTcpADU.class, requestTimeout)
+            transaction.submit(() -> context.sendRequest(modbusRtuADU)
+                .expectResponse(ModbusRtuADU.class, requestTimeout)
                 .onTimeout(future::completeExceptionally)
                 .onError((p, e) -> future.completeExceptionally(e))
                 .check(p -> p.getTransactionIdentifier() == transactionIdentifier)
-                .unwrap(ModbusTcpADU::getPdu)
+                .unwrap(ModbusRtuADU::getPdu)
                 .handle(responsePdu -> {
                     // Try to decode the response data based on the corresponding request.
                     PlcValue plcValue = null;
