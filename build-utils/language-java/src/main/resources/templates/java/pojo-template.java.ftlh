@@ -302,7 +302,7 @@ public<#if helper.isDiscriminatedParentTypeDefinition()> abstract</#if> class ${
 
         // Simple field (${simpleField.name})
         <#if helper.isSimpleTypeReference(simpleField.type)>
-                <#if helper.getLanguageTypeNameForTypeReference(simpleField.type) = "String">
+                <#if helper.getLanguageTypeNameForTypeReference(simpleField.type) = "String" &amp;&amp; simpleTypeReference.sizeInBits == -1>
                     <#assign simpleTypeReference = simpleField.type>
         lengthInBits += ${helper.toSerializationExpression(simpleField, simpleTypeReference.getLengthExpression(), type.parserArguments)};
                 <#else>

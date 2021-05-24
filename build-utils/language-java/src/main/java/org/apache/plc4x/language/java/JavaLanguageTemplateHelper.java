@@ -384,8 +384,13 @@ public class JavaLanguageTemplateHelper extends BaseFreemarkerLanguageTemplateHe
             }
             case STRING: {
                 StringTypeReference stringTypeReference = (StringTypeReference) simpleTypeReference;
-                return "readBuffer.readString(\"" + logicalName + "\", " + toParseExpression(field, stringTypeReference.getLengthExpression(), null) + ", \"" +
-                    stringTypeReference.getEncoding() + "\")";
+                if(stringTypeReference.getLengthExpression() != null) {
+                    return "readBuffer.readString(\"" + logicalName + "\", " + toParseExpression(field, stringTypeReference.getLengthExpression(), null) + ", \"" +
+                        stringTypeReference.getEncoding() + "\")";
+                } else {
+                    return "readBuffer.readString(\"" + logicalName + "\", " + stringTypeReference.getSizeInBits() + ", \"" +
+                        stringTypeReference.getEncoding() + "\")";
+                }
             }
         }
         return "Hurz";
@@ -454,8 +459,13 @@ public class JavaLanguageTemplateHelper extends BaseFreemarkerLanguageTemplateHe
             }
             case STRING: {
                 StringTypeReference stringTypeReference = (StringTypeReference) simpleTypeReference;
-                return "writeBuffer.writeString(\"" + logicalName + "\", " + toSerializationExpression(field, stringTypeReference.getLengthExpression(), getThisTypeDefinition().getParserArguments()) + ", \"" +
-                    stringTypeReference.getEncoding() + "\", (String) " + fieldName + "" + writerArgsString + ")";
+                if(stringTypeReference.getLengthExpression() != null) {
+                    return "writeBuffer.writeString(\"" + logicalName + "\", " + toSerializationExpression(field, stringTypeReference.getLengthExpression(), getThisTypeDefinition().getParserArguments()) + ", \"" +
+                        stringTypeReference.getEncoding() + "\", (String) " + fieldName + "" + writerArgsString + ")";
+                } else {
+                    return "writeBuffer.writeString(\"" + logicalName + "\", " + stringTypeReference.getSizeInBits() + ", \"" +
+                        stringTypeReference.getEncoding() + "\", (String) " + fieldName + "" + writerArgsString + ")";
+                }
             }
         }
         return "Hurz";

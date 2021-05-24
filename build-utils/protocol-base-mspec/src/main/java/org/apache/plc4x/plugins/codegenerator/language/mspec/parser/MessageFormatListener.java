@@ -441,8 +441,15 @@ public class MessageFormatListener extends MSpecBaseListener {
         // String types need an additional "encoding" field and length expression.
         if(simpleBaseType == SimpleTypeReference.SimpleBaseType.STRING) {
             String encoding = (ctx.encoding != null) ? ctx.encoding.getText() : "UTF-8";
-            Term lengthExpression = getExpressionTerm(ctx.length.getText().substring(1, ctx.length.getText().length() - 1));
-            return new DefaultStringTypeReference(simpleBaseType, lengthExpression, encoding);
+            // A simple type of type string can have either a classical
+            // size attribute or a term for defining it's length.
+            if (ctx.size != null) {
+                int size = Integer.parseInt(ctx.size.getText());
+                return new DefaultStringTypeReference(simpleBaseType, size, encoding);
+            } else {
+                Term lengthExpression = getExpressionTerm(ctx.length.getText());
+                return new DefaultStringTypeReference(simpleBaseType, lengthExpression, encoding);
+            }
         }
         // If a size it specified its a simple integer length based type.
         if (ctx.size != null) {

@@ -80,7 +80,8 @@ public class ExpressionStringListener extends ExpressionBaseListener {
 
     @Override
     public void exitStringExpression(ExpressionParser.StringExpressionContext ctx) {
-        parserContexts.peek().add(new StringLiteral(ctx.getText()));
+        String str = ctx.getText();
+        parserContexts.peek().add(new StringLiteral(str.substring(1, str.length() - 1)));
     }
 
     @Override

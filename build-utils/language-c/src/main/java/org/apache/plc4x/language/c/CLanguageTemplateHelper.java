@@ -393,8 +393,13 @@ public class CLanguageTemplateHelper extends BaseFreemarkerLanguageTemplateHelpe
                 throw new FreemarkerException("Unsupported float type with " + floatTypeReference.getSizeInBits() + " bits");
             case STRING:
                 StringTypeReference stringTypeReference = (StringTypeReference) simpleTypeReference;
-                return "plc4c_spi_read_string(readBuffer, " + toParseExpression(getThisTypeDefinition(), field, stringTypeReference.getLengthExpression(), null) + ", \"" +
-                    stringTypeReference.getEncoding() + "\"" + ", (char**) " + valueString + ")";
+                if(stringTypeReference.getLengthExpression() != null) {
+                    return "plc4c_spi_read_string(readBuffer, " + toParseExpression(getThisTypeDefinition(), field, stringTypeReference.getLengthExpression(), null) + ", \"" +
+                        stringTypeReference.getEncoding() + "\"" + ", (char**) " + valueString + ")";
+                } else {
+                    return "plc4c_spi_read_string(readBuffer, " + stringTypeReference.getSizeInBits() + ", \"" +
+                        stringTypeReference.getEncoding() + "\"" + ", (char**) " + valueString + ")";
+                }
             default:
                 throw new FreemarkerException("Unsupported type " + simpleTypeReference.getBaseType().name());
         }
@@ -447,8 +452,13 @@ public class CLanguageTemplateHelper extends BaseFreemarkerLanguageTemplateHelpe
                 throw new FreemarkerException("Unsupported float type with " + floatTypeReference.getSizeInBits() + " bits");
             case STRING:
                 StringTypeReference stringTypeReference = (StringTypeReference) simpleTypeReference;
-                return "plc4c_spi_write_string(writeBuffer, " + toSerializationExpression(getThisTypeDefinition(), field, stringTypeReference.getLengthExpression(), null) + ", \"" +
-                    stringTypeReference.getEncoding() + "\", " + fieldName + ")";
+                if(stringTypeReference.getLengthExpression() != null) {
+                    return "plc4c_spi_write_string(writeBuffer, " + toSerializationExpression(getThisTypeDefinition(), field, stringTypeReference.getLengthExpression(), null) + ", \"" +
+                        stringTypeReference.getEncoding() + "\", " + fieldName + ")";
+                } else {
+                    return "plc4c_spi_write_string(writeBuffer, " + stringTypeReference.getSizeInBits() + ", \"" +
+                        stringTypeReference.getEncoding() + "\", " + fieldName + ")";
+                }
             default:
                 throw new FreemarkerException("Unsupported type " + simpleTypeReference.getBaseType().name());
         }

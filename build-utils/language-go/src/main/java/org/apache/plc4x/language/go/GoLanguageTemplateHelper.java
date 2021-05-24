@@ -354,7 +354,11 @@ public class GoLanguageTemplateHelper extends BaseFreemarkerLanguageTemplateHelp
             }
             case STRING: {
                 StringTypeReference stringTypeReference = (StringTypeReference) simpleTypeReference;
-                return "readBuffer.ReadString(\"" + logicalName + "\", uint32(" + toParseExpression(field, stringTypeReference.getLengthExpression(), null) + "))";
+                if(stringTypeReference.getLengthExpression() != null) {
+                    return "readBuffer.ReadString(\"" + logicalName + "\", uint32(" + toParseExpression(field, stringTypeReference.getLengthExpression(), null) + "))";
+                } else {
+                    return "readBuffer.ReadString(\"" + logicalName + "\", " + stringTypeReference.getSizeInBits() + ")";
+                }
             }
         }
         return "Hurz";
@@ -426,8 +430,13 @@ public class GoLanguageTemplateHelper extends BaseFreemarkerLanguageTemplateHelp
                 StringTypeReference stringTypeReference = (StringTypeReference) simpleTypeReference;
                 String encoding = ((stringTypeReference.getEncoding() != null) && (stringTypeReference.getEncoding().length() > 2)) ?
                     stringTypeReference.getEncoding().substring(1, stringTypeReference.getEncoding().length() - 1) : "UTF-8";
-                return "writeBuffer.WriteString(\"" + logicalName + "\", uint8(" + toSerializationExpression(field, stringTypeReference.getLengthExpression(), getThisTypeDefinition().getParserArguments()) + "), \"" +
-                    encoding + "\", " + fieldName + writerArgsString + ")";
+                if(stringTypeReference.getLengthExpression() != null) {
+                    return "writeBuffer.WriteString(\"" + logicalName + "\", uint8(" + toSerializationExpression(field, stringTypeReference.getLengthExpression(), getThisTypeDefinition().getParserArguments()) + "), \"" +
+                        encoding + "\", " + fieldName + writerArgsString + ")";
+                } else {
+                    return "writeBuffer.WriteString(\"" + logicalName + "\", " + stringTypeReference.getSizeInBits() + ", \"" +
+                        encoding + "\", " + fieldName + writerArgsString + ")";
+                }
             }
         }
         return "Hurz";
@@ -577,10 +586,17 @@ public class GoLanguageTemplateHelper extends BaseFreemarkerLanguageTemplateHelp
                 Term a = tt.getA();
                 Term b = tt.getB();
                 Term c = tt.getC();
+                String type = "uint16";
+                if(fieldType instanceof StringTypeReference) {
+                    return "utils.StringBasedInlineIf(" + toExpression(new DefaultBooleanTypeReference(), a, parserArguments, serializerArguments, serialize, false) + ", " +
+                        "func() string {return string(" + toExpression(fieldType, b, parserArguments, serializerArguments, serialize, false) + ")}, " +
+                        "func() string {return string(" + toExpression(fieldType, c, parserArguments, serializerArguments, serialize, false) + ")})";
+                }
+
                 // TODO: This is not quite correct with the cast to uint16
                 return "utils.InlineIf(" + toExpression(new DefaultBooleanTypeReference(), a, parserArguments, serializerArguments, serialize, false) + ", " +
-                    "func() uint16 {return uint16(" + toExpression(fieldType, b, parserArguments, serializerArguments, serialize, false) + ")}, " +
-                    "func() uint16 {return uint16(" + toExpression(fieldType, c, parserArguments, serializerArguments, serialize, false) + ")})";
+                    "func() " + type + " {return " + type + "(" + toExpression(fieldType, b, parserArguments, serializerArguments, serialize, false) + ")}, " +
+                    "func() " + type + " {return " + type + "(" + toExpression(fieldType, c, parserArguments, serializerArguments, serialize, false) + ")})";
             } else {
                 throw new RuntimeException("Unsupported ternary operation type " + tt.getOperation());
             }

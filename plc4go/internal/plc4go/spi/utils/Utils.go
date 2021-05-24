@@ -27,3 +27,11 @@ func InlineIf(test bool, a func() uint16, b func() uint16) uint16 {
 		return b()
 	}
 }
+
+func StringBasedInlineIf(test bool, a func() string, b func() string) string {
+	if test {
+		return a()
+	} else {
+		return b()
+	}
+}
