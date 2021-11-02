@@ -43,6 +43,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -115,6 +118,7 @@ public class SecureChannel {
     private CompletableFuture<Void> keepAlive;
     private int sendBufferSize;
     private int maxMessageSize;
+    private String[] endpoints = new String[3];
     private AtomicLong senderSequenceNumber = new AtomicLong();
 
     public SecureChannel(DriverContext driverContext, OpcuaConfiguration configuration) {
@@ -147,6 +151,16 @@ public class SecureChannel {
             this.isEncrypted = false;
         }
         this.keyStoreFile = configuration.getKeyStoreFile();
+
+        // Generate a list of endpoints we can use.
+        try {
+            InetAddress address = InetAddress.getByName(this.configuration.getHost());
+            this.endpoints[0] = "opc.tcp://" + address.getHostAddress() + ":" + configuration.getPort() +  configuration.getTransportEndpoint();
+            this.endpoints[1] = "opc.tcp://" + address.getHostName() + ":" + configuration.getPort() +  configuration.getTransportEndpoint();
+            this.endpoints[2] = "opc.tcp://" + address.getCanonicalHostName() + ":" + configuration.getPort() +  configuration.getTransportEndpoint();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     public void submit(ConversationContext<OpcuaAPU> context, Consumer<TimeoutException> onTimeout, BiConsumer<OpcuaAPU, Throwable> error, Consumer<byte[]> consumer, WriteBufferByteBased buffer) {
@@ -484,25 +498,7 @@ public class SecureChannel {
             e.printStackTrace();
         }
 
-        for (String hostEndpoints : endpoints) {
-            for (ExtensionObjectDefinition extensionObject : sessionResponse.getServerEndpoints()) {
-                EndpointDescription endpointDescription = (EndpointDescription) extensionObject;
-                if (endpointDescription.getEndpointUrl().getStringValue().equals(hostEndpoints)) {
-                    for (ExtensionObjectDefinition userTokenCast : endpointDescription.getUserIdentityTokens()) {
-                        UserTokenPolicy identityToken = (UserTokenPolicy) userTokenCast;
-                        if ((identityToken.getTokenType() == UserTokenType.userTokenTypeAnonymous) && (this.username == null)) {
-                            LOGGER.info("Using Endpoint {} with security {}", endpointDescription.getEndpointUrl().getStringValue(), identityToken.getPolicyId().getStringValue());
-                            policyId = identityToken.getPolicyId();
-                            tokenType = identityToken.getTokenType();
-                        } else if ((identityToken.getTokenType() == UserTokenType.userTokenTypeUserName) && (this.username != null)) {
-                            LOGGER.info("Using Endpoint {} with security {}", endpointDescription.getEndpointUrl().getStringValue(), identityToken.getPolicyId().getStringValue());
-                            policyId = identityToken.getPolicyId();
-                            tokenType = identityToken.getTokenType();
-                        }
-                    }
-                }
-            }
-        }
+        selectEndpoint(sessionResponse);
 
         if (this.policyId == null) {
             throw new PlcRuntimeException("Unable to find endpoint - " + endpoints[1]);
@@ -1157,6 +1153,43 @@ public class SecureChannel {
      */
     public int getTokenId() {
         return this.tokenId.get();
+    }
+
+    private void selectEndpoint(CreateSessionResponse sessionResponse) {
+        List<String> returnedEndpoints = new LinkedList<String>();
+        for (ExtensionObjectDefinition extensionObject : sessionResponse.getServerEndpoints()) {
+            EndpointDescription endpointDescription = (EndpointDescription) extensionObject;
+            returnedEndpoints.add(endpointDescription.getEndpointUrl().getStringValue());
+        }
+
+        List<EndpointDescription> filteredEndpoints = Arrays.stream(sessionResponse.getServerEndpoints())
+                                                            .filter(endpoint -> isEndpoint((EndpointDescription) endpoint).getEndpointUrl().getStringValue().equals(hostEndpoints));
+
+
+
+        for (String hostEndpoints : endpoints) {
+            for (ExtensionObjectDefinition extensionObject : sessionResponse.getServerEndpoints()) {
+                EndpointDescription endpointDescription = (EndpointDescription) extensionObject;
+                if (endpointDescription.getEndpointUrl().getStringValue().equals(hostEndpoints)) {
+                    for (ExtensionObjectDefinition userTokenCast : endpointDescription.getUserIdentityTokens()) {
+                        UserTokenPolicy identityToken = (UserTokenPolicy) userTokenCast;
+                        if ((identityToken.getTokenType() == UserTokenType.userTokenTypeAnonymous) && (this.username == null)) {
+                            LOGGER.info("Using Endpoint {} with security {}", endpointDescription.getEndpointUrl().getStringValue(), identityToken.getPolicyId().getStringValue());
+                            policyId = identityToken.getPolicyId();
+                            tokenType = identityToken.getTokenType();
+                        } else if ((identityToken.getTokenType() == UserTokenType.userTokenTypeUserName) && (this.username != null)) {
+                            LOGGER.info("Using Endpoint {} with security {}", endpointDescription.getEndpointUrl().getStringValue(), identityToken.getPolicyId().getStringValue());
+                            policyId = identityToken.getPolicyId();
+                            tokenType = identityToken.getTokenType();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (this.policyId == null) {
+            throw new PlcRuntimeException("Unable to find endpoint - " + endpoints[1]);
+        }
     }
 
     /**
