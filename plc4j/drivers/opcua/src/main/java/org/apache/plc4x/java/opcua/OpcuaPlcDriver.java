@@ -51,7 +51,7 @@ public class OpcuaPlcDriver extends GeneratedDriverBase<OpcuaAPU> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcuaPlcDriver.class);
 
-    public static final Pattern INET_ADDRESS_PATTERN = Pattern.compile("(:(?<transportCode>tcp))?://" +
+    public static final Pattern INET_ADDRESS_PATTERN = Pattern.compile("(:(?<transportCode>[a-z0-9]*))?://" +
                                                                         "(?<transportHost>[\\w.-]+)(:" +
                                                                         "(?<transportPort>\\d*))?");
 

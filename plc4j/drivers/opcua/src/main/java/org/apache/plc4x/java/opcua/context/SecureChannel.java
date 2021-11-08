@@ -261,13 +261,14 @@ public class SecureChannel {
             DEFAULT_MAX_MESSAGE_SIZE,
             DEFAULT_MAX_CHUNK_COUNT,
             this.endpoint);
-
+        System.out.print(hello.toString());
         Consumer<Integer> requestConsumer = t -> {
             context.sendRequest(new OpcuaAPU(hello))
                 .expectResponse(OpcuaAPU.class, REQUEST_TIMEOUT)
                 .check(p -> p.getMessage() instanceof OpcuaAcknowledgeResponse)
                 .unwrap(p -> (OpcuaAcknowledgeResponse) p.getMessage())
                 .handle(opcuaAcknowledgeResponse -> {
+                    System.out.print(opcuaAcknowledgeResponse.toString());
                     sendBufferSize = Math.min(opcuaAcknowledgeResponse.getReceiveBufferSize(), DEFAULT_SEND_BUFFER_SIZE);
                     maxMessageSize = Math.min(opcuaAcknowledgeResponse.getMaxMessageSize(), DEFAULT_MAX_MESSAGE_SIZE);
                     onConnectOpenSecureChannel(context, opcuaAcknowledgeResponse);
@@ -1200,7 +1201,7 @@ public class SecureChannel {
      * @return true if this endpoint matches our configuration
      * @throws PlcRuntimeException - If the returned endpoint string doesn't match the format expected
      */
-    public boolean isEndpoint(EndpointDescription endpoint) throws PlcRuntimeException {
+    private boolean isEndpoint(EndpointDescription endpoint) throws PlcRuntimeException {
         // Split up the connection string into it's individual segments.
         Matcher matcher = URI_PATTERN.matcher(endpoint.getEndpointUrl().getStringValue());
         if (!matcher.matches()) {
