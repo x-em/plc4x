@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -28,7 +28,6 @@ import org.apache.plc4x.java.api.exceptions.PlcInvalidFieldException;
 import org.apache.plc4x.java.api.model.PlcField;
 import org.apache.plc4x.java.s7.readwrite.S7Address;
 import org.apache.plc4x.java.s7.readwrite.S7AddressAny;
-import org.apache.plc4x.java.s7.readwrite.io.S7AddressIO;
 import org.apache.plc4x.java.s7.readwrite.MemoryArea;
 import org.apache.plc4x.java.s7.readwrite.TransportSize;
 import org.apache.plc4x.java.spi.generation.*;
@@ -250,7 +249,7 @@ public class S7Field implements PlcField, Serializable {
             try {
                 byte[] addressData = Hex.decodeHex(fieldString.replaceAll("[-]", ""));
                 ReadBuffer rb = new ReadBufferByteBased(addressData);
-                final S7Address s7Address = S7AddressIO.staticParse(rb);
+                final S7Address s7Address = S7Address.staticParse(rb);
                 if (s7Address instanceof S7AddressAny) {
                     S7AddressAny s7AddressAny = (S7AddressAny) s7Address;
 

@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -37,7 +37,7 @@
  PnPtcp     PROFINET Precision Transparent Clock Protocol
 */
 
-[type Ethernet_Frame byteOrder='"BIG_ENDIAN"'
+[type Ethernet_Frame byteOrder='BIG_ENDIAN'
     // When sending to the mac address prefix of 01:0e:cf are multicast packets
     [simple MacAddress            destination]
     [simple MacAddress            source     ]
@@ -46,25 +46,32 @@
 
 [discriminatedType Ethernet_FramePayload
     [discriminator uint 16 packetType]
-    [typeSwitch 'packetType'
+    [typeSwitch packetType
         ['0x0800' Ethernet_FramePayload_IPv4
-            [const    uint 4              version                         '0x4'                      ]
-            [const    uint 4              headerLength                    '0x5'                      ]
-            [const    uint 6              differentiatedServicesCodepoint '0x00'                     ]
-            [const    uint 2              explicitCongestionNotification  '0x0'                      ]
-            [implicit uint 16             totalLength                     '20 + packet.lengthInBytes']
-            [simple   uint 15             identification                                             ]
-            [const    uint 3              flags                           '0x00'                     ]
-            [const    uint 13             fragmentOffset                  '0x00'                     ]
-            // Time to live: 64
-            [const    uint 8              timeToLive                      '0x40'                     ]
+            [const    uint 4              version                         0x4                        ]
+            // 5 = 5 x 32bit = 5 x 4byte = 20byte
+            [const    uint 4              headerLength                    0x5                        ]
+            [const    uint 6              differentiatedServicesCodepoint 0x00                       ]
+            [const    uint 2              explicitCongestionNotification  0x0                        ]
+            // Length of the header + payload
+            [implicit uint 16             totalLength                     '28 + payload.lengthInBytes']
+            [simple   uint 16             identification                                             ]
+            [const    uint 3              flags                           0x00                       ]
+            [const    uint 13             fragmentOffset                  0x00                       ]
+            [simple   uint 8              timeToLive                                                 ]
             // Protocol: UDP
-            [const    uint 8              protocol                        '0x11'                     ]
-            // TODO: Implement ...
-            //[checksum uint 16             'headerChecksum'                  ''                         ]
+            [const    uint 8              protocol                        0x11                       ]
+            // It seems that modern NICs mess this up as they take care of the validation in dedicated hardware.
+            // This results in the wrong values being read. Using a 'checksum' field would fail most incoming packets.
+            [implicit uint 16             headerChecksum                 'STATIC_CALL("calculateIPv4Checksum", totalLength, identification, timeToLive, sourceAddress, destinationAddress)']
             [simple   IpAddress           sourceAddress                                              ]
             [simple   IpAddress           destinationAddress                                         ]
-            [simple   Udp_Packet          packet                                                     ]
+            // Begin of the UDP packet part
+            [simple   uint 16             sourcePort                                                 ]
+            [simple   uint 16             destinationPort                                            ]
+            [implicit uint 16             packetLength    'lengthInBytes'                            ]
+            //[implicit uint 16             headerChecksum  'STATIC_CALL("calculateUdpChecksum", sourceAddress, destinationAddress, sourcePort, destinationPort, packetLength)'                               ]
+            [simple   DceRpc_Packet       payload                                                    ]
         ]
         ['0x8100' Ethernet_FramePayload_VirtualLan
             [simple VirtualLanPriority    priority                                                   ]
@@ -78,38 +85,29 @@
     ]
 ]
 
-[type Udp_Packet
-    [simple   uint 16       sourcePort                                        ]
-    [simple   uint 16       destinationPort                                   ]
-    [implicit uint 16       packetLength    'lengthInBytes'                   ]
-    // TODO: Implement ...
-    //[checksum uint 16       'headerChecksum'  ''                                ]
-    [simple   DceRpc_Packet payload                                           ]
-]
-
 // 4.10.3.2
 // A lot of the fields are set to constant values, which would
 // usually be dynamic. However are we trying to limit the number of
 // arguments needed to construct the messages and Profinet only seems
 // be using a very limited subset of all possible DCE/RPC packets.
-[type DceRpc_Packet byteOrder='"BIG_ENDIAN"'
+[type DceRpc_Packet byteOrder='BIG_ENDIAN'
 // RPC Header {
     // RPCVersion 4.10.3.2.1
-    [const         uint 8                version                        '0x04'                 ]
+    [const         uint 8                version                        0x04                 ]
     // RPCPacketType 4.10.3.2.2 (8 bit)
     [simple        DceRpc_PacketType     packetType                                            ]
     // PRCFlags 4.10.3.2.3
     [reserved      bit                                                  'false'                ]
-    [const         bit                   broadcast                      'false'                ]
+    [const         bit                   broadcast                      false                ]
     [simple        bit                   idempotent                                            ]
-    [const         bit                   maybe                          'false'                ]
+    [const         bit                   maybe                          false                ]
     [simple        bit                   noFragmentAcknowledgeRequested                        ]
-    [const         bit                   fragment                       'false'                ]
+    [const         bit                   fragment                       false                ]
     [simple        bit                   lastFragment                                          ]
     [reserved      bit                                                  'false'                ]
     // PRCFlags2 4.10.3.2.4
     [reserved      uint 6                                               '0x00'                 ]
-    [const         bit                   cancelWasPending               'false'                ]
+    [const         bit                   cancelWasPending               false                ]
     [reserved      bit                                                  'false'                ]
     // RPCDRep 4.10.3.2.5 (4 bit & 4 bit)
     [simple        IntegerEncoding       integerEncoding                                       ]
@@ -119,8 +117,8 @@
     // RPCDRep3 (8 bit shall be 0)
     [reserved      uint 8                                               '0x00'                 ]
     // RPCSerialHigh 4.10.3.2.6
-    [const         uint 8                serialHigh                     '0x00'                 ]
-    [batchSet byteOrder='integerEncoding ? "BIG_ENDIAN" : "LITTLE_ENDIAN"'
+    [const         uint 8                serialHigh                     0x00                 ]
+    [batchSet byteOrder='integerEncoding == IntegerEncoding.BIG_ENDIAN ? BIG_ENDIAN : LITTLE_ENDIAN'
         // RPCObjectUUID 4.10.3.2.8
         // RPCObjectUUID 4.10.3.2.8
         [simple DceRpc_ObjectUuid        objectUuid                                            ]
@@ -131,40 +129,41 @@
         // RPCServerBootTime 4.10.3.2.11
         [simple uint 32                  serverBootTime                                        ]
         // RPCInterfaceVersion 4.10.3.2.12
-        [const  uint 32                  interfaceVer                   '0x00000001'           ]
+        [const  uint 32                  interfaceVer                   0x00000001           ]
         // RPCSequenceNmb 4.10.3.2.13
         [simple uint 32                  sequenceNumber                                        ]
         // RPCOperationNmb 4.10.3.2.14
         [simple DceRpc_Operation         operation                                             ]
         // RPCInterfaceHint 4.10.3.2.15
-        [const        uint 16            interfaceHint                  '0xFFFF'               ]
+        [const        uint 16            interfaceHint                  0xFFFF               ]
         // RPCActivityHint 4.10.3.2.16
-        [const        uint 16            activityHint                   '0xFFFF'               ]
+        [const        uint 16            activityHint                   0xFFFF               ]
         // RPCLengthOfBody 4.10.3.2.17
         [implicit     uint 16            lengthOfBody                   'payload.lengthInBytes']
         // RPCFragmentNmb 4.10.3.2.18 (Setting this to 0 as we will probably never have anything but 0 here
-        [const        uint 16            fragmentNum                    '0x0000'               ]
+        [const        uint 16            fragmentNum                    0x0000               ]
         // RPCAuthenticationProtocol 4.10.3.2.19
-        [const        uint 8             authProto                      '0x00'                 ]
+        [const        uint 8             authProto                      0x00                 ]
     ]
     // RPCSerialLow 4.10.3.2.7
-    [const            uint 8             serialLow                      '0x00'                 ]
+    [const            uint 8             serialLow                      0x00                 ]
 // RPC Header }
 // RPC Payload {
-    [simple PnIoCm_Packet('packetType') payload byteOrder='integerEncoding ? "BIG_ENDIAN" : "LITTLE_ENDIAN"' ]
+    [simple PnIoCm_Packet('packetType') payload byteOrder='integerEncoding == IntegerEncoding.BIG_ENDIAN ? BIG_ENDIAN : LITTLE_ENDIAN' ]
 // RPC Payload }
 ]
 
 // RPCObjectUUID 4.10.3.2.8
 [type DceRpc_ObjectUuid
-    [const  uint 32 data1      '0xDEA00000'                         ]
-    [const  uint 16 data2      '0x6C97'                             ]
-    [const  uint 16 data3      '0x11D1'                             ]
+    [const  uint 32 data1      0xDEA00000                       ]
+    [const  uint 16 data2      0x6C97                           ]
+    [const  uint 16 data3      0x11D1                           ]
     // This part is described as a byte array, so the byte order is always big-endian
-    [const  uint 16 data4      '0x8271'     byteOrder='"BIG_ENDIAN"']
-    [simple uint 16 nodeNumber              byteOrder='"BIG_ENDIAN"']
-    [simple uint 16 deviceId                byteOrder='"BIG_ENDIAN"']
-    [simple uint 16 vendorId                byteOrder='"BIG_ENDIAN"']
+    [const  uint 16 data4      0x8271     byteOrder='BIG_ENDIAN']
+    [simple uint 4  interfaceNumber       byteOrder='BIG_ENDIAN']
+    [simple uint 12 nodeNumber            byteOrder='BIG_ENDIAN']
+    [simple uint 16 deviceId              byteOrder='BIG_ENDIAN']
+    [simple uint 16 vendorId              byteOrder='BIG_ENDIAN']
 ]
 
 // RPCInterfaceUUID 4.10.3.2.9
@@ -173,15 +172,15 @@
 //       dynamically endianed and the last 8 bytes are set to Big Endian, we
 //       had to do this trick.
 [discriminatedType DceRpc_InterfaceUuid
-    [discriminator  uint 32 interfaceType                                   ]
-    [const          uint 16 data1      '0x6C97'                             ]
-    [const          uint 16 data2      '0x11D1'                             ]
+    [discriminator  uint 32 interfaceType                               ]
+    [const          uint 16 data1      0x6C97                           ]
+    [const          uint 16 data2      0x11D1                           ]
     // This part is described as a byte array, so the byte order is always big-endian
-    [const          uint 16 data3      '0x8271'     byteOrder='"BIG_ENDIAN"']
-    [const          uint 16 data4      '0x00A0'     byteOrder='"BIG_ENDIAN"']
-    [const          uint 16 data5      '0x2442'     byteOrder='"BIG_ENDIAN"']
-    [const          uint 16 data6      '0xDF7D'     byteOrder='"BIG_ENDIAN"']
-    [typeSwitch 'interfaceType'
+    [const          uint 16 data3      0x8271     byteOrder='BIG_ENDIAN']
+    [const          uint 16 data4      0x00A0     byteOrder='BIG_ENDIAN']
+    [const          uint 16 data5      0x2442     byteOrder='BIG_ENDIAN']
+    [const          uint 16 data6      0xDF7D     byteOrder='BIG_ENDIAN']
+    [typeSwitch interfaceType
         ['0xDEA00001' DceRpc_InterfaceUuid_DeviceInterface
         ]
         ['0xDEA00002' DceRpc_InterfaceUuid_ControllerInterface
@@ -270,16 +269,61 @@
 
 // Page 90
 [discriminatedType PnDcp_Pdu
-    [discriminator PnDcp_FrameId     frameId                           ]
-    [discriminator PnDcp_ServiceId   serviceId                         ]
-    [simple        PnDcp_ServiceType serviceType                       ]
-    // 4.3.1.3.4 (Page 95)
-    [simple        uint 32           xid                               ]
-    // 4.3.1.3.5 (Page 95ff)
-    [simple        uint 16           responseDelayFactorOrPadding      ]
-    // 4.3.1.3.4 (Page 95)
-    [implicit      uint 16           dcpDataLength 'lengthInBytes - 12']
-    [typeSwitch 'frameId','serviceId','serviceType.response'
+    [simple        uint 16           frameIdValue                      ]
+    [virtual       PnDcp_FrameId     frameId       'STATIC_CALL("getFrameId", frameIdValue)']
+    [typeSwitch frameId
+        ['RT_CLASS_1' PnDcp_Pdu_RealTimeCyclic
+            // TODO: This type needs to be implemented ...
+//            [simple   PnIo_CyclicServiceDataUnit dataUnit                 ]
+            [simple   uint 16                    cycleCounter             ]
+            // Data Status Start (4.7.2.1.3)
+            [simple   bit                        ignore                   ]
+            [reserved bit                        'false'                  ]
+            [simple   bit                        stationProblemIndicatorOk]
+            [simple   bit                        providerStateRun         ]
+            [reserved bit                        'false'                  ]
+            [simple   bit                        dataValid                ]
+            [simple   bit                        redundancy               ]
+            [simple   bit                        statePrimary             ]
+            // Data Status End
+            // "Transfer-Status" (Set to 0x00 for all RT-Classes except RT-CLASS-3,
+            // which PLC4X will never be able to support
+            [reserved uint 8                     '0x00'                   ] // transferStatus
+        ]
+        ['PTCP_DelayReqPDU' PcDcp_Pdu_DelayReq
+            // Header Start
+            [reserved uint 32 '0x00000000']
+            [reserved uint 32 '0x00000000']
+            [reserved uint 32 '0x00000000']
+            [simple   uint 16 sequenceId  ]
+            [reserved uint 16 '0x0000'    ]
+            // Header End
+            [simple   uint 32 delayInNs   ]
+            // Delay Parameter Start
+            // TODO: This seems to usually be an array of parameters terminated by an End-Parameter which is indicated by type and length being 0
+            [const    uint 7     parameterType   6]
+            [const    uint 9     parameterLength 6]
+            [simple   MacAddress portMacAddress   ]
+            [const    uint 7     endType         0]
+            [const    uint 9     endLength       0]
+            // Delay Parameter End
+        ]
+        ['DCP_Identify_ReqPDU' PnDcp_Pdu_IdentifyReq
+            [const    uint 8      serviceId                    0x05                                ]
+            // ServiceType Start
+            [reserved uint 5      '0x00'                                                           ]
+            [const    bit         notSupported                 false                               ]
+            [reserved uint 1      '0x00'                                                           ]
+            [const    bit         response                     false                               ]
+            // ServiceType End
+            // 4.3.1.3.3 (Page 95)
+            [simple   uint 32     xid                                                              ]
+            // 4.3.1.3.5 (Page 95ff)
+            [simple   uint 16     responseDelay                                                    ]
+            // 4.3.1.3.4 (Page 95)
+            [implicit uint 16     dcpDataLength                'lengthInBytes - 12'                ]
+            [array    PnDcp_Block blocks                        length              'dcpDataLength']
+        ]
         ////////////////////////////////////////////////////////////////////////////
         // Multicast (Well theoretically)
         ////////////////////////////////////////////////////////////////////////////
@@ -287,17 +331,38 @@
         // 1) One containing only an AllSelectorBlock
         // 2) One containing optionally either NameOfStationBlock or AliasNameBlock and another optional IdentifyReqBlock
         // (I assume, that if in case 2 both optionally aren't used, this might not be valid and option 1 should be sent instead)
-        ['DCP_Identify_ReqPDU','IDENTIFY','false' PnDcp_Pdu_IdentifyReq(uint 16 dcpDataLength)
-            [array PnDcp_Block blocks length 'dcpDataLength'           ]
+        ['DCP_Identify_ResPDU' PnDcp_Pdu_IdentifyRes
+            [const    uint 8      serviceId                    0x05                                ]
+            // ServiceType Start
+            [reserved uint 5      '0x00'                                                           ]
+            [simple   bit         notSupported                                                     ]
+            [reserved uint 1      '0x00'                                                           ]
+            [const    bit         response                     true                                ]
+            // ServiceType End
+            // 4.3.1.3.3 (Page 95)
+            [simple   uint 32     xid                                                              ]
+            // 4.3.1.3.5 (Page 95ff)
+            [reserved uint 16     '0x0000'                                                         ]
+            // 4.3.1.3.4 (Page 95)
+            [implicit uint 16     dcpDataLength                'lengthInBytes - 12'                ]
+            [array    PnDcp_Block blocks                        length              'dcpDataLength']
         ]
+    ]
+]
 
-        // Response to a Identify request
-        ['DCP_Identify_ResPDU','IDENTIFY','true' PnDcp_Pdu_IdentifyRes(uint 16 dcpDataLength)
-            [array PnDcp_Block blocks length 'dcpDataLength'           ]
-        ]
+[discriminatedType PnDcp_Pdu_IdentifyRes_Payload
+    [discriminator PnDcp_ServiceId   serviceId                         ]
+    [simple        PnDcp_ServiceType serviceType                       ]
+    // 4.3.1.3.3 (Page 95)
+    [simple        uint 32           xid                               ]
+    // 4.3.1.3.5 (Page 95ff)
+    [simple        uint 16           responseDelayFactorOrPadding      ]
+    // 4.3.1.3.4 (Page 95)
+    [implicit      uint 16           dcpDataLength 'lengthInBytes - 12']
+    [typeSwitch serviceId,serviceType.response
 
         // Packet a Profinet station might emit once it is turned on
-        ['DCP_Hello_ReqPDU','HELLO','false' PnDcp_Pdu_HelloReq
+//        ['DCP_Hello_ReqPDU','HELLO','false' PnDcp_Pdu_HelloReq
 //            [simple NameOfStationBlockRes    nameOfStationBlockRes   ]
 //            [simple IPParameterBlockRes      iPParameterBlockRes     ]
 //            [simple DeviceIdBlockRes         deviceIdBlockRes        ]
@@ -305,40 +370,43 @@
 //            [simple DeviceOptionsBlockRes    deviceOptionsBlockRes   ]
 //            [simple DeviceRoleBlockRes       deviceRoleBlockRes      ]
 //            [simple DeviceInitiativeBlockRes deviceInitiativeBlockRes]
-        ]
+//        ]
 
         ////////////////////////////////////////////////////////////////////////////
         // Unicast
         ////////////////////////////////////////////////////////////////////////////
 
-        ['DCP_GetSet_PDU','GET','false' PnDcp_Pdu_GetReq
+//        ['DCP_GetSet_PDU','GET','false' PnDcp_Pdu_GetReq
 //            [simple GetReqBlock              getReqBlock             ]
-        ]
-        ['DCP_GetSet_PDU','GET','true' PnDcp_Pdu_GetRes
+//        ]
+//        ['DCP_GetSet_PDU','GET','true' PnDcp_Pdu_GetRes
 //            [simple GetResBlock              getResBlock             ]
 //            [simple GetNegResBlock           getNegResBlock          ]
-        ]
+//        ]
 
-        ['DCP_GetSet_PDU','SET','false' PnDcp_Pdu_SetReq
+//        ['DCP_GetSet_PDU','SET','false' PnDcp_Pdu_SetReq
 //            [simple StartTransactionBlock    startTransactionBlock   ]
 //            [simple BlockQualifier           blockQualifier          ]
 //            [simple SetResetReqBlock         setResetReqBlock        ]
 //            [simple SetReqBlock              setReqBlock             ]
 //            [simple StopTransactionBlock     stopTransactionBlock    ]
 //            [simple BlockQualifier           blockQualifier          ]
-        ]
-        ['DCP_GetSet_PDU','SET','true' PnDcp_Pdu_SetRes
+//        ]
+//        ['DCP_GetSet_PDU','SET','true' PnDcp_Pdu_SetRes
 //            [simple SetResBlock              setResBlock             ]
 //            [simple SetNegResBlock           setNegResBlock          ]
-        ]
+//        ]
     ]
 ]
+
+//[discriminatedType PnIo_CyclicServiceDataUnit
+//]
 
 [discriminatedType PnDcp_Block
     [discriminator PnDcp_BlockOptions option                   ]
     [discriminator uint 8       suboption                      ]
     [implicit      uint 16      blockLength 'lengthInBytes - 4']
-    [typeSwitch 'option','suboption'
+    [typeSwitch option,suboption
 
         ////////////////////////////////////////////////////////////////////////////
         // IP_OPTION
@@ -346,19 +414,19 @@
 
         // 4.3.1.4.1 (Page 97)
         ['IP_OPTION','1' PnDcp_Block_IpMacAddress
-            [reserved uint 16  '0x0000'                                                 ]
+            [reserved uint 16  '0x0000'                                               ]
             [simple MacAddress macAddress                                             ]
         ]
         ['IP_OPTION','2' PnDcp_Block_IpParameter
             // 4.3.1.4.12 (Page 105ff)
-            [reserved uint 8 '0x00'                                                     ]
+            [reserved uint 8 '0x00'                                                   ]
             [simple   bit    ipConflictDetected                                       ]
-            [reserved uint 5 '0x00'                                                     ]
+            [reserved uint 5 '0x00'                                                   ]
             [simple   bit    setViaDhcp                                               ]
             [simple   bit    setManually                                              ]
-            [array    uint 8 ipAddress       count '4'                                ]
-            [array    uint 8 subnetMask      count '4'                                ]
-            [array    uint 8 standardGateway count '4'                                ]
+            [array    byte   ipAddress       count '4'                                ]
+            [array    byte   subnetMask      count '4'                                ]
+            [array    byte   standardGateway count '4'                                ]
         ]
         ['IP_OPTION','3' PnDcp_Block_FullIpSuite
             // TODO: Implement this ...
@@ -369,42 +437,40 @@
         ////////////////////////////////////////////////////////////////////////////
 
         ['DEVICE_PROPERTIES_OPTION','1' PnDcp_Block_DevicePropertiesDeviceVendor(uint 16 blockLength)
-            [reserved uint 16     '0x0000'                                              ]
-            // TODO: Figure out how to do this correctly.
+            [reserved uint 16     '0x0000'                                            ]
             [array    byte        deviceVendorValue count 'blockLength-2'             ]
             [padding  uint 8      pad '0x00' 'STATIC_CALL("arrayLength", deviceVendorValue) % 2']
         ]
         ['DEVICE_PROPERTIES_OPTION','2' PnDcp_Block_DevicePropertiesNameOfStation(uint 16 blockLength)
-            [reserved uint 16     '0x0000'                                              ]
-            // TODO: Figure out how to do this correctly.
+            [reserved uint 16     '0x0000'                                            ]
             [array    byte        nameOfStation count 'blockLength-2'                 ]
             [padding  uint 8      pad '0x00' 'STATIC_CALL("arrayLength", nameOfStation) % 2']
         ]
         ['DEVICE_PROPERTIES_OPTION','3' PnDcp_Block_DevicePropertiesDeviceId
-            [reserved uint 16 '0x0000'                                                  ]
+            [reserved uint 16 '0x0000'                                                ]
             [simple   uint 16 vendorId                                                ]
             [simple   uint 16 deviceId                                                ]
         ]
         ['DEVICE_PROPERTIES_OPTION','4' PnDcp_Block_DevicePropertiesDeviceRole
-            [reserved uint 20 '0x000000'                                                ]
+            [reserved uint 20 '0x000000'                                              ]
             [simple   bit     pnioSupervisor                                          ]
             [simple   bit     pnioMultidevive                                         ]
             [simple   bit     pnioController                                          ]
             [simple   bit     pnioDevice                                              ]
-            [reserved uint 8  '0x00'                                                    ]
+            [reserved uint 8  '0x00'                                                  ]
         ]
         // Contains a list of option combinations the device supports.
         ['DEVICE_PROPERTIES_OPTION','5' PnDcp_Block_DevicePropertiesDeviceOptions(uint 16 blockLength)
-            [reserved uint 16               '0x0000'                                    ]
+            [reserved uint 16               '0x0000'                                  ]
             [array    PnDcp_SupportedDeviceOption supportedOptions length 'blockLength - 2' ]
         ]
         ['DEVICE_PROPERTIES_OPTION','6' PnDcp_Block_DevicePropertiesAliasName(uint 16 blockLength)
-            [reserved uint 16     '0x0000'                                              ]
+            [reserved uint 16     '0x0000'                                            ]
             [array    byte        aliasNameValue count 'blockLength-2'                ]
             [padding  uint 8      pad '0x00' 'STATIC_CALL("arrayLength", aliasNameValue) % 2']
         ]
         ['DEVICE_PROPERTIES_OPTION','7' PnDcp_Block_DevicePropertiesDeviceInstance
-            [reserved uint 16 '0x0000'                                                  ]
+            [reserved uint 16 '0x0000'                                                ]
             [simple   uint 8  deviceInstanceHigh                                      ]
             [simple   uint 8  deviceInstanceLow                                       ]
         ]
@@ -500,25 +566,36 @@
 ]
 
 // 4.3.1.3.2 (Page 94ff)
+// 4.3.1.3.2 (Page 94ff)
+// The spec lists meanings for request and response separately, but
+// they are actually mergeable, which we did in this construct.
 [type PnDcp_ServiceType
-    [reserved uint 5 '0x00'     ]
-    [simple   bit notSupported]
-    [reserved uint 1 '0x00'     ]
-    [simple   bit response    ]
+    [reserved uint 5 '0x00'      ]
+    [simple   bit    notSupported]
+    [reserved uint 1 '0x00'      ]
+    [simple   bit    response    ]
 ]
 
 // Page 86ff: Coding of the field FrameID
 [enum uint 16 PnDcp_FrameId
+    ['0x0000' RESERVED                       ]
     // Range 1
     ['0x0020' PTCP_RTSyncPDUWithFollowUp     ]
     // Range 2
     ['0x0080' PTCP_RTSyncPDU                 ]
     // Range 3
-    // 0x100-0x0FFF RT_CLASS_3
+    // 0x0100-0x0FFF RT_CLASS_3
+    ['0x0100' RT_CLASS_3                     ]
+    // Range 4
+    // (Not used)
+    // Range 5
+    // (Not used)
     // Range 6
     // 0x8000-BFFF RT_CLASS_1
+    ['0x8000' RT_CLASS_1                     ]
     // Range 7
     // 0XC000-FBFF RT_CLASS_UDP
+    ['0xC000' RT_CLASS_UDP                   ]
     // Range 8
     ['0xFC01' Alarm_High                     ]
     ['0xFE01' Alarm_Low                      ]
@@ -535,6 +612,7 @@
     ['0xFF43' PTCP_DelayResPDUWithoutFollowUp]
     // Range 12
     // 0xFF80 - 0xFF8F FragmentationFrameId
+    ['0xFF80' FragmentationFrameId           ]
 ]
 
 // Page 94
@@ -570,31 +648,39 @@
 // 5.1.2
 // 5.5.2.2
 [discriminatedType PnIoCm_Packet(DceRpc_PacketType packetType)
-    [typeSwitch 'packetType'
+    [typeSwitch packetType
         ['REQUEST' PnIoCm_Packet_Req
-            [simple uint 32 argsMaximum            ]
+            [simple uint 32      argsMaximum                          ]
+            [simple uint 32      argsLength                           ]
+            [simple uint 32      arrayMaximumCount                    ]
+            [simple uint 32      arrayOffset                          ]
+            [simple uint 32      arrayActualCount                     ]
+            [array  PnIoCm_Block blocks            length 'argsLength']
         ]
         ['RESPONSE' PnIoCm_Packet_Res
-            [simple uint 8  errorCode2             ]
-            [simple uint 8  errorCode1             ]
-            [simple uint 8  errorDecode            ]
-            [simple uint 8  errorCode              ]
+            [simple uint 8       errorCode2                           ]
+            [simple uint 8       errorCode1                           ]
+            [simple uint 8       errorDecode                          ]
+            [simple uint 8       errorCode                            ]
+            [simple uint 32      argsLength                           ]
+            [simple uint 32      arrayMaximumCount                    ]
+            [simple uint 32      arrayOffset                          ]
+            [simple uint 32      arrayActualCount                     ]
+            [array  PnIoCm_Block blocks            length 'argsLength']
+        ]
+        ['REJECT'   PnIoCm_Packet_Rej
+            [simple uint 32      status                               ]
         ]
     ]
-    [simple uint 32      argsLength                           ]
-    [simple uint 32      arrayMaximumCount                    ]
-    [simple uint 32      arrayOffset                          ]
-    [simple uint 32      arrayActualCount                     ]
-    [array  PnIoCm_Block blocks            length 'argsLength']
 ]
 
 // Big Endian
-[discriminatedType PnIoCm_Block
+[discriminatedType PnIoCm_Block byteOrder='BIG_ENDIAN'
     [discriminator PnIoCm_BlockType blockType                           ]
     [implicit      uint 16          blockLength      'lengthInBytes - 4']
     [simple        uint 8           blockVersionHigh                    ]
     [simple        uint 8           blockVersionLow                     ]
-    [typeSwitch 'blockType'
+    [typeSwitch blockType
         ['AR_BLOCK_REQ' PnIoCm_Block_ArReq
             [simple   PnIoCm_ArType                   arType                                                 ]
             [simple   Uuid                            arUuid                                                 ]
@@ -605,11 +691,11 @@
             [simple   bit                             pullModuleAlarmAllowed                                 ]
             [simple   bit                             nonLegacyStartupMode                                   ]
             [simple   bit                             combinedObjectContainerUsed                            ]
-            [reserved uint 17                         '0x00000'                                                ]
+            [reserved uint 17                         '0x00000'                                              ]
             [simple   bit                             acknowledgeCompanionAr                                 ]
             [simple   PnIoCm_CompanionArType          companionArType                                        ]
             [simple   bit                             deviceAccess                                           ]
-            [reserved uint 3                          '0x0'                                                    ]
+            [reserved uint 3                          '0x0'                                                  ]
             [simple   bit                             cmInitiator                                            ]
             [simple   bit                             supervisorTakeoverAllowed                              ]
             [simple   PnIoCm_State                    state                                                  ]
@@ -617,14 +703,14 @@
             [simple   uint 16                         cmInitiatorActivityTimeoutFactor                       ]
             [simple   uint 16                         cmInitiatorUdpRtPort                                   ]
             [implicit uint 16                         stationNameLength     'STR_LEN(cmInitiatorStationName)']
-            [simple   vstring                'stationNameLength * 8' 'cmInitiatorStationName'         ]
+            [simple   vstring 'stationNameLength * 8' cmInitiatorStationName                                 ]
         ]
         ['AR_BLOCK_RES' PnIoCm_Block_ArRes
             [simple   PnIoCm_ArType          arType                                                 ]
             [simple   Uuid                   arUuid                                                 ]
             [simple   uint 16                sessionKey                                             ]
             [simple   MacAddress             cmResponderMacAddr                                     ]
-            [simple   Uuid                   cmResponderObjectUuid                                  ]
+            [simple   uint 16                responderUDPRTPort                                     ]
         ]
         ['IO_CR_BLOCK_REQ' PnIoCm_Block_IoCrReq
             [simple PnIoCm_IoCrType          ioCrType                                               ]
@@ -634,9 +720,9 @@
             [simple   bit                    fullSubFrameStructure                                  ]
             [simple   bit                    distributedSubFrameWatchDog                            ]
             [simple   bit                    fastForwardingMacAdr                                   ]
-            [reserved uint 17                '0x0000'                                                 ]
+            [reserved uint 17                '0x0000'                                               ]
             [simple   bit                    mediaRedundancy                                        ]
-            [reserved uint 7                 '0x00'                                                   ]
+            [reserved uint 7                 '0x00'                                                 ]
             [simple   PnIoCm_RtClass         rtClass                                                ]
             // End IOCRProperties
             [simple   uint 16                dataLength                                             ]
@@ -662,7 +748,7 @@
             [simple   PnIoCm_AlarmCrType     alarmType                                              ]
             [simple   uint 16                lt                                                     ]
             // Begin AlarmCrProperties
-            [reserved uint 30                '0x00000000'                                             ]
+            [reserved uint 30                '0x00000000'                                           ]
             [simple   bit                    transport                                              ]
             [simple   bit                    priority                                               ]
             // End AlarmCrProperties
@@ -688,18 +774,18 @@
         ]
         ['AR_SERVER_BLOCK' PnIoCm_Block_ArServer
             //[implicit uint 16                         stationNameLength      'STR_LEN(cmInitiatorStationName)']
-            //[simple   vstring 'stationNameLength * 8' 'cmInitiatorStationName'                                  ]
+            //[simple   vstring 'stationNameLength * 8' cmInitiatorStationName                                  ]
             //[padding  byte 0x00                                                                               ]
         ]
     ]
 ]
 
 [type PnIoCm_IoCrBlockReqApi
-    [const    uint 32            api              '0x00000000'             ]
-    [implicit uint 16            numIoDataObjects 'COUNT(ioDataObjects)'   ]
-    [array    PnIoCm_IoDataObject ioDataObjects    count 'numIoDataObjects']
-    [implicit uint 16            numIoCss         'COUNT(ioCss)'           ]
-    [array    PnIoCm_IoCs         ioCss            count 'numIoCss'        ]
+    [const    uint 32             api              0x00000000             ]
+    [implicit uint 16             numIoDataObjects 'COUNT(ioDataObjects)'   ]
+    [array    PnIoCm_IoDataObject ioDataObjects    count 'numIoDataObjects' ]
+    [implicit uint 16             numIoCss         'COUNT(ioCss)'           ]
+    [array    PnIoCm_IoCs         ioCss            count 'numIoCss'         ]
 ]
 
 [type PnIoCm_IoDataObject
@@ -715,7 +801,7 @@
 ]
 
 [type PnIoCm_ExpectedSubmoduleBlockReqApi
-    [const    uint 32          api               '0x00000000'                       ]
+    [const    uint 32          api               0x00000000                       ]
     [simple   uint 16          slotNumber                                           ]
     [simple   uint 32          moduleIdentNumber                                    ]
     [simple   uint 16          moduleProperties                                     ]
@@ -724,7 +810,7 @@
 ]
 
 [type PnIoCm_ModuleDiffBlockApi
-    [const    uint 32                          api        '0x00000000'                    ]
+    [const    uint 32                          api        0x00000000                    ]
     [implicit uint 16                          numModules 'COUNT(modules)'                ]
     [array    PnIoCm_ModuleDiffBlockApi_Module modules    count               'numModules']
 ]
@@ -754,26 +840,26 @@
     [simple        uint 16                slotNumber                    ]
     [simple        uint 32                submoduleIdentNumber          ]
     // Begin SubmoduleProperties
-    [reserved      uint 10                '0x000'                         ]
+    [reserved      uint 10                '0x000'                       ]
     [simple        bit                    discardIoxs                   ]
     [simple        bit                    reduceOutputModuleDataLength  ]
     [simple        bit                    reduceInputModuleDataLength   ]
     [simple        bit                    sharedInput                   ]
     [discriminator PnIoCm_SubmoduleType   submoduleType                 ]
     // End SubmoduleProperties
-    [typeSwitch 'submoduleType'
+    [typeSwitch submoduleType
         ['NO_INPUT_NO_OUTPUT_DATA' PnIoCm_Submodule_NoInputNoOutputData
-            [const    uint 16             dataDescription       '0x0001']
-            [const    uint 16             submoduleDataLength   '0x0000']
-            [const    uint 8              lengthIoCs            '0x01'  ]
-            [const    uint 8              lengthIoPs            '0x01'  ]
+            [const    uint 16             dataDescription       0x0001]
+            [const    uint 16             submoduleDataLength   0x0000]
+            [const    uint 8              lengthIoCs            0x01  ]
+            [const    uint 8              lengthIoPs            0x01  ]
         ]
         ['INPUT_AND_OUTPUT_DATA' PnIoCm_Submodule_InputAndOutputData
-            [const    uint 16             inputDataDescription  '0x0001']
+            [const    uint 16             inputDataDescription  0x0001]
             [simple   uint 16             inputSubmoduleDataLength      ]
             [simple   uint 8              inputLengthIoCs               ]
             [simple   uint 8              inputLengthIoPs               ]
-            [const    uint 16             outputDataDescription '0x0002']
+            [const    uint 16             outputDataDescription 0x0002]
             [simple   uint 16             outputSubmoduleDataLength     ]
             [simple   uint 8              outputLengthIoCs              ]
             [simple   uint 8              outputLengthIoPs              ]

@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +18,7 @@
  */
 package org.apache.plc4x.java.spi.codegen.io;
 
+import org.apache.plc4x.java.spi.codegen.FieldCommons;
 import org.apache.plc4x.java.spi.generation.SerializationException;
 import org.apache.plc4x.java.spi.generation.WithWriterArgs;
 import org.apache.plc4x.java.spi.generation.WriteBuffer;
@@ -30,7 +31,8 @@ public class DataWriterSimpleString extends DataWriterSimpleBase<String> {
 
     @Override
     public void write(String logicalName, String value, WithWriterArgs... writerArgs) throws SerializationException {
-        writeBuffer.writeString(logicalName, bitLength,"UTF-8", value, writerArgs);
+        String encoding = extractEncoding(writerArgs).orElse("UTF-8");
+        writeBuffer.writeString(logicalName, bitLength, encoding, value, writerArgs);
     }
 
 }

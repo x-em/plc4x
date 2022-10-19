@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -38,6 +38,9 @@ public class KnxNetIpConfiguration implements Configuration, UdpTransportConfigu
     @ConfigurationParameter("knxproj-file-path")
     public String knxprojFilePath;
 
+    @ConfigurationParameter("knxproj-password")
+    public String knxprojPassword;
+
     @ConfigurationParameter("group-address-num-levels")
     @IntDefaultValue(3)
     public int groupAddressNumLevels = 3;
@@ -60,6 +63,14 @@ public class KnxNetIpConfiguration implements Configuration, UdpTransportConfigu
 
     public void setKnxprojFilePath(String knxprojFilePath) {
         this.knxprojFilePath = knxprojFilePath;
+    }
+
+    public String getKnxprojPassword() {
+        return knxprojPassword;
+    }
+
+    public void setKnxprojPassword(String knxprojPassword) {
+        this.knxprojPassword = knxprojPassword;
     }
 
     public int getGroupAddressNumLevels() {

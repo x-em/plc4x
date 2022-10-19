@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,26 +18,27 @@
  */
 package org.apache.plc4x.java.spi.codegen.fields;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.apache.plc4x.java.spi.codegen.FieldCommons;
 import org.apache.plc4x.java.spi.codegen.io.DataWriter;
 import org.apache.plc4x.java.spi.generation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class FieldWriterArray<T> implements FieldWriter<T> {
+public class FieldWriterArray<T> implements FieldCommons {
 
-    @Override
-    public void writeField(String logicalName, T value, DataWriter<T> dataWriter, WithWriterArgs... writerArgs) throws SerializationException {
-        throw new NotImplementedException();
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriterArray.class);
 
     public void writeByteArrayField(String logicalName, byte[] values, DataWriter<byte[]> dataWriter, WithWriterArgs... writerArgs) throws SerializationException {
+        LOGGER.debug("write field {}", logicalName);
         if (values != null) {
             dataWriter.write(logicalName, values, writerArgs);
         }
     }
 
     public void writeSimpleTypeArrayField(String logicalName, List<T> values, DataWriter<T> dataWriter, WithWriterArgs... writerArgs) throws SerializationException {
+        LOGGER.debug("write field {}", logicalName);
         switchSerializeByteOrderIfNecessary(() -> {
             if (values != null) {
                 dataWriter.pushContext(logicalName, WithReaderWriterArgs.WithRenderAsList(true));
@@ -46,10 +47,11 @@ public class FieldWriterArray<T> implements FieldWriter<T> {
                 }
                 dataWriter.popContext(logicalName, WithReaderWriterArgs.WithRenderAsList(true));
             }
-        }, dataWriter, extractByteOder(writerArgs).orElse(null));
+        }, dataWriter, extractByteOrder(writerArgs).orElse(null));
     }
 
     public void writeComplexTypeArrayField(String logicalName, List<? extends Message> values, WriteBuffer writeBuffer, WithWriterArgs... writerArgs) throws SerializationException {
+        LOGGER.debug("write field {}", logicalName);
         switchSerializeByteOrderIfNecessary(() -> {
             if (values != null) {
                 writeBuffer.pushContext(logicalName, WithReaderWriterArgs.WithRenderAsList(true));
@@ -58,7 +60,7 @@ public class FieldWriterArray<T> implements FieldWriter<T> {
                 }
                 writeBuffer.popContext(logicalName, WithReaderWriterArgs.WithRenderAsList(true));
             }
-        }, writeBuffer, extractByteOder(writerArgs).orElse(null));
+        }, writeBuffer, extractByteOrder(writerArgs).orElse(null));
     }
 
 }

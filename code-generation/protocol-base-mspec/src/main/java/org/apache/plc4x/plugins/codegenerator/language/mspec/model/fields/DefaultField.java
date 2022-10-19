@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +18,7 @@
  */
 package org.apache.plc4x.plugins.codegenerator.language.mspec.model.fields;
 
+import org.apache.plc4x.plugins.codegenerator.types.definitions.TypeDefinition;
 import org.apache.plc4x.plugins.codegenerator.types.terms.Term;
 
 import java.util.Map;
@@ -26,11 +27,19 @@ import java.util.Optional;
 
 public abstract class DefaultField {
 
-    private final Map<String, Term> attributes;
+    protected TypeDefinition owner;
+    protected final Map<String, Term> attributes;
 
     protected DefaultField(Map<String, Term> attributes) {
-        super();
         this.attributes = Objects.requireNonNull(attributes);
+    }
+
+    public void setOwner(TypeDefinition owner) {
+        this.owner = owner;
+    }
+
+    public TypeDefinition getOwner() {
+        return owner;
     }
 
     public Optional<Term> getAttribute(String attributeName) {
@@ -40,4 +49,23 @@ public abstract class DefaultField {
         return Optional.empty();
     }
 
+    @Override
+    public String toString() {
+        return "DefaultField{" +
+            "attributes=" + attributes +
+            '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DefaultField that = (DefaultField) o;
+        return Objects.equals(attributes, that.attributes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(attributes);
+    }
 }

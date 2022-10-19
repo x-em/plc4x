@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +18,7 @@
  */
 package org.apache.plc4x.java.spi.codegen.fields;
 
+import org.apache.plc4x.java.spi.codegen.FieldCommons;
 import org.apache.plc4x.java.spi.codegen.io.DataReader;
 import org.apache.plc4x.java.spi.generation.ParseAssertException;
 import org.apache.plc4x.java.spi.generation.ParseException;
@@ -27,19 +28,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class FieldReaderAssert<T> implements FieldReader<T> {
+public class FieldReaderAssert<T> implements FieldCommons {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldReaderAssert.class);
 
-    @Override
-    public T readField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
-        throw new IllegalStateException("not possible with assert field");
-    }
-
     public T readAssertField(String logicalName, DataReader<T> dataReader, T expectedValue, WithReaderArgs... readerArgs) throws ParseException {
-        T assertValue = dataReader.read(logicalName, readerArgs);
+        LOGGER.debug("reading field {}", logicalName);
+        T assertValue;
+        try {
+            assertValue = dataReader.read(logicalName, readerArgs);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new ParseAssertException("Field: " + logicalName + ": Not enough data", e);
+        }
         if (!Objects.equals(assertValue, expectedValue)) {
-            throw new ParseAssertException("Actual value " + assertValue + " doesn't match expected " + expectedValue);
+            throw new ParseAssertException("Field: " + logicalName + ": Actual value " + assertValue + " doesn't match expected " + expectedValue);
         }
         return assertValue;
     }

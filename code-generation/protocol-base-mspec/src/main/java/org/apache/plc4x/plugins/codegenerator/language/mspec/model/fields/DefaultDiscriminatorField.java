@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,29 +18,20 @@
  */
 package org.apache.plc4x.plugins.codegenerator.language.mspec.model.fields;
 
+import org.apache.plc4x.plugins.codegenerator.types.definitions.TypeDefinition;
 import org.apache.plc4x.plugins.codegenerator.types.fields.DiscriminatorField;
-import org.apache.plc4x.plugins.codegenerator.types.references.TypeReference;
 import org.apache.plc4x.plugins.codegenerator.types.terms.Term;
 
 import java.util.*;
 
-public class DefaultDiscriminatorField extends DefaultField implements DiscriminatorField {
+public class DefaultDiscriminatorField extends DefaultTypedNamedField implements DiscriminatorField {
 
-    private final TypeReference type;
-    private final String name;
-
-    public DefaultDiscriminatorField(Map<String, Term> attributes, TypeReference type, String name) {
-        super(attributes);
-        this.type = Objects.requireNonNull(type);
-        this.name = Objects.requireNonNull(name);
+    public DefaultDiscriminatorField(Map<String, Term> attributes, String name) {
+        super(attributes, name);
     }
 
-    public TypeReference getType() {
-        return type;
+    @Override
+    public String toString() {
+        return "DefaultDiscriminatorField{} " + super.toString();
     }
-
-    public String getName() {
-        return name;
-    }
-
 }

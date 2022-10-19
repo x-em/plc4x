@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -24,6 +24,7 @@ import org.apache.plc4x.java.api.messages.PlcSubscriptionRequest;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.opcua.OpcuaPlcDriverTest;
+import org.apache.plc4x.test.DisableOnParallelsVmFlag;
 import org.eclipse.milo.examples.server.ExampleServer;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
@@ -33,8 +34,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- */
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
+@DisableOnParallelsVmFlag
 public class OpcuaSubscriptionHandleTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcuaPlcDriverTest.class);
@@ -99,6 +101,11 @@ public class OpcuaSubscriptionHandleTest {
             assert opcuaConnection.isConnected();
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                exampleServer.shutdown().get();
+            } catch (Exception j) {
+                j.printStackTrace();
+            }
         }
     }
 

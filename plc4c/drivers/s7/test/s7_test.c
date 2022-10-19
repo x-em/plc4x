@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -22,9 +22,13 @@
 #include "tpkt_packet.h"
 #include "stdio.h"
 
+void parser_serializer_test_s7_read_write();
+
 void s7_address_parser_test();
 
-void internal_assert_arrays_equal(uint8_t* expected_array,
+void internal_assert_arrays_equal(uint8_t* expected_array, uint8_t* actual_array, uint8_t num_bytes);
+
+/*void internal_assert_arrays_equal(uint8_t* expected_array,
                                   plc4c_spi_write_buffer* write_buffer,
                                   uint8_t num_bytes) {
   for (int i = 0; i < num_bytes; i++) {
@@ -47,7 +51,7 @@ void internal_assert_arrays_equal(uint8_t* expected_array,
     }
     TEST_ASSERT_EQUAL_UINT8_MESSAGE(expected_value, actual_value, "Byte arrays differ");
   }
-}
+}*/
 
 void internal_parse_serialize_test(uint8_t* payload,
                                    uint8_t payload_size) {
@@ -62,7 +66,7 @@ void internal_parse_serialize_test(uint8_t* payload,
   plc4c_s7_read_write_tpkt_packet* message = NULL;
   return_code = plc4c_s7_read_write_tpkt_packet_parse(read_buffer, &message);
   if (return_code != OK) {
-    TEST_FAIL_MESSAGE("Error error parsing tpkt packet");
+    TEST_FAIL_MESSAGE("Error parsing packet");
   }
 
   plc4c_spi_write_buffer* write_buffer;
@@ -78,7 +82,7 @@ void internal_parse_serialize_test(uint8_t* payload,
     TEST_FAIL_MESSAGE("Error serializing");
   }
 
-  internal_assert_arrays_equal(payload, write_buffer, payload_size);
+  internal_assert_arrays_equal(payload, write_buffer->data, payload_size);
 
   printf("Success");
 }
@@ -245,6 +249,8 @@ int main(void) {
   // Run the address parser tests ...
   // TODO: Commented out as it seems to only fail while doing releases :-/
   //RUN_TEST(s7_address_parser_test);
+
+  parser_serializer_test_s7_read_write();
 
   return UNITY_END();
 }

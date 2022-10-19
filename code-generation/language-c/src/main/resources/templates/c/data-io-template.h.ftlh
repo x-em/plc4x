@@ -7,7 +7,7 @@
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
@@ -27,7 +27,7 @@
 <#-- @ftlvariable name="type" type="org.apache.plc4x.plugins.codegenerator.types.definitions.DataIoTypeDefinition" -->
 <#-- Declare the name and type of variables declared locally inside the template -->
 <#-- @ftlvariable name="field" type="org.apache.plc4x.plugins.codegenerator.types.fields.NamedField" -->
-<#if !type.isDiscriminatedChildTypeDefinition()>${helper.getIncludesDirectory()?replace(".", "/")}/${helper.camelCaseToSnakeCase(type.name)}.h
+${helper.getIncludesDirectory()?replace(".", "/")}/${helper.camelCaseToSnakeCase(type.name)}.h
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -37,7 +37,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -51,15 +51,14 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <plc4c/driver_${protocolName}_static.h>
 #include <plc4c/spi/read_buffer.h>
 #include <plc4c/spi/write_buffer.h>
 #include <plc4c/utils/list.h>
 <#--
     Add any import statements for partent-types, complex types used in properties or parser arguments.
 -->
-<#if helper.getComplexTypeReferences()?has_content>
-    <#list helper.getComplexTypeReferences() as typeReference>
+<#if helper.getTypeNamesForImportStatements()?has_content>
+    <#list helper.getTypeNamesForImportStatements() as typeReference>
 #include "${helper.camelCaseToSnakeCase(typeReference)}.h"
     </#list>
 </#if>
@@ -68,27 +67,26 @@
 
 <#-- TODO: the code below implies that parserArguments will be null if not present... not pretty  -->
 <#if type.parserArguments.isPresent()><#assign parserArguments=type.parserArguments.orElseThrow()></#if>
-#ifdef __cplusplus
+<#--#ifdef __cplusplus
 extern "C" {
-#endif
+#endif-->
 
 <#--
     Define the parse-method for elements of this tpye
 -->
-plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer* readBuffer, <#if parserArguments?has_content><#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !helper.isSimpleTypeReference(parserArgument.type) && !helper.isEnumTypeReference(parserArgument.type)>*</#if> ${parserArgument.name}<#sep>, </#list>, </#if>plc4c_data** data_item);
+plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer* readBuffer, <#if parserArguments?has_content><#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !parserArgument.type.isSimpleTypeReference() && !parserArgument.type.isEnumTypeReference()>*</#if> ${parserArgument.name}<#sep>, </#list>, </#if>plc4c_data** data_item);
 
 <#--
     Define the serialize-method for elements of this tpye
 -->
-plc4c_return_code ${helper.getCTypeName(type.name)}_serialize(plc4c_spi_write_buffer* writeBuffer, plc4c_data** data_item<#if helper.getSerializerArguments(parserArguments)?has_content>, <#list helper.getSerializerArguments(parserArguments) as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)} ${parserArgument.name}<#sep>, </#sep></#list></#if>);
+plc4c_return_code ${helper.getCTypeName(type.name)}_serialize(plc4c_spi_write_buffer* writeBuffer, <#if parserArguments?has_content><#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !parserArgument.type.isSimpleTypeReference() && !parserArgument.type.isEnumTypeReference()>*</#if> ${parserArgument.name}<#sep>, </#list>, </#if>plc4c_data** data_item);
 
-uint16_t ${helper.getCTypeName(type.name)}_length_in_bytes(plc4c_data* data_item);
+uint16_t ${helper.getCTypeName(type.name)}_length_in_bytes(plc4c_data* data_item<#if parserArguments?has_content>, <#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !parserArgument.type.isSimpleTypeReference() && !parserArgument.type.isEnumTypeReference()>*</#if> ${parserArgument.name}<#sep>, </#list></#if>);
 
-uint16_t ${helper.getCTypeName(type.name)}_length_in_bits(plc4c_data* data_item);
+uint16_t ${helper.getCTypeName(type.name)}_length_in_bits(plc4c_data* data_item<#if parserArguments?has_content>, <#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !parserArgument.type.isSimpleTypeReference() && !parserArgument.type.isEnumTypeReference()>*</#if> ${parserArgument.name}<#sep>, </#list></#if>);
 
-#ifdef __cplusplus
+<#--#ifdef __cplusplus
 }
-#endif
+#endif-->
 #endif  // ${helper.getCTypeName(type.name)?upper_case}_H_
-</#if>
 </#outputformat>

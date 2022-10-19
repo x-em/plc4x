@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -28,7 +28,6 @@ import org.apache.plc4x.java.opcua.config.OpcuaConfiguration;
 import org.apache.plc4x.java.opcua.context.SecureChannel;
 import org.apache.plc4x.java.opcua.field.OpcuaField;
 import org.apache.plc4x.java.opcua.readwrite.*;
-import org.apache.plc4x.java.opcua.readwrite.io.*;
 import org.apache.plc4x.java.spi.ConversationContext;
 import org.apache.plc4x.java.spi.Plc4xProtocolBase;
 import org.apache.plc4x.java.spi.configuration.HasConfiguration;
@@ -42,6 +41,7 @@ import org.apache.plc4x.java.spi.values.IEC61131ValueHandler;
 import org.apache.plc4x.java.spi.values.PlcList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.math.BigInteger;
 import java.time.Duration;
 import java.time.Instant;
@@ -58,7 +58,7 @@ import java.util.function.Consumer;
 public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements HasConfiguration<OpcuaConfiguration>, PlcSubscriber {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcuaProtocolLogic.class);
-    protected static final PascalString NULL_STRING = new PascalString( "");
+    protected static final PascalString NULL_STRING = new PascalString("");
     private static ExpandedNodeId NULL_EXPANDED_NODEID = new ExpandedNodeId(false,
         false,
         new NodeIdTwoByte((short) 0),
@@ -69,7 +69,8 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
     protected static final ExtensionObject NULL_EXTENSION_OBJECT = new ExtensionObject(
         NULL_EXPANDED_NODEID,
         new ExtensionObjectEncodingMask(false, false, false),
-        new NullExtension());               // Body
+        new NullExtension(),
+        true);               // Body
 
     private static final long EPOCH_OFFSET = 116444736000000000L;         //Offset between OPC UA epoch time and linux epoch time.
     private OpcuaConfiguration configuration;
@@ -115,6 +116,9 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
     public void onDiscover(ConversationContext<OpcuaAPU> context) {
         // Only the TCP transport supports login.
         LOGGER.debug("Opcua Driver running in ACTIVE mode, discovering endpoints");
+        if (this.channel == null) {
+            this.channel = new SecureChannel(driverContext, this.configuration);
+        }
         channel.onDiscover(context);
     }
 
@@ -135,7 +139,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
 
         List<ExtensionObjectDefinition> readValueArray = new ArrayList<>(request.getFieldNames().size());
         Iterator<String> iterator = request.getFieldNames().iterator();
-        for (int i = 0; i < request.getFieldNames().size(); i++ ) {
+        for (int i = 0; i < request.getFieldNames().size(); i++) {
             String fieldName = iterator.next();
             OpcuaField field = (OpcuaField) request.getField(fieldName);
 
@@ -163,17 +167,18 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
         ExtensionObject extObject = new ExtensionObject(
             expandedNodeId,
             null,
-            opcuaReadRequest);
+            opcuaReadRequest,
+            false);
 
         try {
             WriteBufferByteBased buffer = new WriteBufferByteBased(extObject.getLengthInBytes(), ByteOrder.LITTLE_ENDIAN);
             extObject.serialize(buffer);
 
             /* Functional Consumer example using inner class */
-            Consumer<byte []> consumer = opcuaResponse -> {
+            Consumer<byte[]> consumer = opcuaResponse -> {
                 PlcReadResponse response = null;
                 try {
-                    ExtensionObjectDefinition reply = ExtensionObjectIO.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
+                    ExtensionObjectDefinition reply = ExtensionObject.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
                     if (reply instanceof ReadResponse) {
                         future.complete(new DefaultPlcReadResponse(request, readResponse(request.getFieldNames(), ((ReadResponse) reply).getResults())));
                     } else {
@@ -193,7 +198,8 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     }
                 } catch (ParseException e) {
                     future.completeExceptionally(new PlcRuntimeException(e));
-                };
+                }
+                ;
             };
 
             /* Functional Consumer example using inner class */
@@ -238,7 +244,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
         PlcResponseCode responseCode = PlcResponseCode.OK;
         Map<String, ResponseItem<PlcValue>> response = new HashMap<>();
         int count = 0;
-        for ( String field : fieldNames ) {
+        for (String field : fieldNames) {
             PlcValue value = null;
             if (results.get(count).getValueSpecified()) {
                 Variant variant = results.get(count).getValue();
@@ -365,7 +371,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                         tmpValue[i] = strings.get(i).toString();
                     }
                     value = IEC61131ValueHandler.of(tmpValue);
-                }else if (variant instanceof VariantStatusCode) {
+                } else if (variant instanceof VariantStatusCode) {
                     int length = ((VariantStatusCode) variant).getValue().size();
                     List<StatusCode> strings = ((VariantStatusCode) variant).getValue();
                     String[] tmpValue = new String[length];
@@ -376,18 +382,18 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                 } else if (variant instanceof VariantByteString) {
                     PlcList plcList = new PlcList();
                     List<ByteStringArray> array = ((VariantByteString) variant).getValue();
-                    for (ByteStringArray byteStringArray : array) {
-                        int length = byteStringArray.getValue().size();
+                    for (int k = 0; k < array.size(); k++) {
+                        int length = array.get(k).getValue().size();
                         Short[] tmpValue = new Short[length];
                         for (int i = 0; i < length; i++) {
-                            tmpValue[i] = byteStringArray.getValue().get(i);
+                            tmpValue[i] = array.get(k).getValue().get(i);
                         }
                         plcList.add(IEC61131ValueHandler.of(tmpValue));
                     }
                     value = plcList;
                 } else {
                     responseCode = PlcResponseCode.UNSUPPORTED;
-                    LOGGER.error("Data type - " +  variant.getClass() + " is not supported ");
+                    LOGGER.error("Data type - " + variant.getClass() + " is not supported ");
                 }
             } else {
                 if (results.get(count).getStatusCode().getStatusCode() == OpcuaStatusCode.BadNodeIdUnknown.getValue()) {
@@ -436,6 +442,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
         }
         int length = valueObject.getLength();
         switch (dataType) {
+            // Simple boolean values
             case "BOOL":
             case "BIT":
                 byte[] tmpBOOL = new byte[length];
@@ -448,14 +455,14 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpBOOL);
+
+            // 8-Bit Bit-Strings (Groups of Boolean Values)
             case "BYTE":
-            case "BITARR8":
-            case "USINT":
-            case "UINT8":
             case "BIT8":
+            case "BITARR8":
                 List<Short> tmpBYTE = new ArrayList<>(length);
                 for (int i = 0; i < length; i++) {
-                    tmpBYTE.add((short) valueObject.getIndex(i).getByte());
+                    tmpBYTE.add(valueObject.getIndex(i).getShort());
                 }
                 return new VariantByte(length != 1,
                     false,
@@ -463,6 +470,67 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpBYTE);
+
+            // 16-Bit Bit-Strings (Groups of Boolean Values)
+            case "WORD":
+            case "BIT16":
+            case "BITARR16":
+                List<Integer> tmpWORD = new ArrayList<>(length);
+                for (int i = 0; i < length; i++) {
+                    tmpWORD.add(valueObject.getIndex(i).getInteger());
+                }
+                return new VariantUInt16(length != 1,
+                    false,
+                    null,
+                    null,
+                    length == 1 ? null : length,
+                    tmpWORD);
+
+            // 32-Bit Bit-Strings (Groups of Boolean Values)
+            case "DWORD":
+            case "BIT32":
+            case "BITARR32":
+                List<Long> tmpDWORD = new ArrayList<>(length);
+                for (int i = 0; i < length; i++) {
+                    tmpDWORD.add(valueObject.getIndex(i).getLong());
+                }
+                return new VariantUInt32(length != 1,
+                    false,
+                    null,
+                    null,
+                    length == 1 ? null : length,
+                    tmpDWORD);
+
+            // 64-Bit Bit-Strings (Groups of Boolean Values)
+            case "LWORD":
+            case "BIT64":
+            case "BITARR64":
+                List<BigInteger> tmpLWORD = new ArrayList<>(length);
+                for (int i = 0; i < length; i++) {
+                    tmpLWORD.add(valueObject.getIndex(i).getBigInteger());
+                }
+                return new VariantUInt64(length != 1,
+                    false,
+                    null,
+                    null,
+                    length == 1 ? null : length,
+                    tmpLWORD);
+
+            // 8-Bit Unsigned Integers
+            case "USINT":
+            case "UINT8":
+                List<Short> tmpUSINT = new ArrayList<>(length);
+                for (int i = 0; i < length; i++) {
+                    tmpUSINT.add(valueObject.getIndex(i).getShort());
+                }
+                return new VariantByte(length != 1,
+                    false,
+                    null,
+                    null,
+                    length == 1 ? null : length,
+                    tmpUSINT);
+
+            // 8-Bit Signed Integers
             case "SINT":
             case "INT8":
                 byte[] tmpSINT = new byte[length];
@@ -475,6 +543,22 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpSINT);
+
+            // 16-Bit Unsigned Integers
+            case "UINT":
+            case "UINT16":
+                List<Integer> tmpUINT = new ArrayList<>(length);
+                for (int i = 0; i < length; i++) {
+                    tmpUINT.add(valueObject.getIndex(i).getInt());
+                }
+                return new VariantUInt16(length != 1,
+                    false,
+                    null,
+                    null,
+                    length == 1 ? null : length,
+                    tmpUINT);
+
+            // 16-Bit Signed Integers
             case "INT":
             case "INT16":
                 List<Short> tmpINT16 = new ArrayList<>(length);
@@ -487,20 +571,22 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpINT16);
-            case "UINT":
-            case "UINT16":
-            case "WORD":
-            case "BITARR16":
-                List<Integer> tmpUINT = new ArrayList<>(length);
+
+            // 32-Bit Unsigned Integers
+            case "UDINT":
+            case "UINT32":
+                List<Long> tmpUDINT = new ArrayList<>(length);
                 for (int i = 0; i < length; i++) {
-                    tmpUINT.add(valueObject.getIndex(i).getInt());
+                    tmpUDINT.add(valueObject.getIndex(i).getLong());
                 }
-                return new VariantUInt16(length != 1,
+                return new VariantUInt32(length != 1,
                     false,
                     null,
                     null,
                     length == 1 ? null : length,
-                    tmpUINT);
+                    tmpUDINT);
+
+            // 32-Bit Signed Integers
             case "DINT":
             case "INT32":
                 List<Integer> tmpDINT = new ArrayList<>(length);
@@ -513,20 +599,22 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpDINT);
-            case "UDINT":
-            case "UINT32":
-            case "DWORD":
-            case "BITARR32":
-                List<Long> tmpUDINT = new ArrayList<>(length);
+
+            // 64-Bit Unsigned Integers
+            case "ULINT":
+            case "UINT64":
+                List<BigInteger> tmpULINT = new ArrayList<>(length);
                 for (int i = 0; i < length; i++) {
-                    tmpUDINT.add(valueObject.getIndex(i).getLong());
+                    tmpULINT.add(valueObject.getIndex(i).getBigInteger());
                 }
-                return new VariantUInt32(length != 1,
+                return new VariantUInt64(length != 1,
                     false,
                     null,
                     null,
                     length == 1 ? null : length,
-                    tmpUDINT);
+                    tmpULINT);
+
+            // 64-Bit Signed Integers
             case "LINT":
             case "INT64":
                 List<Long> tmpLINT = new ArrayList<>(length);
@@ -539,20 +627,8 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpLINT);
-            case "ULINT":
-            case "UINT64":
-            case "LWORD":
-            case "BITARR64":
-                List<BigInteger> tmpULINT = new ArrayList<>(length);
-                for (int i = 0; i < length; i++) {
-                    tmpULINT.add(valueObject.getIndex(i).getBigInteger());
-                }
-                return new VariantUInt64(length != 1,
-                    false,
-                    null,
-                    null,
-                    length == 1 ? null : length,
-                    tmpULINT);
+
+            // 32-Bit Floating Point Values
             case "REAL":
             case "FLOAT":
                 List<Float> tmpREAL = new ArrayList<>(length);
@@ -565,6 +641,8 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpREAL);
+
+            // 64-Bit Floating Point Values
             case "LREAL":
             case "DOUBLE":
                 List<Double> tmpLREAL = new ArrayList<>(length);
@@ -577,9 +655,13 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpLREAL);
+
+            // UTF-8 Characters and Strings
             case "CHAR":
-            case "WCHAR":
             case "STRING":
+
+                // UTF-16 Characters and Strings
+            case "WCHAR":
             case "WSTRING":
             case "STRING16":
                 List<PascalString> tmpString = new ArrayList<>(length);
@@ -593,6 +675,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
                     null,
                     length == 1 ? null : length,
                     tmpString);
+
             case "DATE_AND_TIME":
                 List<Long> tmpDateTime = new ArrayList<>(length);
                 for (int i = 0; i < length; i++) {
@@ -661,7 +744,8 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
         ExtensionObject extObject = new ExtensionObject(
             expandedNodeId,
             null,
-            opcuaWriteRequest);
+            opcuaWriteRequest,
+            false);
 
         try {
             WriteBufferByteBased buffer = new WriteBufferByteBased(extObject.getLengthInBytes(), ByteOrder.LITTLE_ENDIAN);
@@ -671,9 +755,9 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
             Consumer<byte[]> consumer = opcuaResponse -> {
                 WriteResponse responseMessage = null;
                 try {
-                    responseMessage = (WriteResponse) ExtensionObjectIO.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
+                    responseMessage = (WriteResponse) ExtensionObject.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    throw new PlcRuntimeException(e);
                 }
                 PlcWriteResponse response = writeResponse(request, responseMessage);
 
@@ -704,7 +788,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
         Map<String, PlcResponseCode> responseMap = new HashMap<>();
         List<StatusCode> results = writeResponse.getResults();
         Iterator<String> responseIterator = request.getFieldNames().iterator();
-        for (int i = 0; i < request.getFieldNames().size(); i++ ) {
+        for (int i = 0; i < request.getFieldNames().size(); i++) {
             String fieldName = responseIterator.next();
             OpcuaStatusCode statusCode = OpcuaStatusCode.enumForValue(results.get(i).getStatusCode());
             switch (statusCode) {
@@ -727,7 +811,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
         return CompletableFuture.supplyAsync(() -> {
             Map<String, ResponseItem<PlcSubscriptionHandle>> values = new HashMap<>();
             long subscriptionId;
-            ArrayList<String> fields = new ArrayList<>( subscriptionRequest.getFieldNames() );
+            ArrayList<String> fields = new ArrayList<>(subscriptionRequest.getFieldNames());
             long cycleTime = (subscriptionRequest.getField(fields.get(0))).getDuration().orElse(Duration.ofMillis(1000)).toMillis();
 
             try {
@@ -782,7 +866,8 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
         ExtensionObject extObject = new ExtensionObject(
             expandedNodeId,
             null,
-            createSubscriptionRequest);
+            createSubscriptionRequest,
+            false);
 
         try {
             WriteBufferByteBased buffer = new WriteBufferByteBased(extObject.getLengthInBytes(), ByteOrder.LITTLE_ENDIAN);
@@ -792,7 +877,7 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
             Consumer<byte[]> consumer = opcuaResponse -> {
                 CreateSubscriptionResponse responseMessage = null;
                 try {
-                    responseMessage = (CreateSubscriptionResponse) ExtensionObjectIO.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
+                    responseMessage = (CreateSubscriptionResponse) ExtensionObject.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -804,24 +889,21 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
 
             /* Functional Consumer example using inner class */
             Consumer<TimeoutException> timeout = e -> {
-                LOGGER.error("Timeout while waiting on the crate subscription response");
-                e.printStackTrace();
+                LOGGER.error("Timeout while waiting on the crate subscription response", e);
                 // Pass the response back to the application.
                 future.completeExceptionally(e);
             };
 
             /* Functional Consumer example using inner class */
             BiConsumer<OpcuaAPU, Throwable> error = (message, e) -> {
-                LOGGER.error("Error while creating the subscription");
-                e.printStackTrace();
+                LOGGER.error("Error while creating the subscription", e);
                 // Pass the response back to the application.
                 future.completeExceptionally(e);
             };
 
             channel.submit(context, timeout, error, consumer, buffer);
         } catch (SerializationException e) {
-            LOGGER.error("Error while creating the subscription");
-            e.printStackTrace();
+            LOGGER.error("Error while creating the subscription", e);
             future.completeExceptionally(e);
         }
         return future;
@@ -863,8 +945,8 @@ public class OpcuaProtocolLogic extends Plc4xProtocolBase<OpcuaAPU> implements H
 
     private GuidValue toGuidValue(String identifier) {
         LOGGER.error("Querying Guid nodes is not supported");
-        byte[] data4 = new byte[] {0,0};
-        byte[] data5 = new byte[] {0,0,0,0,0,0};
-        return new GuidValue(0L,0,0,data4, data5);
+        byte[] data4 = new byte[]{0, 0};
+        byte[] data5 = new byte[]{0, 0, 0, 0, 0, 0};
+        return new GuidValue(0L, 0, 0, data4, data5);
     }
 }

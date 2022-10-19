@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -24,13 +24,25 @@ import org.apache.plc4x.java.spi.generation.ParseException;
 import org.apache.plc4x.java.spi.generation.ReadBuffer;
 import org.apache.plc4x.java.spi.generation.WithReaderArgs;
 
+import java.math.BigInteger;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FieldReaderFactory {
 
+    @SuppressWarnings("unused")
     public static <T> T readAbstractField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
-        return new FieldReaderAbstract<T>().readField(logicalName, dataReader, readerArgs);
+        return new FieldReaderAbstract<T>().readAbstractField(logicalName, dataReader, readerArgs);
+    }
+
+    // TODO: only used as lazy workaround
+    @Deprecated
+    public static <T> List<T> readCountArrayField(String logicalName, DataReader<T> dataReader, BigInteger count, WithReaderArgs... readerArgs) throws ParseException {
+        if (count.bitLength() > 64) {
+            throw new IllegalStateException("can't handle more than 64 bit. Actual: " + count.bitLength());
+        }
+        return readCountArrayField(logicalName, dataReader, count.longValue(), readerArgs);
     }
 
     public static <T> List<T> readCountArrayField(String logicalName, DataReader<T> dataReader, long count, WithReaderArgs... readerArgs) throws ParseException {
@@ -66,7 +78,7 @@ public class FieldReaderFactory {
     }
 
     public static <T> T readChecksumField(String logicalName, DataReader<T> dataReader, T expectedValue, WithReaderArgs... readerArgs) throws ParseException {
-        return new FieldReaderChecksum<T>().readField(logicalName, dataReader, expectedValue, readerArgs);
+        return new FieldReaderChecksum<T>().readChecksumField(logicalName, dataReader, expectedValue, readerArgs);
     }
 
     public static <T> T readConstField(String logicalName, DataReader<T> dataReader, T expectedValue, WithReaderArgs... readerArgs) throws ParseException {
@@ -74,15 +86,15 @@ public class FieldReaderFactory {
     }
 
     public static <T> T readDiscriminatorField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
-        return new FieldReaderDiscriminator<T>().readField(logicalName, dataReader, readerArgs);
+        return new FieldReaderDiscriminator<T>().readDiscriminatorField(logicalName, dataReader, readerArgs);
     }
 
     public static <T> T readEnumField(String logicalName, String innerName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
-        return new FieldReaderEnum<T>().readField(logicalName, innerName, dataReader, readerArgs);
+        return new FieldReaderEnum<T>().readEnumField(logicalName, innerName, dataReader, readerArgs);
     }
 
     public static <T> T readImplicitField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
-        return new FieldReaderImplicit<T>().readField(logicalName, dataReader, readerArgs);
+        return new FieldReaderImplicit<T>().readImplicitField(logicalName, dataReader, readerArgs);
     }
 
     public static <T> T readOptionalField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
@@ -93,11 +105,11 @@ public class FieldReaderFactory {
         return new FieldReaderOptional<T>().readOptionalField(logicalName, dataReader, condition, readerArgs);
     }
 
-    public static byte[] readManualByteArrayField(String logicalName, ReadBuffer readBuffer, Supplier<Boolean> termination, ParseSupplier<Byte> parse, WithReaderArgs... readerArgs) throws ParseException {
+    public static byte[] readManualByteArrayField(String logicalName, ReadBuffer readBuffer, Function<byte[], Boolean> termination, ParseSupplier<Byte> parse, WithReaderArgs... readerArgs) throws ParseException {
         return new FieldReaderManualArray<Byte>().readManualByteArrayField(logicalName, readBuffer, termination, parse, readerArgs);
     }
 
-    public static <T> List<T> readManualArrayField(String logicalName, ReadBuffer readBuffer, Supplier<Boolean> termination, ParseSupplier<T> parse, WithReaderArgs... readerArgs) throws ParseException {
+    public static <T> List<T> readManualArrayField(String logicalName, ReadBuffer readBuffer, Function<List<T>, Boolean> termination, ParseSupplier<T> parse, WithReaderArgs... readerArgs) throws ParseException {
         return new FieldReaderManualArray<T>().readManualArrayField(logicalName, readBuffer, termination, parse, readerArgs);
     }
 
@@ -114,15 +126,23 @@ public class FieldReaderFactory {
     }
 
     public static <T> T readSimpleField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
-        return new FieldReaderSimple<T>().readField(logicalName, dataReader, readerArgs);
+        return new FieldReaderSimple<T>().readSimpleField(logicalName, dataReader, readerArgs);
     }
 
     public static <T> T readUnknownField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
         return new FieldReaderUnknown<T>().readUnknownField(logicalName, dataReader, readerArgs);
     }
 
-    public static <T> T readVirtualField(Class<T> type, Object valueExpression, WithReaderArgs... readerArgs) throws ParseException {
-        return new FieldReaderVirtual<T>().readVirtualField(type, valueExpression, readerArgs);
+    public static <T> T readVirtualField(String logicalName, Class<T> type, Object valueExpression, WithReaderArgs... readerArgs) throws ParseException {
+        return new FieldReaderVirtual<T>().readVirtualField(logicalName, type, valueExpression, readerArgs);
+    }
+
+    public static <T> T readPeekField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
+        return new FieldReaderPeek<T>().readPeekField(logicalName, dataReader, 0, readerArgs);
+    }
+
+    public static <T> T readPeekField(String logicalName, DataReader<T> dataReader, int offset, WithReaderArgs... readerArgs) throws ParseException {
+        return new FieldReaderPeek<T>().readPeekField(logicalName, dataReader, offset, readerArgs);
     }
 
 }

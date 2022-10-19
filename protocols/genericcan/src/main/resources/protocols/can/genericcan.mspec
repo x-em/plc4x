@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -40,8 +40,8 @@
     [REAL64      ['64'] ]
 ]
 
-[dataIo DataItem(GenericCANDataType dataType) byteOrder='"LITTLE_ENDIAN"'
-    [typeSwitch 'dataType'
+[dataIo DataItem(GenericCANDataType dataType) byteOrder='LITTLE_ENDIAN'
+    [typeSwitch dataType
         ['BYTE' BYTE
             [simple byte value]
         ]

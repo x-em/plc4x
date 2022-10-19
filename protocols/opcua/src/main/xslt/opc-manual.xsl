@@ -8,7 +8,7 @@
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
@@ -19,13 +19,8 @@
 -->
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:opc="http://opcfoundation.org/BinarySchema/"
-                xmlns:plc4x="https://plc4x.apache.org/"
-                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:ua="http://opcfoundation.org/UA/"
-                xmlns:tns="http://opcfoundation.org/UA/"
                 xmlns:node="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
 
     <xsl:output
@@ -55,13 +50,13 @@
     <xsl:template match="/">
 // Remark: The different fields are encoded in Little-endian.
 
-[type OpcuaAPU(bit response) byteOrder='"LITTLE_ENDIAN"'
+[type OpcuaAPU(bit response) byteOrder='LITTLE_ENDIAN'
     [simple MessagePDU('response') message]
 ]
 
 [discriminatedType MessagePDU(bit response)
     [discriminator string 24            messageType]
-    [typeSwitch 'messageType','response'
+    [typeSwitch messageType,response
         ['"HEL"','false'     OpcuaHelloRequest
             [simple          string 8           chunk]
             [implicit        int 32             messageSize 'lengthInBytes']
@@ -177,7 +172,7 @@
 ]
 
 [discriminatedType ExtensionObjectDefinition(vstring '-1' identifier)
-    [typeSwitch 'identifier'
+    [typeSwitch identifier
         ['"0"' NullExtension
         ]
 
@@ -214,7 +209,7 @@
 ]
 
 [discriminatedType UserIdentityTokenDefinition(vstring '-1' identifier)
-    [typeSwitch 'identifier'
+    [typeSwitch identifier
         ['"anonymous"' AnonymousIdentityToken
         ]
         ['"username"' UserNameIdentityToken
@@ -237,7 +232,7 @@
     [simple bit arrayLengthSpecified]
     [simple bit arrayDimensionsSpecified]
     [discriminator uint 6 VariantType]
-    [typeSwitch 'VariantType','arrayLengthSpecified'
+    [typeSwitch VariantType,arrayLengthSpecified
         ['1' VariantBoolean (bit arrayLengthSpecified)
             [optional int 32 arrayLength 'arrayLengthSpecified']
             [array byte value count 'arrayLength == null ? 1 : arrayLength']
@@ -346,7 +341,7 @@
 [discriminatedType NodeIdTypeDefinition
     [abstract vstring '-1' identifier]
     [discriminator NodeIdType nodeType]
-    [typeSwitch 'nodeType'
+    [typeSwitch nodeType
         ['nodeIdTypeTwoByte' NodeIdTwoByte
             [simple uint 8 id]
             [virtual vstring '-1' identifier 'id']

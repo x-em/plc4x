@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -25,7 +25,6 @@ import org.apache.plc4x.java.api.value.PlcValue;
 import org.apache.plc4x.java.opcua.context.SecureChannel;
 import org.apache.plc4x.java.opcua.field.OpcuaField;
 import org.apache.plc4x.java.opcua.readwrite.*;
-import org.apache.plc4x.java.opcua.readwrite.io.ExtensionObjectIO;
 import org.apache.plc4x.java.spi.ConversationContext;
 import org.apache.plc4x.java.spi.generation.*;
 import org.apache.plc4x.java.spi.messages.DefaultPlcSubscriptionEvent;
@@ -35,6 +34,7 @@ import org.apache.plc4x.java.spi.model.DefaultPlcSubscriptionField;
 import org.apache.plc4x.java.spi.model.DefaultPlcSubscriptionHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -67,7 +67,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
         super(plcSubscriber);
         this.consumers = new HashSet<>();
         this.subscriptionRequest = subscriptionRequest;
-        this.fieldNames = new ArrayList<>( subscriptionRequest.getFieldNames() );
+        this.fieldNames = new ArrayList<>(subscriptionRequest.getFieldNames());
         this.channel = channel;
         this.subscriptionId = subscriptionId;
         this.plcSubscriber = plcSubscriber;
@@ -77,16 +77,15 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
         try {
             onSubscribeCreateMonitoredItemsRequest().get();
         } catch (Exception e) {
-            LOGGER.info("Unable to serialize the Create Monitored Item Subscription Message");
-            e.printStackTrace();
+            LOGGER.info("Unable to serialize the Create Monitored Item Subscription Message", e);
             plcSubscriber.onDisconnect(context);
         }
         startSubscriber();
     }
 
-    private CompletableFuture<CreateMonitoredItemsResponse> onSubscribeCreateMonitoredItemsRequest()  {
+    private CompletableFuture<CreateMonitoredItemsResponse> onSubscribeCreateMonitoredItemsRequest() {
         List<ExtensionObjectDefinition> requestList = new ArrayList<>(this.fieldNames.size());
-        for (int i = 0; i <  this.fieldNames.size(); i++) {
+        for (int i = 0; i < this.fieldNames.size(); i++) {
             final DefaultPlcSubscriptionField fieldDefaultPlcSubscription = (DefaultPlcSubscriptionField) subscriptionRequest.getField(fieldNames.get(i));
 
             NodeId idNode = generateNodeId((OpcuaField) fieldDefaultPlcSubscription.getPlcField());
@@ -141,7 +140,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
         CreateMonitoredItemsRequest createMonitoredItemsRequest = new CreateMonitoredItemsRequest(
             requestHeader,
             subscriptionId,
-            TimestampsToReturn.timestampsToReturnNeither,
+            TimestampsToReturn.timestampsToReturnBoth,
             requestList.size(),
             requestList
         );
@@ -155,7 +154,8 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
         ExtensionObject extObject = new ExtensionObject(
             expandedNodeId,
             null,
-            createMonitoredItemsRequest);
+            createMonitoredItemsRequest,
+            false);
 
         try {
             WriteBufferByteBased buffer = new WriteBufferByteBased(extObject.getLengthInBytes(), ByteOrder.LITTLE_ENDIAN);
@@ -164,7 +164,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
             Consumer<byte[]> consumer = opcuaResponse -> {
                 CreateMonitoredItemsResponse responseMessage = null;
                 try {
-                    ExtensionObjectDefinition unknownExtensionObject = ExtensionObjectIO.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
+                    ExtensionObjectDefinition unknownExtensionObject = ExtensionObject.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
                     if (unknownExtensionObject instanceof CreateMonitoredItemsResponse) {
                         responseMessage = (CreateMonitoredItemsResponse) unknownExtensionObject;
                     } else {
@@ -174,37 +174,35 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
                         plcSubscriber.onDisconnect(context);
                     }
                 } catch (ParseException e) {
-                    LOGGER.error("Unable to parse the returned Subscription response");
-                    e.printStackTrace();
+                    LOGGER.error("Unable to parse the returned Subscription response", e);
                     plcSubscriber.onDisconnect(context);
                 }
-                for (MonitoredItemCreateResult result : responseMessage.getResults().toArray(new MonitoredItemCreateResult[0])) {
+                MonitoredItemCreateResult[] array = responseMessage.getResults().toArray(new MonitoredItemCreateResult[0]);
+                for (int index = 0, arrayLength = array.length; index < arrayLength; index++) {
+                    MonitoredItemCreateResult result = array[index];
                     if (OpcuaStatusCode.enumForValue(result.getStatusCode().getStatusCode()) != OpcuaStatusCode.Good) {
-                        LOGGER.error("Invalid Field {}, subscription created without this field", fieldNames.get((int) result.getMonitoredItemId()));
+                        LOGGER.error("Invalid Field {}, subscription created without this field", fieldNames.get(index));
                     } else {
-                        LOGGER.debug("Field {} was added to the subscription", fieldNames.get((int) result.getMonitoredItemId() - 1));
+                        LOGGER.debug("Field {} was added to the subscription", fieldNames.get(index));
                     }
                 }
                 future.complete(responseMessage);
             };
 
             Consumer<TimeoutException> timeout = e -> {
-                LOGGER.info("Timeout while sending the Create Monitored Item Subscription Message");
-                e.printStackTrace();
+                LOGGER.info("Timeout while sending the Create Monitored Item Subscription Message", e);
                 plcSubscriber.onDisconnect(context);
             };
 
             BiConsumer<OpcuaAPU, Throwable> error = (message, e) -> {
-                LOGGER.info("Error while sending the Create Monitored Item Subscription Message");
-                e.printStackTrace();
+                LOGGER.info("Error while sending the Create Monitored Item Subscription Message", e);
                 plcSubscriber.onDisconnect(context);
             };
 
             channel.submit(context, timeout, error, consumer, buffer);
 
         } catch (SerializationException e) {
-            LOGGER.info("Unable to serialize the Create Monitored Item Subscription Message");
-            e.printStackTrace();
+            LOGGER.info("Unable to serialize the Create Monitored Item Subscription Message", e);
             plcSubscriber.onDisconnect(context);
         }
         return future;
@@ -222,6 +220,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
      * Main subscriber loop. For subscription we still need to send a request the server on every cycle.
      * Which includes a request for an update of the previsouly agreed upon list of tags.
      * The server will respond at most once every cycle.
+     *
      * @return
      */
     public void startSubscriber() {
@@ -263,7 +262,8 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
                         ExtensionObject extObject = new ExtensionObject(
                             extExpandedNodeId,
                             null,
-                            publishRequest);
+                            publishRequest,
+                            false);
 
                         try {
                             WriteBufferByteBased buffer = new WriteBufferByteBased(extObject.getLengthInBytes(), ByteOrder.LITTLE_ENDIAN);
@@ -274,18 +274,17 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
                                 PublishResponse responseMessage = null;
                                 ServiceFault serviceFault = null;
                                 try {
-                                    ExtensionObjectDefinition unknownExtensionObject = ExtensionObjectIO.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
+                                    ExtensionObjectDefinition unknownExtensionObject = ExtensionObject.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
                                     if (unknownExtensionObject instanceof PublishResponse) {
                                         responseMessage = (PublishResponse) unknownExtensionObject;
                                     } else {
                                         serviceFault = (ServiceFault) unknownExtensionObject;
                                         ResponseHeader header = (ResponseHeader) serviceFault.getResponseHeader();
-                                        LOGGER.error("Subscription ServiceFault returned from server with error code,  '{}'", header.getServiceResult().toString());
+                                        LOGGER.debug("Subscription ServiceFault returned from server with error code,  '{}', ignoring as it is probably just a result of a Delete Subscription Request", header.getServiceResult().toString());
                                         //plcSubscriber.onDisconnect(context);
                                     }
                                 } catch (ParseException e) {
-                                    LOGGER.error("Unable to parse the returned Subscription response");
-                                    e.printStackTrace();
+                                    LOGGER.error("Unable to parse the returned Subscription response", e);
                                     plcSubscriber.onDisconnect(context);
                                 }
                                 if (serviceFault == null) {
@@ -309,14 +308,12 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
                             };
 
                             Consumer<TimeoutException> timeout = e -> {
-                                LOGGER.error("Timeout while waiting for subscription response");
-                                e.printStackTrace();
+                                LOGGER.error("Timeout while waiting for subscription response", e);
                                 plcSubscriber.onDisconnect(context);
                             };
 
                             BiConsumer<OpcuaAPU, Throwable> error = (message, e) -> {
-                                LOGGER.error("Error while waiting for subscription response");
-                                e.printStackTrace();
+                                LOGGER.error("Error while waiting for subscription response", e);
                                 plcSubscriber.onDisconnect(context);
                             };
 
@@ -324,8 +321,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
                             channel.submit(context, timeout, error, consumer, buffer);
 
                         } catch (SerializationException e) {
-                            LOGGER.warn("Unable to serialize subscription request");
-                            e.printStackTrace();
+                            LOGGER.warn("Unable to serialize subscription request", e);
                         }
                     }
                     /* Put the subscriber loop to sleep for the rest of the cycle. */
@@ -335,8 +331,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
                 //sleep(this.revisedCycleTime * 10);
                 complete = true;
             } catch (Exception e) {
-                LOGGER.error("Failed :(");
-                e.printStackTrace();
+                LOGGER.error("Failed to start subscription", e);
             }
             return null;
         });
@@ -345,6 +340,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
 
     /**
      * Stop the subscriber either on disconnect or on error
+     *
      * @return
      */
     public void stopSubscriber() {
@@ -365,7 +361,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
         DeleteSubscriptionsRequest deleteSubscriptionrequest = new DeleteSubscriptionsRequest(requestHeader,
             1,
             subscriptions
-            );
+        );
 
         ExpandedNodeId extExpandedNodeId = new ExpandedNodeId(false,           //Namespace Uri Specified
             false,            //Server Index Specified
@@ -376,7 +372,8 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
         ExtensionObject extObject = new ExtensionObject(
             extExpandedNodeId,
             null,
-            deleteSubscriptionrequest);
+            deleteSubscriptionrequest,
+            false);
 
         try {
             WriteBufferByteBased buffer = new WriteBufferByteBased(extObject.getLengthInBytes(), ByteOrder.LITTLE_ENDIAN);
@@ -386,36 +383,32 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
             Consumer<byte[]> consumer = opcuaResponse -> {
                 DeleteSubscriptionsResponse responseMessage = null;
                 try {
-                    ExtensionObjectDefinition unknownExtensionObject = ExtensionObjectIO.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
+                    ExtensionObjectDefinition unknownExtensionObject = ExtensionObject.staticParse(new ReadBufferByteBased(opcuaResponse, ByteOrder.LITTLE_ENDIAN), false).getBody();
                     if (unknownExtensionObject instanceof DeleteSubscriptionsResponse) {
                         responseMessage = (DeleteSubscriptionsResponse) unknownExtensionObject;
                     } else {
                         ServiceFault serviceFault = (ServiceFault) unknownExtensionObject;
                         ResponseHeader header = (ResponseHeader) serviceFault.getResponseHeader();
-                        LOGGER.error("Fault when deleteing Subscription ServiceFault return from server with error code,  '{}'", header.getServiceResult().toString());
+                        LOGGER.debug("Fault when deleting Subscription ServiceFault return from server with error code,  '{}', ignoring as it is probably just a result of a Delete Subscription Request", header.getServiceResult().toString());
                     }
                 } catch (ParseException e) {
-                    LOGGER.error("Unable to parse the returned Delete Subscriptions Response");
-                    e.printStackTrace();
+                    LOGGER.error("Unable to parse the returned Delete Subscriptions Response", e);
                 }
             };
 
             Consumer<TimeoutException> timeout = e -> {
-                LOGGER.error("Timeout while waiting for delete subscription response");
-                e.printStackTrace();
+                LOGGER.error("Timeout while waiting for delete subscription response", e);
                 plcSubscriber.onDisconnect(context);
             };
 
             BiConsumer<OpcuaAPU, Throwable> error = (message, e) -> {
-                LOGGER.error("Error while waiting for delete subscription response");
-                e.printStackTrace();
+                LOGGER.error("Error while waiting for delete subscription response", e);
                 plcSubscriber.onDisconnect(context);
             };
 
             channel.submit(context, timeout, error, consumer, buffer);
         } catch (SerializationException e) {
-            LOGGER.warn("Unable to serialize subscription request");
-            e.printStackTrace();
+            LOGGER.warn("Unable to serialize subscription request", e);
         }
 
         sleep(500);
@@ -424,6 +417,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
 
     /**
      * Receive the returned values from the OPCUA server and format it so that it can be received by the PLC4X client.
+     *
      * @param values - array of data values to be sent to the client.
      */
     private void onSubscriptionValue(MonitoredItemNotification[] values) {
@@ -441,6 +435,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
 
     /**
      * Registers a new Consumer, this allows multiple PLC4X consumers to use the same subscription.
+     *
      * @param consumer - Consumer to be used to send any returned values.
      * @return PlcConsumerRegistration - return the important information back to the client.
      */
@@ -453,6 +448,7 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
 
     /**
      * Given an PLC4X OpcuaField generate the OPC UA Node Id
+     *
      * @param field - The PLC4X OpcuaField, this is the field generated from the OpcuaField class from the parsed field string.
      * @return NodeId - Returns an OPC UA Node Id which can be sent over the wire.
      */
@@ -473,7 +469,6 @@ public class OpcuaSubscriptionHandle extends DefaultPlcSubscriptionHandle {
         }
         return nodeId;
     }
-
 
 
 }

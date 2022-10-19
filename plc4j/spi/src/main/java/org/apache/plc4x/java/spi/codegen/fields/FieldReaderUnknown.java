@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,22 +18,19 @@
  */
 package org.apache.plc4x.java.spi.codegen.fields;
 
+import org.apache.plc4x.java.spi.codegen.FieldCommons;
 import org.apache.plc4x.java.spi.codegen.io.DataReader;
 import org.apache.plc4x.java.spi.generation.ParseException;
 import org.apache.plc4x.java.spi.generation.WithReaderArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FieldReaderUnknown<T> implements FieldReader<T> {
+public class FieldReaderUnknown<T> implements FieldCommons {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldReaderUnknown.class);
 
-    @Override
-    public T readField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
-        throw new IllegalStateException("not possible with unknown field");
-    }
-
     public T readUnknownField(String logicalName, DataReader<T> dataReader, WithReaderArgs... readerArgs) throws ParseException {
+        LOGGER.debug("reading field {}", logicalName);
         T unknownValue = dataReader.read(logicalName, readerArgs);
         LOGGER.debug("Read unknown value {}", unknownValue);
         return unknownValue;

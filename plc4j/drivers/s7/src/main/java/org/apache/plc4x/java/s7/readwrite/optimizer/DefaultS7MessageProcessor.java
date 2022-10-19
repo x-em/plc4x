@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -48,11 +48,11 @@ public class DefaultS7MessageProcessor implements S7MessageProcessor {
     public static final int EMPTY_READ_REQUEST_SIZE = new S7MessageRequest(0, new S7ParameterReadVarRequest(
         Collections.emptyList()), null).getLengthInBytes();
     public static final int EMPTY_READ_RESPONSE_SIZE = new S7MessageResponseData(0, new S7ParameterReadVarResponse(
-        (short) 0), new S7PayloadReadVarResponse(Collections.emptyList()), (short) 0, (short) 0).getLengthInBytes();
+        (short) 0), new S7PayloadReadVarResponse(Collections.emptyList(),null), (short) 0, (short) 0).getLengthInBytes();
     public static final int EMPTY_WRITE_REQUEST_SIZE = new S7MessageRequest(0, new S7ParameterWriteVarRequest(
-        Collections.emptyList()), new S7PayloadWriteVarRequest(Collections.emptyList())).getLengthInBytes();
+        Collections.emptyList()), new S7PayloadWriteVarRequest(Collections.emptyList(),null)).getLengthInBytes();
     public static final int EMPTY_WRITE_RESPONSE_SIZE = new S7MessageResponseData(0, new S7ParameterWriteVarResponse(
-        (short) 0), new S7PayloadWriteVarResponse(Collections.emptyList()), (short) 0, (short) 0).getLengthInBytes();
+        (short) 0), new S7PayloadWriteVarResponse(Collections.emptyList(),null), (short) 0, (short) 0).getLengthInBytes();
 
     public DefaultS7MessageProcessor(AtomicInteger tpduGenerator) {
         this.tpduRefGen = tpduGenerator;

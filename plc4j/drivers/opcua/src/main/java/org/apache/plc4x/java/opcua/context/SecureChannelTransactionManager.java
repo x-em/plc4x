@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -36,8 +36,8 @@ public class SecureChannelTransactionManager {
     private AtomicInteger activeTransactionId = new AtomicInteger(0);
     private Map<Integer, Transaction> queue = new HashMap<>();
 
-    public void submit(Consumer<Integer> onSend, Integer transactionId) {
-        LOGGER.info("New Transaction Submitted {}", activeTransactionId.get());
+    public synchronized void submit(Consumer<Integer> onSend, Integer transactionId) {
+        LOGGER.info("Active transaction Number {}", activeTransactionId.get());
         if (activeTransactionId.get() == transactionId) {
             onSend.accept(transactionId);
             int newTransactionId = getActiveTransactionIdentifier();

@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -39,17 +39,17 @@ import java.util.Optional;
 
 public class WriteBufferXmlBased implements WriteBuffer, BufferCommons {
 
-    Deque<String> stack;
+    private final Deque<String> stack;
 
-    ByteArrayOutputStream byteArrayOutputStream;
+    private final ByteArrayOutputStream byteArrayOutputStream;
 
-    XMLEventFactory xmlEventFactory;
+    private final XMLEventFactory xmlEventFactory;
 
-    XMLEventWriter xmlEventWriter;
+    private final XMLEventWriter xmlEventWriter;
 
-    int pos = 1;
+    private int pos = 1;
 
-    int depth = 0;
+    private int depth = 0;
 
     public WriteBufferXmlBased() {
         byteArrayOutputStream = new ByteArrayOutputStream();
@@ -202,7 +202,8 @@ public class WriteBufferXmlBased implements WriteBuffer, BufferCommons {
 
     @Override
     public void writeString(String logicalName, int bitLength, String encoding, String value, WithWriterArgs... writerArgs) throws SerializationException {
-        createAndAppend(logicalName, rwStringKey, bitLength, value, encoding, writerArgs);
+        String cleanedUpString = StringUtils.trimToEmpty(value).replaceAll("[^\u0009\r\n\u0020-\uD7FF\uE000-\uFFFD\ud800\udc00-\udbff\udfff]", "");
+        createAndAppend(logicalName, rwStringKey, bitLength, cleanedUpString, encoding, writerArgs);
         move(bitLength);
     }
 

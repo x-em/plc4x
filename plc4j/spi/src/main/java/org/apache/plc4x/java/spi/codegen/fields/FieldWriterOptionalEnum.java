@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,22 +18,24 @@
  */
 package org.apache.plc4x.java.spi.codegen.fields;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.apache.plc4x.java.spi.codegen.FieldCommons;
 import org.apache.plc4x.java.spi.codegen.io.DataWriter;
 import org.apache.plc4x.java.spi.generation.SerializationException;
 import org.apache.plc4x.java.spi.generation.WithWriterArgs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class FieldWriterOptionalEnum<T> implements FieldWriter<T> {
+public class FieldWriterOptionalEnum<T> implements FieldCommons {
 
-    @Override
-    public void writeField(String logicalName, T value, DataWriter<T> dataWriter, WithWriterArgs... writerArgs) throws SerializationException {
-        throw new NotImplementedException();
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriterOptionalEnum.class);
 
-    public void writeField(String logicalName, String innerName, T value, DataWriter<T> dataWriter, WithWriterArgs... writerArgs) throws SerializationException {
+    public void writeOptionalEnumField(String logicalName, String innerName, T value, DataWriter<T> dataWriter, boolean condition, WithWriterArgs... writerArgs) throws SerializationException {
+        LOGGER.debug("write field {}", logicalName);
         dataWriter.pushContext(logicalName);
-        if(value != null) {
-            switchSerializeByteOrderIfNecessary(() -> dataWriter.write(innerName, value, writerArgs), dataWriter, extractByteOder(writerArgs).orElse(null));
+        if (condition && value != null) {
+            switchSerializeByteOrderIfNecessary(() -> dataWriter.write(innerName, value, writerArgs), dataWriter, extractByteOrder(writerArgs).orElse(null));
+        } else {
+            LOGGER.debug("field {} not written because value is null({}) or condition({}) didn't evaluate to true", logicalName, value != null, condition);
         }
         dataWriter.popContext(logicalName);
     }

@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,11 +18,8 @@
  */
 
 import org.apache.plc4x.java.s7.readwrite.*;
-import org.apache.plc4x.java.s7.readwrite.io.TPKTPacketIO;
-import org.apache.plc4x.java.spi.generation.ReadBufferJsonBased;
-import org.apache.plc4x.java.spi.generation.ReadBufferXmlBased;
-import org.apache.plc4x.java.spi.generation.WriteBufferJsonBased;
-import org.apache.plc4x.java.spi.generation.WriteBufferXmlBased;
+import org.apache.plc4x.java.spi.generation.*;
+import org.apache.plc4x.java.spi.utils.ascii.AsciiBox;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -37,6 +34,99 @@ public class S7IoTest {
 
     @Test
     void TestS7MessageBytes() throws Exception {
+        String wantBoxStringSerialized = ""
+            + "╔═TPKTPacket═══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n"
+            + "║╔═protocolId╗╔═reserved╗╔═len═════╗                                                                               ║\n"
+            + "║║  0x03 3   ║║ 0x00 0  ║║0x001e 30║                                                                               ║\n"
+            + "║╚═══════════╝╚═════════╝╚═════════╝                                                                               ║\n"
+            + "║╔═payload════════════════════════════════════════════════════════════════════════════════════════════════════════╗║\n"
+            + "║║╔═COTPPacket═══════════════════════════════════════════════════════════════════════════════════════════════════╗║║\n"
+            + "║║║╔═headerLength╗╔═tpduCode╗╔═COTPPacketData═════╗╔═parameters═════════════════════════════════════════════════╗║║║\n"
+            + "║║║║   0x05 5    ║║0xf0 240 ║║╔═eot════╗╔═tpduRef╗║║╔═COTPParameter════════════════════════════════════════════╗║║║║\n"
+            + "║║║╚═════════════╝╚═════════╝║║b0 false║║ 0xd 13 ║║║║╔═parameterType╗╔═parameterLength╗╔═COTPParameterTpduSize╗║║║║║\n"
+            + "║║║                          ║╚════════╝╚════════╝║║║║   0xc0 192   ║║     0x01 1     ║║╔═tpduSize══════════╗ ║║║║║║\n"
+            + "║║║                          ╚════════════════════╝║║╚══════════════╝╚════════════════╝║║╔═COTPTpduSize════╗║ ║║║║║║\n"
+            + "║║║                                                ║║                                  ║║║0x0c 12 SIZE_4096║║ ║║║║║║\n"
+            + "║║║                                                ║║                                  ║║╚═════════════════╝║ ║║║║║║\n"
+            + "║║║                                                ║║                                  ║╚═══════════════════╝ ║║║║║║\n"
+            + "║║║                                                ║║                                  ╚══════════════════════╝║║║║║\n"
+            + "║║║                                                ║╚══════════════════════════════════════════════════════════╝║║║║\n"
+            + "║║║                                                ╚════════════════════════════════════════════════════════════╝║║║\n"
+            + "║║║╔═payload══════════════════════════════════════════════════════════════════════════════════╗                  ║║║\n"
+            + "║║║║╔═S7Message══════════════════════════════════════════════════════════════════════════════╗║                  ║║║\n"
+            + "║║║║║╔═protocolId╗╔═messageType╗╔═reserved╗╔═tpduReference╗╔═parameterLength╗╔═payloadLength╗║║                  ║║║\n"
+            + "║║║║║║  0x32 50  ║║   0x03 3   ║║0x0000 0 ║║  0x000b 11   ║║    0x0002 2    ║║   0x0006 6   ║║║                  ║║║\n"
+            + "║║║║║╚═══════════╝╚════════════╝╚═════════╝╚══════════════╝╚════════════════╝╚══════════════╝║║                  ║║║\n"
+            + "║║║║║╔═S7MessageResponseData═══╗╔═parameter═════════════════════════════════════╗            ║║                  ║║║\n"
+            + "║║║║║║╔═errorClass╗╔═errorCode╗║║╔═S7Parameter═════════════════════════════════╗║            ║║                  ║║║\n"
+            + "║║║║║║║  0x00 0   ║║  0x00 0  ║║║║╔═parameterType╗╔═S7ParameterReadVarResponse╗║║            ║║                  ║║║\n"
+            + "║║║║║║╚═══════════╝╚══════════╝║║║║    0x04 4    ║║        ╔═numItems╗        ║║║            ║║                  ║║║\n"
+            + "║║║║║╚═════════════════════════╝║║╚══════════════╝║        ║ 0x01 1  ║        ║║║            ║║                  ║║║\n"
+            + "║║║║║                           ║║                ║        ╚═════════╝        ║║║            ║║                  ║║║\n"
+            + "║║║║║                           ║║                ╚═══════════════════════════╝║║            ║║                  ║║║\n"
+            + "║║║║║                           ║╚═════════════════════════════════════════════╝║            ║║                  ║║║\n"
+            + "║║║║║                           ╚═══════════════════════════════════════════════╝            ║║                  ║║║\n"
+            + "║║║║║╔═payload══════════════════════════════════════════════════════════════╗                ║║                  ║║║\n"
+            + "║║║║║║╔═S7Payload══════════════════════════════════════════════════════════╗║                ║║                  ║║║\n"
+            + "║║║║║║║╔═S7PayloadReadVarResponse═════════════════════════════════════════╗║║                ║║                  ║║║\n"
+            + "║║║║║║║║╔═items══════════════════════════════════════════════════════════╗║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║╔═S7VarPayloadDataItem═════════════════════════════════════════╗║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║╔═returnCode══════════════╗╔═transportSize══════╗╔═dataLength╗║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║║╔═DataTransportErrorCode╗║║╔═DataTransportSize╗║║ 0x0001 1  ║║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║║║      0xff 255 OK      ║║║║    0x03 3 BIT    ║║╚═══════════╝║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║║╚═══════════════════════╝║║╚══════════════════╝║             ║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║╚═════════════════════════╝╚════════════════════╝             ║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║╔═data═══════════════════════════════════════╗╔═padding╗      ║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║║0|01                            '.         '║║╔══════╗║      ║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║╚════════════════════════════════════════════╝║║0x00 0║║      ║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║                                              ║╚══════╝║      ║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║║                                              ╚════════╝      ║║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║║╚══════════════════════════════════════════════════════════════╝║║║║                ║║                  ║║║\n"
+            + "║║║║║║║║╚════════════════════════════════════════════════════════════════╝║║║                ║║                  ║║║\n"
+            + "║║║║║║║╚══════════════════════════════════════════════════════════════════╝║║                ║║                  ║║║\n"
+            + "║║║║║║╚════════════════════════════════════════════════════════════════════╝║                ║║                  ║║║\n"
+            + "║║║║║╚══════════════════════════════════════════════════════════════════════╝                ║║                  ║║║\n"
+            + "║║║║╚════════════════════════════════════════════════════════════════════════════════════════╝║                  ║║║\n"
+            + "║║║╚══════════════════════════════════════════════════════════════════════════════════════════╝                  ║║║\n"
+            + "║║╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝║║\n"
+            + "║╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝║\n"
+            + "╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝";
+        String wantBoxStringSerializedCompact = ""
+            + "╔═TPKTPacket═════════════════════════════════════════════════════════════════════════════════════╗\n"
+            + "║╔═protocolId╗╔═reserved╗╔═len═════╗                                                             ║\n"
+            + "║║  0x03 3   ║║ 0x00 0  ║║0x001e 30║                                                             ║\n"
+            + "║╚═══════════╝╚═════════╝╚═════════╝                                                             ║\n"
+            + "║╔═payload/COTPPacket═══════════════════════════════════════════════════════════════════════════╗║\n"
+            + "║║╔═headerLength╗╔═tpduCode╗╔═COTPPacketData═════╗                                              ║║\n"
+            + "║║║   0x05 5    ║║0xf0 240 ║║╔═eot════╗╔═tpduRef╗║                                              ║║\n"
+            + "║║╚═════════════╝╚═════════╝║║b0 false║║ 0xd 13 ║║                                              ║║\n"
+            + "║║                          ║╚════════╝╚════════╝║                                              ║║\n"
+            + "║║                          ╚════════════════════╝                                              ║║\n"
+            + "║║╔═parameters/COTPParameter════════════════════════════════════════════════════════════╗       ║║\n"
+            + "║║║╔═parameterType╗╔═parameterLength╗╔═COTPParameterTpduSize/tpduSize/COTPTpduSize═════╗║       ║║\n"
+            + "║║║║   0xc0 192   ║║     0x01 1     ║║                0x0c 12 SIZE_4096                ║║       ║║\n"
+            + "║║║╚══════════════╝╚════════════════╝╚═════════════════════════════════════════════════╝║       ║║\n"
+            + "║║╚═════════════════════════════════════════════════════════════════════════════════════╝       ║║\n"
+            + "║║╔═payload/S7Message══════════════════════════════════════════════════════════════════════════╗║║\n"
+            + "║║║╔═protocolId╗╔═messageType╗╔═reserved╗╔═tpduReference╗╔═parameterLength╗╔═payloadLength╗    ║║║\n"
+            + "║║║║  0x32 50  ║║   0x03 3   ║║0x0000 0 ║║  0x000b 11   ║║    0x0002 2    ║║   0x0006 6   ║    ║║║\n"
+            + "║║║╚═══════════╝╚════════════╝╚═════════╝╚══════════════╝╚════════════════╝╚══════════════╝    ║║║\n"
+            + "║║║╔═S7MessageResponseData═══╗╔═parameter/S7Parameter═══════════════════════════════════╗      ║║║\n"
+            + "║║║║╔═errorClass╗╔═errorCode╗║║╔═parameterType╗╔═S7ParameterReadVarResponse/numItems═══╗║      ║║║\n"
+            + "║║║║║  0x00 0   ║║  0x00 0  ║║║║    0x04 4    ║║                0x01 1                 ║║      ║║║\n"
+            + "║║║║╚═══════════╝╚══════════╝║║╚══════════════╝╚═══════════════════════════════════════╝║      ║║║\n"
+            + "║║║╚═════════════════════════╝╚═════════════════════════════════════════════════════════╝      ║║║\n"
+            + "║║║╔═payload/S7Payload/S7PayloadReadVarResponse/items/S7VarPayloadDataItem════════════════════╗║║║\n"
+            + "║║║║╔═returnCode/DataTransportErrorCode════════════╗╔═transportSize/DataTransportSize════════╗║║║║\n"
+            + "║║║║║                 0xff 255 OK                  ║║               0x03 3 BIT               ║║║║║\n"
+            + "║║║║╚══════════════════════════════════════════════╝╚════════════════════════════════════════╝║║║║\n"
+            + "║║║║╔═dataLength╗╔═data═══════════════════════════════════════╗╔═padding/╗                    ║║║║\n"
+            + "║║║║║ 0x0001 1  ║║0|01                            '.         '║║ 0x00 0  ║                    ║║║║\n"
+            + "║║║║╚═══════════╝╚════════════════════════════════════════════╝╚═════════╝                    ║║║║\n"
+            + "║║║╚══════════════════════════════════════════════════════════════════════════════════════════╝║║║\n"
+            + "║║╚════════════════════════════════════════════════════════════════════════════════════════════╝║║\n"
+            + "║╚══════════════════════════════════════════════════════════════════════════════════════════════╝║\n"
+            + "╚════════════════════════════════════════════════════════════════════════════════════════════════╝";
         String wantXml =
             "<TPKTPacket>\n" +
                 "  <protocolId dataType=\"uint\" bitLength=\"8\">3</protocolId>\n" +
@@ -56,7 +146,7 @@ public class S7IoTest {
                 "          <parameterLength dataType=\"uint\" bitLength=\"8\">1</parameterLength>\n" +
                 "          <COTPParameterTpduSize>\n" +
                 "            <tpduSize>\n" +
-                "              <COTPTpduSize dataType=\"int\" bitLength=\"8\" stringRepresentation=\"SIZE_4096\">12</COTPTpduSize>\n" +
+                "              <COTPTpduSize dataType=\"uint\" bitLength=\"8\" stringRepresentation=\"SIZE_4096\">12</COTPTpduSize>\n" +
                 "            </tpduSize>\n" +
                 "          </COTPParameterTpduSize>\n" +
                 "        </COTPParameter>\n" +
@@ -211,7 +301,7 @@ public class S7IoTest {
             "                \"tpduSize\": {\n" +
             "                  \"COTPTpduSize\": 12,\n" +
             "                  \"COTPTpduSize__plc4x_bitLength\": 8,\n" +
-            "                  \"COTPTpduSize__plc4x_dataType\": \"int\",\n" +
+            "                  \"COTPTpduSize__plc4x_dataType\": \"uint\",\n" +
             "                  \"COTPTpduSize__plc4x_stringRepresentation\": \"SIZE_4096\"\n" +
             "                }\n" +
             "              },\n" +
@@ -241,7 +331,7 @@ public class S7IoTest {
 
         TPKTPacket tpktPacket = new TPKTPacket(
             new COTPPacketData(
-                Collections.singletonList(new COTPParameterTpduSize(COTPTpduSize.SIZE_4096)),
+                Collections.singletonList(new COTPParameterTpduSize(COTPTpduSize.SIZE_4096,(short)3)),
                 new S7MessageResponseData(
                     11,
                     new S7ParameterReadVarResponse((short) 1),
@@ -252,15 +342,38 @@ public class S7IoTest {
                                 DataTransportSize.BIT,
                                 new byte[]{0x1}
                             )
-                        )
+                        ),new S7ParameterReadVarResponse((short) 1)
                     ),
                     (short) 0,
                     (short) 0
                 ),
                 false,
-                (short) 13
+                (short) 13,
+                26
             )
         );
+        // To string
+        {
+            // TODO: implement me
+            tpktPacket.toString();
+        }
+
+        // To box
+        {
+            WriteBufferBoxBased writeBufferBoxBased = new WriteBufferBoxBased();
+            tpktPacket.serialize(writeBufferBoxBased);
+            AsciiBox gotBox = writeBufferBoxBased.getBox();
+            assertEquals(wantBoxStringSerialized, gotBox.toString());
+        }
+
+        // To box compact
+        {
+            WriteBufferBoxBased writeBufferBoxBased = new WriteBufferBoxBased(true, true);
+            tpktPacket.serialize(writeBufferBoxBased);
+            AsciiBox gotBox = writeBufferBoxBased.getBox();
+            assertEquals(wantBoxStringSerializedCompact, gotBox.toString());
+        }
+
         // Xml
         {
             WriteBufferXmlBased writeBufferXmlBased = new WriteBufferXmlBased();
@@ -268,7 +381,7 @@ public class S7IoTest {
             String gotXml = writeBufferXmlBased.getXmlString();
             assertEquals(wantXml, gotXml);
             ReadBufferXmlBased readBufferXmlBased = new ReadBufferXmlBased(new ByteArrayInputStream(gotXml.getBytes()));
-            TPKTPacket reReadTpktPacket = TPKTPacketIO.staticParse(readBufferXmlBased);
+            TPKTPacket reReadTpktPacket = TPKTPacket.staticParse(readBufferXmlBased);
             assertThat(reReadTpktPacket).usingRecursiveComparison().isEqualTo(tpktPacket);
         }
         // json
@@ -278,7 +391,7 @@ public class S7IoTest {
             String gotJson = writeBufferJsonBased.getJsonString();
             JSONAssert.assertEquals(wantJson, gotJson, JSONCompareMode.LENIENT);
             ReadBufferJsonBased readBufferXmlBased = new ReadBufferJsonBased(new ByteArrayInputStream(gotJson.getBytes()));
-            TPKTPacket reReadTpktPacket = TPKTPacketIO.staticParse(readBufferXmlBased);
+            TPKTPacket reReadTpktPacket = TPKTPacket.staticParse(readBufferXmlBased);
             assertThat(reReadTpktPacket).usingRecursiveComparison().isEqualTo(tpktPacket);
         }
     }

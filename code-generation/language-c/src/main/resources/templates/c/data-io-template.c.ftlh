@@ -7,7 +7,7 @@
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
@@ -25,7 +25,7 @@
 <#-- @ftlvariable name="helper" type="org.apache.plc4x.language.c.CLanguageTemplateHelper" -->
 <#-- @ftlvariable name="tracer" type="org.apache.plc4x.plugins.codegenerator.protocol.freemarker.Tracer" -->
 <#-- @ftlvariable name="type" type="org.apache.plc4x.plugins.codegenerator.types.definitions.DataIoTypeDefinition" -->
-<#if !type.isDiscriminatedChildTypeDefinition()>${helper.getSourceDirectory()?replace(".", "/")}/${helper.camelCaseToSnakeCase(type.name)}.c
+${helper.getSourceDirectory()?replace(".", "/")}/${helper.camelCaseToSnakeCase(type.name)}.c
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -35,7 +35,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -51,6 +51,8 @@
 #include <plc4c/data.h>
 #include <plc4c/utils/list.h>
 #include <plc4c/spi/evaluation_helper.h>
+#include <plc4c/spi/types_private.h>
+#include <plc4c/driver_${protocolName}_static.h>
 
 #include "${helper.camelCaseToSnakeCase(type.name)}.h"
 
@@ -59,24 +61,24 @@
 <#-- TODO: the code below implies that parserArguments will be null if not present... not pretty  -->
 <#if type.parserArguments.isPresent()><#assign parserArguments=type.parserArguments.orElseThrow()></#if>
 // Parse function.
-plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer* readBuffer, <#if parserArguments?has_content><#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !helper.isSimpleTypeReference(parserArgument.type) && !helper.isEnumTypeReference(parserArgument.type)>*</#if> ${parserArgument.name}<#sep>, </#list>, </#if>plc4c_data** data_item) {
+plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer* readBuffer, <#if parserArguments?has_content><#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !parserArgument.type.isSimpleTypeReference() && !parserArgument.type.isEnumTypeReference()>*</#if> ${parserArgument.name}<#sep>, </#list>, </#if>plc4c_data** data_item) {
     uint16_t startPos = plc4c_spi_read_get_pos(readBuffer);
     uint16_t curPos;
     plc4c_return_code _res = OK;
 
-    <#list type.switchField.cases as case>
-        <#if case.discriminatorValues?has_content>if(<#list case.discriminatorValues as discriminatorValue><#if case.discriminatorValues?size &gt; 1>(</#if><#if helper.discriminatorValueNeedsStringEqualityCheck(type.switchField.discriminatorExpressions[discriminatorValue?index])>strcmp(${helper.toParseExpression(type, null, type.switchField.discriminatorExpressions[discriminatorValue?index], parserArguments)}, "${discriminatorValue}") == 0<#else>${helper.toParseExpression(type, null, type.switchField.discriminatorExpressions[discriminatorValue?index], parserArguments)} == <#if helper.isComplexTypeReference(parserArguments[discriminatorValue?index].type)><#if helper.isEnumTypeReference(parserArguments[discriminatorValue?index].type)>${helper.getLanguageTypeNameForTypeReference(parserArguments[discriminatorValue?index].type)}_${discriminatorValue}<#else>${discriminatorValue}</#if><#else>${discriminatorValue}</#if></#if><#if case.discriminatorValues?size &gt; 1>)</#if><#sep> && </#sep></#list>) </#if>{ /* ${case.name} */
-<#--        (*_message)->_type = ${helper.getCTypeName(type.name)}_type_${helper.getCTypeName(case.name)};-->
+    <#list type.switchField.orElseThrow().cases as case>
+        <#if case.discriminatorValueTerms?has_content>if(<#list case.discriminatorValueTerms as discriminatorValueTerm><#if case.discriminatorValueTerms?size &gt; 1>(</#if><#if helper.discriminatorValueNeedsStringEqualityCheck(type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index])>strcmp(${helper.toParseExpression(type, null, type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index], parserArguments)}, ${helper.toParseExpression(null, null, discriminatorValueTerm, parserArguments)}) == 0<#else>${helper.toParseExpression(type, null, type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index], parserArguments)} == <#if parserArguments[discriminatorValueTerm?index].type.isNonSimpleTypeReference()><#if parserArguments[discriminatorValueTerm?index].type.isEnumTypeReference()>${helper.getLanguageTypeNameForTypeReference(parserArguments[discriminatorValueTerm?index].type)}_${discriminatorValueTerm.asLiteral().orElseThrow().asVariableLiteral().orElseThrow().name}<#else>${helper.toParseExpression(type, null, discriminatorValueTerm, parserArguments)}</#if><#else>${helper.toParseExpression(type, null, discriminatorValueTerm, parserArguments)}</#if></#if><#if case.discriminatorValueTerms?size &gt; 1>)</#if><#sep> && </#sep></#list>) </#if>{ /* ${case.name} */
         <#assign skipReturn=false>
         <#list case.fields as field>
             <#switch field.typeName>
                 <#case "array">
                     <#assign arrayField = field.asArrayField().orElseThrow()>
+                    <#assign elementTypeReference=arrayField.type.elementTypeReference>
 
         // Array field (${arrayField.name})
                 <#-- Only update curPos if the length expression uses it -->
                     <#if arrayField.loopExpression.contains("curPos")>
-        curPos = readBuffer.getPos() - startPos;
+        curPos = plc4c_spi_read_get_pos(readBuffer) - startPos;
                     </#if>
                 <#-- If this is a count array, we can directly initialize an array with the given size -->
                     <#if arrayField.isCountArrayField()>
@@ -85,12 +87,12 @@ plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer*
         plc4c_utils_list_create(&${arrayField.name});
         int itemCount = (int) ${helper.toParseExpression(type, arrayField, arrayField.loopExpression, parserArguments)};
         for(int curItem = 0; curItem < itemCount; curItem++) {
-            ${helper.getLanguageTypeNameForTypeReference(arrayField.type)}* _val = malloc(sizeof(${helper.getLanguageTypeNameForTypeReference(arrayField.type)}) * 1);
-            _res = <#if helper.isSimpleTypeReference(arrayField.type)>${helper.getReadBufferReadMethodCall(arrayField.type.asSimpleTypeReference().orElseThrow(), "_val", arrayField)}<#else>${arrayField.type.asComplexTypeReference().orElseThrow().name}IO.staticParse(readBuffer<#if arrayField.params.isPresent()>, <#list arrayField.params.orElseThrow() as parserArgument>(${helper.getLanguageTypeNameForTypeReference(helper.getArgumentType(arrayField.type, parserArgument?index))}) (${helper.toParseExpression(type, arrayField, parserArgument, parserArguments)})<#sep>, </#sep></#list></#if>)</#if>;
+            ${helper.getLanguageTypeNameForTypeReference(elementTypeReference)}* _val = malloc(sizeof(${helper.getLanguageTypeNameForTypeReference(elementTypeReference)}) * 1);
+            _res = <#if elementTypeReference.isSimpleTypeReference()>${helper.getReadBufferReadMethodCall(elementTypeReference.asSimpleTypeReference().orElseThrow(), "_val", arrayField)}<#else>${elementTypeReference.asNonSimpleTypeReference().orElseThrow().name}IO.staticParse(readBuffer<#if arrayField.params.isPresent()>, <#list arrayField.params.orElseThrow() as parserArgument>(${helper.getLanguageTypeNameForTypeReference(helper.getArgumentType(elementTypeReference, parserArgument?index))}) (${helper.toParseExpression(type, arrayField, parserArgument, parserArguments)})<#sep>, </#sep></#list></#if>)</#if>;
             if(_res != OK) {
                 return _res;
             }
-            plc4c_data* _item = plc4c_data_create_${helper.getLanguageTypeNameForTypeReference(arrayField.type)}_data(*_val);
+            plc4c_data* _item = plc4c_data_create_${helper.getDataIoTypeNameForTypeReference(elementTypeReference)}_data(*_val);
             plc4c_utils_list_insert_head_value(${arrayField.name}, _item);
         }
                     <#-- In all other cases do we have to work with a list, that is later converted to an array -->
@@ -99,25 +101,29 @@ plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer*
                         <#if arrayField.isLengthArrayField()>
         // Length array
         int _${arrayField.name}Length = ${helper.toParseExpression(type, arrayField, arrayField.loopExpression, parserArguments)};
-        List<${helper.getLanguageTypeNameForField(arrayField)}> _${arrayField.name}List = new LinkedList<>();
-        int ${arrayField.name}EndPos = readBuffer.getPos() + _${arrayField.name}Length;
-        while(readBuffer.getPos() < ${arrayField.name}EndPos) {
-            _${arrayField.name}List.add(<#if helper.isSimpleTypeReference(arrayField.type)>${helper.getReadBufferReadMethodCall(arrayField.type.asSimpleTypeReference().orElseThrow(), null, arrayField)}<#else>${arrayField.type.asComplexTypeReference().orElseThrow().name}IO.staticParse(readBuffer<#if field.params.isPresent()>, <#list field.params.orElseThrow() as parserArgument>(${helper.getLanguageTypeNameForTypeReference(helper.getArgumentType(arrayField.type, parserArgument?index))}) (${helper.toParseExpression(type, arrayField, parserArgument, parserArguments)})<#sep>, </#sep></#list></#if>)</#if>);
+        plc4c_list* ${arrayField.name};
+        plc4c_utils_list_create(&${arrayField.name});
+        int ${arrayField.name}EndPos = plc4c_spi_read_get_pos(readBuffer) + _${arrayField.name}Length;
+        while(plc4c_spi_read_get_pos(readBuffer) < ${arrayField.name}EndPos) {
+            plc4c_data* _item =<#if elementTypeReference.isSimpleTypeReference()>${helper.getReadBufferReadMethodCall(elementTypeReference.asSimpleTypeReference().orElseThrow(), null, arrayField)}<#else>${elementTypeReference.asNonSimpleTypeReference().orElseThrow().name}IO.staticParse(readBuffer<#if field.params.isPresent()>, <#list field.params.orElseThrow() as parserArgument>(${helper.getLanguageTypeNameForTypeReference(helper.getArgumentType(elementTypeReference, parserArgument?index))}) (${helper.toParseExpression(type, arrayField, parserArgument, parserArguments)})<#sep>, </#sep></#list></#if>)</#if>;
+            plc4c_utils_list_insert_head_value(${arrayField.name}, _item);
                         <#-- After parsing, update the current position, but only if it's needed -->
                             <#if arrayField.loopExpression.contains("curPos")>
-            curPos = readBuffer.getPos() - startPos;
+            curPos = plc4c_spi_read_get_pos(readBuffer) - startPos;
                             </#if>
         }
                         <#-- A terminated array keeps on reading data as long as the termination expression evaluates to false -->
                         <#elseif arrayField.isTerminatedArrayField()>
         // Terminated array
-        List<${helper.getLanguageTypeNameForField(arrayField)}> _${arrayField.name}List = new LinkedList<>();
+        plc4c_list* ${arrayField.name};
+        plc4c_utils_list_create(&${arrayField.name});
         while(!((boolean) (${helper.toParseExpression(type, arrayField, arrayField.loopExpression, parserArguments)}))) {
-            _${arrayField.name}List.add(<#if helper.isSimpleTypeReference(arrayField.type)>${helper.getReadBufferReadMethodCall(arrayField.type.asSimpleTypeReference().orElseThrow())}<#else>${arrayField.type.asComplexTypeReference().orElseThrow().name}IO.staticParse(readBuffer<#if arrayField.params.isPresent()>, <#list arrayField.params.orElseThrow() as parserArgument>(${helper.getLanguageTypeNameForTypeReference(helper.getArgumentType(arrayField.type, parserArgument?index))}) (${helper.toParseExpression(type, arrayField, parserArgument, parserArguments)})<#sep>, </#sep></#list></#if>)</#if>);
+            plc4c_data* _item =<#if elementTypeReference.isSimpleTypeReference()>${helper.getReadBufferReadMethodCall(elementTypeReference.asSimpleTypeReference().orElseThrow(), null, arrayField)}<#else>${elementTypeReference.asNonSimpleTypeReference().orElseThrow().name}IO.staticParse(readBuffer<#if field.params.isPresent()>, <#list field.params.orElseThrow() as parserArgument>(${helper.getLanguageTypeNameForTypeReference(helper.getArgumentType(elementTypeReference, parserArgument?index))}) (${helper.toParseExpression(type, arrayField, parserArgument, parserArguments)})<#sep>, </#sep></#list></#if>)</#if>;
+            plc4c_utils_list_insert_head_value(${arrayField.name}, _item);
 
                         <#-- After parsing, update the current position, but only if it's needed -->
                             <#if arrayField.loopExpression.contains("curPos")>
-            curPos = readBuffer.getPos() - startPos;
+            curPos = plc4c_spi_read_get_pos(readBuffer) - startPos;
                             </#if>
         }
                         </#if>
@@ -126,16 +132,16 @@ plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer*
                         type we have to iterate over it's elements and explicitly cast them.
                         Otherwise a simple toArray call is fine.
                     -->
-                        <#if helper.isSimpleTypeReference(arrayField.type)>
-        ${helper.getLanguageTypeNameForField(arrayField)}[] ${arrayField.name} = new ${helper.getLanguageTypeNameForField(arrayField)}[_${arrayField.name}List.size()];
+                        <#--if elementTypeReference.isSimpleTypeReference()>
+        ${helper.getLanguageTypeNameForField(arrayField)}[] ${arrayField.name} = malloc(sizeof(${helper.getLanguageTypeNameForField(arrayField)}) * _${arrayField.name}List.size()];
         for(int i = 0; i < _${arrayField.name}List.size(); i++) {
             ${arrayField.name}[i] = (${helper.getLanguageTypeNameForField(arrayField)}) _${arrayField.name}List.get(i);
         }
                         <#else>
         ${helper.getLanguageTypeNameForField(arrayField)}[] ${arrayField.name} = _${arrayField.name}List.toArray(new ${helper.getLanguageTypeNameForField(arrayField)}[0]);
-                        </#if>
+                        </#if-->
                     </#if>
-        *data_item = plc4c_data_create_list_data(*${arrayField.name});
+        *data_item = plc4c_data_create_list_data(${arrayField.name});
 
                     <#break>
                 <#case "const">
@@ -201,47 +207,273 @@ plc4c_return_code ${helper.getCTypeName(type.name)}_parse(plc4c_spi_read_buffer*
 
                 // Simple Field (${simpleField.name})
                 <#-- Inizialize a local variable with the simple type (Intentionally keeping the java-style names so they can be used in expressions) -->
-                <#if helper.isSimpleTypeReference(simpleField.type)>
+                <#if simpleField.type.isSimpleTypeReference()>
                 ${helper.getLanguageTypeNameForField(simpleField)} ${simpleField.name} = ${helper.getNullValueForTypeReference(simpleField.type)};
                 _res = ${helper.getReadBufferReadMethodCall(simpleField.type.asSimpleTypeReference().orElseThrow(), "&" + simpleField.name, simpleField)};
                 <#else>
                 <#-- Inizialize a local variable with the complex type (Intentionally keeping the java-style names so they can be used in expressions) -->
                 ${helper.getLanguageTypeNameForField(simpleField)}* ${simpleField.name};
-                _res = ${helper.getCTypeName(simpleField.type.asComplexTypeReference().orElseThrow().name)}_parse(readBuffer<#if simpleField.params.isPresent()>, <#list simpleField.params.orElseThrow() as parserTerm>${helper.toParseExpression(type, simpleField, parserTerm, parserArguments)}<#sep>, </#sep></#list></#if>, (void*) &${simpleField.name});
+                _res = ${helper.getCTypeName(simpleField.type.asNonSimpleTypeReference().orElseThrow().name)}_parse(readBuffer<#if simpleField.params.isPresent()>, <#list simpleField.params.orElseThrow() as parserTerm>${helper.toParseExpression(type, simpleField, parserTerm, parserArguments)}<#sep>, </#sep></#list></#if>, (void*) &${simpleField.name});
                 </#if>
                 if(_res != OK) {
                     return _res;
                 }
 
-                <#if case.name == "BitString">
-                *data_item = plc4c_data_create_${helper.getLanguageTypeNameForField(field)}_bit_string_data(${simpleField.name});
+                <#if case.name == "STRING">
+                    <#if simpleField.type.isVstringTypeReference()>
+                *data_item = plc4c_data_create_string_data(stringLength, ${simpleField.name});
+                    <#else>
+                *data_item = plc4c_data_create_string_data(${simpleField.type.asStringTypeReference().orElseThrow().sizeInBits}, ${simpleField.name});
+                    </#if>
                 <#else>
-                    // Hurz
-                *data_item = plc4c_data_create_${helper.getLanguageTypeNameForField(field)}_data(${simpleField.name});
+                *data_item = plc4c_data_create_${case.name?lower_case}_data(${simpleField.name});
                 </#if>
 
                     <#break>
             </#switch>
         </#list>
     }<#sep> else </#sep></#list>
-    </#if>
 
   return OK;
 }
 
-plc4c_return_code ${helper.getCTypeName(type.name)}_serialize(plc4c_spi_write_buffer* writeBuffer, plc4c_data** data_item<#if helper.getSerializerArguments(parserArguments)?has_content>, <#list helper.getSerializerArguments(parserArguments) as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)} ${parserArgument.name}<#sep>, </#sep></#list></#if>) {
+plc4c_return_code ${helper.getCTypeName(type.name)}_serialize(plc4c_spi_write_buffer* writeBuffer, <#if parserArguments?has_content><#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !parserArgument.type.isSimpleTypeReference() && !parserArgument.type.isEnumTypeReference()>*</#if> ${parserArgument.name}<#sep>, </#list>, </#if>plc4c_data** data_item) {
   plc4c_return_code _res = OK;
+    <#list type.switchField.orElseThrow().cases as case>
+        <#if case.discriminatorValueTerms?has_content>if(<#list case.discriminatorValueTerms as discriminatorValueTerm><#if case.discriminatorValueTerms?size &gt; 1>(</#if><#if helper.discriminatorValueNeedsStringEqualityCheck(type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index])>strcmp(${helper.toParseExpression(type, null, type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index], parserArguments)}, ${helper.toParseExpression(null, null, discriminatorValueTerm, parserArguments)}) == 0<#else>${helper.toParseExpression(type, null, type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index], parserArguments)} == <#if parserArguments[discriminatorValueTerm?index].type.isNonSimpleTypeReference()><#if parserArguments[discriminatorValueTerm?index].type.isEnumTypeReference()>${helper.getLanguageTypeNameForTypeReference(parserArguments[discriminatorValueTerm?index].type)}_${discriminatorValueTerm.asLiteral().orElseThrow().asVariableLiteral().orElseThrow().name}<#else>${helper.toParseExpression(type, null, discriminatorValueTerm, parserArguments)}</#if><#else>${helper.toParseExpression(type, null, discriminatorValueTerm, parserArguments)}</#if></#if><#if case.discriminatorValueTerms?size &gt; 1>)</#if><#sep> && </#sep></#list>) </#if>{ /* ${case.name} */
+        <#list case.fields as field>
+            <#switch field.typeName>
+                <#case "array">
+                    <#assign arrayField = field.asArrayField().orElseThrow()>
+                    <#assign elementTypeReference=arrayField.type.elementTypeReference>
 
+                    // Array field
+                    <#break>
+                <#case "checksum">
+                    <#assign checksumField = field.asChecksumField().orElseThrow()>
+                    <#assign simpleTypeReference = checksumField.type>
+
+                    // Checksum Field (checksum)
+                    <#break>
+                <#case "const">
+                    <#assign constField =  field.asConstField().orElseThrow()>
+                    <#assign simpleTypeReference = constField.type.asSimpleTypeReference().orElseThrow()>
+
+                    // Const Field (${constField.name})
+                    <#break>
+                <#case "discriminator">
+                    <#assign discriminatorField = field.asDiscriminatorField().orElseThrow()>
+
+                    // Discriminator Field (${discriminatorField.name})
+                    <#break>
+                <#case "enum">
+                    <#assign enumField =  field.asEnumField().orElseThrow()>
+
+                    // Enum Field (${enumField.name})
+                    <#break>
+                <#case "implicit">
+                    <#assign implicitField = field.asImplicitField().orElseThrow()>
+                    <#assign simpleTypeReference = implicitField.type.asSimpleTypeReference().orElseThrow()>
+
+                    // Implicit Field (${implicitField.name})
+                    <#break>
+                <#case "manualArray">
+                    <#assign manualArrayField = field.asManualArrayField().orElseThrow()>
+
+                    // Manual Array Field (${manualArrayField.name})
+                    <#break>
+                <#case "manual">
+                    <#assign manualField =  field.asManualField().orElseThrow()>
+
+                    // Manual Field (${manualField.name})
+                    <#break>
+                <#case "optional">
+                    <#assign optionalField = field.asOptionalField().orElseThrow()>
+
+                    // Optional Field (${optionalField.name})
+                    <#break>
+                <#case "padding">
+                    <#assign paddingField = field.asPaddingField().orElseThrow()>
+                    <#assign simpleTypeReference = paddingField.type.asSimpleTypeReference().orElseThrow()>
+
+                    // Padding Field (padding)
+                    <#break>
+                <#case "reserved">
+                    <#assign reservedField = field.asReservedField().orElseThrow()>
+                    <#assign simpleTypeReference = reservedField.type.asSimpleTypeReference().orElseThrow()>
+
+                    // Reserved Field (reserved)
+                    <#break>
+                <#case "simple">
+                    <#assign simpleField = field.asSimpleField().orElseThrow()>
+                    <#assign simpleTypeReference = simpleField.type.asSimpleTypeReference().orElseThrow()>
+
+                    // Simple field (${simpleField.name})
+                    _res = ${helper.getWriteBufferWriteMethodCall(simpleTypeReference, "(*data_item)->data." + case.name?lower_case + "_value", simpleField)};
+                    if(_res != OK) {
+                        return _res;
+                    }
+                    <#break>
+                <#case "virtual">
+                    <#assign virtualField = field.asVirtualField().orElseThrow()>
+
+                    // Virtual field (${simpleField.name})
+                    <#break>
+            </#switch>
+        </#list>
+        }<#sep> else </#sep></#list>
   return OK;
 }
 
-uint16_t ${helper.getCTypeName(type.name)}_length_in_bytes(plc4c_data* data_item) {
-  return ${helper.getCTypeName(type.name)}_length_in_bits(data_item) / 8;
+uint16_t ${helper.getCTypeName(type.name)}_length_in_bytes(plc4c_data* data_item<#if type.parserArguments.isPresent()>, <#list type.parserArguments.orElseThrow() as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)} ${helper.camelCaseToSnakeCase(parserArgument.name)}<#sep>, </#sep></#list></#if>) {
+  return ${helper.getCTypeName(type.name)}_length_in_bits(data_item<#if type.parserArguments.isPresent()>, <#list type.parserArguments.orElseThrow() as parserArgument>${helper.camelCaseToSnakeCase(parserArgument.name)}<#sep>, </#sep></#list></#if>) / 8;
 }
 
-uint16_t ${helper.getCTypeName(type.name)}_length_in_bits(plc4c_data* data_item) {
+uint16_t ${helper.getCTypeName(type.name)}_length_in_bits(plc4c_data* data_item<#if parserArguments?has_content>, <#list parserArguments as parserArgument>${helper.getLanguageTypeNameForTypeReference(parserArgument.type)}<#if !parserArgument.type.isSimpleTypeReference() && !parserArgument.type.isEnumTypeReference()>*</#if> ${parserArgument.name}<#sep>, </#list></#if>) {
   uint16_t lengthInBits = 0;
+    <#list type.switchField.orElseThrow().cases as case>
+    <#if case.discriminatorValueTerms?has_content>if(<#list case.discriminatorValueTerms as discriminatorValueTerm><#if case.discriminatorValueTerms?size &gt; 1>(</#if><#if helper.discriminatorValueNeedsStringEqualityCheck(type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index])>strcmp(${helper.toParseExpression(type, null, type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index], parserArguments)}, ${helper.toParseExpression(null, null, discriminatorValueTerm, parserArguments)}) == 0<#else>${helper.toParseExpression(type, null, type.switchField.orElseThrow().discriminatorExpressions[discriminatorValueTerm?index], parserArguments)} == <#if parserArguments[discriminatorValueTerm?index].type.isNonSimpleTypeReference()><#if parserArguments[discriminatorValueTerm?index].type.isEnumTypeReference()>${helper.getLanguageTypeNameForTypeReference(parserArguments[discriminatorValueTerm?index].type)}_${discriminatorValueTerm.asLiteral().orElseThrow().asVariableLiteral().orElseThrow().name}<#else>${helper.toParseExpression(type, null, discriminatorValueTerm, parserArguments)}</#if><#else>${helper.toParseExpression(type, null, discriminatorValueTerm, parserArguments)}</#if></#if><#if case.discriminatorValueTerms?size &gt; 1>)</#if><#sep> && </#sep></#list>) </#if>{ /* ${case.name} */
+        <#list case.fields as field>
+            <#switch field.typeName>
+                <#case "array">
+                    <#assign arrayField = field.asArrayField().orElseThrow()>
+                    <#assign elementTypeReference=arrayField.type.elementTypeReference>
 
+        // Array field
+                    <#if elementTypeReference.isSimpleTypeReference()>
+                        <#assign simpleTypeReference = elementTypeReference.asSimpleTypeReference().orElseThrow()>
+        lengthInBits += ${simpleTypeReference.sizeInBits} * plc4c_utils_list_size(data_item->data.list_value);
+                    <#else>
+        if(data_item->data.list_value != NULL) {
+            plc4c_list_element* curElement = data_item->data.list_value->tail;
+            while (curElement != NULL) {
+                lengthInBits += ${helper.getLengthInBitsFunctionNameForComplexTypedField(arrayField)}((${helper.getLanguageTypeNameForTypeReference(elementTypeReference)}*) curElement->value);
+                curElement = curElement->next;
+            }
+        }
+                    </#if>
+                    <#break>
+                <#case "checksum">
+                    <#assign checksumField = field.asChecksumField().orElseThrow()>
+                    <#assign simpleTypeReference = checksumField.type>
+
+        // Checksum Field (checksum)
+        lengthInBits += ${simpleTypeReference.sizeInBits};
+                    <#break>
+                <#case "const">
+                    <#assign constField =  field.asConstField().orElseThrow()>
+                    <#assign simpleTypeReference = constField.type.asSimpleTypeReference().orElseThrow()>
+
+        // Const Field (${constField.name})
+        lengthInBits += ${simpleTypeReference.sizeInBits};
+                    <#break>
+                <#case "discriminator">
+                    <#assign discriminatorField = field.asDiscriminatorField().orElseThrow()>
+
+        // Discriminator Field (${discriminatorField.name})
+                    <#if discriminatorField.type.isSimpleTypeReference()>
+                        <#assign simpleTypeReference = discriminatorField.type.asSimpleTypeReference().orElseThrow()>
+                        <#if simpleTypeReference.isVstringTypeReference()>
+                            <#assign vstringTypeReference = simpleTypeReference.asVstringTypeReference().orElseThrow()>
+        lengthInBits +=  ${helper.toParseExpression(type, discriminatorField, vstringTypeReference.lengthExpression, parserArguments)};
+                        <#else>
+        lengthInBits += ${simpleTypeReference.sizeInBits};
+                        </#if>
+                    <#elseif helper.isEnumField(field)>
+                        <#assign enumTypeReference = discriminatorField.type.asEnumTypeReference().orElseThrow()>
+        lengthInBits += ${enumTypeReference.baseTypeReference.orElseThrow().sizeInBits};
+                    <#else>
+        lengthInBits += ${discriminatorField.name}.getLengthInBits();
+                    </#if>
+                    <#break>
+                <#case "enum">
+                    <#assign enumField =  field.asEnumField().orElseThrow()>
+
+        // Enum Field (${enumField.name})
+        lengthInBits += ${helper.getEnumBaseTypeReference(enumField.type).sizeInBits};
+                <#break>
+                <#case "implicit">
+                    <#assign implicitField = field.asImplicitField().orElseThrow()>
+                    <#assign simpleTypeReference = implicitField.type.asSimpleTypeReference().orElseThrow()>
+
+        // Implicit Field (${implicitField.name})
+        lengthInBits += ${simpleTypeReference.sizeInBits};
+                    <#break>
+                <#case "manualArray">
+                    <#assign manualArrayField = field.asManualArrayField().orElseThrow()>
+
+        // Manual Array Field (${manualArrayField.name})
+        lengthInBits += ${helper.toSerializationExpression(type, manualArrayField, manualArrayField.lengthExpression, parserArguments)};
+                    <#break>
+                <#case "manual">
+                    <#assign manualField =  field.asManualField().orElseThrow()>
+
+        // Manual Field (${manualField.name})
+        <#-- if the expression uses the "_value", we need to locally define it so we can access it in the expression -->
+        <#if manualField.lengthExpression.contains("_value")>
+        {
+            ${helper.getLanguageTypeNameForField(manualField)} _value = data_item->data.${case.name?lower_case}_value;
+            lengthInBits += ${helper.toSerializationExpression(type, manualField, manualField.lengthExpression, parserArguments)};
+        }
+        <#else>
+        lengthInBits += ${helper.toSerializationExpression(type, manualField, manualField.lengthExpression, parserArguments)};
+        </#if>
+                    <#break>
+                <#case "optional">
+                    <#assign optionalField = field.asOptionalField().orElseThrow()>
+
+        // Optional Field (${optionalField.name})
+        if(data_item->${helper.getFieldName(type, optionalField)} != NULL) {
+                    <#if optionalField.type.isSimpleTypeReference()>
+                        <#assign simpleTypeReference = optionalField.type.asSimpleTypeReference().orElseThrow()>
+            lengthInBits += ${simpleTypeReference.sizeInBits};
+                    <#else>
+            lengthInBits += ${helper.getLengthInBitsFunctionNameForComplexTypedField(optionalField)}(data_item->${helper.getFieldName(type, optionalField)});
+                    </#if>
+        }
+                    <#break>
+                <#case "padding">
+                    <#assign paddingField = field.asPaddingField().orElseThrow()>
+                    <#assign simpleTypeReference = paddingField.type.asSimpleTypeReference().orElseThrow()>
+
+        // Padding Field (padding)
+                <#-- We're replacing the "lastItem" with 'false' here as the item itself can't know if it is the last -->
+        int _needsPadding = (int) (${helper.toSerializationExpression(type, paddingField, paddingField.paddingCondition, parserArguments)?replace("lastItem", "false")});
+        while(_needsPadding-- > 0) {
+            lengthInBits += ${simpleTypeReference.sizeInBits};
+        }
+                    <#break>
+                <#case "reserved">
+                    <#assign reservedField = field.asReservedField().orElseThrow()>
+                    <#assign simpleTypeReference = reservedField.type.asSimpleTypeReference().orElseThrow()>
+
+        // Reserved Field (reserved)
+        lengthInBits += ${simpleTypeReference.sizeInBits};
+                    <#break>
+                <#case "simple">
+                    <#assign simpleField = field.asSimpleField().orElseThrow()>
+
+        // Simple field (${simpleField.name})
+                    <#if simpleField.type.isSimpleTypeReference()>
+                        <#assign simpleTypeReference = simpleField.type.asSimpleTypeReference().orElseThrow()>
+                        <#if simpleTypeReference.isVstringTypeReference()>
+                            <#assign vstringTypeReference = simpleTypeReference.asVstringTypeReference().orElseThrow()>
+        lengthInBits +=  ${helper.toSerializationExpression(type, simpleField, vstringTypeReference.lengthExpression, parserArguments)};
+                        <#else>
+        lengthInBits += ${simpleTypeReference.sizeInBits};
+                        </#if>
+                    <#else>
+        lengthInBits += ${helper.getLengthInBitsFunctionNameForComplexTypedField(simpleField)}(<#if simpleField.type.isEnumTypeReference()>&</#if>data_item->${helper.getFieldName(type, simpleField)});
+                    </#if>
+                    <#break>
+                <#case "virtual">
+                    <#assign virtualField = field.asVirtualField().orElseThrow()>
+
+        // A virtual field doesn't have any in- or output.
+                    <#break>
+            </#switch>
+        </#list>
+    }<#sep> else </#sep></#list>
   return lengthInBits;
 }
 

@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,6 +19,8 @@
 package org.apache.plc4x.java.spi.generation;
 
 import com.github.jinahya.bit.io.BufferByteOutput;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.plc4x.java.api.exceptions.PlcRuntimeException;
 import org.apache.plc4x.java.spi.generation.io.MyDefaultBitOutput;
 
 import java.io.IOException;
@@ -26,6 +28,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import static org.apache.commons.lang3.ArrayUtils.subarray;
 
 public class WriteBufferByteBased implements WriteBuffer {
 
@@ -56,20 +61,21 @@ public class WriteBufferByteBased implements WriteBuffer {
         bb.position(position);
     }
 
+    /**
+     * @deprecated use {@link WriteBufferByteBased#getBytes()}
+     */
+    @Deprecated
     public byte[] getData() {
-        return bb.array();
+        return getBytes();
+    }
+
+    public byte[] getBytes() {
+        return ArrayUtils.subarray(bb.array(), 0, getPos());
     }
 
     @Override
     public int getPos() {
         return (int) bo.getPos();
-    }
-
-    public byte[] getBytes(int startPos, int endPos) {
-        int numBytes = endPos - startPos;
-        byte[] data = new byte[numBytes];
-        System.arraycopy(bb.array(), startPos, data, 0, numBytes);
-        return data;
     }
 
     @Override
@@ -299,20 +305,36 @@ public class WriteBufferByteBased implements WriteBuffer {
 
     @Override
     public void writeString(String logicalName, int bitLength, String encoding, String value, WithWriterArgs... writerArgs) throws SerializationException {
-        final byte[] bytes = value.getBytes(Charset.forName(encoding.replaceAll("[^a-zA-Z0-9]", "")));
-        int fixedByteLength = bitLength / 8;
+        byte[] bytes;
+        encoding = encoding.replaceAll("[^a-zA-Z0-9]", "");
+        switch (encoding.toUpperCase()) {
+            case "UTF8": {
+                bytes = value.getBytes(StandardCharsets.UTF_8);
+                break;
+            }
+            case "UTF16":
+            case "UTF16LE":
+            case "UTF16BE": {
+                bytes = value.getBytes(StandardCharsets.UTF_16);
+                break;
+            }
+            default:
+                throw new SerializationException("Unsupported encoding: " + encoding);
+        }
 
+        int fixedByteLength = (int) Math.ceil((float) bitLength / 8.0);
         if (bitLength == 0) {
             fixedByteLength = bytes.length;
         }
 
         try {
-            for (int i = 0; i < fixedByteLength; i++) {
-                if (i >= bytes.length) {
-                    bo.writeByte(false, 8, (byte) 0x00);
-                } else {
-                    bo.writeByte(false, 8, bytes[i]);
-                }
+            int offset = bytes.length - fixedByteLength;
+            while (offset < 0) {
+                bo.writeByte(false, 8, (byte) 0x00);
+                offset++;
+            }
+            for (int i = offset; i < bytes.length; i++) {
+                bo.writeByte(false, 8, bytes[i]);
             }
         } catch (IOException e) {
             throw new SerializationException("Error writing string", e);
