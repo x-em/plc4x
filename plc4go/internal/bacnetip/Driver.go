@@ -22,8 +22,14 @@ package bacnetip
 import (
 	"context"
 	"fmt"
+	"math"
+	"net"
+	"net/url"
+	"strconv"
+
 	"github.com/apache/plc4x/plc4go/pkg/api"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
+	"github.com/apache/plc4x/plc4go/protocols/bacnetip/readwrite/model"
 	"github.com/apache/plc4x/plc4go/spi"
 	_default "github.com/apache/plc4x/plc4go/spi/default"
 	"github.com/apache/plc4x/plc4go/spi/options"
@@ -31,10 +37,6 @@ import (
 	"github.com/apache/plc4x/plc4go/spi/transports/udp"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"math"
-	"net"
-	"net/url"
-	"strconv"
 )
 
 type Driver struct {
@@ -42,11 +44,12 @@ type Driver struct {
 	tm                      spi.RequestTransactionManager
 	awaitSetupComplete      bool
 	awaitDisconnectComplete bool
+	DeviceInventory         DeviceInventory
 }
 
 func NewDriver() plc4go.PlcDriver {
 	return &Driver{
-		DefaultDriver:           _default.NewDefaultDriver("bacnet-ip", "BACnet/IP", "udp", NewFieldHandler()),
+		DefaultDriver:           _default.NewDefaultDriver("bacnet-ip", "BACnet/IP", "udp", NewTagHandler()),
 		tm:                      *spi.NewRequestTransactionManager(math.MaxInt),
 		awaitSetupComplete:      true,
 		awaitDisconnectComplete: true,
@@ -66,7 +69,7 @@ func (m *Driver) GetConnection(transportUrl url.URL, transports map[string]trans
 		return ch
 	}
 	// Provide a default-port to the transport, which is used, if the user doesn't provide on in the connection string.
-	options["defaultUdpPort"] = []string{"47808"}
+	options["defaultUdpPort"] = []string{strconv.Itoa(int(model.BacnetConstants_BACNETUDPDEFAULTPORT))}
 	// Set so_reuse by default
 	if _, ok := options["so-reuse"]; !ok {
 		options["so-reuse"] = []string{"true"}
@@ -121,11 +124,11 @@ func (m *Driver) GetConnection(transportUrl url.URL, transports map[string]trans
 		return ch
 	}
 
-	codec := NewMessageCodec(transportInstance)
+	codec := NewApplicationLayerMessageCodec(transportInstance, &m.DeviceInventory)
 	log.Debug().Msgf("working with codec %#v", codec)
 
 	// Create the new connection
-	connection := NewConnection(codec, m.GetPlcFieldHandler(), &m.tm, options)
+	connection := NewConnection(codec, m.GetPlcTagHandler(), &m.tm, options)
 	log.Debug().Msg("created connection, connecting now")
 	return connection.Connect()
 }

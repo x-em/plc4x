@@ -22,10 +22,11 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/icza/bitio"
-	"github.com/pkg/errors"
 	"math"
 	"math/big"
+
+	"github.com/icza/bitio"
+	"github.com/pkg/errors"
 )
 
 type ReadBufferByteBased interface {
@@ -35,25 +36,26 @@ type ReadBufferByteBased interface {
 	PeekByte(offset byte) byte
 }
 
-func NewReadBufferByteBased(data []byte) ReadBufferByteBased {
+func NewReadBufferByteBased(data []byte, options ...ReadBufferByteBasedOptions) ReadBufferByteBased {
 	buffer := bytes.NewBuffer(data)
 	reader := bitio.NewReader(buffer)
-	return &byteReadBuffer{
+	b := &byteReadBuffer{
 		data:      data,
 		reader:    reader,
 		pos:       uint64(0),
 		byteOrder: binary.BigEndian,
 	}
+	for _, option := range options {
+		option(b)
+	}
+	return b
 }
 
-func NewLittleEndianReadBufferByteBased(data []byte) ReadBufferByteBased {
-	buffer := bytes.NewBuffer(data)
-	reader := bitio.NewReader(buffer)
-	return &byteReadBuffer{
-		data:      data,
-		reader:    reader,
-		pos:       uint64(0),
-		byteOrder: binary.LittleEndian,
+type ReadBufferByteBasedOptions = func(b *byteReadBuffer)
+
+func WithByteOrderForReadBufferByteBased(byteOrder binary.ByteOrder) ReadBufferByteBasedOptions {
+	return func(b *byteReadBuffer) {
+		b.byteOrder = byteOrder
 	}
 }
 
@@ -278,6 +280,7 @@ func (rb *byteReadBuffer) ReadBigInt(_ string, bitLength uint64, _ ...WithReader
 		}
 		// we now read the bits
 		data := rb.reader.TryReadBits(bitToRead)
+		rb.pos += bitLength
 
 		// and check for uneven bits for a right shift at the end
 		correction = 64 - bitToRead

@@ -62,9 +62,7 @@ func (m *_NLMIAmRouterToNetwork) GetMessageType() uint8 {
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-func (m *_NLMIAmRouterToNetwork) InitializeParent(parent NLM, vendorId *BACnetVendorId) {
-	m.VendorId = vendorId
-}
+func (m *_NLMIAmRouterToNetwork) InitializeParent(parent NLM) {}
 
 func (m *_NLMIAmRouterToNetwork) GetParent() NLM {
 	return m._NLM
@@ -85,10 +83,10 @@ func (m *_NLMIAmRouterToNetwork) GetDestinationNetworkAddress() []uint16 {
 ///////////////////////////////////////////////////////////
 
 // NewNLMIAmRouterToNetwork factory function for _NLMIAmRouterToNetwork
-func NewNLMIAmRouterToNetwork(destinationNetworkAddress []uint16, vendorId *BACnetVendorId, apduLength uint16) *_NLMIAmRouterToNetwork {
+func NewNLMIAmRouterToNetwork(destinationNetworkAddress []uint16, apduLength uint16) *_NLMIAmRouterToNetwork {
 	_result := &_NLMIAmRouterToNetwork{
 		DestinationNetworkAddress: destinationNetworkAddress,
-		_NLM:                      NewNLM(vendorId, apduLength),
+		_NLM:                      NewNLM(apduLength),
 	}
 	_result._NLM._NLMChildRequirements = _result
 	return _result
@@ -128,7 +126,11 @@ func (m *_NLMIAmRouterToNetwork) GetLengthInBytes() uint16 {
 	return m.GetLengthInBits() / 8
 }
 
-func NLMIAmRouterToNetworkParse(readBuffer utils.ReadBuffer, apduLength uint16, messageType uint8) (NLMIAmRouterToNetwork, error) {
+func NLMIAmRouterToNetworkParse(theBytes []byte, apduLength uint16) (NLMIAmRouterToNetwork, error) {
+	return NLMIAmRouterToNetworkParseWithBuffer(utils.NewReadBufferByteBased(theBytes), apduLength)
+}
+
+func NLMIAmRouterToNetworkParseWithBuffer(readBuffer utils.ReadBuffer, apduLength uint16) (NLMIAmRouterToNetwork, error) {
 	positionAware := readBuffer
 	_ = positionAware
 	if pullErr := readBuffer.PullContext("NLMIAmRouterToNetwork"); pullErr != nil {
@@ -144,7 +146,7 @@ func NLMIAmRouterToNetworkParse(readBuffer utils.ReadBuffer, apduLength uint16, 
 	// Length array
 	var destinationNetworkAddress []uint16
 	{
-		_destinationNetworkAddressLength := uint16(apduLength) - uint16((utils.InlineIf((bool((bool((messageType) >= (128)))) && bool((bool((messageType) <= (255))))), func() interface{} { return uint16(uint16(3)) }, func() interface{} { return uint16(uint16(1)) }).(uint16)))
+		_destinationNetworkAddressLength := uint16(apduLength) - uint16(uint16(1))
 		_destinationNetworkAddressEndPos := positionAware.GetPos() + uint16(_destinationNetworkAddressLength)
 		for positionAware.GetPos() < _destinationNetworkAddressEndPos {
 			_item, _err := readBuffer.ReadUint16("", 16)
@@ -173,7 +175,15 @@ func NLMIAmRouterToNetworkParse(readBuffer utils.ReadBuffer, apduLength uint16, 
 	return _child, nil
 }
 
-func (m *_NLMIAmRouterToNetwork) Serialize(writeBuffer utils.WriteBuffer) error {
+func (m *_NLMIAmRouterToNetwork) Serialize() ([]byte, error) {
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes())))
+	if err := m.SerializeWithWriteBuffer(wb); err != nil {
+		return nil, err
+	}
+	return wb.GetBytes(), nil
+}
+
+func (m *_NLMIAmRouterToNetwork) SerializeWithWriteBuffer(writeBuffer utils.WriteBuffer) error {
 	positionAware := writeBuffer
 	_ = positionAware
 	ser := func() error {
