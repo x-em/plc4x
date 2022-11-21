@@ -19,35 +19,39 @@
 
 package bacnetip
 
-import "time"
+import (
+	"github.com/pkg/errors"
+)
 
-// TODO: this is a placeholder for a tasking framework
-type _Task struct {
-	taskTime    time.Time
-	isScheduled bool
+type UDPActor struct {
 }
 
-func (t *_Task) InstallTask(when *time.Time, delta *time.Duration) {
-	// TODO: schedule task
+type UDPPickleActor struct {
+	*UDPActor
 }
 
-func (t *_Task) SuspendTask() {
-	// TODO: suspend task
+// TODO: finish me
+type UDPDirector struct {
+	*Server
+	*ServiceAccessPoint
 }
 
-func (t *_Task) Resume() {
-	// TODO: resume task
+func (d *UDPDirector) Close() {
+
 }
 
-type OneShotTask struct {
-	_Task
-}
+func NewUDPDirector(address *AddressTuple[string, uint16], timeout *int, reuse *bool, sid *int, sapID *int) (*UDPDirector, error) {
+	u := &UDPDirector{}
+	var err error
+	u.Server, err = NewServer(sid, u)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating server")
+	}
+	u.ServiceAccessPoint, err = NewServiceAccessPoint(sapID, u)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating service access point")
+	}
 
-type OneShotDeleteTask struct {
-	_Task
-}
-
-func FunctionTask(func()) _Task {
-	// TODO: implement me
-	return _Task{}
+	// TODO: finish this
+	return u, nil
 }

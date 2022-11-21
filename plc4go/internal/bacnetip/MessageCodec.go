@@ -55,7 +55,11 @@ func NewApplicationLayerMessageCodec(udpTransport *udp.Transport, transportUrl u
 		localAddress:  localAddress,
 		remoteAddress: remoteAddress,
 	}
-	application, err := NewBIPSimpleApplication(&local.LocalDeviceObject{}, localAddress, &a.deviceInfoCache, nil)
+	address, err := NewAddress(localAddress)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating address")
+	}
+	application, err := NewBIPSimpleApplication(&local.LocalDeviceObject{}, *address, &a.deviceInfoCache, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +92,11 @@ func (m *ApplicationLayerMessageCodec) IsRunning() bool {
 }
 
 func (m *ApplicationLayerMessageCodec) Send(message spi.Message) error {
-	iocb, err := NewIOCB(message.(model.APDU), m.remoteAddress)
+	address, err2 := NewAddress(m.remoteAddress)
+	if err2 != nil {
+		panic(err2)
+	}
+	iocb, err := NewIOCB(NewPDU(message, WithPDUDestination(*address)), m.remoteAddress)
 	if err != nil {
 		return errors.Wrap(err, "error creating IOCB")
 	}
@@ -97,8 +105,10 @@ func (m *ApplicationLayerMessageCodec) Send(message spi.Message) error {
 		iocb.Wait()
 		if iocb.ioError != nil {
 			// TODO: handle error
+			println(iocb.ioError)
 		} else if iocb.ioResponse != nil {
 			// TODO: response?
+			println(iocb.ioResponse)
 		} else {
 			// TODO: what now?
 		}
@@ -107,11 +117,16 @@ func (m *ApplicationLayerMessageCodec) Send(message spi.Message) error {
 }
 
 func (m *ApplicationLayerMessageCodec) Expect(ctx context.Context, acceptsMessage spi.AcceptsMessage, handleMessage spi.HandleMessage, handleError spi.HandleError, ttl time.Duration) error {
-	panic("not yet mapped")
+	// TODO: implement me
+	return nil
 }
 
 func (m *ApplicationLayerMessageCodec) SendRequest(ctx context.Context, message spi.Message, acceptsMessage spi.AcceptsMessage, handleMessage spi.HandleMessage, handleError spi.HandleError, ttl time.Duration) error {
-	panic("not yet mapped")
+
+	// TODO: implement me
+	m.Send(message)
+
+	return nil
 }
 
 func (m *ApplicationLayerMessageCodec) GetDefaultIncomingMessageChannel() chan spi.Message {
