@@ -24,14 +24,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.plc4x.java.api.exceptions.PlcRuntimeException;
 import org.apache.plc4x.java.api.types.PlcValueType;
+import org.apache.plc4x.java.spi.codegen.WithOption;
 import org.apache.plc4x.java.spi.generation.SerializationException;
 import org.apache.plc4x.java.spi.generation.WriteBuffer;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "className")
 public class PlcLDATE extends PlcSimpleValue<LocalDate> {
@@ -46,28 +45,33 @@ public class PlcLDATE extends PlcSimpleValue<LocalDate> {
         throw new PlcRuntimeException("Invalid value type");
     }
 
+    public static PlcLDATE ofNanosecondsSinceEpoch(BigInteger nanosecondsSinceEpoch) {
+        BigInteger epochSecond = nanosecondsSinceEpoch.divide(BigInteger.valueOf(1000_000));
+        BigInteger nanoOfSecond = nanosecondsSinceEpoch.mod(BigInteger.valueOf(1000_000));
+        return new PlcLDATE(LocalDateTime.ofEpochSecond(epochSecond.longValue(), nanoOfSecond.intValue(),
+            ZoneOffset.of(ZoneOffset.systemDefault().getId())).toLocalDate());
+    }
+
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public PlcLDATE(@JsonProperty("value") LocalDate value) {
         super(value, true);
     }
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public PlcLDATE(@JsonProperty("value") Integer value) {
-        // In this case the date is the number of days since 1990-01-01
-        // So we gotta add 7305 days to the value to have it relative to epoch
-        // Then we also need to transform it from days to seconds by multiplying by 86400
-        super(LocalDateTime.ofInstant(Instant.ofEpochSecond((value + 7305L) * 86400L),
-            ZoneId.systemDefault()).toLocalDate(), true);
-    }
-
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public PlcLDATE(@JsonProperty("value") Long value) {
-        super(LocalDateTime.ofInstant(Instant.ofEpochSecond(value), ZoneId.systemDefault()).toLocalDate(), true);
+    public PlcLDATE(@JsonProperty("value") BigInteger nanosecondsSinceEpoch) {
+        super(LocalDateTime.ofEpochSecond(nanosecondsSinceEpoch.longValue() / 1000000,
+            (int) (nanosecondsSinceEpoch.longValue() % 1000000),
+            ZoneOffset.of(ZoneOffset.systemDefault().getId())).toLocalDate(), true);
     }
 
     @Override
     public PlcValueType getPlcValueType() {
         return PlcValueType.DATE;
+    }
+
+    public BigInteger getNanosecondsSinceEpoch() {
+        Instant instant = getDateTime().toInstant(ZoneOffset.of(ZoneOffset.systemDefault().getId()));
+        return BigInteger.valueOf(instant.getEpochSecond()).multiply(BigInteger.valueOf(1000_000_000)).add(BigInteger.valueOf(instant.getNano()));
     }
 
     @Override
@@ -114,7 +118,9 @@ public class PlcLDATE extends PlcSimpleValue<LocalDate> {
     @Override
     public void serialize(WriteBuffer writeBuffer) throws SerializationException {
         String valueString = value.toString();
-        writeBuffer.writeString(getClass().getSimpleName(), valueString.getBytes(StandardCharsets.UTF_8).length * 8, StandardCharsets.UTF_8.name(), valueString);
+        writeBuffer.writeString(getClass().getSimpleName(),
+            valueString.getBytes(StandardCharsets.UTF_8).length * 8,
+            valueString, WithOption.WithEncoding(StandardCharsets.UTF_8.name()));
     }
 
 }

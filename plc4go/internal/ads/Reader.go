@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/apache/plc4x/plc4go/internal/ads/model"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	"github.com/apache/plc4x/plc4go/pkg/api/values"
 	driverModel "github.com/apache/plc4x/plc4go/protocols/ads/readwrite/model"
@@ -66,8 +67,8 @@ func (m *Connection) singleRead(ctx context.Context, readRequest apiModel.PlcRea
 	// Here we can be sure that we're only handling a single request.
 	tagName := readRequest.GetTagNames()[0]
 	tag := readRequest.GetTag(tagName)
-	if needsResolving(tag) {
-		adsField, err := castToSymbolicPlcTagFromPlcTag(tag)
+	if model.NeedsResolving(tag) {
+		adsField, err := model.CastToSymbolicPlcTagFromPlcTag(tag)
 		if err != nil {
 			result <- &internalModel.DefaultPlcReadRequestResult{
 				Request:  readRequest,
@@ -89,7 +90,7 @@ func (m *Connection) singleRead(ctx context.Context, readRequest apiModel.PlcRea
 			return
 		}
 	}
-	directAdsTag, ok := tag.(*DirectPlcTag)
+	directAdsTag, ok := tag.(*model.DirectPlcTag)
 	if !ok {
 		result <- &internalModel.DefaultPlcReadRequestResult{
 			Request:  readRequest,
@@ -142,12 +143,12 @@ func (m *Connection) multiRead(ctx context.Context, readRequest apiModel.PlcRead
 	// Calculate the size of all tags together.
 	// Calculate the expected size of the response data.
 	expectedResponseDataSize := uint32(0)
-	directAdsTags := map[string]*DirectPlcTag{}
+	directAdsTags := map[string]*model.DirectPlcTag{}
 	requestItems := make([]driverModel.AdsMultiRequestItem, 0)
 	for _, tagName := range readRequest.GetTagNames() {
 		tag := readRequest.GetTag(tagName)
-		if needsResolving(tag) {
-			adsField, err := castToSymbolicPlcTagFromPlcTag(tag)
+		if model.NeedsResolving(tag) {
+			adsField, err := model.CastToSymbolicPlcTagFromPlcTag(tag)
 			if err != nil {
 				result <- &internalModel.DefaultPlcReadRequestResult{
 					Request:  readRequest,
@@ -169,7 +170,7 @@ func (m *Connection) multiRead(ctx context.Context, readRequest apiModel.PlcRead
 				return
 			}
 		}
-		directAdsTag, ok := tag.(*DirectPlcTag)
+		directAdsTag, ok := tag.(*model.DirectPlcTag)
 		if !ok {
 			result <- &internalModel.DefaultPlcReadRequestResult{
 				Request:  readRequest,
@@ -313,67 +314,3 @@ func (m *Connection) parsePlcValue(dataType driverModel.AdsDataTypeTableEntry, a
 		return driverModel.DataItemParseWithBuffer(rb, adsValueType, stringLength)
 	}
 }
-
-/*func (m *Connection) ToPlc4xReadResponse(adsReadResponse driverModel.AdsReadResponse, readRequest apiModel.PlcReadRequest) (apiModel.PlcReadResponse, error) {
-	var rb utils.ReadBuffer
-	responseCodes := map[string]apiModel.PlcResponseCode{}
-	switch data := amsTcpPaket.GetUserdata().(type) {
-	case driverModel.AdsReadResponse:
-		rb = utils.NewReadBufferByteBased(data.GetData(), utils.WithByteOrderForReadBufferByteBased(binary.LittleEndian))
-		for _, fieldName := range readRequest.GetTagNames() {
-			responseCodes[fieldName] = apiModel.PlcResponseCode_OK
-		}
-	case driverModel.AdsReadWriteResponse:
-		rb = utils.NewReadBufferByteBased(data.GetData(), utils.WithByteOrderForReadBufferByteBased(binary.LittleEndian))
-		// When parsing a multi-item response, the error codes of each items come
-		// in sequence and then come the values.
-		for _, fieldName := range readRequest.GetTagNames() {
-			if len(readRequest.GetTagNames()) <= 1 {
-				// TODO: the comment above seems strange as there is no such spec for response codes per field so maybe this is a speciality
-				break
-			}
-			responseCode, err := rb.ReadUint32("responseCode", 32)
-			if err != nil {
-				log.Error().Err(err).Str("fieldName", fieldName).Msgf("Error parsing field %s", fieldName)
-				responseCodes[fieldName] = apiModel.PlcResponseCode_INTERNAL_ERROR
-				continue
-			}
-			val, _ := driverModel.ReturnCodeByValue(responseCode)
-			switch val {
-			case driverModel.ReturnCode_OK:
-				responseCodes[fieldName] = apiModel.PlcResponseCode_OK
-			default:
-				// TODO: Implement this a little more ...
-				log.Error().Stringer("adsReturnCode", val).Msgf("Unmapped return code for %s", fieldName)
-				responseCodes[fieldName] = apiModel.PlcResponseCode_INTERNAL_ERROR
-			}
-		}
-	default:
-		return nil, errors.Errorf("unsupported response type %T", data)
-	}
-
-	plcValues := map[string]values.PlcValue{}
-	// Get the field from the request
-	for _, fieldName := range readRequest.GetTagNames() {
-		log.Debug().Msgf("get a field from request with name %s", fieldName)
-		field, err := castToAdsFieldFromPlcField(readRequest.GetTag(fieldName))
-		if err != nil {
-			return nil, errors.Wrap(err, "error casting to ads-field")
-		}
-
-		// Decode the data according to the information from the request
-		log.Trace().Msg("decode data")
-		value, err := driverModel.DataItemParseWithBuffer(rb, field.GetDatatype().PlcValueType(), field.GetStringLength())
-		if err != nil {
-			log.Error().Err(err).Msg("Error parsing data item")
-			responseCodes[fieldName] = apiModel.PlcResponseCode_INTERNAL_ERROR
-			continue
-		}
-		plcValues[fieldName] = value
-		responseCodes[fieldName] = apiModel.PlcResponseCode_OK
-	}
-
-	// Return the response
-	log.Trace().Msg("Returning the response")
-	return internalModel.NewDefaultPlcReadResponse(readRequest, responseCodes, plcValues), nil
-}*/

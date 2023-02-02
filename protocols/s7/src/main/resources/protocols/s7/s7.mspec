@@ -1,4 +1,4 @@
-/*
+'/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -223,7 +223,7 @@
 [discriminatedType S7Payload (uint 8 messageType, S7Parameter parameter)
     [typeSwitch parameter.parameterType, messageType
         ['0x04','0x03' S7PayloadReadVarResponse
-            [array S7VarPayloadDataItem items count 'CAST(parameter, "S7ParameterReadVarResponse").numItems']
+            [array S7VarPayloadDataItem /*('true')*/ items count 'CAST(parameter, "S7ParameterReadVarResponse").numItems']
         ]
         ['0x05','0x01' S7PayloadWriteVarRequest
             [array S7VarPayloadDataItem items count 'COUNT(CAST(parameter, "S7ParameterWriteVarRequest").items)']
@@ -238,12 +238,15 @@
 ]
 
 // This is actually not quite correct as depending pon the transportSize the length is either defined in bits or bytes.
-[type S7VarPayloadDataItem
+//@param hasNext In the serialization process, if you have multiple write
+//               requests the last element does not require padding.
+[type S7VarPayloadDataItem/*(bit hasNext)*/
     [simple   DataTransportErrorCode returnCode]
     [simple   DataTransportSize      transportSize]
     [implicit uint 16                dataLength 'COUNT(data) * ((transportSize == DataTransportSize.BIT) ? 1 : (transportSize.sizeInBits ? 8 : 1))']
     [array    byte                   data       count 'transportSize.sizeInBits ? CEIL(dataLength / 8.0) : dataLength']
-    [padding  uint 8                 pad        '0x00' 'COUNT(data) % 2']
+    [padding  uint 8                 pad        '0x00' '(COUNT(data) % 2)']
+    //[padding  uint 8                 pad        '0x00' '(PADCOUNT(data, hasNext) % 2)']
 ]
 
 [type S7VarPayloadStatusItem
@@ -614,26 +617,38 @@
         // -----------------------------------------
         // TIA Date-Formats
         // -----------------------------------------
-        // Interpreted as "milliseconds"
+        // - Duration: Interpreted as "milliseconds"
         ['"IEC61131_TIME"' TIME
-            [simple uint 32 value]
+            [simple uint 32 milliseconds]
         ]
         //['"S7_S5TIME"' TIME
         //    [reserved uint 2  '0x00']
         //    [uint     uint 2  'base']
         //    [simple   uint 12 value]
         //]
-        // Interpreted as "number of nanoseconds"
+        // - Duration: Interpreted as "number of nanoseconds"
         ['"IEC61131_LTIME"' LTIME
-            [simple uint 64 value]
+            [simple uint 64 nanoseconds]
         ]
-        // Interpreted as "number of days since 1990-01-01"
+        // - Date: Interpreted as "number of days since 1990-01-01"
         ['"IEC61131_DATE"' DATE
-            [simple uint 16 value]
+            [simple uint 16 daysSinceSiemensEpoch]
+            // Number of days between 1990-01-01 and 1970-01-01 according to https://www.timeanddate.com/
+            //[virtual uint 16 daysSinceEpoch 'daysSinceSiemensEpoch + 7305']
         ]
+        //['"IEC61131_LDATE"' LDATE
+        //    [implicit uint 16 daysSinceSiemensEpoch 'daysSinceEpoch - 7305']
+        //    [virtual uint 16 daysSinceEpoch 'daysSinceSiemensEpoch + 7305']
+        //]
+        // - Time: Interpreted as "milliseconds since midnight (0:00)"
         ['"IEC61131_TIME_OF_DAY"' TIME_OF_DAY
-            [simple uint 32 value]
+            [simple uint 32 millisecondsSinceMidnight]
         ]
+        // - Time: Interpreted as "nanoseconds since midnight (0:00)"
+        ['"IEC61131_LTIME_OF_DAY"' LTIME_OF_DAY
+            [simple uint 64 nanosecondsSinceMidnight]
+        ]
+        // - Date & Time: interpreted as individual components.
         ['"IEC61131_DATE_AND_TIME"' DATE_AND_TIME
             [simple uint 16 year]
             [simple uint 8  month]
@@ -642,8 +657,13 @@
             [simple uint 8  hour]
             [simple uint 8  minutes]
             [simple uint 8  seconds]
-            [simple uint 32 nanos]
+            [simple uint 32 nanoseconds]
         ]
+        // - Date & Time: Interpreted as "number of nanoseconds since 1990-01-01"
+        //['"IEC61131_LDATE_AND_TIME"' LDATE_AND_TIME
+        //    [implicit uint 16 nanosecondsSinceSiemensEpoch 'nanosecondsSinceEpoch ...']
+        //    [virtual uint 16 nanosecondsSinceEpoch 'nanosecondsSinceSiemensEpoch ...']
+        //]
     ]
 ]
 

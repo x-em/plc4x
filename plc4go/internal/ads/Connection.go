@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 
+	model2 "github.com/apache/plc4x/plc4go/internal/ads/model"
 	"github.com/apache/plc4x/plc4go/pkg/api"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	"github.com/apache/plc4x/plc4go/pkg/api/values"
@@ -42,37 +43,38 @@ import (
 
 type Connection struct {
 	_default.DefaultConnection
+
 	messageCodec       spi.MessageCodec
 	requestInterceptor interceptors.RequestInterceptor
-	configuration      Configuration
-	driverContext      DriverContext
+	configuration      model2.Configuration
+	driverContext      *DriverContext
 	tracer             *spi.Tracer
+
+	subscriptions map[uint32]apiModel.PlcSubscriptionHandle
 }
 
-func NewConnection(messageCodec spi.MessageCodec, configuration Configuration, tagHandler spi.PlcTagHandler, options map[string][]string) (*Connection, error) {
+func NewConnection(messageCodec spi.MessageCodec, configuration model2.Configuration, options map[string][]string) (*Connection, error) {
 	driverContext, err := NewDriverContext(configuration)
 	if err != nil {
 		return nil, err
 	}
 	connection := &Connection{
-		messageCodec: messageCodec,
-		requestInterceptor: interceptors.NewSingleItemRequestInterceptor(
-			internalModel.NewDefaultPlcReadRequest,
-			internalModel.NewDefaultPlcWriteRequest,
-			internalModel.NewDefaultPlcReadResponse,
-			internalModel.NewDefaultPlcWriteResponse,
-		),
+		messageCodec:  messageCodec,
 		configuration: configuration,
 		driverContext: driverContext,
+		subscriptions: map[uint32]apiModel.PlcSubscriptionHandle{},
 	}
 	if traceEnabledOption, ok := options["traceEnabled"]; ok {
 		if len(traceEnabledOption) == 1 {
+			// TODO: Connection Id is probably "" all the time.
 			connection.tracer = spi.NewTracer(driverContext.connectionId)
 		}
 	}
+	tagHandler := NewTagHandlerWithDriverContext(driverContext)
+	valueHandler := NewValueHandlerWithDriverContext(driverContext, tagHandler)
 	connection.DefaultConnection = _default.NewDefaultConnection(connection,
 		_default.WithPlcTagHandler(tagHandler),
-		_default.WithPlcValueHandler(NewValueHandler()),
+		_default.WithPlcValueHandler(valueHandler),
 	)
 	return connection, nil
 }
@@ -100,12 +102,8 @@ func (m *Connection) Connect() <-chan plc4go.PlcConnectionConnectResult {
 	log.Trace().Msg("Connecting")
 	ch := make(chan plc4go.PlcConnectionConnectResult)
 
-	var err error
-	m.driverContext, err = NewDriverContext(m.configuration)
-	if err != nil {
-		ch <- _default.NewDefaultPlcConnectionConnectResult(m, err)
-		return ch
-	}
+	// Reset the driver context (Actually this should not be required, but just to be on the safe side)
+	m.driverContext.clear()
 
 	go func() {
 		err := m.messageCodec.Connect()
@@ -156,20 +154,55 @@ func (m *Connection) setupConnection(ctx context.Context, ch chan plc4go.PlcConn
 		return
 	}
 
+	// Start the worker for handling incoming messages
+	// (Messages that are not responses to outgoing messages)
+	defaultIncomingMessageChannel := m.messageCodec.GetDefaultIncomingMessageChannel()
+	go func() {
+		for message := range defaultIncomingMessageChannel {
+			switch message.(type) {
+			case model.AmsTCPPacket:
+				amsTCPPacket := message.(model.AmsTCPPacket)
+				switch amsTCPPacket.GetUserdata().(type) {
+				// Forward all device notification requests to the subscriber component.
+				case model.AdsDeviceNotificationRequest:
+					m.handleIncomingDeviceNotificationRequest(
+						amsTCPPacket.GetUserdata().(model.AdsDeviceNotificationRequest))
+				default:
+					log.Warn().Msgf("Got unexpected type of incoming ADS message %v", message)
+				}
+			default:
+				log.Warn().Msgf("Got unexpected type of incoming ADS message %v", message)
+			}
+		}
+		log.Info().Msg("Done waiting for messages ...")
+	}()
+
 	// Subscribe for changes to the symbol or the offline-versions
-	/*versionChangeRequest, err := m.SubscriptionRequestBuilder().
+	versionChangeRequest, err := m.SubscriptionRequestBuilder().
 		AddChangeOfStateTagAddress("offlineVersion", "0xF008/0x0000:USINT").
 		AddPreRegisteredConsumer("offlineVersion", func(event apiModel.PlcSubscriptionEvent) {
-			err := m.readSymbolTableAndDatatypeTable(ctx)
-			if err != nil {
-				log.Error().Err(err).Msg("error updating data-type and symbol tables")
+			if event.GetResponseCode("offlineVersion") == apiModel.PlcResponseCode_OK {
+				newVersion := event.GetValue("offlineVersion").GetUint8()
+				if newVersion != m.driverContext.symbolVersion {
+					log.Info().Msg("detected offline version change: reloading symbol- and data-type-table.")
+					err := m.readSymbolTableAndDatatypeTable(ctx)
+					if err != nil {
+						log.Error().Err(err).Msg("error updating data-type and symbol tables")
+					}
+				}
 			}
 		}).
 		AddChangeOfStateTagAddress("onlineVersion", "TwinCAT_SystemInfoVarList._AppInfo.OnlineChangeCnt").
 		AddPreRegisteredConsumer("onlineVersion", func(event apiModel.PlcSubscriptionEvent) {
-			err := m.readSymbolTableAndDatatypeTable(ctx)
-			if err != nil {
-				log.Error().Err(err).Msg("error updating data-type and symbol tables")
+			if event.GetResponseCode("onlineVersion") == apiModel.PlcResponseCode_OK {
+				newVersion := event.GetValue("onlineVersion").GetUint32()
+				if newVersion != m.driverContext.onlineVersion {
+					log.Info().Msg("detected online version change: reloading symbol- and data-type-table.")
+					err := m.readSymbolTableAndDatatypeTable(ctx)
+					if err != nil {
+						log.Error().Err(err).Msg("error updating data-type and symbol tables")
+					}
+				}
 			}
 		}).
 		Build()
@@ -178,7 +211,7 @@ func (m *Connection) setupConnection(ctx context.Context, ch chan plc4go.PlcConn
 	if subscriptionRequestResult.GetErr() != nil {
 		ch <- _default.NewDefaultPlcConnectionCloseResult(nil, subscriptionRequestResult.GetErr())
 		return
-	}*/
+	}
 
 	// Return the finished connection
 	ch <- _default.NewDefaultPlcConnectionConnectResult(m, nil)
@@ -257,7 +290,7 @@ func (m *Connection) readSymbolTable(ctx context.Context, symbolTableSize uint32
 	return symbols, nil
 }
 
-func (m *Connection) resolveSymbolicTag(ctx context.Context, symbolicTag SymbolicPlcTag) (*DirectPlcTag, error) {
+func (m *Connection) resolveSymbolicTag(ctx context.Context, symbolicTag model2.SymbolicPlcTag) (*model2.DirectPlcTag, error) {
 	// Find the initial datatype, based on the first to segments.
 	symbolicAddress := symbolicTag.SymbolicAddress
 	addressParts := strings.Split(symbolicAddress, ".")
@@ -284,7 +317,7 @@ func (m *Connection) resolveSymbolicTag(ctx context.Context, symbolicTag Symboli
 	return m.resolveSymbolicAddress(ctx, addressParts, dataType, symbol.GetGroup(), symbol.GetOffset())
 }
 
-func (m *Connection) resolveSymbolicAddress(ctx context.Context, addressParts []string, curDataType model.AdsDataTypeTableEntry, indexGroup uint32, indexOffset uint32) (*DirectPlcTag, error) {
+func (m *Connection) resolveSymbolicAddress(ctx context.Context, addressParts []string, curDataType model.AdsDataTypeTableEntry, indexGroup uint32, indexOffset uint32) (*model2.DirectPlcTag, error) {
 	// If we've reached then end of the resolution, return the final entry.
 	if len(addressParts) == 0 {
 		var arrayInfo []apiModel.ArrayInfo
@@ -295,9 +328,9 @@ func (m *Connection) resolveSymbolicAddress(ctx context.Context, addressParts []
 			})
 		}
 		plcValueType, stringLength := m.getPlcValueForAdsDataTypeTableEntry(curDataType)
-		return &DirectPlcTag{
-			PlcTag: PlcTag{
-				arrayInfo: arrayInfo,
+		return &model2.DirectPlcTag{
+			PlcTag: model2.PlcTag{
+				ArrayInfo: arrayInfo,
 			},
 			IndexGroup:   indexGroup,
 			IndexOffset:  indexOffset,

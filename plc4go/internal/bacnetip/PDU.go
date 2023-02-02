@@ -29,6 +29,7 @@ import (
 	"net"
 	"reflect"
 	"regexp"
+	"strings"
 )
 
 type AddressType int
@@ -66,6 +67,10 @@ type AddressTuple[L any, R any] struct {
 	Right R
 }
 
+func (a *AddressTuple[L, R]) String() string {
+	return fmt.Sprintf("(%v, %v)", a.Left, a.Right)
+}
+
 var _field_address = regexp.MustCompile(`((?:\d+)|(?:0x(?:[0-9A-Fa-f][0-9A-Fa-f])+))`)
 var _ip_address_port = regexp.MustCompile(`(\d+\.\d+\.\d+\.\d+)(?::(\d+))?`)
 var _ip_address_mask_port = regexp.MustCompile(`(\d+\.\d+\.\d+\.\d+)(?:/(\d+))?(?::(\d+))?`)
@@ -92,7 +97,7 @@ type Address struct {
 	AddrNet     *uint16
 	AddrAddress []byte
 	AddrLen     *uint32
-	AddrRoute   *uint32
+	AddrRoute   *Address
 
 	AddrIP             *uint32
 	AddrMask           *uint32
@@ -123,12 +128,12 @@ func NewAddress(args ...interface{}) (*Address, error) {
 		switch a.AddrType {
 		case LOCAL_STATION_ADDRESS:
 			a.AddrType = REMOTE_STATION_ADDRESS
-			var net = (args[0]).(uint16)
-			a.AddrNet = &net
+			var addrNet = (args[0]).(uint16)
+			a.AddrNet = &addrNet
 		case LOCAL_BROADCAST_ADDRESS:
 			a.AddrType = REMOTE_BROADCAST_ADDRESS
-			var net = (args[0]).(uint16)
-			a.AddrNet = &net
+			var addrNet = (args[0]).(uint16)
+			a.AddrNet = &addrNet
 		default:
 			return nil, errors.New("unrecognized address ctor form")
 		}
@@ -159,7 +164,10 @@ func (a *Address) decodeAddress(addr interface{}) error {
 		case net.Addr:
 			// TODO: hacked in udp support
 			udpAddr := addr.(*net.UDPAddr)
-			a.AddrAddress = udpAddr.IP
+			a.AddrAddress = udpAddr.IP.To4()
+			if a.AddrAddress == nil {
+				a.AddrAddress = udpAddr.IP.To16()
+			}
 			length := uint32(len(a.AddrAddress))
 			a.AddrLen = &length
 			port := uint16(udpAddr.Port)
@@ -299,7 +307,42 @@ func (a *Address) String() string {
 	if a == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("Address{AddrType: %s, AddrNet: %d, AddrAddress: %x, AddrLen: %d, AddrRoute: %d, AddrIP: %d, AddrMask: %d, AddrHost: %d, AddrSubnet: %d, AddrPort: %d, AddrTuple: %v, AddrBroadcastTuple: %v}", a.AddrType, a.AddrNet, a.AddrAddress, a.AddrLen, a.AddrRoute, a.AddrIP, a.AddrMask, a.AddrHost, a.AddrSubnet, a.AddrPort, a.AddrTuple, a.AddrBroadcastTuple)
+	var sb strings.Builder
+	sb.WriteString(a.AddrType.String())
+	if a.AddrNet != nil {
+		_, _ = fmt.Fprintf(&sb, ", net: %d", *a.AddrNet)
+	}
+	if len(a.AddrAddress) > 0 {
+		_, _ = fmt.Fprintf(&sb, ", address: %d", a.AddrAddress)
+	}
+	if a.AddrLen != nil {
+		_, _ = fmt.Fprintf(&sb, " with len %d", *a.AddrLen)
+	}
+	if a.AddrRoute != nil {
+		_, _ = fmt.Fprintf(&sb, ", route: %s", a.AddrRoute)
+	}
+	if a.AddrIP != nil {
+		_, _ = fmt.Fprintf(&sb, ", ip: %d", *a.AddrIP)
+	}
+	if a.AddrMask != nil {
+		_, _ = fmt.Fprintf(&sb, ", mask: %d", *a.AddrMask)
+	}
+	if a.AddrHost != nil {
+		_, _ = fmt.Fprintf(&sb, ", host: %d", *a.AddrHost)
+	}
+	if a.AddrSubnet != nil {
+		_, _ = fmt.Fprintf(&sb, ", subnet: %d", *a.AddrSubnet)
+	}
+	if a.AddrPort != nil {
+		_, _ = fmt.Fprintf(&sb, ", port: %d", *a.AddrPort)
+	}
+	if a.AddrTuple != nil {
+		_, _ = fmt.Fprintf(&sb, ", tuple: %s", a.AddrTuple)
+	}
+	if a.AddrBroadcastTuple != nil {
+		_, _ = fmt.Fprintf(&sb, ", broadcast tuple: %s", a.AddrBroadcastTuple)
+	}
+	return sb.String()
 }
 
 func portToUint16(port []byte) uint16 {
@@ -332,12 +375,8 @@ func uint32ToIpv4(number uint32) net.IP {
 	return ipv4
 }
 
-type LocalStation struct {
-	Address
-}
-
-func NewLocalStation(addr interface{}, route *uint32) (*LocalStation, error) {
-	l := &LocalStation{}
+func NewLocalStation(addr interface{}, route *Address) (*Address, error) {
+	l := &Address{}
 	l.AddrType = LOCAL_STATION_ADDRESS
 	l.AddrRoute = route
 
@@ -360,12 +399,8 @@ func NewLocalStation(addr interface{}, route *uint32) (*LocalStation, error) {
 	return l, nil
 }
 
-type RemoteStation struct {
-	Address
-}
-
-func NewRemoteStation(net *uint16, addr interface{}, route *uint32) (*RemoteStation, error) {
-	l := &RemoteStation{}
+func NewRemoteStation(net *uint16, addr interface{}, route *Address) (*Address, error) {
+	l := &Address{}
 	l.AddrType = REMOTE_STATION_ADDRESS
 	l.AddrNet = net
 	l.AddrRoute = route
@@ -389,38 +424,26 @@ func NewRemoteStation(net *uint16, addr interface{}, route *uint32) (*RemoteStat
 	return l, nil
 }
 
-type LocalBroadcast struct {
-	Address
-}
-
-func NewLocalBroadcast(route *uint32) (*LocalBroadcast, error) {
-	l := &LocalBroadcast{}
+func NewLocalBroadcast(route *Address) *Address {
+	l := &Address{}
 	l.AddrType = LOCAL_BROADCAST_ADDRESS
 	l.AddrRoute = route
-	return l, nil
+	return l
 }
 
-type RemoteBroadcast struct {
-	Address
-}
-
-func NewRemoteBroadcast(net *uint16, route *uint32) (*RemoteBroadcast, error) {
-	r := &RemoteBroadcast{}
+func NewRemoteBroadcast(net *uint16, route *Address) *Address {
+	r := &Address{}
 	r.AddrType = REMOTE_BROADCAST_ADDRESS
 	r.AddrNet = net
 	r.AddrRoute = route
-	return r, nil
+	return r
 }
 
-type GlobalBroadcast struct {
-	Address
-}
-
-func NewGlobalBroadcast(route *uint32) (*GlobalBroadcast, error) {
-	g := &GlobalBroadcast{}
+func NewGlobalBroadcast(route *Address) *Address {
+	g := &Address{}
 	g.AddrType = GLOBAL_BROADCAST_ADDRESS
 	g.AddrRoute = route
-	return g, nil
+	return g
 }
 
 type PCI struct {
@@ -429,7 +452,11 @@ type PCI struct {
 	networkPriority readWriteModel.NPDUNetworkPriority
 }
 
-func NewPCI(msg spi.Message, pduSource Address, pduDestination Address, expectingReply bool, networkPriority readWriteModel.NPDUNetworkPriority) *PCI {
+func (p *PCI) String() string {
+	return fmt.Sprintf("PCI{%s, expectingReply: %t, networkPriority: %s}", p._PCI, p.expectingReply, p.networkPriority)
+}
+
+func NewPCI(msg spi.Message, pduSource *Address, pduDestination *Address, expectingReply bool, networkPriority readWriteModel.NPDUNetworkPriority) *PCI {
 	return &PCI{
 		_New_PCI(msg, pduSource, pduDestination),
 		expectingReply,
@@ -438,23 +465,21 @@ func NewPCI(msg spi.Message, pduSource Address, pduDestination Address, expectin
 }
 
 type _PDU interface {
-	spi.Message
-	GetPDUSource() Address
-	GetPDUDestination() Address
+	GetMessage() spi.Message
+	GetPDUSource() *Address
+	GetPDUDestination() *Address
+	SetPDUDestination(*Address)
 	GetExpectingReply() bool
 	GetNetworkPriority() readWriteModel.NPDUNetworkPriority
 }
 
 type PDU struct {
-	spi.Message
 	*PCI
 }
 
 func NewPDU(msg spi.Message, pduOptions ...PDUOption) *PDU {
-	nullAddress, _ := NewAddress()
 	p := &PDU{
-		msg,
-		NewPCI(msg, *nullAddress, *nullAddress, false, readWriteModel.NPDUNetworkPriority_NORMAL_MESSAGE),
+		NewPCI(msg, nil, nil, false, readWriteModel.NPDUNetworkPriority_NORMAL_MESSAGE),
 	}
 	for _, option := range pduOptions {
 		option(p)
@@ -463,9 +488,8 @@ func NewPDU(msg spi.Message, pduOptions ...PDUOption) *PDU {
 }
 
 func NewPDUFromPDU(pdu _PDU, pduOptions ...PDUOption) *PDU {
-	msg := pdu.(*PDU).Message
+	msg := pdu.(*PDU).pduUserData
 	p := &PDU{
-		msg,
 		NewPCI(msg, pdu.GetPDUSource(), pdu.GetPDUDestination(), pdu.GetExpectingReply(), pdu.GetNetworkPriority()),
 	}
 	for _, option := range pduOptions {
@@ -474,22 +498,31 @@ func NewPDUFromPDU(pdu _PDU, pduOptions ...PDUOption) *PDU {
 	return p
 }
 
-func NewPDUWithAllOptions(msg spi.Message, pduSource Address, pduDestination Address, expectingReply bool, networkPriority readWriteModel.NPDUNetworkPriority) *PDU {
+func NewPDUFromPDUWithNewMessage(pdu _PDU, msg spi.Message, pduOptions ...PDUOption) *PDU {
+	p := &PDU{
+		NewPCI(msg, pdu.GetPDUSource(), pdu.GetPDUDestination(), pdu.GetExpectingReply(), pdu.GetNetworkPriority()),
+	}
+	for _, option := range pduOptions {
+		option(p)
+	}
+	return p
+}
+
+func NewPDUWithAllOptions(msg spi.Message, pduSource *Address, pduDestination *Address, expectingReply bool, networkPriority readWriteModel.NPDUNetworkPriority) *PDU {
 	return &PDU{
-		msg,
 		NewPCI(msg, pduSource, pduDestination, expectingReply, networkPriority),
 	}
 }
 
 type PDUOption func(pdu *PDU)
 
-func WithPDUSource(pduSource Address) PDUOption {
+func WithPDUSource(pduSource *Address) PDUOption {
 	return func(pdu *PDU) {
 		pdu.pduSource = pduSource
 	}
 }
 
-func WithPDUDestination(pduDestination Address) PDUOption {
+func WithPDUDestination(pduDestination *Address) PDUOption {
 	return func(pdu *PDU) {
 		pdu.pduDestination = pduDestination
 	}
@@ -507,12 +540,20 @@ func WithPDUNetworkPriority(networkPriority readWriteModel.NPDUNetworkPriority) 
 	}
 }
 
-func (p *PDU) GetPDUSource() Address {
+func (p *PDU) GetMessage() spi.Message {
+	return p.pduUserData
+}
+
+func (p *PDU) GetPDUSource() *Address {
 	return p.pduSource
 }
 
-func (p *PDU) GetPDUDestination() Address {
+func (p *PDU) GetPDUDestination() *Address {
 	return p.pduDestination
+}
+
+func (p *PDU) SetPDUDestination(destination *Address) {
+	p.pduDestination = destination
 }
 
 func (p *PDU) GetExpectingReply() bool {
@@ -521,4 +562,8 @@ func (p *PDU) GetExpectingReply() bool {
 
 func (p *PDU) GetNetworkPriority() readWriteModel.NPDUNetworkPriority {
 	return p.networkPriority
+}
+
+func (p *PDU) String() string {
+	return fmt.Sprintf("PDU{\n%s}", p._PCI)
 }

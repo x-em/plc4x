@@ -7,7 +7,7 @@
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+     https://www.apache.org/licenses/LICENSE-2.0
 
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
@@ -136,7 +136,7 @@ public class Plc4xSourceRecordProcessor extends BasePlc4xProcessor {
 		final AtomicLong nrOfRows = new AtomicLong(0L);
 		final StopWatch executeTime = new StopWatch(true);
 
-		try (PlcConnection connection = getDriverManager().getConnection(getConnectionString())) {
+		try (PlcConnection connection = getConnectionManager().getConnection(getConnectionString())) {
 
 			String inputFileUUID = fileToProcess == null ? null : fileToProcess.getAttribute(CoreAttributes.UUID.key());
 			Map<String, String> inputFileAttrMap = fileToProcess == null ? null : fileToProcess.getAttributes();

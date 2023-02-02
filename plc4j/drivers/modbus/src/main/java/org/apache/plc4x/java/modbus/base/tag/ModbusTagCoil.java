@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 public class ModbusTagCoil extends ModbusTag {
 
+    public static final String ADDRESS_PREFIX = "0x";
     public static final Pattern ADDRESS_PATTERN = Pattern.compile("coil:" + ModbusTag.ADDRESS_PATTERN);
     public static final Pattern ADDRESS_SHORTER_PATTERN = Pattern.compile("0" + ModbusTag.FIXED_DIGIT_MODBUS_PATTERN);
     public static final Pattern ADDRESS_SHORT_PATTERN = Pattern.compile("0x" + ModbusTag.FIXED_DIGIT_MODBUS_PATTERN);
@@ -36,16 +37,13 @@ public class ModbusTagCoil extends ModbusTag {
         super(address, quantity, dataType);
     }
 
+    protected String getAddressStringPrefix() {
+        return ADDRESS_PREFIX;
+    }
+
     @Override
-    public String getAddressString() {
-        String address = "0x" + getAddress();
-        if(getDataType() != null) {
-            address += ":" + getDataType().name();
-        }
-        if(getArrayInfo().size() > 0) {
-            address += "[" + getArrayInfo().get(0).getUpperBound() + "]";
-        }
-        return address;
+    public int getLogicalAddress() {
+        return getAddress() + PROTOCOL_ADDRESS_OFFSET;
     }
 
     public static boolean matches(String addressString) {
@@ -82,6 +80,10 @@ public class ModbusTagCoil extends ModbusTag {
         int quantity = quantityString != null ? Integer.parseInt(quantityString) : 1;
         if ((address + quantity) > REGISTER_MAXADDRESS) {
             throw new IllegalArgumentException("Last requested address is out of range, should be between " + PROTOCOL_ADDRESS_OFFSET + " and " + REGISTER_MAXADDRESS + ". Was " + (address + PROTOCOL_ADDRESS_OFFSET + (quantity - 1)));
+        }
+
+        if (quantity > 2000) {
+            throw new IllegalArgumentException("quantity may not be larger than 2000. Was " + quantity);
         }
 
         ModbusDataType dataType = (matcher.group("datatype") != null) ? ModbusDataType.valueOf(matcher.group("datatype")) : ModbusDataType.BOOL;

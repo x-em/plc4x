@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 public class ModbusTagExtendedRegister extends ModbusTag {
 
+    public static final String ADDRESS_PREFIX = "6x";
     public static final Pattern ADDRESS_PATTERN = Pattern.compile("extended-register:" + ModbusTag.ADDRESS_PATTERN);
     public static final Pattern ADDRESS_SHORTER_PATTERN = Pattern.compile("6" + ModbusTag.FIXED_DIGIT_MODBUS_PATTERN);
     public static final Pattern ADDRESS_SHORT_PATTERN = Pattern.compile("6x" + ModbusTag.FIXED_DIGIT_MODBUS_PATTERN);
@@ -36,16 +37,14 @@ public class ModbusTagExtendedRegister extends ModbusTag {
         super(address, quantity, dataType);
     }
 
+    protected String getAddressStringPrefix() {
+        return ADDRESS_PREFIX;
+    }
+
     @Override
-    public String getAddressString() {
-        String address = "6x" + getAddress();
-        if(getDataType() != null) {
-            address += ":" + getDataType().name();
-        }
-        if(getArrayInfo().size() > 0) {
-            address += "[" + getArrayInfo().get(0).getUpperBound() + "]";
-        }
-        return address;
+    public int getLogicalAddress() {
+        // Addresses for extended memory start at address 0 instead of 1
+        return getAddress();
     }
 
     public static boolean matches(String addressString) {
@@ -82,6 +81,10 @@ public class ModbusTagExtendedRegister extends ModbusTag {
         int quantity = quantityString != null ? Integer.parseInt(quantityString) : 1;
         if ((address + quantity) > REGISTER_MAXADDRESS) {
             throw new IllegalArgumentException("Last requested address is out of range, should be between 0 and " + REGISTER_MAXADDRESS + ". Was " + (address + (quantity - 1)));
+        }
+
+        if (quantity > 125) {
+            throw new IllegalArgumentException("quantity may not be larger than 125. Was " + quantity);
         }
 
         ModbusDataType dataType = (matcher.group("datatype") != null) ? ModbusDataType.valueOf(matcher.group("datatype")) : ModbusDataType.INT;

@@ -66,6 +66,39 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.plc4x.plugins</groupId>
+        <artifactId>plc4x-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-modbus-driver</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate-driver</goal>
+            </goals>
+            <configuration>
+              <protocolName>modbus</protocolName>
+              <languageName>python</languageName>
+              <outputFlavor>read-write</outputFlavor>
+              <outputDir>${project.basedir}/plc4py/protocols</outputDir>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-simulated-driver</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate-driver</goal>
+            </goals>
+            <configuration>
+              <protocolName>simulated</protocolName>
+              <languageName>python</languageName>
+              <outputFlavor>read-write</outputFlavor>
+              <outputDir>${project.basedir}/plc4py/protocols</outputDir>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
         <configuration>
@@ -79,12 +112,12 @@
         <executions>
           <execution>
             <id>python-venv</id>
-            <phase>compile</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>exec</goal>
             </goals>
             <configuration>
-              <executable>python3</executable>
+              <executable>${python.exe.bin}</executable>
               <arguments>
                 <argument>-m</argument>
                 <argument>venv</argument>
@@ -94,8 +127,26 @@
           </execution>
 
           <execution>
+            <id>python-upgrade-pip</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${python.venv.bin}${python.exe.bin}</executable>
+              <arguments>
+                <argument>-m</argument>
+                <argument>pip</argument>
+                <argument>install</argument>
+                <argument>--upgrade</argument>
+                <argument>pip</argument>
+              </arguments>
+            </configuration>
+          </execution>
+
+          <execution>
             <id>python-install</id>
-            <phase>compile</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>exec</goal>
             </goals>
@@ -103,6 +154,22 @@
               <executable>${python.venv.bin}pip3</executable>
               <arguments>
                 <argument>install</argument>
+                <argument>.</argument>
+              </arguments>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>python-black</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${python.venv.bin}${python.exe.bin}</executable>
+              <arguments>
+                <argument>-m</argument>
+                <argument>black</argument>
                 <argument>.</argument>
               </arguments>
             </configuration>
@@ -130,7 +197,7 @@
               <goal>exec</goal>
             </goals>
             <configuration>
-              <executable>${python.venv.bin}python3</executable>
+              <executable>${python.venv.bin}${python.exe.bin}</executable>
               <arguments>
                 <argument>-m</argument>
                 <argument>pytest</argument>
@@ -192,6 +259,15 @@
   </build>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.apache.plc4x</groupId>
+      <artifactId>plc4x-code-generation-language-python</artifactId>
+      <version>0.11.0-SNAPSHOT</version>
+      <!-- Scope is 'provided' as this way it's not shipped with the driver -->
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.plc4x</groupId>
       <artifactId>plc4x-protocols-modbus</artifactId>
