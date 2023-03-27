@@ -681,8 +681,7 @@ public enum KnxManufacturer {
   M_SHANGHAI_LEWIN_INTELLIGENT_TECHNOLOGY_CO__LTD_(
       (int) 593, (int) 651, (String) "Shanghai Lewin Intelligent Technology Co.,Ltd."),
   M_KG_POWER((int) 594, (int) 652, (String) "KG-POWER"),
-  M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD(
-      (int) 595, (int) 653, (String) "Zhejiang Moorgen Intelligent Technology Co., Ltd"),
+  M_ZHEJIANG_MOORGEN_GROUP_CO__LTD((int) 595, (int) 653, (String) "Zhejiang Moorgen Group Co.,Ltd"),
   M_GUANGDONG_KANWAY((int) 596, (int) 654, (String) "Guangdong Kanway"),
   M_RAMIREZ_ENGINEERING_GMBH((int) 597, (int) 656, (String) "RAMIREZ Engineering GmbH"),
   M_ZHONGSHAN_TAIYANG_IMPANDEXP__CO_LTD(
@@ -702,9 +701,17 @@ public enum KnxManufacturer {
   M_XIAMEN_INTRETECH_INC_((int) 609, (int) 668, (String) "Xiamen Intretech Inc."),
   M_KILOELEC_TECHNOLOGY((int) 610, (int) 669, (String) "KiloElec Technology"),
   M_INYX((int) 611, (int) 670, (String) "Inyx"),
-  M_ABB___RESERVED((int) 612, (int) 43954, (String) "ABB - reserved"),
+  M_SMART_BUILDING_SERVICES_GMBH((int) 612, (int) 671, (String) "Smart Building Services GmbH"),
+  M_BSS_GMBH((int) 613, (int) 672, (String) "BSS GmbH"),
+  M_LUMI_ELECTRONICS((int) 614, (int) 673, (String) "Lumi Electronics"),
+  M_OJEAELECTRONICS((int) 615, (int) 674, (String) "OjeaElectronics"),
+  M_SMART_NODE((int) 616, (int) 675, (String) "Smart Node"),
+  M_NEXHOME((int) 617, (int) 676, (String) "NEXhome"),
+  M_HUOTENG_WULIAN_JIANGSU_CO___LTD(
+      (int) 618, (int) 677, (String) "Huoteng Wulian (Jiangsu) Co., Ltd"),
+  M_ABB___RESERVED((int) 619, (int) 43954, (String) "ABB - reserved"),
   M_BUSCH_JAEGER_ELEKTRO___RESERVED(
-      (int) 613, (int) 43959, (String) "Busch-Jaeger Elektro - reserved");
+      (int) 620, (int) 43959, (String) "Busch-Jaeger Elektro - reserved");
   private static final Map<Integer, KnxManufacturer> map;
 
   static {

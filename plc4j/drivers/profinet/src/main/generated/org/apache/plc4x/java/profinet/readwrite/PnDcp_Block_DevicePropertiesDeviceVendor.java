@@ -67,6 +67,7 @@ public class PnDcp_Block_DevicePropertiesDeviceVendor extends PnDcp_Block implem
   @Override
   protected void serializePnDcp_BlockChild(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     int startPos = positionAware.getPos();
     writeBuffer.pushContext("PnDcp_Block_DevicePropertiesDeviceVendor");
 
@@ -74,10 +75,15 @@ public class PnDcp_Block_DevicePropertiesDeviceVendor extends PnDcp_Block implem
     writeReservedField(
         "reserved",
         reservedField0 != null ? reservedField0 : (int) 0x0000,
-        writeUnsignedInt(writeBuffer, 16));
+        writeUnsignedInt(writeBuffer, 16),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Array Field (deviceVendorValue)
-    writeByteArrayField("deviceVendorValue", deviceVendorValue, writeByteArray(writeBuffer, 8));
+    writeByteArrayField(
+        "deviceVendorValue",
+        deviceVendorValue,
+        writeByteArray(writeBuffer, 8),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Padding Field (padding)
     writePaddingField(
@@ -87,7 +93,8 @@ public class PnDcp_Block_DevicePropertiesDeviceVendor extends PnDcp_Block implem
                     deviceVendorValue))
                 % (2)),
         (short) 0x00,
-        writeUnsignedShort(writeBuffer, 8));
+        writeUnsignedShort(writeBuffer, 8),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     writeBuffer.popContext("PnDcp_Block_DevicePropertiesDeviceVendor");
   }
@@ -101,6 +108,7 @@ public class PnDcp_Block_DevicePropertiesDeviceVendor extends PnDcp_Block implem
   public int getLengthInBits() {
     int lengthInBits = super.getLengthInBits();
     PnDcp_Block_DevicePropertiesDeviceVendor _value = this;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     // Reserved Field (reserved)
     lengthInBits += 16;
@@ -129,19 +137,28 @@ public class PnDcp_Block_DevicePropertiesDeviceVendor extends PnDcp_Block implem
     PositionAware positionAware = readBuffer;
     int startPos = positionAware.getPos();
     int curPos;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     Integer reservedField0 =
-        readReservedField("reserved", readUnsignedInt(readBuffer, 16), (int) 0x0000);
+        readReservedField(
+            "reserved",
+            readUnsignedInt(readBuffer, 16),
+            (int) 0x0000,
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     byte[] deviceVendorValue =
-        readBuffer.readByteArray("deviceVendorValue", Math.toIntExact((blockLength) - (2)));
+        readBuffer.readByteArray(
+            "deviceVendorValue",
+            Math.toIntExact((blockLength) - (2)),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     readPaddingField(
         readUnsignedShort(readBuffer, 8),
         (int)
             ((org.apache.plc4x.java.profinet.readwrite.utils.StaticHelper.arrayLength(
                     deviceVendorValue))
-                % (2)));
+                % (2)),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     readBuffer.closeContext("PnDcp_Block_DevicePropertiesDeviceVendor");
     // Create the instance

@@ -20,6 +20,7 @@
 package model
 
 import (
+	"context"
 	"encoding/binary"
 
 	"github.com/apache/plc4x/plc4go/pkg/api/model"
@@ -32,14 +33,18 @@ type DefaultPlcBrowseResponse struct {
 	DefaultResponse
 	request      model.PlcBrowseRequest
 	responseCode model.PlcResponseCode
-	results      map[string][]model.PlcBrowseItem
+	results      map[string]*DefaultPlcBrowseResponseItem
 }
 
 func NewDefaultPlcBrowseResponse(request model.PlcBrowseRequest, results map[string][]model.PlcBrowseItem, responseCodes map[string]model.PlcResponseCode) DefaultPlcBrowseResponse {
+	res := map[string]*DefaultPlcBrowseResponseItem{}
+	for name, code := range responseCodes {
+		value := results[name]
+		res[name] = NewBrowseResponseItem(code, value)
+	}
 	return DefaultPlcBrowseResponse{
-		DefaultResponse: DefaultResponse{responseCodes: responseCodes},
-		request:         request,
-		results:         results,
+		request: request,
+		results: res,
 	}
 }
 
@@ -55,25 +60,29 @@ func (d DefaultPlcBrowseResponse) GetQueryNames() []string {
 	return queryNames
 }
 
+func (d DefaultPlcBrowseResponse) GetResponseCode(name string) model.PlcResponseCode {
+	return d.results[name].GetCode()
+}
+
 func (d DefaultPlcBrowseResponse) GetQueryResults(queryName string) []model.PlcBrowseItem {
-	return d.results[queryName]
+	return d.results[queryName].GetResults()
 }
 
 func (d DefaultPlcBrowseResponse) Serialize() ([]byte, error) {
 	wb := utils.NewWriteBufferByteBased(utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
-	if err := d.SerializeWithWriteBuffer(wb); err != nil {
+	if err := d.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
 	return wb.GetBytes(), nil
 }
 
-func (d DefaultPlcBrowseResponse) SerializeWithWriteBuffer(writeBuffer utils.WriteBuffer) error {
+func (d DefaultPlcBrowseResponse) SerializeWithWriteBuffer(ctx context.Context, writeBuffer utils.WriteBuffer) error {
 	if err := writeBuffer.PushContext("PlcBrowseResponse"); err != nil {
 		return err
 	}
 
 	if serializableRequest, ok := d.request.(utils.Serializable); ok {
-		if err := serializableRequest.SerializeWithWriteBuffer(writeBuffer); err != nil {
+		if err := serializableRequest.SerializeWithWriteBuffer(ctx, writeBuffer); err != nil {
 			return err
 		}
 	} else {
@@ -83,13 +92,13 @@ func (d DefaultPlcBrowseResponse) SerializeWithWriteBuffer(writeBuffer utils.Wri
 	if err := writeBuffer.PushContext("results"); err != nil {
 		return err
 	}
-	for tagName, foundTags := range d.results {
+	for tagName, browseResponseItem := range d.results {
 		if err := writeBuffer.PushContext(tagName); err != nil {
 			return err
 		}
-		for _, tag := range foundTags {
+		for _, tag := range browseResponseItem.GetResults() {
 			if serializableTag, ok := tag.(utils.Serializable); ok {
-				if err := serializableTag.SerializeWithWriteBuffer(writeBuffer); err != nil {
+				if err := serializableTag.SerializeWithWriteBuffer(ctx, writeBuffer); err != nil {
 					return err
 				}
 			} else {
@@ -111,7 +120,7 @@ func (d DefaultPlcBrowseResponse) SerializeWithWriteBuffer(writeBuffer utils.Wri
 
 func (d DefaultPlcBrowseResponse) String() string {
 	writeBuffer := utils.NewWriteBufferBoxBasedWithOptions(true, true)
-	if err := writeBuffer.WriteSerializable(d); err != nil {
+	if err := writeBuffer.WriteSerializable(context.Background(), d); err != nil {
 		return err.Error()
 	}
 	return writeBuffer.GetBox().String()

@@ -92,22 +92,37 @@ public class PnIoCm_Submodule_InputData extends PnIoCm_Submodule implements Mess
   protected void serializePnIoCm_SubmoduleChild(WriteBuffer writeBuffer)
       throws SerializationException {
     PositionAware positionAware = writeBuffer;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     int startPos = positionAware.getPos();
     writeBuffer.pushContext("PnIoCm_Submodule_InputData");
 
     // Const Field (inputDataDescription)
     writeConstField(
-        "inputDataDescription", INPUTDATADESCRIPTION, writeUnsignedInt(writeBuffer, 16));
+        "inputDataDescription",
+        INPUTDATADESCRIPTION,
+        writeUnsignedInt(writeBuffer, 16),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (inputSubmoduleDataLength)
     writeSimpleField(
-        "inputSubmoduleDataLength", inputSubmoduleDataLength, writeUnsignedInt(writeBuffer, 16));
+        "inputSubmoduleDataLength",
+        inputSubmoduleDataLength,
+        writeUnsignedInt(writeBuffer, 16),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (inputLengthIoCs)
-    writeSimpleField("inputLengthIoCs", inputLengthIoCs, writeUnsignedShort(writeBuffer, 8));
+    writeSimpleField(
+        "inputLengthIoCs",
+        inputLengthIoCs,
+        writeUnsignedShort(writeBuffer, 8),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (inputLengthIoPs)
-    writeSimpleField("inputLengthIoPs", inputLengthIoPs, writeUnsignedShort(writeBuffer, 8));
+    writeSimpleField(
+        "inputLengthIoPs",
+        inputLengthIoPs,
+        writeUnsignedShort(writeBuffer, 8),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     writeBuffer.popContext("PnIoCm_Submodule_InputData");
   }
@@ -121,6 +136,7 @@ public class PnIoCm_Submodule_InputData extends PnIoCm_Submodule implements Mess
   public int getLengthInBits() {
     int lengthInBits = super.getLengthInBits();
     PnIoCm_Submodule_InputData _value = this;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     // Const Field (inputDataDescription)
     lengthInBits += 16;
@@ -143,19 +159,32 @@ public class PnIoCm_Submodule_InputData extends PnIoCm_Submodule implements Mess
     PositionAware positionAware = readBuffer;
     int startPos = positionAware.getPos();
     int curPos;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     int inputDataDescription =
         readConstField(
             "inputDataDescription",
             readUnsignedInt(readBuffer, 16),
-            PnIoCm_Submodule_InputData.INPUTDATADESCRIPTION);
+            PnIoCm_Submodule_InputData.INPUTDATADESCRIPTION,
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     int inputSubmoduleDataLength =
-        readSimpleField("inputSubmoduleDataLength", readUnsignedInt(readBuffer, 16));
+        readSimpleField(
+            "inputSubmoduleDataLength",
+            readUnsignedInt(readBuffer, 16),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    short inputLengthIoCs = readSimpleField("inputLengthIoCs", readUnsignedShort(readBuffer, 8));
+    short inputLengthIoCs =
+        readSimpleField(
+            "inputLengthIoCs",
+            readUnsignedShort(readBuffer, 8),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    short inputLengthIoPs = readSimpleField("inputLengthIoPs", readUnsignedShort(readBuffer, 8));
+    short inputLengthIoPs =
+        readSimpleField(
+            "inputLengthIoPs",
+            readUnsignedShort(readBuffer, 8),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     readBuffer.closeContext("PnIoCm_Submodule_InputData");
     // Create the instance

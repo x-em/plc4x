@@ -66,23 +66,37 @@ public class PnIoCm_DataUnitIoCs implements Message {
 
   public void serialize(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     int startPos = positionAware.getPos();
     writeBuffer.pushContext("PnIoCm_DataUnitIoCs");
 
     // Simple Field (dataState)
-    writeSimpleField("dataState", dataState, writeBoolean(writeBuffer));
+    writeSimpleField(
+        "dataState",
+        dataState,
+        writeBoolean(writeBuffer),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (instance)
-    writeSimpleField("instance", instance, writeUnsignedByte(writeBuffer, 2));
+    writeSimpleField(
+        "instance",
+        instance,
+        writeUnsignedByte(writeBuffer, 2),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Reserved Field (reserved)
     writeReservedField(
         "reserved",
         reservedField0 != null ? reservedField0 : (byte) 0x00,
-        writeUnsignedByte(writeBuffer, 4));
+        writeUnsignedByte(writeBuffer, 4),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (extension)
-    writeSimpleField("extension", extension, writeBoolean(writeBuffer));
+    writeSimpleField(
+        "extension",
+        extension,
+        writeBoolean(writeBuffer),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     writeBuffer.popContext("PnIoCm_DataUnitIoCs");
   }
@@ -96,6 +110,7 @@ public class PnIoCm_DataUnitIoCs implements Message {
   public int getLengthInBits() {
     int lengthInBits = 0;
     PnIoCm_DataUnitIoCs _value = this;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     // Simple field (dataState)
     lengthInBits += 1;
@@ -123,15 +138,28 @@ public class PnIoCm_DataUnitIoCs implements Message {
     PositionAware positionAware = readBuffer;
     int startPos = positionAware.getPos();
     int curPos;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
-    boolean dataState = readSimpleField("dataState", readBoolean(readBuffer));
+    boolean dataState =
+        readSimpleField(
+            "dataState", readBoolean(readBuffer), WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    byte instance = readSimpleField("instance", readUnsignedByte(readBuffer, 2));
+    byte instance =
+        readSimpleField(
+            "instance",
+            readUnsignedByte(readBuffer, 2),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     Byte reservedField0 =
-        readReservedField("reserved", readUnsignedByte(readBuffer, 4), (byte) 0x00);
+        readReservedField(
+            "reserved",
+            readUnsignedByte(readBuffer, 4),
+            (byte) 0x00,
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    boolean extension = readSimpleField("extension", readBoolean(readBuffer));
+    boolean extension =
+        readSimpleField(
+            "extension", readBoolean(readBuffer), WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     readBuffer.closeContext("PnIoCm_DataUnitIoCs");
     // Create the instance

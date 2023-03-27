@@ -86,6 +86,7 @@ public class BACnetUnconfirmedServiceRequestIAm extends BACnetUnconfirmedService
   protected void serializeBACnetUnconfirmedServiceRequestChild(WriteBuffer writeBuffer)
       throws SerializationException {
     PositionAware positionAware = writeBuffer;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     int startPos = positionAware.getPos();
     writeBuffer.pushContext("BACnetUnconfirmedServiceRequestIAm");
 
@@ -120,6 +121,7 @@ public class BACnetUnconfirmedServiceRequestIAm extends BACnetUnconfirmedService
   public int getLengthInBits() {
     int lengthInBits = super.getLengthInBits();
     BACnetUnconfirmedServiceRequestIAm _value = this;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     // Simple field (deviceIdentifier)
     lengthInBits += deviceIdentifier.getLengthInBits();
@@ -143,6 +145,7 @@ public class BACnetUnconfirmedServiceRequestIAm extends BACnetUnconfirmedService
     PositionAware positionAware = readBuffer;
     int startPos = positionAware.getPos();
     int curPos;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     BACnetApplicationTagObjectIdentifier deviceIdentifier =
         readSimpleField(
@@ -168,7 +171,7 @@ public class BACnetUnconfirmedServiceRequestIAm extends BACnetUnconfirmedService
             new DataReaderComplexDefault<>(
                 () ->
                     BACnetSegmentationTagged.staticParse(
-                        readBuffer, (short) (0), (TagClass) (TagClass.APPLICATION_TAGS)),
+                        readBuffer, (short) (9), (TagClass) (TagClass.APPLICATION_TAGS)),
                 readBuffer));
 
     BACnetVendorIdTagged vendorId =

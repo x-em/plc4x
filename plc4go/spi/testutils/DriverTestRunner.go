@@ -20,6 +20,7 @@
 package testutils
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -100,39 +101,42 @@ func (m DriverTestsuite) Run(driverManager plc4go.PlcDriverManager, testcase Tes
 	connectionChan := driverManager.GetConnection(m.driverName + ":test://hurz" + optionsString)
 	connectionResult := <-connectionChan
 
-	if connectionResult.GetConnection() != nil {
+	if connectionResult.GetErr() != nil {
 		return errors.Wrap(connectionResult.GetErr(), "error getting a connection")
 	}
+	connection := connectionResult.GetConnection()
 
 	log.Info().Msgf("\n-------------------------------------------------------\nExecuting testcase: %s \n-------------------------------------------------------\n", testcase.name)
 
 	// Run the setup steps
 	log.Info().Msgf("\n-------------------------------------------------------\nPerforming setup for: %s \n-------------------------------------------------------\n", testcase.name)
 	for _, testStep := range m.setupSteps {
-		err := m.ExecuteStep(connectionResult.GetConnection(), &testcase, testStep)
+		err := m.ExecuteStep(connection, &testcase, testStep)
 		if err != nil {
 			return errors.Wrap(err, "error in setup step "+testStep.name)
 		}
 		// We sleep a bit to not run too fast into the post setup steps and give connections a bit time to settle built up
-		time.Sleep(time.Second)
+		time.Sleep(10 * time.Millisecond)
 	}
 
 	// Run the actual scenario steps
 	log.Info().Msgf("\n-------------------------------------------------------\nRunning testcases for: %s \n-------------------------------------------------------\n", testcase.name)
 	for _, testStep := range testcase.steps {
-		err := m.ExecuteStep(connectionResult.GetConnection(), &testcase, testStep)
+		err := m.ExecuteStep(connection, &testcase, testStep)
 		if err != nil {
 			return errors.Wrap(err, "error in step "+testStep.name)
 		}
+		time.Sleep(10 * time.Millisecond)
 	}
 
 	// Run the teardown steps
 	log.Info().Msgf("\n-------------------------------------------------------\nPerforming teardown for: %s \n-------------------------------------------------------\n", testcase.name)
 	for _, testStep := range m.teardownSteps {
-		err := m.ExecuteStep(connectionResult.GetConnection(), &testcase, testStep)
+		err := m.ExecuteStep(connection, &testcase, testStep)
 		if err != nil {
 			return errors.Wrap(err, "error in teardown step "+testStep.name)
 		}
+		time.Sleep(10 * time.Millisecond)
 	}
 
 	log.Info().Msgf("\n-------------------------------------------------------\nDone\n-------------------------------------------------------\n")
@@ -225,7 +229,7 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 			}
 			// Serialize the response to XML
 			xmlWriteBuffer := utils.NewXmlWriteBuffer()
-			err := readRequestResult.GetResponse().(utils.Serializable).SerializeWithWriteBuffer(xmlWriteBuffer)
+			err := readRequestResult.GetResponse().(utils.Serializable).SerializeWithWriteBuffer(context.Background(), xmlWriteBuffer)
 			if err != nil {
 				return errors.Wrap(err, "error serializing response")
 			}
@@ -250,7 +254,7 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 			}
 			// Serialize the response to XML
 			xmlWriteBuffer := utils.NewXmlWriteBuffer()
-			err := writeResponseResult.GetResponse().(utils.Serializable).SerializeWithWriteBuffer(xmlWriteBuffer)
+			err := writeResponseResult.GetResponse().(utils.Serializable).SerializeWithWriteBuffer(context.Background(), xmlWriteBuffer)
 			if err != nil {
 				return errors.Wrap(err, "error serializing response")
 			}
@@ -288,7 +292,7 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 		} else {
 			expectedWriteBuffer = utils.NewWriteBufferByteBased(utils.WithByteOrderForByteBasedBuffer(binary.LittleEndian))
 		}
-		err = expectedSerializable.SerializeWithWriteBuffer(expectedWriteBuffer)
+		err = expectedSerializable.SerializeWithWriteBuffer(context.Background(), expectedWriteBuffer)
 		if err != nil {
 			return errors.Wrap(err, "error serializing expectedMessage")
 		}
@@ -300,9 +304,12 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 		log.Trace().Uint32("expectedRawOutputLength", expectedRawOutputLength).Msg("Reading bytes")
 		for testTransportInstance.GetNumDrainableBytes() < expectedRawOutputLength {
 			if time.Now().Sub(now) > 2*time.Second {
-				return errors.Errorf("error getting bytes from transport. Not enough data available: actual(%d)<expected(%d)", testTransportInstance.GetNumDrainableBytes(), expectedRawOutputLength)
+				drainableBytes := testTransportInstance.GetNumDrainableBytes()
+				actualRawOutput, _ := testTransportInstance.DrainWriteBuffer(drainableBytes)
+				return errors.Errorf("error getting bytes from transport. Not enough data available: actual(%d)<expected(%d), \nactual:   0x%X\nexpected: 0x%X\nHexdumps:\n%s",
+					drainableBytes, expectedRawOutputLength, actualRawOutput, expectedRawOutput, utils.DiffHex(expectedRawOutput, actualRawOutput))
 			}
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(2 * time.Millisecond)
 		}
 		actualRawOutput, err := testTransportInstance.DrainWriteBuffer(expectedRawOutputLength)
 		if testTransportInstance.GetNumDrainableBytes() != 0 {
@@ -329,7 +336,7 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 					actual, err := m.rootTypeParser(readBufferByteBased)
 					log.Error().Err(err).Msgf("A readable render of expectation:\n%v\nvs actual paket\n%v\n", expectedSerializable, actual)
 				}
-				return errors.Errorf("actual output doesn't match expected output:\nactual:\n%s\nexpected:\n%s", utils.Dump(actualRawOutput), utils.Dump(expectedRawOutput))
+				return errors.Errorf("actual output doesn't match expected output:\nactual:   0x%X\nexpected: 0x%X\nHexdumps:\n%s", actualRawOutput, expectedRawOutput, utils.DiffHex(expectedRawOutput, actualRawOutput))
 			}
 		}
 		// If there's a difference, parse the input and display it to simplify debugging
@@ -349,7 +356,7 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 		log.Trace().Msg("Comparing bytes")
 		for i := range expectedRawInput {
 			if expectedRawInput[i] != rawInput[i] {
-				return errors.Errorf("actual output doesn't match expected output:\nactual:   0x%X\nexpected: 0x%X", rawInput, expectedRawInput)
+				return errors.Errorf("actual output doesn't match expected output:\nactual:   0x%X\nexpected: 0x%X\nHexdumps:\n%s", rawInput, expectedRawInput, utils.DiffHex(expectedRawInput, rawInput))
 			}
 		}
 		// If there's a difference, parse the input and display it to simplify debugging
@@ -376,7 +383,7 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 		} else {
 			wb = utils.NewWriteBufferByteBased(utils.WithByteOrderForByteBasedBuffer(binary.LittleEndian))
 		}
-		err = expectedSerializable.SerializeWithWriteBuffer(wb)
+		err = expectedSerializable.SerializeWithWriteBuffer(context.Background(), wb)
 		if err != nil {
 			return errors.Wrap(err, "error serializing expectedMessage")
 		}
@@ -410,7 +417,7 @@ func (m DriverTestsuite) ExecuteStep(connection plc4go.PlcConnection, testcase *
 		}
 		// Sleep for that long
 		log.Debug().Int("delay", delay).Msg("Sleeping")
-		time.Sleep(time.Millisecond * time.Duration(delay))
+		time.Sleep(time.Duration(delay) * time.Millisecond)
 	case StepTypeTerminate:
 		// Simply close the transport connection
 		log.Trace().Msg("closing transport")

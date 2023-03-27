@@ -51,6 +51,7 @@ public abstract class PnDcp_Block implements Message {
 
   public void serialize(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     int startPos = positionAware.getPos();
     writeBuffer.pushContext("PnDcp_Block");
 
@@ -62,15 +63,24 @@ public abstract class PnDcp_Block implements Message {
         new DataWriterEnumDefault<>(
             PnDcp_BlockOptions::getValue,
             PnDcp_BlockOptions::name,
-            writeUnsignedShort(writeBuffer, 8)));
+            writeUnsignedShort(writeBuffer, 8)),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Discriminator Field (suboption) (Used as input to a switch field)
-    writeDiscriminatorField("suboption", getSuboption(), writeUnsignedShort(writeBuffer, 8));
+    writeDiscriminatorField(
+        "suboption",
+        getSuboption(),
+        writeUnsignedShort(writeBuffer, 8),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Implicit Field (blockLength) (Used for parsing, but its value is not stored as it's
     // implicitly given by the objects content)
     int blockLength = (int) ((getLengthInBytes()) - (4));
-    writeImplicitField("blockLength", blockLength, writeUnsignedInt(writeBuffer, 16));
+    writeImplicitField(
+        "blockLength",
+        blockLength,
+        writeUnsignedInt(writeBuffer, 16),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Switch field (Serialize the sub-type)
     serializePnDcp_BlockChild(writeBuffer);
@@ -87,6 +97,7 @@ public abstract class PnDcp_Block implements Message {
   public int getLengthInBits() {
     int lengthInBits = 0;
     PnDcp_Block _value = this;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     // Discriminator Field (option)
     lengthInBits += 8;
@@ -113,16 +124,26 @@ public abstract class PnDcp_Block implements Message {
     PositionAware positionAware = readBuffer;
     int startPos = positionAware.getPos();
     int curPos;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     PnDcp_BlockOptions option =
         readDiscriminatorField(
             "option",
             new DataReaderEnumDefault<>(
-                PnDcp_BlockOptions::enumForValue, readUnsignedShort(readBuffer, 8)));
+                PnDcp_BlockOptions::enumForValue, readUnsignedShort(readBuffer, 8)),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    short suboption = readDiscriminatorField("suboption", readUnsignedShort(readBuffer, 8));
+    short suboption =
+        readDiscriminatorField(
+            "suboption",
+            readUnsignedShort(readBuffer, 8),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    int blockLength = readImplicitField("blockLength", readUnsignedInt(readBuffer, 16));
+    int blockLength =
+        readImplicitField(
+            "blockLength",
+            readUnsignedInt(readBuffer, 16),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Switch Field (Depending on the discriminator values, passes the instantiation to a sub-type)
     PnDcp_BlockBuilder builder = null;

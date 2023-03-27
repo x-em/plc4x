@@ -70,6 +70,7 @@ public class PnDcp_Block_DevicePropertiesDeviceId extends PnDcp_Block implements
   @Override
   protected void serializePnDcp_BlockChild(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     int startPos = positionAware.getPos();
     writeBuffer.pushContext("PnDcp_Block_DevicePropertiesDeviceId");
 
@@ -77,13 +78,22 @@ public class PnDcp_Block_DevicePropertiesDeviceId extends PnDcp_Block implements
     writeReservedField(
         "reserved",
         reservedField0 != null ? reservedField0 : (int) 0x0000,
-        writeUnsignedInt(writeBuffer, 16));
+        writeUnsignedInt(writeBuffer, 16),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (vendorId)
-    writeSimpleField("vendorId", vendorId, writeUnsignedInt(writeBuffer, 16));
+    writeSimpleField(
+        "vendorId",
+        vendorId,
+        writeUnsignedInt(writeBuffer, 16),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (deviceId)
-    writeSimpleField("deviceId", deviceId, writeUnsignedInt(writeBuffer, 16));
+    writeSimpleField(
+        "deviceId",
+        deviceId,
+        writeUnsignedInt(writeBuffer, 16),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     writeBuffer.popContext("PnDcp_Block_DevicePropertiesDeviceId");
   }
@@ -97,6 +107,7 @@ public class PnDcp_Block_DevicePropertiesDeviceId extends PnDcp_Block implements
   public int getLengthInBits() {
     int lengthInBits = super.getLengthInBits();
     PnDcp_Block_DevicePropertiesDeviceId _value = this;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     // Reserved Field (reserved)
     lengthInBits += 16;
@@ -116,13 +127,26 @@ public class PnDcp_Block_DevicePropertiesDeviceId extends PnDcp_Block implements
     PositionAware positionAware = readBuffer;
     int startPos = positionAware.getPos();
     int curPos;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     Integer reservedField0 =
-        readReservedField("reserved", readUnsignedInt(readBuffer, 16), (int) 0x0000);
+        readReservedField(
+            "reserved",
+            readUnsignedInt(readBuffer, 16),
+            (int) 0x0000,
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    int vendorId = readSimpleField("vendorId", readUnsignedInt(readBuffer, 16));
+    int vendorId =
+        readSimpleField(
+            "vendorId",
+            readUnsignedInt(readBuffer, 16),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
-    int deviceId = readSimpleField("deviceId", readUnsignedInt(readBuffer, 16));
+    int deviceId =
+        readSimpleField(
+            "deviceId",
+            readUnsignedInt(readBuffer, 16),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     readBuffer.closeContext("PnDcp_Block_DevicePropertiesDeviceId");
     // Create the instance

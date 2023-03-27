@@ -32,7 +32,8 @@ public enum BACnetVendorId {
   MC_QUAY_INTERNATIONAL((int) 3, (int) 3, (String) "McQuay International"),
   POLAR_SOFT((int) 4, (int) 4, (String) "PolarSoft"),
   JOHNSON_CONTROLS_INC((int) 5, (int) 5, (String) "Johnson Controls, Inc."),
-  AMERICAN_AUTO_MATRIX((int) 6, (int) 6, (String) "American Auto-Matrix"),
+  ABB_FORMERLY_AMERICAN_AUTO_MATRIX(
+      (int) 6, (int) 6, (String) "ABB (Formerly American Auto-Matrix)"),
   SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE(
       (int) 7, (int) 7, (String) "Siemens Schweiz AG (Formerly: Landis & Staefa Division Europe)"),
   DELTA_CONTROLS((int) 8, (int) 8, (String) "Delta Controls"),
@@ -68,7 +69,7 @@ public enum BACnetVendorId {
   NOTIFIER((int) 34, (int) 34, (String) "Notifier"),
   RELIABLE_CONTROLS_CORPORATION((int) 35, (int) 35, (String) "Reliable Controls Corporation"),
   TRIDIUM_INC((int) 36, (int) 36, (String) "Tridium Inc."),
-  SIERRA_MONITOR_CORPORATION((int) 37, (int) 37, (String) "Sierra Monitor Corporation"),
+  MSA_SAFETY((int) 37, (int) 37, (String) "MSA Safety"),
   SILICON_ENERGY((int) 38, (int) 38, (String) "Silicon Energy"),
   KIEBACK_PETER_GMBH_COKG((int) 39, (int) 39, (String) "Kieback & Peter GmbH & Co KG"),
   ANACON_SYSTEMS_INC((int) 40, (int) 40, (String) "Anacon Systems, Inc."),
@@ -225,7 +226,8 @@ public enum BACnetVendorId {
   FUJIIT_CO_LTD((int) 168, (int) 168, (String) "Fuji IT Co., Ltd."),
   VACON_PLC((int) 169, (int) 169, (String) "Vacon Plc"),
   LEADER_CONTROLS((int) 170, (int) 170, (String) "Leader Controls"),
-  CYLON_CONTROLS_LTD((int) 171, (int) 171, (String) "Cylon Controls, Ltd."),
+  ABB_FORMERLY_CYLON_CONTROLS_LTD(
+      (int) 171, (int) 171, (String) "ABB (Formerly Cylon Controls, Ltd)"),
   COMPAS((int) 172, (int) 172, (String) "Compas"),
   MITSUBISHI_ELECTRIC_BUILDING_TECHNO_SERVICE_CO_LTD(
       (int) 173, (int) 173, (String) "Mitsubishi Electric Building Techno-Service Co., Ltd."),
@@ -285,7 +287,7 @@ public enum BACnetVendorId {
   CONTROL_TECHNIQUES_LTD((int) 220, (int) 220, (String) "Control Techniques, Ltd."),
   OPEN_GENERAL_PTY_LTD((int) 221, (int) 221, (String) "OpenGeneral Pty., Ltd."),
   WAGO_KONTAKTTECHNIK_GMBH_COKG((int) 222, (int) 222, (String) "WAGO Kontakttechnik GmbH & Co. KG"),
-  CERUS_INDUSTRIAL((int) 223, (int) 223, (String) "Cerus Industrial"),
+  FRANKLIN_ELECTRIC((int) 223, (int) 223, (String) "Franklin Electric"),
   CHLORIDE_POWER_PROTECTION_COMPANY(
       (int) 224, (int) 224, (String) "Chloride Power Protection Company"),
   COMPUTROLS_INC((int) 225, (int) 225, (String) "Computrols, Inc."),
@@ -1069,7 +1071,7 @@ public enum BACnetVendorId {
   IMI_HYDRONIC_ENGINEERING_INTERNATIONALSA(
       (int) 926, (int) 926, (String) "IMI Hydronic Engineering International SA"),
   ARIGO_SOFTWARE((int) 927, (int) 927, (String) "ARIGO Software"),
-  MSA_SAFETY((int) 928, (int) 928, (String) "MSA Safety"),
+  MSA_SAFETY1((int) 928, (int) 928, (String) "MSA Safety"),
   SMART_SOLUCOES_LTDAMERCATO((int) 929, (int) 929, (String) "Smart Solucoes Ltda – MERCATO"),
   PIATRA_ENGINEERING((int) 930, (int) 930, (String) "PIATRA Engineering"),
   ODIN_AUTOMATION_SYSTEMSLLC((int) 931, (int) 931, (String) "ODIN Automation Systems, LLC"),
@@ -1610,6 +1612,16 @@ public enum BACnetVendorId {
   BITPOOL((int) 1401, (int) 1401, (String) "Bitpool"),
   SONICULLC((int) 1402, (int) 1402, (String) "Sonicu, LLC"),
   RISHABH_INSTRUMENTS_LIMITED((int) 1403, (int) 1403, (String) "Rishabh Instruments Limited"),
+  THING_WAREHOUSELLC((int) 1404, (int) 1404, (String) "Thing Warehouse LLC"),
+  INNOFRIENDS_GMBH((int) 1405, (int) 1405, (String) "Innofriends GmbH"),
+  METRONICAKP_SPJ((int) 1406, (int) 1406, (String) "Metronic AKP Sp. J."),
+  TECHKNAVE((int) 1407, (int) 1407, (String) "Techknave"),
+  ELSNER_ELEKTRONIK((int) 1408, (int) 1408, (String) "Elsner Elektronik"),
+  LEFOO_INDUSTRIAL_HANGZHOU_CO_LTD(
+      (int) 1409, (int) 1409, (String) "LEFOO Industrial (Hangzhou) Co., Ltd."),
+  CALIBRATION_TECHNOLOGIES_INC((int) 1410, (int) 1410, (String) "Calibration Technologies, Inc."),
+  ALLORADO((int) 1411, (int) 1411, (String) "Allorado"),
+  VERKADA((int) 1412, (int) 1412, (String) "Verkada"),
   UNKNOWN_VENDOR((int) 0xFFFF, (int) 0xFFFF, (String) "Unknown");
   private static final Map<Integer, BACnetVendorId> map;
 

@@ -19,8 +19,6 @@
 package org.apache.plc4x.java.profinet.config;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
-import org.apache.plc4x.java.profinet.context.ProfinetDriverContext;
 import org.apache.plc4x.java.profinet.device.GsdFileMap;
 import org.apache.plc4x.java.profinet.device.ProfinetDevice;
 import org.apache.plc4x.java.profinet.device.ProfinetDevices;
@@ -31,7 +29,6 @@ import org.apache.plc4x.java.spi.configuration.annotations.ConfigurationParamete
 import org.apache.plc4x.java.spi.configuration.annotations.ParameterConverter;
 import org.apache.plc4x.java.spi.configuration.annotations.Required;
 import org.apache.plc4x.java.spi.configuration.annotations.defaults.IntDefaultValue;
-import org.apache.plc4x.java.spi.configuration.annotations.defaults.StringDefaultValue;
 import org.apache.plc4x.java.transport.rawsocket.RawSocketTransportConfiguration;
 import org.apache.plc4x.java.utils.pcap.netty.handlers.PacketHandler;
 
@@ -95,8 +92,10 @@ public class ProfinetConfiguration implements Configuration, RawSocketTransportC
 
     public static class ProfinetDeviceConvertor implements ConfigurationParameterConverter<ProfinetDevices> {
 
-        public static final Pattern DEVICE_NAME_ARRAY_PATTERN = Pattern.compile("^\\[(?:(\\[(?:[\\w-]*){1},(?:[\\w]*){1},\\((?:[\\w]*[, ]?)*\\){1}\\])[, ]?)+\\]");
-        public static final Pattern DEVICE_PARAMETERS = Pattern.compile("^(?<devicename>[\\w-]*){1}[, ]+(?<deviceaccess>[\\w]*){1}[, ]+\\((?<submodules>[\\w, ]*)\\)");
+        public static final String DEVICE_STRING = "((?<devicename>[\\w- ]*){1}[, ]+(?<deviceaccess>[\\w ]*){1}[, ]+\\((?<submodules>[\\w, ]*)\\))";
+        public static final String DEVICE_ARRAY_STRING = "^\\[(?:(\\[" + DEVICE_STRING + "{1}\\])[, ]?)+\\]";
+        public static final Pattern DEVICE_NAME_ARRAY_PATTERN = Pattern.compile(DEVICE_ARRAY_STRING);
+        public static final Pattern DEVICE_PARAMETERS = Pattern.compile(DEVICE_STRING);
 
         @Override
         public Class<ProfinetDevices> getType() {
@@ -107,7 +106,7 @@ public class ProfinetConfiguration implements Configuration, RawSocketTransportC
         public ProfinetDevices convert(String value) {
 
             // Split up the connection string into its individual segments.
-            value = value.replaceAll(" ", "").toUpperCase();
+            value = value.toUpperCase();
             Matcher matcher = DEVICE_NAME_ARRAY_PATTERN.matcher(value);
 
             if (!matcher.matches()) {
@@ -115,7 +114,7 @@ public class ProfinetConfiguration implements Configuration, RawSocketTransportC
             }
 
             Map<String, ProfinetDevice> devices = new HashMap<>();
-            String[] deviceParameters  = value.substring(1, value.length() - 1).replaceAll(" ", "").split("[\\[\\]]");
+            String[] deviceParameters  = value.substring(1, value.length() - 1).split("[\\[\\]]");
             for (String deviceParameter : deviceParameters) {
                 if (deviceParameter.length() > 7) {
                     matcher = DEVICE_PARAMETERS.matcher(deviceParameter);

@@ -62,14 +62,23 @@ public class PnIoCm_DataUnitDataObject implements Message {
 
   public void serialize(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     int startPos = positionAware.getPos();
     writeBuffer.pushContext("PnIoCm_DataUnitDataObject");
 
     // Array Field (dataState)
-    writeByteArrayField("dataState", dataState, writeByteArray(writeBuffer, 8));
+    writeByteArrayField(
+        "dataState",
+        dataState,
+        writeByteArray(writeBuffer, 8),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     // Simple Field (iops)
-    writeSimpleField("iops", iops, new DataWriterComplexDefault<>(writeBuffer));
+    writeSimpleField(
+        "iops",
+        iops,
+        new DataWriterComplexDefault<>(writeBuffer),
+        WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     writeBuffer.popContext("PnIoCm_DataUnitDataObject");
   }
@@ -83,6 +92,7 @@ public class PnIoCm_DataUnitDataObject implements Message {
   public int getLengthInBits() {
     int lengthInBits = 0;
     PnIoCm_DataUnitDataObject _value = this;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     // Array field
     if (dataState != null) {
@@ -121,14 +131,20 @@ public class PnIoCm_DataUnitDataObject implements Message {
     PositionAware positionAware = readBuffer;
     int startPos = positionAware.getPos();
     int curPos;
+    boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
-    byte[] dataState = readBuffer.readByteArray("dataState", Math.toIntExact(dataObjectLength));
+    byte[] dataState =
+        readBuffer.readByteArray(
+            "dataState",
+            Math.toIntExact(dataObjectLength),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     PnIoCm_DataUnitIoCs iops =
         readSimpleField(
             "iops",
             new DataReaderComplexDefault<>(
-                () -> PnIoCm_DataUnitIoCs.staticParse(readBuffer), readBuffer));
+                () -> PnIoCm_DataUnitIoCs.staticParse(readBuffer), readBuffer),
+            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN));
 
     readBuffer.closeContext("PnIoCm_DataUnitDataObject");
     // Create the instance

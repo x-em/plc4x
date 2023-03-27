@@ -20,6 +20,7 @@
 package model
 
 import (
+	"context"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 	"github.com/pkg/errors"
 )
@@ -631,7 +632,7 @@ const (
 	KnxManufacturer_M_DELTA_ELECTRONICS                                  KnxManufacturer = 592
 	KnxManufacturer_M_SHANGHAI_LEWIN_INTELLIGENT_TECHNOLOGY_CO__LTD_     KnxManufacturer = 593
 	KnxManufacturer_M_KG_POWER                                           KnxManufacturer = 594
-	KnxManufacturer_M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD   KnxManufacturer = 595
+	KnxManufacturer_M_ZHEJIANG_MOORGEN_GROUP_CO__LTD                     KnxManufacturer = 595
 	KnxManufacturer_M_GUANGDONG_KANWAY                                   KnxManufacturer = 596
 	KnxManufacturer_M_RAMIREZ_ENGINEERING_GMBH                           KnxManufacturer = 597
 	KnxManufacturer_M_ZHONGSHAN_TAIYANG_IMPANDEXP__CO_LTD                KnxManufacturer = 598
@@ -648,8 +649,15 @@ const (
 	KnxManufacturer_M_XIAMEN_INTRETECH_INC_                              KnxManufacturer = 609
 	KnxManufacturer_M_KILOELEC_TECHNOLOGY                                KnxManufacturer = 610
 	KnxManufacturer_M_INYX                                               KnxManufacturer = 611
-	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 612
-	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 613
+	KnxManufacturer_M_SMART_BUILDING_SERVICES_GMBH                       KnxManufacturer = 612
+	KnxManufacturer_M_BSS_GMBH                                           KnxManufacturer = 613
+	KnxManufacturer_M_LUMI_ELECTRONICS                                   KnxManufacturer = 614
+	KnxManufacturer_M_OJEAELECTRONICS                                    KnxManufacturer = 615
+	KnxManufacturer_M_SMART_NODE                                         KnxManufacturer = 616
+	KnxManufacturer_M_NEXHOME                                            KnxManufacturer = 617
+	KnxManufacturer_M_HUOTENG_WULIAN_JIANGSU_CO___LTD                    KnxManufacturer = 618
+	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 619
+	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 620
 )
 
 var KnxManufacturerValues []KnxManufacturer
@@ -1252,7 +1260,7 @@ func init() {
 		KnxManufacturer_M_DELTA_ELECTRONICS,
 		KnxManufacturer_M_SHANGHAI_LEWIN_INTELLIGENT_TECHNOLOGY_CO__LTD_,
 		KnxManufacturer_M_KG_POWER,
-		KnxManufacturer_M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD,
+		KnxManufacturer_M_ZHEJIANG_MOORGEN_GROUP_CO__LTD,
 		KnxManufacturer_M_GUANGDONG_KANWAY,
 		KnxManufacturer_M_RAMIREZ_ENGINEERING_GMBH,
 		KnxManufacturer_M_ZHONGSHAN_TAIYANG_IMPANDEXP__CO_LTD,
@@ -1269,6 +1277,13 @@ func init() {
 		KnxManufacturer_M_XIAMEN_INTRETECH_INC_,
 		KnxManufacturer_M_KILOELEC_TECHNOLOGY,
 		KnxManufacturer_M_INYX,
+		KnxManufacturer_M_SMART_BUILDING_SERVICES_GMBH,
+		KnxManufacturer_M_BSS_GMBH,
+		KnxManufacturer_M_LUMI_ELECTRONICS,
+		KnxManufacturer_M_OJEAELECTRONICS,
+		KnxManufacturer_M_SMART_NODE,
+		KnxManufacturer_M_NEXHOME,
+		KnxManufacturer_M_HUOTENG_WULIAN_JIANGSU_CO___LTD,
 		KnxManufacturer_M_ABB___RESERVED,
 		KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED,
 	}
@@ -3562,15 +3577,43 @@ func (e KnxManufacturer) Number() uint16 {
 		}
 	case 612:
 		{ /* '612' */
-			return 43954
+			return 671
 		}
 	case 613:
 		{ /* '613' */
-			return 43959
+			return 672
+		}
+	case 614:
+		{ /* '614' */
+			return 673
+		}
+	case 615:
+		{ /* '615' */
+			return 674
+		}
+	case 616:
+		{ /* '616' */
+			return 675
+		}
+	case 617:
+		{ /* '617' */
+			return 676
+		}
+	case 618:
+		{ /* '618' */
+			return 677
+		}
+	case 619:
+		{ /* '619' */
+			return 43954
 		}
 	case 62:
 		{ /* '62' */
 			return 101
+		}
+	case 620:
+		{ /* '620' */
+			return 43959
 		}
 	case 63:
 		{ /* '63' */
@@ -5956,7 +5999,7 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 595:
 		{ /* '595' */
-			return "Zhejiang Moorgen Intelligent Technology Co., Ltd"
+			return "Zhejiang Moorgen Group Co.,Ltd"
 		}
 	case 596:
 		{ /* '596' */
@@ -6036,15 +6079,43 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 612:
 		{ /* '612' */
-			return "ABB - reserved"
+			return "Smart Building Services GmbH"
 		}
 	case 613:
 		{ /* '613' */
-			return "Busch-Jaeger Elektro - reserved"
+			return "BSS GmbH"
+		}
+	case 614:
+		{ /* '614' */
+			return "Lumi Electronics"
+		}
+	case 615:
+		{ /* '615' */
+			return "OjeaElectronics"
+		}
+	case 616:
+		{ /* '616' */
+			return "Smart Node"
+		}
+	case 617:
+		{ /* '617' */
+			return "NEXhome"
+		}
+	case 618:
+		{ /* '618' */
+			return "Huoteng Wulian (Jiangsu) Co., Ltd"
+		}
+	case 619:
+		{ /* '619' */
+			return "ABB - reserved"
 		}
 	case 62:
 		{ /* '62' */
 			return "WHD Wilhelm Huber + Söhne"
+		}
+	case 620:
+		{ /* '620' */
+			return "Busch-Jaeger Elektro - reserved"
 		}
 	case 63:
 		{ /* '63' */
@@ -7326,7 +7397,7 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 594:
 		return KnxManufacturer_M_KG_POWER, true
 	case 595:
-		return KnxManufacturer_M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD, true
+		return KnxManufacturer_M_ZHEJIANG_MOORGEN_GROUP_CO__LTD, true
 	case 596:
 		return KnxManufacturer_M_GUANGDONG_KANWAY, true
 	case 597:
@@ -7366,11 +7437,25 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 611:
 		return KnxManufacturer_M_INYX, true
 	case 612:
-		return KnxManufacturer_M_ABB___RESERVED, true
+		return KnxManufacturer_M_SMART_BUILDING_SERVICES_GMBH, true
 	case 613:
-		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
+		return KnxManufacturer_M_BSS_GMBH, true
+	case 614:
+		return KnxManufacturer_M_LUMI_ELECTRONICS, true
+	case 615:
+		return KnxManufacturer_M_OJEAELECTRONICS, true
+	case 616:
+		return KnxManufacturer_M_SMART_NODE, true
+	case 617:
+		return KnxManufacturer_M_NEXHOME, true
+	case 618:
+		return KnxManufacturer_M_HUOTENG_WULIAN_JIANGSU_CO___LTD, true
+	case 619:
+		return KnxManufacturer_M_ABB___RESERVED, true
 	case 62:
 		return KnxManufacturer_M_WHD_WILHELM_HUBER_Plus_SOEHNE, true
+	case 620:
+		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
 	case 63:
 		return KnxManufacturer_M_BISCHOFF_ELEKTRONIK, true
 	case 64:
@@ -8559,8 +8644,8 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_SHANGHAI_LEWIN_INTELLIGENT_TECHNOLOGY_CO__LTD_, true
 	case "M_KG_POWER":
 		return KnxManufacturer_M_KG_POWER, true
-	case "M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD":
-		return KnxManufacturer_M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD, true
+	case "M_ZHEJIANG_MOORGEN_GROUP_CO__LTD":
+		return KnxManufacturer_M_ZHEJIANG_MOORGEN_GROUP_CO__LTD, true
 	case "M_GUANGDONG_KANWAY":
 		return KnxManufacturer_M_GUANGDONG_KANWAY, true
 	case "M_RAMIREZ_ENGINEERING_GMBH":
@@ -8599,12 +8684,26 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_KILOELEC_TECHNOLOGY, true
 	case "M_INYX":
 		return KnxManufacturer_M_INYX, true
+	case "M_SMART_BUILDING_SERVICES_GMBH":
+		return KnxManufacturer_M_SMART_BUILDING_SERVICES_GMBH, true
+	case "M_BSS_GMBH":
+		return KnxManufacturer_M_BSS_GMBH, true
+	case "M_LUMI_ELECTRONICS":
+		return KnxManufacturer_M_LUMI_ELECTRONICS, true
+	case "M_OJEAELECTRONICS":
+		return KnxManufacturer_M_OJEAELECTRONICS, true
+	case "M_SMART_NODE":
+		return KnxManufacturer_M_SMART_NODE, true
+	case "M_NEXHOME":
+		return KnxManufacturer_M_NEXHOME, true
+	case "M_HUOTENG_WULIAN_JIANGSU_CO___LTD":
+		return KnxManufacturer_M_HUOTENG_WULIAN_JIANGSU_CO___LTD, true
 	case "M_ABB___RESERVED":
 		return KnxManufacturer_M_ABB___RESERVED, true
-	case "M_BUSCH_JAEGER_ELEKTRO___RESERVED":
-		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
 	case "M_WHD_WILHELM_HUBER_Plus_SOEHNE":
 		return KnxManufacturer_M_WHD_WILHELM_HUBER_Plus_SOEHNE, true
+	case "M_BUSCH_JAEGER_ELEKTRO___RESERVED":
+		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
 	case "M_BISCHOFF_ELEKTRONIK":
 		return KnxManufacturer_M_BISCHOFF_ELEKTRONIK, true
 	case "M_JEPAZ":
@@ -8708,19 +8807,19 @@ func CastKnxManufacturer(structType interface{}) KnxManufacturer {
 	return castFunc(structType)
 }
 
-func (m KnxManufacturer) GetLengthInBits() uint16 {
+func (m KnxManufacturer) GetLengthInBits(ctx context.Context) uint16 {
 	return 16
 }
 
-func (m KnxManufacturer) GetLengthInBytes() uint16 {
-	return m.GetLengthInBits() / 8
+func (m KnxManufacturer) GetLengthInBytes(ctx context.Context) uint16 {
+	return m.GetLengthInBits(ctx) / 8
 }
 
-func KnxManufacturerParse(theBytes []byte) (KnxManufacturer, error) {
-	return KnxManufacturerParseWithBuffer(utils.NewReadBufferByteBased(theBytes))
+func KnxManufacturerParse(ctx context.Context, theBytes []byte) (KnxManufacturer, error) {
+	return KnxManufacturerParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
 }
 
-func KnxManufacturerParseWithBuffer(readBuffer utils.ReadBuffer) (KnxManufacturer, error) {
+func KnxManufacturerParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (KnxManufacturer, error) {
 	val, err := readBuffer.ReadUint16("KnxManufacturer", 16)
 	if err != nil {
 		return 0, errors.Wrap(err, "error reading KnxManufacturer")
@@ -8735,13 +8834,13 @@ func KnxManufacturerParseWithBuffer(readBuffer utils.ReadBuffer) (KnxManufacture
 
 func (e KnxManufacturer) Serialize() ([]byte, error) {
 	wb := utils.NewWriteBufferByteBased()
-	if err := e.SerializeWithWriteBuffer(wb); err != nil {
+	if err := e.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
 	return wb.GetBytes(), nil
 }
 
-func (e KnxManufacturer) SerializeWithWriteBuffer(writeBuffer utils.WriteBuffer) error {
+func (e KnxManufacturer) SerializeWithWriteBuffer(ctx context.Context, writeBuffer utils.WriteBuffer) error {
 	return writeBuffer.WriteUint16("KnxManufacturer", 16, uint16(e), utils.WithAdditionalStringRepresentation(e.PLC4XEnumName()))
 }
 
@@ -9850,8 +9949,8 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_SHANGHAI_LEWIN_INTELLIGENT_TECHNOLOGY_CO__LTD_"
 	case KnxManufacturer_M_KG_POWER:
 		return "M_KG_POWER"
-	case KnxManufacturer_M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD:
-		return "M_ZHEJIANG_MOORGEN_INTELLIGENT_TECHNOLOGY_CO___LTD"
+	case KnxManufacturer_M_ZHEJIANG_MOORGEN_GROUP_CO__LTD:
+		return "M_ZHEJIANG_MOORGEN_GROUP_CO__LTD"
 	case KnxManufacturer_M_GUANGDONG_KANWAY:
 		return "M_GUANGDONG_KANWAY"
 	case KnxManufacturer_M_RAMIREZ_ENGINEERING_GMBH:
@@ -9890,12 +9989,26 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_KILOELEC_TECHNOLOGY"
 	case KnxManufacturer_M_INYX:
 		return "M_INYX"
+	case KnxManufacturer_M_SMART_BUILDING_SERVICES_GMBH:
+		return "M_SMART_BUILDING_SERVICES_GMBH"
+	case KnxManufacturer_M_BSS_GMBH:
+		return "M_BSS_GMBH"
+	case KnxManufacturer_M_LUMI_ELECTRONICS:
+		return "M_LUMI_ELECTRONICS"
+	case KnxManufacturer_M_OJEAELECTRONICS:
+		return "M_OJEAELECTRONICS"
+	case KnxManufacturer_M_SMART_NODE:
+		return "M_SMART_NODE"
+	case KnxManufacturer_M_NEXHOME:
+		return "M_NEXHOME"
+	case KnxManufacturer_M_HUOTENG_WULIAN_JIANGSU_CO___LTD:
+		return "M_HUOTENG_WULIAN_JIANGSU_CO___LTD"
 	case KnxManufacturer_M_ABB___RESERVED:
 		return "M_ABB___RESERVED"
-	case KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED:
-		return "M_BUSCH_JAEGER_ELEKTRO___RESERVED"
 	case KnxManufacturer_M_WHD_WILHELM_HUBER_Plus_SOEHNE:
 		return "M_WHD_WILHELM_HUBER_Plus_SOEHNE"
+	case KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED:
+		return "M_BUSCH_JAEGER_ELEKTRO___RESERVED"
 	case KnxManufacturer_M_BISCHOFF_ELEKTRONIK:
 		return "M_BISCHOFF_ELEKTRONIK"
 	case KnxManufacturer_M_JEPAZ:
