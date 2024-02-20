@@ -88,7 +88,7 @@ public enum TransportSize {
       (boolean) false,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_LWORD",
       null),
   INT(
@@ -179,7 +179,7 @@ public enum TransportSize {
       (boolean) false,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_LINT",
       TransportSize.INT),
   ULINT(
@@ -187,12 +187,12 @@ public enum TransportSize {
       (boolean) false,
       (boolean) false,
       (short) 0x00,
-      (short) 16,
+      (short) 8,
       (boolean) false,
       (boolean) false,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_ULINT",
       TransportSize.INT),
   REAL(
@@ -212,13 +212,13 @@ public enum TransportSize {
       (short) 0x0F,
       (boolean) false,
       (boolean) false,
-      (short) 0x30,
+      (short) 0x00,
       (short) 8,
       (boolean) false,
       (boolean) true,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_LREAL",
       TransportSize.REAL),
   CHAR(
@@ -231,7 +231,7 @@ public enum TransportSize {
       (boolean) true,
       (short) 'B',
       (boolean) true,
-      DataTransportSize.BYTE_WORD_DWORD,
+      DataTransportSize.OCTET_STRING,
       (String) "IEC61131_CHAR",
       null),
   WCHAR(
@@ -244,7 +244,7 @@ public enum TransportSize {
       (boolean) true,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.OCTET_STRING,
       (String) "IEC61131_WCHAR",
       null),
   STRING(
@@ -257,7 +257,7 @@ public enum TransportSize {
       (boolean) true,
       (short) 'X',
       (boolean) true,
-      DataTransportSize.BYTE_WORD_DWORD,
+      DataTransportSize.OCTET_STRING,
       (String) "IEC61131_STRING",
       null),
   WSTRING(
@@ -270,20 +270,33 @@ public enum TransportSize {
       (boolean) true,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.OCTET_STRING,
       (String) "IEC61131_WSTRING",
       null),
-  TIME(
+  S5TIME(
       (short) 0x14,
       (boolean) true,
+      (boolean) false,
+      (short) 0x00,
+      (short) 2,
       (boolean) true,
-      (short) 0x0B,
+      (boolean) false,
+      (short) 'X',
+      (boolean) true,
+      DataTransportSize.BYTE_WORD_DWORD,
+      (String) "S7_S5TIME",
+      null),
+  TIME(
+      (short) 0x15,
+      (boolean) true,
+      (boolean) true,
+      (short) 0x00,
       (short) 4,
       (boolean) true,
       (boolean) true,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_TIME",
       null),
   LTIME(
@@ -296,14 +309,14 @@ public enum TransportSize {
       (boolean) false,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_LTIME",
       TransportSize.TIME),
   DATE(
       (short) 0x17,
       (boolean) true,
       (boolean) true,
-      (short) 0x09,
+      (short) 0x00,
       (short) 2,
       (boolean) true,
       (boolean) true,
@@ -316,7 +329,7 @@ public enum TransportSize {
       (short) 0x18,
       (boolean) true,
       (boolean) true,
-      (short) 0x06,
+      (short) 0x00,
       (short) 4,
       (boolean) true,
       (boolean) true,
@@ -329,7 +342,7 @@ public enum TransportSize {
       (short) 0x19,
       (boolean) true,
       (boolean) true,
-      (short) 0x06,
+      (short) 0x0A,
       (short) 4,
       (boolean) true,
       (boolean) true,
@@ -338,31 +351,96 @@ public enum TransportSize {
       DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_TIME_OF_DAY",
       null),
-  DATE_AND_TIME(
+  LTIME_OF_DAY(
       (short) 0x1A,
+      (boolean) false,
+      (boolean) true,
+      (short) 0x00,
+      (short) 8,
+      (boolean) false,
+      (boolean) false,
+      (short) 'X',
+      (boolean) true,
+      DataTransportSize.BYTE_WORD_DWORD,
+      (String) "IEC61131_LTIME_OF_DAY",
+      null),
+  LTOD(
+      (short) 0x1B,
+      (boolean) false,
+      (boolean) true,
+      (short) 0x00,
+      (short) 8,
+      (boolean) false,
+      (boolean) false,
+      (short) 'X',
+      (boolean) true,
+      DataTransportSize.BYTE_WORD_DWORD,
+      (String) "IEC61131_LTIME_OF_DAY",
+      null),
+  DATE_AND_TIME(
+      (short) 0x1C,
       (boolean) true,
       (boolean) false,
-      (short) 0x0F,
-      (short) 12,
+      (short) 0x00,
+      (short) 8,
       (boolean) true,
       (boolean) false,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_DATE_AND_TIME",
       null),
   DT(
-      (short) 0x1B,
+      (short) 0x1D,
       (boolean) true,
       (boolean) false,
-      (short) 0x0F,
-      (short) 12,
+      (short) 0x00,
+      (short) 8,
       (boolean) true,
       (boolean) false,
       (short) 'X',
       (boolean) true,
-      null,
+      DataTransportSize.BYTE_WORD_DWORD,
       (String) "IEC61131_DATE_AND_TIME",
+      null),
+  DATE_AND_LTIME(
+      (short) 0x1E,
+      (boolean) false,
+      (boolean) false,
+      (short) 0x00,
+      (short) 8,
+      (boolean) false,
+      (boolean) false,
+      (short) 'X',
+      (boolean) true,
+      DataTransportSize.BYTE_WORD_DWORD,
+      (String) "IEC61131_DATE_AND_LTIME",
+      null),
+  LDT(
+      (short) 0x1F,
+      (boolean) false,
+      (boolean) false,
+      (short) 0x00,
+      (short) 8,
+      (boolean) false,
+      (boolean) false,
+      (short) 'X',
+      (boolean) true,
+      DataTransportSize.BYTE_WORD_DWORD,
+      (String) "IEC61131_DATE_AND_LTIME",
+      null),
+  DTL(
+      (short) 0x21,
+      (boolean) false,
+      (boolean) false,
+      (short) 0x00,
+      (short) 12,
+      (boolean) false,
+      (boolean) true,
+      (short) 'X',
+      (boolean) true,
+      DataTransportSize.BYTE_WORD_DWORD,
+      (String) "IEC61131_DTL",
       null);
   private static final Map<Short, TransportSize> map;
 
@@ -373,18 +451,18 @@ public enum TransportSize {
     }
   }
 
-  private short value;
-  private boolean supported_S7_300;
-  private boolean supported_LOGO;
-  private short code;
-  private short sizeInBytes;
-  private boolean supported_S7_400;
-  private boolean supported_S7_1200;
-  private short shortName;
-  private boolean supported_S7_1500;
-  private DataTransportSize dataTransportSize;
-  private String dataProtocolId;
-  private TransportSize baseType;
+  private final short value;
+  private final boolean supported_S7_300;
+  private final boolean supported_LOGO;
+  private final short code;
+  private final short sizeInBytes;
+  private final boolean supported_S7_400;
+  private final boolean supported_S7_1200;
+  private final short shortName;
+  private final boolean supported_S7_1500;
+  private final DataTransportSize dataTransportSize;
+  private final String dataProtocolId;
+  private final TransportSize baseType;
 
   TransportSize(
       short value,
@@ -431,7 +509,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldSupported_S7_300(boolean fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getSupported_S7_300() == fieldValue) {
         _values.add(_val);
@@ -454,7 +532,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldSupported_LOGO(boolean fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getSupported_LOGO() == fieldValue) {
         _values.add(_val);
@@ -477,7 +555,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldCode(short fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getCode() == fieldValue) {
         _values.add(_val);
@@ -500,7 +578,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldSizeInBytes(short fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getSizeInBytes() == fieldValue) {
         _values.add(_val);
@@ -523,7 +601,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldSupported_S7_400(boolean fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getSupported_S7_400() == fieldValue) {
         _values.add(_val);
@@ -546,7 +624,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldSupported_S7_1200(boolean fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getSupported_S7_1200() == fieldValue) {
         _values.add(_val);
@@ -569,7 +647,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldShortName(short fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getShortName() == fieldValue) {
         _values.add(_val);
@@ -592,7 +670,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldSupported_S7_1500(boolean fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getSupported_S7_1500() == fieldValue) {
         _values.add(_val);
@@ -615,7 +693,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldDataTransportSize(DataTransportSize fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getDataTransportSize() == fieldValue) {
         _values.add(_val);
@@ -638,7 +716,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldDataProtocolId(String fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getDataProtocolId().equals(fieldValue)) {
         _values.add(_val);
@@ -661,7 +739,7 @@ public enum TransportSize {
   }
 
   public static List<TransportSize> enumsForFieldBaseType(TransportSize fieldValue) {
-    List<TransportSize> _values = new ArrayList();
+    List<TransportSize> _values = new ArrayList<>();
     for (TransportSize _val : TransportSize.values()) {
       if (_val.getBaseType() == fieldValue) {
         _values.add(_val);

@@ -20,20 +20,24 @@
 package model
 
 import (
-	"context"
-	"encoding/binary"
-	"fmt"
+	"github.com/apache/plc4x/plc4go/spi/options"
+	"github.com/rs/zerolog"
 	"time"
 
-	"github.com/apache/plc4x/plc4go/pkg/api/model"
-	"github.com/apache/plc4x/plc4go/pkg/api/values"
+	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
+	apiValues "github.com/apache/plc4x/plc4go/pkg/api/values"
 	"github.com/apache/plc4x/plc4go/spi/utils"
+	spiValues "github.com/apache/plc4x/plc4go/spi/values"
 )
 
+var _ apiModel.PlcSubscriptionEvent = &DefaultPlcSubscriptionEvent{}
+
+//go:generate go run ../../tools/plc4xgenerator/gen.go -type=DefaultPlcSubscriptionEvent
 type DefaultPlcSubscriptionEvent struct {
-	DefaultResponse
 	DefaultPlcSubscriptionEventRequirements `ignore:"true"` // Avoid recursion
 	values                                  map[string]*DefaultPlcSubscriptionEventItem
+
+	log zerolog.Logger `ignore:"true"`
 }
 
 type DefaultPlcSubscriptionEventRequirements interface {
@@ -41,9 +45,15 @@ type DefaultPlcSubscriptionEventRequirements interface {
 	GetAddress(name string) string
 }
 
-func NewDefaultPlcSubscriptionEvent(defaultPlcSubscriptionEventRequirements DefaultPlcSubscriptionEventRequirements, tags map[string]model.PlcTag, types map[string]SubscriptionType,
-	intervals map[string]time.Duration, responseCodes map[string]model.PlcResponseCode,
-	values map[string]values.PlcValue) DefaultPlcSubscriptionEvent {
+func NewDefaultPlcSubscriptionEvent(
+	defaultPlcSubscriptionEventRequirements DefaultPlcSubscriptionEventRequirements,
+	tags map[string]apiModel.PlcTag,
+	types map[string]apiModel.PlcSubscriptionType,
+	intervals map[string]time.Duration,
+	responseCodes map[string]apiModel.PlcResponseCode,
+	values map[string]apiValues.PlcValue,
+	_options ...options.WithOption,
+) apiModel.PlcSubscriptionEvent {
 
 	valueMap := map[string]*DefaultPlcSubscriptionEventItem{}
 	for name, code := range responseCodes {
@@ -51,13 +61,19 @@ func NewDefaultPlcSubscriptionEvent(defaultPlcSubscriptionEventRequirements Defa
 		subscriptionType := types[name]
 		interval := intervals[name]
 		value := values[name]
-		valueMap[name] = NewSubscriptionEventItem(code, tag, subscriptionType, interval, value)
+		valueMap[name] = NewDefaultPlcSubscriptionEventItem(code, tag, subscriptionType, interval, value)
 	}
 
-	return DefaultPlcSubscriptionEvent{
+	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
+	return &DefaultPlcSubscriptionEvent{
 		DefaultPlcSubscriptionEventRequirements: defaultPlcSubscriptionEventRequirements,
 		values:                                  valueMap,
+		log:                                     customLogger,
 	}
+}
+
+func (d *DefaultPlcSubscriptionEvent) IsAPlcMessage() bool {
+	return true
 }
 
 func (d *DefaultPlcSubscriptionEvent) GetTagNames() []string {
@@ -68,24 +84,48 @@ func (d *DefaultPlcSubscriptionEvent) GetTagNames() []string {
 	return tagNames
 }
 
-func (d *DefaultPlcSubscriptionEvent) GetResponseCode(name string) model.PlcResponseCode {
-	return d.values[name].GetCode()
+func (d *DefaultPlcSubscriptionEvent) GetResponseCode(name string) apiModel.PlcResponseCode {
+	item, ok := d.values[name]
+	if !ok {
+		return apiModel.PlcResponseCode_NOT_FOUND
+	}
+	return item.GetCode()
 }
 
-func (d *DefaultPlcSubscriptionEvent) GetTag(name string) model.PlcTag {
-	return d.values[name].GetTag()
+func (d *DefaultPlcSubscriptionEvent) GetTag(name string) apiModel.PlcTag {
+	item := d.values[name]
+	if item == nil {
+		d.log.Warn().Str("name", name).Msg("field for name not found")
+		return nil
+	}
+	return item.GetTag()
 }
 
-func (d *DefaultPlcSubscriptionEvent) GetType(name string) SubscriptionType {
-	return d.values[name].GetSubscriptionType()
+func (d *DefaultPlcSubscriptionEvent) GetType(name string) apiModel.PlcSubscriptionType {
+	item := d.values[name]
+	if item == nil {
+		d.log.Warn().Str("name", name).Msg("field for name not found")
+		return 0
+	}
+	return item.GetSubscriptionType()
 }
 
 func (d *DefaultPlcSubscriptionEvent) GetInterval(name string) time.Duration {
-	return d.values[name].GetInterval()
+	item := d.values[name]
+	if item == nil {
+		d.log.Warn().Str("name", name).Msg("field for name not found")
+		return -1
+	}
+	return item.GetInterval()
 }
 
-func (d *DefaultPlcSubscriptionEvent) GetValue(name string) values.PlcValue {
-	return d.values[name].GetValue()
+func (d *DefaultPlcSubscriptionEvent) GetValue(name string) apiValues.PlcValue {
+	item := d.values[name]
+	if item == nil {
+		d.log.Warn().Str("name", name).Msg("field for name not found")
+		return spiValues.PlcNull{}
+	}
+	return item.GetValue()
 }
 
 func (d *DefaultPlcSubscriptionEvent) GetAddress(name string) string {
@@ -94,43 +134,4 @@ func (d *DefaultPlcSubscriptionEvent) GetAddress(name string) string {
 
 func (d *DefaultPlcSubscriptionEvent) GetSource(name string) string {
 	return d.GetAddress(name)
-}
-
-func (d *DefaultPlcSubscriptionEvent) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
-	if err := d.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
-		return nil, err
-	}
-	return wb.GetBytes(), nil
-}
-
-func (d *DefaultPlcSubscriptionEvent) SerializeWithWriteBuffer(ctx context.Context, writeBuffer utils.WriteBuffer) error {
-	if err := writeBuffer.PushContext("PlcSubscriptionEvent"); err != nil {
-		return err
-	}
-	if err := writeBuffer.PushContext("values", utils.WithRenderAsList(true)); err != nil {
-		return err
-	}
-	for name, elem := range d.values {
-		_value := fmt.Sprintf("%v", elem)
-
-		if err := writeBuffer.WriteString(name, uint32(len(_value)*8), "UTF-8", _value); err != nil {
-			return err
-		}
-	}
-	if err := writeBuffer.PopContext("values", utils.WithRenderAsList(true)); err != nil {
-		return err
-	}
-	if err := writeBuffer.PopContext("PlcSubscriptionEvent"); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (d *DefaultPlcSubscriptionEvent) String() string {
-	writeBuffer := utils.NewWriteBufferBoxBasedWithOptions(true, true)
-	if err := writeBuffer.WriteSerializable(context.Background(), d); err != nil {
-		return err.Error()
-	}
-	return writeBuffer.GetBox().String()
 }

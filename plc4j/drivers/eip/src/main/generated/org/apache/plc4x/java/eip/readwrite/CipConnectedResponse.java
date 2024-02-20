@@ -38,8 +38,8 @@ import org.apache.plc4x.java.spi.generation.*;
 public class CipConnectedResponse extends CipService implements Message {
 
   // Accessors for discriminator values.
-  public Short getService() {
-    return (short) 0x52;
+  public Byte getService() {
+    return (byte) 0x52;
   }
 
   public Boolean getResponse() {
@@ -78,7 +78,6 @@ public class CipConnectedResponse extends CipService implements Message {
   protected void serializeCipServiceChild(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
-    int startPos = positionAware.getPos();
     writeBuffer.pushContext("CipConnectedResponse");
 
     // Reserved Field (reserved)
@@ -129,8 +128,6 @@ public class CipConnectedResponse extends CipService implements Message {
       ReadBuffer readBuffer, Boolean connected, Integer serviceLen) throws ParseException {
     readBuffer.pullContext("CipConnectedResponse");
     PositionAware positionAware = readBuffer;
-    int startPos = positionAware.getPos();
-    int curPos;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     Short reservedField0 =

@@ -19,47 +19,43 @@
 
 from dataclasses import dataclass
 
-from ctypes import c_bool
-from ctypes import c_uint16
-from ctypes import c_uint8
+from plc4py.api.exceptions.exceptions import PlcRuntimeException
+from plc4py.api.exceptions.exceptions import SerializationException
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
-from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDUBuilder
+from plc4py.spi.generation.ReadBuffer import ReadBuffer
+from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from typing import ClassVar
 import math
 
 
 @dataclass
-class ModbusPDUDiagnosticResponse(PlcMessage, ModbusPDU):
-    sub_function: c_uint16
-    data: c_uint16
+class ModbusPDUDiagnosticResponse(ModbusPDU):
+    sub_function: int
+    data: int
     # Accessors for discriminator values.
-    error_flag: c_bool = False
-    function_flag: c_uint8 = 0x08
-    response: c_bool = True
-
-    def __post_init__(self):
-        super().__init__()
+    error_flag: ClassVar[bool] = False
+    function_flag: ClassVar[int] = 0x08
+    response: ClassVar[bool] = True
 
     def serialize_modbus_pdu_child(self, write_buffer: WriteBuffer):
-        position_aware: PositionAware = write_buffer
-        start_pos: int = position_aware.get_pos()
         write_buffer.push_context("ModbusPDUDiagnosticResponse")
 
         # Simple Field (subFunction)
-        write_simple_field(
-            "subFunction", self.sub_function, write_unsigned_int(write_buffer, 16)
+        write_buffer.write_unsigned_short(
+            self.sub_function, bit_length=16, logical_name="subFunction"
         )
 
         # Simple Field (data)
-        write_simple_field("data", self.data, write_unsigned_int(write_buffer, 16))
+        write_buffer.write_unsigned_short(self.data, bit_length=16, logical_name="data")
 
         write_buffer.pop_context("ModbusPDUDiagnosticResponse")
 
     def length_in_bytes(self) -> int:
-        return int(math.ceil(float(self.get_length_in_bits() / 8.0)))
+        return int(math.ceil(float(self.length_in_bits() / 8.0)))
 
-    def get_length_in_bits(self) -> int:
-        length_in_bits: int = super().get_length_in_bits()
+    def length_in_bits(self) -> int:
+        length_in_bits: int = super().length_in_bits()
         _value: ModbusPDUDiagnosticResponse = self
 
         # Simple field (subFunction)
@@ -71,19 +67,18 @@ class ModbusPDUDiagnosticResponse(PlcMessage, ModbusPDU):
         return length_in_bits
 
     @staticmethod
-    def static_parse_builder(read_buffer: ReadBuffer, response: c_bool):
-        read_buffer.pull_context("ModbusPDUDiagnosticResponse")
-        position_aware: PositionAware = read_buffer
-        start_pos: int = position_aware.get_pos()
-        cur_pos: int = 0
+    def static_parse_builder(read_buffer: ReadBuffer, response: bool):
+        read_buffer.push_context("ModbusPDUDiagnosticResponse")
 
-        sub_function: c_uint16 = read_simple_field(
-            "subFunction", read_unsigned_int(read_buffer, 16)
+        sub_function: int = read_buffer.read_unsigned_short(
+            logical_name="subFunction", bit_length=16, response=response
         )
 
-        data: c_uint16 = read_simple_field("data", read_unsigned_int(read_buffer, 16))
+        data: int = read_buffer.read_unsigned_short(
+            logical_name="data", bit_length=16, response=response
+        )
 
-        read_buffer.close_context("ModbusPDUDiagnosticResponse")
+        read_buffer.pop_context("ModbusPDUDiagnosticResponse")
         # Create the instance
         return ModbusPDUDiagnosticResponseBuilder(sub_function, data)
 
@@ -106,22 +101,20 @@ class ModbusPDUDiagnosticResponse(PlcMessage, ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        try:
-            write_buffer_box_based.writeSerializable(self)
-        except SerializationException as e:
-            raise RuntimeException(e)
+        pass
+        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
+        # try:
+        #    write_buffer_box_based.writeSerializable(self)
+        # except SerializationException as e:
+        #    raise PlcRuntimeException(e)
 
-        return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
 
 
 @dataclass
-class ModbusPDUDiagnosticResponseBuilder(ModbusPDUBuilder):
-    subFunction: c_uint16
-    data: c_uint16
-
-    def __post_init__(self):
-        pass
+class ModbusPDUDiagnosticResponseBuilder:
+    sub_function: int
+    data: int
 
     def build(
         self,

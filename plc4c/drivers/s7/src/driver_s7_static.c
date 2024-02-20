@@ -22,6 +22,8 @@
 #include <string.h>
 #include <time.h>
 
+#include "data_transport_size.h"
+
 /*
  *
  *   Static functions
@@ -35,7 +37,7 @@ uint16_t plc4c_s7_read_write_event_item_length(plc4c_spi_read_buffer* io, uint16
   return 0;
 }
 
-uint16_t plc4c_s7_read_write_right_shift3(plc4c_spi_read_buffer* io) {
+uint16_t plc4c_s7_read_write_right_shift3(plc4c_spi_read_buffer* io, plc4c_s7_read_write_data_transport_size transportSize) {
   return 0;
 }
 
@@ -145,6 +147,10 @@ plc4c_return_code plc4c_s7_read_write_byte_to_bcd(plc4c_spi_write_buffer* writeB
 
 plc4c_return_code plc4c_s7_read_write_int_to_s7msec(plc4c_spi_write_buffer* writeBuffer, uint16_t value) {
   // TODO: Implement ...
+  return 0;
+}
+
+uint8_t plc4c_s7_read_write_parse_siemens_year(plc4c_spi_read_buffer* io) {
   return 0;
 }
 

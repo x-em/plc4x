@@ -18,13 +18,22 @@
  */
 package org.apache.plc4x.java.transport.udp;
 
-import org.apache.plc4x.java.spi.transport.TransportConfiguration;
+import org.apache.plc4x.java.spi.configuration.PlcTransportConfiguration;
 
-public interface UdpTransportConfiguration extends TransportConfiguration {
+public interface UdpTransportConfiguration extends PlcTransportConfiguration {
 
     int NO_DEFAULT_PORT = -1;
 
     default int getDefaultPort() {
+        return NO_DEFAULT_PORT;
+    }
+
+    /**
+     * Most transports don't care about the local port, but some do.
+     * This option allows forcing a local port number to be used.
+     * @return local port number
+     */
+    default int getLocalPort() {
         return NO_DEFAULT_PORT;
     }
 

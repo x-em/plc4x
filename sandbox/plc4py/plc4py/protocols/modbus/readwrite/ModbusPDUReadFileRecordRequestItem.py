@@ -19,53 +19,50 @@
 
 from dataclasses import dataclass
 
-from ctypes import c_uint16
-from ctypes import c_uint8
+from plc4py.api.exceptions.exceptions import PlcRuntimeException
+from plc4py.api.exceptions.exceptions import SerializationException
 from plc4py.api.messages.PlcMessage import PlcMessage
+from plc4py.spi.generation.ReadBuffer import ReadBuffer
+from plc4py.spi.generation.WriteBuffer import WriteBuffer
 import math
 
 
 @dataclass
-class ModbusPDUReadFileRecordRequestItem(PlcMessage):
-    reference_type: c_uint8
-    file_number: c_uint16
-    record_number: c_uint16
-    record_length: c_uint16
-
-    def __post_init__(self):
-        super().__init__()
+class ModbusPDUReadFileRecordRequestItem:
+    reference_type: int
+    file_number: int
+    record_number: int
+    record_length: int
 
     def serialize(self, write_buffer: WriteBuffer):
-        position_aware: PositionAware = write_buffer
-        start_pos: int = position_aware.get_pos()
         write_buffer.push_context("ModbusPDUReadFileRecordRequestItem")
 
         # Simple Field (referenceType)
-        write_simple_field(
-            "referenceType", self.reference_type, write_unsigned_short(write_buffer, 8)
+        write_buffer.write_unsigned_byte(
+            self.reference_type, bit_length=8, logical_name="referenceType"
         )
 
         # Simple Field (fileNumber)
-        write_simple_field(
-            "fileNumber", self.file_number, write_unsigned_int(write_buffer, 16)
+        write_buffer.write_unsigned_short(
+            self.file_number, bit_length=16, logical_name="fileNumber"
         )
 
         # Simple Field (recordNumber)
-        write_simple_field(
-            "recordNumber", self.record_number, write_unsigned_int(write_buffer, 16)
+        write_buffer.write_unsigned_short(
+            self.record_number, bit_length=16, logical_name="recordNumber"
         )
 
         # Simple Field (recordLength)
-        write_simple_field(
-            "recordLength", self.record_length, write_unsigned_int(write_buffer, 16)
+        write_buffer.write_unsigned_short(
+            self.record_length, bit_length=16, logical_name="recordLength"
         )
 
         write_buffer.pop_context("ModbusPDUReadFileRecordRequestItem")
 
     def length_in_bytes(self) -> int:
-        return int(math.ceil(float(self.get_length_in_bits() / 8.0)))
+        return int(math.ceil(float(self.length_in_bits() / 8.0)))
 
-    def get_length_in_bits(self) -> int:
+    def length_in_bits(self) -> int:
         length_in_bits: int = 0
         _value: ModbusPDUReadFileRecordRequestItem = self
 
@@ -83,36 +80,35 @@ class ModbusPDUReadFileRecordRequestItem(PlcMessage):
 
         return length_in_bits
 
-    def static_parse(read_buffer: ReadBuffer, args):
-        position_aware: PositionAware = read_buffer
-        return staticParse(read_buffer)
+    @staticmethod
+    def static_parse(read_buffer: ReadBuffer, **kwargs):
+        return ModbusPDUReadFileRecordRequestItem.static_parse_context(read_buffer)
 
     @staticmethod
     def static_parse_context(read_buffer: ReadBuffer):
-        read_buffer.pull_context("ModbusPDUReadFileRecordRequestItem")
-        position_aware: PositionAware = read_buffer
-        start_pos: int = position_aware.get_pos()
-        cur_pos: int = 0
+        read_buffer.push_context("ModbusPDUReadFileRecordRequestItem")
 
-        reference_type: c_uint8 = read_simple_field(
-            "referenceType", read_unsigned_short(read_buffer, 8)
+        reference_type: int = read_buffer.read_unsigned_byte(
+            logical_name="referenceType", bit_length=8
         )
 
-        file_number: c_uint16 = read_simple_field(
-            "fileNumber", read_unsigned_int(read_buffer, 16)
+        file_number: int = read_buffer.read_unsigned_short(
+            logical_name="fileNumber", bit_length=16
         )
 
-        record_number: c_uint16 = read_simple_field(
-            "recordNumber", read_unsigned_int(read_buffer, 16)
+        record_number: int = read_buffer.read_unsigned_short(
+            logical_name="recordNumber", bit_length=16
         )
 
-        record_length: c_uint16 = read_simple_field(
-            "recordLength", read_unsigned_int(read_buffer, 16)
+        record_length: int = read_buffer.read_unsigned_short(
+            logical_name="recordLength", bit_length=16
         )
 
-        read_buffer.close_context("ModbusPDUReadFileRecordRequestItem")
+        read_buffer.pop_context("ModbusPDUReadFileRecordRequestItem")
         # Create the instance
-        _modbus_pdu_read_file_record_request_item: ModbusPDUReadFileRecordRequestItem = ModbusPDUReadFileRecordRequestItem(
+        _modbus_pdu_read_file_record_request_item: (
+            ModbusPDUReadFileRecordRequestItem
+        ) = ModbusPDUReadFileRecordRequestItem(
             reference_type, file_number, record_number, record_length
         )
         return _modbus_pdu_read_file_record_request_item
@@ -137,10 +133,11 @@ class ModbusPDUReadFileRecordRequestItem(PlcMessage):
         return hash(self)
 
     def __str__(self) -> str:
-        write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        try:
-            write_buffer_box_based.writeSerializable(self)
-        except SerializationException as e:
-            raise RuntimeException(e)
+        pass
+        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
+        # try:
+        #    write_buffer_box_based.writeSerializable(self)
+        # except SerializationException as e:
+        #    raise PlcRuntimeException(e)
 
-        return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"

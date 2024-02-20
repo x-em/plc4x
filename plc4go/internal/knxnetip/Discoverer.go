@@ -23,17 +23,18 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/apache/plc4x/plc4go/spi/utils"
-	"github.com/rs/zerolog/log"
+	"github.com/apache/plc4x/plc4go/spi/pool"
+	"github.com/rs/zerolog"
 	"net"
 	"net/url"
+	"runtime/debug"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	driverModel "github.com/apache/plc4x/plc4go/protocols/knxnetip/readwrite/model"
-	internalModel "github.com/apache/plc4x/plc4go/spi/model"
+	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/transports"
 	"github.com/apache/plc4x/plc4go/spi/transports/udp"
@@ -41,16 +42,22 @@ import (
 
 type Discoverer struct {
 	transportInstanceCreationWorkItemId atomic.Int32
-	transportInstanceCreationQueue      utils.Executor
+	transportInstanceCreationQueue      pool.Executor
 	deviceScanningWorkItemId            atomic.Int32
-	deviceScanningQueue                 utils.Executor
+	deviceScanningQueue                 pool.Executor
+
+	log      zerolog.Logger
+	_options []options.WithOption // Used to pass them downstream
 }
 
-func NewDiscoverer() *Discoverer {
+func NewDiscoverer(_options ...options.WithOption) *Discoverer {
+	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
 	return &Discoverer{
 		// TODO: maybe a dynamic executor would be better to not waste cycles when not in use
-		transportInstanceCreationQueue: utils.NewFixedSizeExecutor(50, 100),
-		deviceScanningQueue:            utils.NewFixedSizeExecutor(50, 100),
+		transportInstanceCreationQueue: pool.NewFixedSizeExecutor(50, 100, _options...),
+		deviceScanningQueue:            pool.NewFixedSizeExecutor(50, 100, _options...),
+		log:                            customLogger,
+		_options:                       _options,
 	}
 }
 
@@ -78,7 +85,13 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	deviceNames := options.FilterDiscoveryOptionsDeviceName(discoveryOptions)
 	if len(deviceNames) > 0 {
 		for _, curInterface := range allInterfaces {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
 			for _, deviceNameOption := range deviceNames {
+				if err := ctx.Err(); err != nil {
+					return err
+				}
 				if curInterface.Name == deviceNameOption.GetDeviceName() {
 					interfaces = append(interfaces, curInterface)
 					break
@@ -93,17 +106,32 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	wg := &sync.WaitGroup{}
 	// Iterate over all network devices of this system.
 	for _, netInterface := range interfaces {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		addrs, err := netInterface.Addrs()
 		if err != nil {
 			return err
 		}
 		wg.Add(1)
 		go func(netInterface net.Interface) {
+			defer func() {
+				if err := recover(); err != nil {
+					d.log.Error().
+						Str("stack", string(debug.Stack())).
+						Interface("err", err).
+						Msg("panic-ed")
+				}
+			}()
 			defer func() { wg.Done() }()
 			// Iterate over all addresses the current interface has configured
 			// For KNX we're only interested in IPv4 addresses, as it doesn't
 			// seem to work with IPv6.
 			for _, addr := range addrs {
+				if err := ctx.Err(); err != nil {
+					d.log.Debug().Err(err).Msg("done")
+					return
+				}
 				var ipv4Addr net.IP
 				switch addr.(type) {
 				// If the device is configured to communicate with a subnet
@@ -127,19 +155,27 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	}
 	go func() {
 		wg.Wait()
-		log.Trace().Msg("Closing transport instance channel")
+		d.log.Trace().Msg("Closing transport instance channel")
 		close(transportInstances)
 	}()
 
 	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				d.log.Error().
+					Str("stack", string(debug.Stack())).
+					Interface("err", err).
+					Msg("panic-ed")
+			}
+		}()
 		for transportInstance := range transportInstances {
-			d.deviceScanningQueue.Submit(ctx, d.deviceScanningWorkItemId.Add(1), d.createDeviceScanDispatcher(transportInstance.(*udp.TransportInstance), callback))
+			d.deviceScanningQueue.Submit(ctx, d.deviceScanningWorkItemId.Add(1), d.createDeviceScanDispatcher(ctx, transportInstance.(*udp.TransportInstance), callback))
 		}
 	}()
 	return nil
 }
 
-func (d *Discoverer) createTransportInstanceDispatcher(ctx context.Context, wg *sync.WaitGroup, connectionUrl *url.URL, ipv4Addr net.IP, udpTransport *udp.Transport, transportInstances chan transports.TransportInstance) utils.Runnable {
+func (d *Discoverer) createTransportInstanceDispatcher(ctx context.Context, wg *sync.WaitGroup, connectionUrl *url.URL, ipv4Addr net.IP, udpTransport *udp.Transport, transportInstances chan transports.TransportInstance) pool.Runnable {
 	wg.Add(1)
 	return func() {
 		defer wg.Done()
@@ -148,27 +184,31 @@ func (d *Discoverer) createTransportInstanceDispatcher(ctx context.Context, wg *
 			udpTransport.CreateTransportInstanceForLocalAddress(*connectionUrl, nil,
 				&net.UDPAddr{IP: ipv4Addr, Port: 0})
 		if err != nil {
-			log.Error().Err(err).Msg("error creating transport instance")
+			d.log.Error().Err(err).Msg("error creating transport instance")
 			return
 		}
 		err = transportInstance.ConnectWithContext(ctx)
 		if err != nil {
-			log.Debug().Err(err).Msg("Error Connecting")
+			d.log.Debug().Err(err).Msg("Error Connecting")
 			return
 		}
-		log.Debug().Msgf("Adding transport instance to scan %v", transportInstance)
+		d.log.Debug().Stringer("transportInstance", transportInstance).Msg("Adding transport instance to scan %v")
 		transportInstances <- transportInstance
 	}
 }
 
-func (d *Discoverer) createDeviceScanDispatcher(udpTransportInstance *udp.TransportInstance, callback func(event apiModel.PlcDiscoveryItem)) utils.Runnable {
+func (d *Discoverer) createDeviceScanDispatcher(ctx context.Context, udpTransportInstance *udp.TransportInstance, callback func(event apiModel.PlcDiscoveryItem)) pool.Runnable {
 	return func() {
-		log.Debug().Msgf("Scanning %v", udpTransportInstance)
+		d.log.Debug().Stringer("udpTransportInstance", udpTransportInstance).Msg("Scanning")
 		// Create a codec for sending and receiving messages.
-		codec := NewMessageCodec(udpTransportInstance, nil)
+		codec := NewMessageCodec(
+			udpTransportInstance,
+			nil,
+			append(d._options, options.WithCustomLogger(d.log))...,
+		)
 		// Explicitly start the worker
-		if err := codec.Connect(); err != nil {
-			log.Error().Err(err).Msg("Error connecting")
+		if err := codec.ConnectWithContext(context.TODO()); err != nil {
+			d.log.Error().Err(err).Msg("Error connecting")
 			return
 		}
 
@@ -181,15 +221,19 @@ func (d *Discoverer) createDeviceScanDispatcher(udpTransportInstance *udp.Transp
 		searchRequestMessage := driverModel.NewSearchRequest(discoveryEndpoint)
 		// Send the search request.
 		if err := codec.Send(searchRequestMessage); err != nil {
-			log.Debug().Err(err).Msgf("Error sending message:\n%s", searchRequestMessage)
+			d.log.Debug().Err(err).Stringer("searchRequestMessage", searchRequestMessage).Msg("Error sending message")
 			return
 		}
 		// Keep on reading responses till the timeout is done.
 		// TODO: Make this configurable
-		timeout := time.NewTimer(time.Second * 1)
+		timeout := time.NewTimer(1 * time.Second)
 		timeout.Stop()
 		for start := time.Now(); time.Since(start) < time.Second*5; {
-			timeout.Reset(time.Second * 1)
+			if err := ctx.Err(); err != nil {
+				d.log.Debug().Err(err).Msg("done")
+				return
+			}
+			timeout.Reset(1 * time.Second)
 			select {
 			case message := <-codec.GetDefaultIncomingMessageChannel():
 				{
@@ -205,13 +249,14 @@ func (d *Discoverer) createDeviceScanDispatcher(udpTransportInstance *udp.Transp
 							continue
 						}
 						deviceName := string(bytes.Trim(searchResponse.GetDibDeviceInfo().GetDeviceFriendlyName(), "\x00"))
-						discoveryEvent := &internalModel.DefaultPlcDiscoveryItem{
-							ProtocolCode:  "knxnet-ip",
-							TransportCode: "udp",
-							TransportUrl:  *remoteUrl,
-							Options:       nil,
-							Name:          deviceName,
-						}
+						discoveryEvent := spiModel.NewDefaultPlcDiscoveryItem(
+							"knxnet-ip",
+							"udp",
+							*remoteUrl,
+							nil,
+							deviceName,
+							nil,
+						)
 						// Pass the event back to the callback
 						callback(discoveryEvent)
 					}

@@ -204,22 +204,22 @@ public class PlcEntityManagerComplexTest implements WithAssertions {
         when(connection.getMetadata()).thenReturn(new PlcConnectionMetadata() {
 
             @Override
-            public boolean canRead() {
+            public boolean isReadSupported() {
                 return true;
             }
 
             @Override
-            public boolean canWrite() {
+            public boolean isWriteSupported() {
                 return true;
             }
 
             @Override
-            public boolean canSubscribe() {
+            public boolean isSubscribeSupported() {
                 return true;
             }
 
             @Override
-            public boolean canBrowse() {
+            public boolean isBrowseSupported() {
                 return true;
             }
 
@@ -312,7 +312,7 @@ public class PlcEntityManagerComplexTest implements WithAssertions {
     public static class EntityWithBadConstructor {
 
         @PlcTag("asdf")
-        private long field;
+        private final long field;
 
         public EntityWithBadConstructor(long field) {
             this.field = field;

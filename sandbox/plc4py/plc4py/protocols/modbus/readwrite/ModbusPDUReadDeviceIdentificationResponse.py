@@ -19,8 +19,8 @@
 
 from dataclasses import dataclass
 
-from ctypes import c_bool
-from ctypes import c_uint8
+from plc4py.api.exceptions.exceptions import PlcRuntimeException
+from plc4py.api.exceptions.exceptions import SerializationException
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusDeviceInformationConformityLevel import (
     ModbusDeviceInformationConformityLevel,
@@ -35,100 +35,71 @@ from plc4py.protocols.modbus.readwrite.ModbusDeviceInformationObject import (
     ModbusDeviceInformationObject,
 )
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
-from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDUBuilder
+from plc4py.spi.generation.ReadBuffer import ReadBuffer
+from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from typing import Any
+from typing import ClassVar
 from typing import List
 import math
 
 
 @dataclass
-class ModbusPDUReadDeviceIdentificationResponse(PlcMessage, ModbusPDU):
+class ModbusPDUReadDeviceIdentificationResponse(ModbusPDU):
     level: ModbusDeviceInformationLevel
-    individual_access: c_bool
+    individual_access: bool
     conformity_level: ModbusDeviceInformationConformityLevel
     more_follows: ModbusDeviceInformationMoreFollows
-    next_object_id: c_uint8
+    next_object_id: int
     objects: List[ModbusDeviceInformationObject]
-    MEITYPE: c_uint8 = 0x0E
+    MEI_TYPE: int = 0x0E
     # Accessors for discriminator values.
-    error_flag: c_bool = False
-    function_flag: c_uint8 = 0x2B
-    response: c_bool = True
-
-    def __post_init__(self):
-        super().__init__()
+    error_flag: ClassVar[bool] = False
+    function_flag: ClassVar[int] = 0x2B
+    response: ClassVar[bool] = True
 
     def serialize_modbus_pdu_child(self, write_buffer: WriteBuffer):
-        position_aware: PositionAware = write_buffer
-        start_pos: int = position_aware.get_pos()
         write_buffer.push_context("ModbusPDUReadDeviceIdentificationResponse")
 
         # Const Field (meiType)
-        write_const_field(
-            "meiType", self.mei_type, write_unsigned_short(write_buffer, 8)
-        )
+        write_buffer.write_unsigned_byte(self.MEI_TYPE, logical_name="meiType")
 
         # Simple Field (level)
-        write_simple_enum_field(
-            "level",
-            "ModbusDeviceInformationLevel",
-            self.level,
-            DataWriterEnumDefault(
-                ModbusDeviceInformationLevel.value,
-                ModbusDeviceInformationLevel.name,
-                write_unsigned_short(write_buffer, 8),
-            ),
-        )
+        write_buffer.write_unsigned_byte(self.level, logical_name="level")
 
         # Simple Field (individualAccess)
-        write_simple_field(
-            "individualAccess", self.individual_access, write_boolean(write_buffer)
+        write_buffer.write_bit(
+            self.individual_access, bit_length=1, logical_name="individualAccess"
         )
 
         # Simple Field (conformityLevel)
-        write_simple_enum_field(
-            "conformityLevel",
-            "ModbusDeviceInformationConformityLevel",
-            self.conformity_level,
-            DataWriterEnumDefault(
-                ModbusDeviceInformationConformityLevel.value,
-                ModbusDeviceInformationConformityLevel.name,
-                write_unsigned_short(write_buffer, 7),
-            ),
+        write_buffer.write_unsigned_byte(
+            self.conformity_level, logical_name="conformityLevel"
         )
 
         # Simple Field (moreFollows)
-        write_simple_enum_field(
-            "moreFollows",
-            "ModbusDeviceInformationMoreFollows",
-            self.more_follows,
-            DataWriterEnumDefault(
-                ModbusDeviceInformationMoreFollows.value,
-                ModbusDeviceInformationMoreFollows.name,
-                write_unsigned_short(write_buffer, 8),
-            ),
-        )
+        write_buffer.write_unsigned_byte(self.more_follows, logical_name="moreFollows")
 
         # Simple Field (nextObjectId)
-        write_simple_field(
-            "nextObjectId", self.next_object_id, write_unsigned_short(write_buffer, 8)
+        write_buffer.write_unsigned_byte(
+            self.next_object_id, bit_length=8, logical_name="nextObjectId"
         )
 
         # Implicit Field (number_of_objects) (Used for parsing, but its value is not stored as it's implicitly given by the objects content)
-        number_of_objects: c_uint8 = c_uint8((COUNT(self.objects())))
-        write_implicit_field(
-            "numberOfObjects", number_of_objects, write_unsigned_short(write_buffer, 8)
+        number_of_objects: int = int(len(self.objects))
+        write_buffer.write_unsigned_byte(
+            number_of_objects, logical_name="numberOfObjects"
         )
 
         # Array Field (objects)
-        write_complex_type_array_field("objects", self.objects, write_buffer)
+        write_buffer.write_complex_array(self.objects, logical_name="objects")
 
         write_buffer.pop_context("ModbusPDUReadDeviceIdentificationResponse")
 
     def length_in_bytes(self) -> int:
-        return int(math.ceil(float(self.get_length_in_bits() / 8.0)))
+        return int(math.ceil(float(self.length_in_bits() / 8.0)))
 
-    def get_length_in_bits(self) -> int:
-        length_in_bits: int = super().get_length_in_bits()
+    def length_in_bits(self) -> int:
+        length_in_bits: int = super().length_in_bits()
         _value: ModbusPDUReadDeviceIdentificationResponse = self
 
         # Const Field (meiType)
@@ -154,74 +125,62 @@ class ModbusPDUReadDeviceIdentificationResponse(PlcMessage, ModbusPDU):
 
         # Array field
         if self.objects is not None:
-            i: int = 0
             for element in self.objects:
-                last: bool = ++i >= self.objects.size()
-                length_in_bits += element.get_length_in_bits()
+                length_in_bits += element.length_in_bits()
 
         return length_in_bits
 
     @staticmethod
-    def static_parse_builder(read_buffer: ReadBuffer, response: c_bool):
-        read_buffer.pull_context("ModbusPDUReadDeviceIdentificationResponse")
-        position_aware: PositionAware = read_buffer
-        start_pos: int = position_aware.get_pos()
-        cur_pos: int = 0
+    def static_parse_builder(read_buffer: ReadBuffer, response: bool):
+        read_buffer.push_context("ModbusPDUReadDeviceIdentificationResponse")
 
-        mei_type: c_uint8 = read_const_field(
-            "meiType",
-            read_unsigned_short(read_buffer, 8),
-            ModbusPDUReadDeviceIdentificationResponse.MEITYPE,
+        MEI_TYPE: int = read_buffer.read_unsigned_byte(
+            logical_name="meiType", response=response
         )
 
-        level: ModbusDeviceInformationLevel = read_enum_field(
-            "level",
-            "ModbusDeviceInformationLevel",
-            DataReaderEnumDefault(
-                ModbusDeviceInformationLevel.enumForValue,
-                read_unsigned_short(read_buffer, 8),
-            ),
+        level: ModbusDeviceInformationLevel = read_buffer.read_enum(
+            read_function=ModbusDeviceInformationLevel,
+            bit_length=8,
+            logical_name="level",
+            response=response,
         )
 
-        individual_access: c_bool = read_simple_field(
-            "individualAccess", read_boolean(read_buffer)
+        individual_access: bool = read_buffer.read_bit(
+            logical_name="individualAccess", bit_length=1, response=response
         )
 
-        conformity_level: ModbusDeviceInformationConformityLevel = read_enum_field(
-            "conformityLevel",
-            "ModbusDeviceInformationConformityLevel",
-            DataReaderEnumDefault(
-                ModbusDeviceInformationConformityLevel.enumForValue,
-                read_unsigned_short(read_buffer, 7),
-            ),
+        conformity_level: ModbusDeviceInformationConformityLevel = (
+            read_buffer.read_enum(
+                read_function=ModbusDeviceInformationConformityLevel,
+                bit_length=7,
+                logical_name="conformityLevel",
+                response=response,
+            )
         )
 
-        more_follows: ModbusDeviceInformationMoreFollows = read_enum_field(
-            "moreFollows",
-            "ModbusDeviceInformationMoreFollows",
-            DataReaderEnumDefault(
-                ModbusDeviceInformationMoreFollows.enumForValue,
-                read_unsigned_short(read_buffer, 8),
-            ),
+        more_follows: ModbusDeviceInformationMoreFollows = read_buffer.read_enum(
+            read_function=ModbusDeviceInformationMoreFollows,
+            bit_length=8,
+            logical_name="moreFollows",
+            response=response,
         )
 
-        next_object_id: c_uint8 = read_simple_field(
-            "nextObjectId", read_unsigned_short(read_buffer, 8)
+        next_object_id: int = read_buffer.read_unsigned_byte(
+            logical_name="nextObjectId", bit_length=8, response=response
         )
 
-        number_of_objects: c_uint8 = read_implicit_field(
-            "numberOfObjects", read_unsigned_short(read_buffer, 8)
+        number_of_objects: int = read_buffer.read_unsigned_byte(
+            logical_name="numberOfObjects", response=response
         )
 
-        objects: List[ModbusDeviceInformationObject] = read_count_array_field(
-            "objects",
-            DataReaderComplexDefault(
-                ModbusDeviceInformationObject.static_parse(read_buffer), read_buffer
-            ),
-            number_of_objects,
+        objects: List[Any] = read_buffer.read_array_field(
+            logical_name="objects",
+            read_function=ModbusDeviceInformationObject.static_parse,
+            count=number_of_objects,
+            response=response,
         )
 
-        read_buffer.close_context("ModbusPDUReadDeviceIdentificationResponse")
+        read_buffer.pop_context("ModbusPDUReadDeviceIdentificationResponse")
         # Create the instance
         return ModbusPDUReadDeviceIdentificationResponseBuilder(
             level,
@@ -257,31 +216,31 @@ class ModbusPDUReadDeviceIdentificationResponse(PlcMessage, ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        try:
-            write_buffer_box_based.writeSerializable(self)
-        except SerializationException as e:
-            raise RuntimeException(e)
+        pass
+        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
+        # try:
+        #    write_buffer_box_based.writeSerializable(self)
+        # except SerializationException as e:
+        #    raise PlcRuntimeException(e)
 
-        return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
 
 
 @dataclass
-class ModbusPDUReadDeviceIdentificationResponseBuilder(ModbusPDUBuilder):
+class ModbusPDUReadDeviceIdentificationResponseBuilder:
     level: ModbusDeviceInformationLevel
-    individualAccess: c_bool
-    conformityLevel: ModbusDeviceInformationConformityLevel
-    moreFollows: ModbusDeviceInformationMoreFollows
-    nextObjectId: c_uint8
+    individual_access: bool
+    conformity_level: ModbusDeviceInformationConformityLevel
+    more_follows: ModbusDeviceInformationMoreFollows
+    next_object_id: int
     objects: List[ModbusDeviceInformationObject]
-
-    def __post_init__(self):
-        pass
 
     def build(
         self,
     ) -> ModbusPDUReadDeviceIdentificationResponse:
-        modbus_pdu_read_device_identification_response: ModbusPDUReadDeviceIdentificationResponse = ModbusPDUReadDeviceIdentificationResponse(
+        modbus_pdu_read_device_identification_response: (
+            ModbusPDUReadDeviceIdentificationResponse
+        ) = ModbusPDUReadDeviceIdentificationResponse(
             self.level,
             self.individual_access,
             self.conformity_level,

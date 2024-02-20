@@ -19,8 +19,6 @@
 
 package org.apache.plc4x.java.profinet.device;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.plc4x.java.profinet.config.ProfinetConfiguration;
 import org.apache.plc4x.java.profinet.discovery.ProfinetPlcDiscoverer;
 import org.apache.plc4x.java.profinet.readwrite.*;
 import org.apache.plc4x.java.spi.generation.*;
@@ -32,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
 
 public class ProfinetChannel {
 
@@ -40,11 +37,11 @@ public class ProfinetChannel {
     private static final EtherType PN_EtherType = EtherType.getInstance((short) 0x8892);
     private static final EtherType LLDP_EtherType = EtherType.getInstance((short) 0x88cc);
     private ProfinetPlcDiscoverer discoverer = null;
-    private Map<MacAddress, PcapHandle> openHandles;
-    private ProfinetDevices configuredDevices;
+    private final Map<MacAddress, PcapHandle> openHandles;
+    private Map<String, ProfinetDevice> devices;
 
-    public ProfinetChannel(List<PcapNetworkInterface> devs, ProfinetDevices devices) {
-        this.configuredDevices = devices;
+    public ProfinetChannel(List<PcapNetworkInterface> devs, Map<String, ProfinetDevice> devices) {
+        this.devices = devices;
         this.openHandles = getInterfaceHandles(devs);
         startListener();
     }
@@ -66,30 +63,36 @@ public class ProfinetChannel {
     public void startListener() {
         for (Map.Entry<MacAddress, PcapHandle> entry : openHandles.entrySet()) {
             PcapHandle handle = entry.getValue();
-
-            Thread thread = new Thread(
-                new ProfinetRunnable(handle,
-                    message -> {
-                        PacketListener listener = createListener();
-                        try {
-                            handle.loop(-1, listener);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        } catch (PcapNativeException | NotOpenException e) {
-                            logger.error("Got error handling raw socket", e);
-                        }
-                        return null;
-                    }));
+            MacAddress macAddress = entry.getKey();
+            ProfinetRunnable packetHandler = new ProfinetRunnable(handle,
+                message -> {
+                    PacketListener listener = createListener(macAddress);
+                    try {
+                        handle.loop(-1, listener);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } catch (PcapNativeException | NotOpenException e) {
+                        logger.error("Got error handling raw socket", e);
+                    }
+                    return null;
+                });
+            Thread thread = new Thread(packetHandler);
             thread.start();
         }
     }
-    public PacketListener createListener() {
+    public PacketListener createListener(MacAddress localMacAddress) {
         PacketListener listener =
             packet -> {
                 // EthernetPacket is the highest level of abstraction we can be expecting.
                 // Everything inside this we will have to decode ourselves.
                 if (packet instanceof EthernetPacket) {
                     EthernetPacket ethernetPacket = (EthernetPacket) packet;
+
+                    // Check if the packet is an outgoing packet (src != our owm MAC address)
+                    if(Arrays.equals(((EthernetPacket.EthernetHeader) packet.getHeader()).getSrcAddr().getAddress(), localMacAddress.getAddress())) {
+                        return;
+                    }
+
                     boolean isPnPacket = false;
                     // I have observed sometimes the ethernet packets being wrapped inside a VLAN
                     // Packet, in this case we simply unpack the content.
@@ -123,31 +126,61 @@ public class ProfinetChannel {
                                     if (discoverer != null) {
                                         discoverer.processPnDcp(pdu, ethernetPacket);
                                     }
-                                }  else if (pdu.getFrameId() == PnDcp_FrameId.Alarm_Low) {
-                                    for (Map.Entry<String, ProfinetDevice> device : this.configuredDevices.getConfiguredDevices().entrySet()) {
+                                } else if (pdu.getFrameId() == PnDcp_FrameId.DCP_GetSet_PDU) {
+                                    for (Map.Entry<String, ProfinetDevice> device : devices.entrySet()) {
                                         if (Arrays.equals(device.getValue().getDeviceContext().getMacAddress().getAddress(), ethernetFrame.getSource().getAddress())) {
-                                            PnDcp_Pdu_AlarmLow alarmPdu = (PnDcp_Pdu_AlarmLow) pdu;
-                                            device.getValue().handleAlarmResponse(alarmPdu);
+                                            PcDcp_GetSet_Pdu getSetPdu = (PcDcp_GetSet_Pdu) pdu;
+                                            device.getValue().handleSetIpAddressResponse(getSetPdu);
                                         }
                                     }
-                                }
-                                else if (pdu.getFrameId() == PnDcp_FrameId.RT_CLASS_1) {
-                                    for (Map.Entry<String, ProfinetDevice> device : this.configuredDevices.getConfiguredDevices().entrySet()) {
-                                        if (Arrays.equals(device.getValue().getDeviceContext().getMacAddress().getAddress(), ethernetFrame.getSource().getAddress())) {
-                                            PnDcp_Pdu_RealTimeCyclic cyclicPdu = (PnDcp_Pdu_RealTimeCyclic) pdu;
-                                            device.getValue().handleRealTimeResponse(cyclicPdu);
+                                } else if (pdu.getFrameId() == PnDcp_FrameId.Alarm_Low) {
+                                        for (Map.Entry<String, ProfinetDevice> device : devices.entrySet()) {
+                                            if (Arrays.equals(device.getValue().getDeviceContext().getMacAddress().getAddress(), ethernetFrame.getSource().getAddress())) {
+                                                PnDcp_Pdu_AlarmLow alarmPdu = (PnDcp_Pdu_AlarmLow) pdu;
+                                                device.getValue().handleAlarmResponse(alarmPdu);
+                                            }
                                         }
                                     }
-                                }
+                                    else if (pdu.getFrameId() == PnDcp_FrameId.RT_CLASS_1) {
+                                        for (Map.Entry<String, ProfinetDevice> device : devices.entrySet()) {
+                                            /*if (device.getValue().getDeviceContext().getMacAddress() == null) {
+                                                logger.info("Hurz");
+                                            } else*/ if (Arrays.equals(device.getValue().getDeviceContext().getMacAddress().getAddress(), ethernetFrame.getSource().getAddress())) {
+                                                PnDcp_Pdu_RealTimeCyclic cyclicPdu = (PnDcp_Pdu_RealTimeCyclic) pdu;
+                                                device.getValue().handleRealTimeResponse(cyclicPdu);
+                                            }
+                                        }
+                                    }
                             } else if (payload instanceof Ethernet_FramePayload_LLDP) {
                                 Lldp_Pdu pdu = ((Ethernet_FramePayload_LLDP) payload).getPdu();
                                 if (discoverer != null) {
                                     discoverer.processLldp(pdu);
                                 }
                             } else if (payload instanceof Ethernet_FramePayload_IPv4) {
-                                for (Map.Entry<String, ProfinetDevice> device : this.configuredDevices.getConfiguredDevices().entrySet()) {
-                                    if (Arrays.equals(device.getValue().getDeviceContext().getMacAddress().getAddress(), ethernetFrame.getSource().getAddress())) {
-                                        device.getValue().handleResponse((Ethernet_FramePayload_IPv4) payload);
+                                Ethernet_FramePayload_IPv4 payloadIPv4 = (Ethernet_FramePayload_IPv4) payload;
+                                if (payloadIPv4.getPayload().getPacketType() == DceRpc_PacketType.PING) {
+                                    DceRpc_Packet pingRequest = payloadIPv4.getPayload();
+                                    // Intercept ping packets that originated from the PN device itself.
+                                    // TODO: Find out how to react to PING messages.
+                                    // According to https://pubs.opengroup.org/onlinepubs/9629399/chap12.htm the correct response for us to such a ping message would be a "working" response
+                                    Ethernet_Frame pingResponse = new Ethernet_Frame(ethernetFrame.getSource(), ethernetFrame.getDestination(),
+                                        new Ethernet_FramePayload_IPv4(payloadIPv4.getIdentification(), false, false,
+                                            payloadIPv4.getTimeToLive(), payloadIPv4.getDestinationAddress(),
+                                            payloadIPv4.getSourceAddress(), payloadIPv4.getDestinationPort(),
+                                            payloadIPv4.getSourcePort(), new DceRpc_Packet(DceRpc_PacketType.WORKING,
+                                            false, false, false,
+                                            IntegerEncoding.BIG_ENDIAN, CharacterEncoding.ASCII, FloatingPointEncoding.IEEE,
+                                            pingRequest.getObjectUuid(), pingRequest.getInterfaceUuid(), pingRequest.getActivityUuid(),
+                                            0L, 0L, DceRpc_Operation.CONNECT, (short) 0, new PnIoCm_Packet_Working())
+                                            ));
+                                    this.send(pingResponse);
+
+                                    logger.info("Received PING packet: {}", packet);
+                                } else {
+                                    for (Map.Entry<String, ProfinetDevice> device : devices.entrySet()) {
+                                        if (Arrays.equals(device.getValue().getDeviceContext().getMacAddress().getAddress(), ethernetFrame.getSource().getAddress())) {
+                                            device.getValue().handleResponse(payloadIPv4);
+                                        }
                                     }
                                 }
                             }
@@ -211,8 +244,8 @@ public class ProfinetChannel {
         return openHandles;
     }
 
-    public void setConfiguredDevices(ProfinetDevices configuredDevices) {
-        this.configuredDevices = configuredDevices;
+    public void setConfiguredDevices(Map<String, ProfinetDevice> configuredDevices) {
+        this.devices = configuredDevices;
     }
 
     private static MacAddress toPlc4xMacAddress(org.pcap4j.util.MacAddress pcap4jMacAddress) {

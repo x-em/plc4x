@@ -38,7 +38,7 @@ import org.apache.plc4x.java.spi.generation.*;
 public abstract class DataSegmentType implements Message {
 
   // Abstract accessors for discriminator values.
-  public abstract Short getDataSegmentType();
+  public abstract Byte getDataSegmentType();
 
   public DataSegmentType() {
     super();
@@ -50,12 +50,11 @@ public abstract class DataSegmentType implements Message {
   public void serialize(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
-    int startPos = positionAware.getPos();
     writeBuffer.pushContext("DataSegmentType");
 
     // Discriminator Field (dataSegmentType) (Used as input to a switch field)
     writeDiscriminatorField(
-        "dataSegmentType", getDataSegmentType(), writeUnsignedShort(writeBuffer, 5));
+        "dataSegmentType", getDataSegmentType(), writeUnsignedByte(writeBuffer, 5));
 
     // Switch field (Serialize the sub-type)
     serializeDataSegmentTypeChild(writeBuffer);
@@ -91,16 +90,14 @@ public abstract class DataSegmentType implements Message {
   public static DataSegmentType staticParse(ReadBuffer readBuffer) throws ParseException {
     readBuffer.pullContext("DataSegmentType");
     PositionAware positionAware = readBuffer;
-    int startPos = positionAware.getPos();
-    int curPos;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
-    short dataSegmentType =
-        readDiscriminatorField("dataSegmentType", readUnsignedShort(readBuffer, 5));
+    byte dataSegmentType =
+        readDiscriminatorField("dataSegmentType", readUnsignedByte(readBuffer, 5));
 
     // Switch Field (Depending on the discriminator values, passes the instantiation to a sub-type)
     DataSegmentTypeBuilder builder = null;
-    if (EvaluationHelper.equals(dataSegmentType, (short) 0x11)) {
+    if (EvaluationHelper.equals(dataSegmentType, (byte) 0x11)) {
       builder = AnsiExtendedSymbolSegment.staticParseDataSegmentTypeBuilder(readBuffer);
     }
     if (builder == null) {

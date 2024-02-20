@@ -17,10 +17,11 @@
 # under the License.
 #
 from abc import abstractmethod
+from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Union, List
+from typing import Union, List, Dict
 
-from plc4py.api.messages.PlcField import PlcField
+from plc4py.api.messages.PlcField import PlcTag
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.utils.GenericTypes import GenericGenerator
 
@@ -32,16 +33,32 @@ class PlcRequest(PlcMessage):
 
 
 @dataclass
-class PlcFieldRequest(PlcRequest):
-    fields: List[PlcField] = field(default_factory=lambda: [])
+class PlcTagRequest(PlcRequest):
+    tags: Dict[str, PlcTag] = field(default_factory=lambda: OrderedDict())
 
     @property
-    def field_names(self):
-        return [field.name for field in self.fields]
+    def tag_names(self):
+        return [tag_name for tag_name in self.tags.keys()]
 
 
 @dataclass
-class PlcReadRequest(PlcFieldRequest):
+class PlcQueryRequest(PlcRequest):
+    queries: Dict[str, str] = field(default_factory=lambda: OrderedDict())
+
+    @property
+    def query_names(self):
+        return [quary_name for quary_name in self.queries.keys()]
+
+
+@dataclass
+class PlcReadRequest(PlcTagRequest):
+    """
+    Base type for all messages sent from the plc4x system to a connected plc.
+    """
+
+
+@dataclass
+class PlcBrowseRequest(PlcQueryRequest):
     """
     Base type for all messages sent from the plc4x system to a connected plc.
     """
@@ -53,5 +70,15 @@ class ReadRequestBuilder(GenericGenerator):
         pass
 
     @abstractmethod
-    def add_item(self, field_query: Union[str, PlcField]) -> None:
+    def add_item(self, tag_name: str, address_string: str) -> None:
+        pass
+
+
+class BrowseRequestBuilder(GenericGenerator):
+    @abstractmethod
+    def build(self) -> PlcBrowseRequest:
+        pass
+
+    @abstractmethod
+    def add_query(self, query_name: str, query: str) -> None:
         pass

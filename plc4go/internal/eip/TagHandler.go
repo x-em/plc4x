@@ -21,9 +21,10 @@ package eip
 
 import (
 	"fmt"
+	"github.com/apache/plc4x/plc4go/protocols/eip/readwrite/model"
 	"regexp"
 
-	"github.com/apache/plc4x/plc4go/pkg/api/model"
+	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 )
 
 type TagHandler struct {
@@ -42,11 +43,11 @@ const (
 	ELEMENT_NB = "elementNb"
 )
 
-func (m TagHandler) ParseTag(tagAddress string) (model.PlcTag, error) {
+func (m TagHandler) ParseTag(tagAddress string) (apiModel.PlcTag, error) {
 	// TODO: This isn't pretty ...
-	return NewTag(tagAddress, 0, uint16(1)), nil
+	return NewTag(tagAddress, model.CIPDataTypeCode_DINT, uint16(1)), nil
 }
 
-func (m TagHandler) ParseQuery(query string) (model.PlcQuery, error) {
+func (m TagHandler) ParseQuery(query string) (apiModel.PlcQuery, error) {
 	return nil, fmt.Errorf("queries not supported")
 }

@@ -48,6 +48,10 @@ func NewPlcDATA_AND_TIMEFromSecondsSinceEpoch(secondsSinceEpoch uint32) PlcDATE_
 	return NewPlcDATE_AND_TIME(time.Unix(int64(secondsSinceEpoch), 0))
 }
 
+func (m PlcDATE_AND_TIME) IsRaw() bool {
+	return true
+}
+
 func (m PlcDATE_AND_TIME) GetRaw() []byte {
 	theBytes, _ := m.Serialize()
 	return theBytes
@@ -87,6 +91,10 @@ func (m PlcDATE_AND_TIME) GetSeconds() uint8 {
 
 func (m PlcDATE_AND_TIME) GetNanoseconds() uint32 {
 	return uint32(m.value.Nanosecond())
+}
+
+func (m PlcDATE_AND_TIME) GetMillisecondsOfSecond() uint64 {
+	return uint64(time.Duration(m.GetNanoseconds()).Milliseconds())
 }
 
 func (m PlcDATE_AND_TIME) IsDateTime() bool {

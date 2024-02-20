@@ -43,13 +43,13 @@ class DefaultSendRequestContextTest {
     Consumer<HandlerRegistration> finisher;
 
     @Mock
-    Plc4xNettyWrapper.DefaultConversationContext context;
+    ConversationContext context;
 
     DefaultSendRequestContext<Object> SUT;
 
     @BeforeEach
     void setUp() {
-        SUT = new DefaultSendRequestContext(finisher, null, context);
+        SUT = new DefaultSendRequestContext(null, finisher, null, context);
     }
 
     @Test

@@ -19,56 +19,49 @@
 
 from dataclasses import dataclass
 
-from ctypes import c_bool
-from ctypes import c_uint16
-from ctypes import c_uint8
+from plc4py.api.exceptions.exceptions import PlcRuntimeException
+from plc4py.api.exceptions.exceptions import SerializationException
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
-from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDUBuilder
+from plc4py.spi.generation.ReadBuffer import ReadBuffer
+from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from typing import Any
+from typing import ClassVar
 from typing import List
 import math
 
 
 @dataclass
-class ModbusPDUReadFifoQueueResponse(PlcMessage, ModbusPDU):
-    fifo_value: List[c_uint16]
+class ModbusPDUReadFifoQueueResponse(ModbusPDU):
+    fifo_value: List[int]
     # Accessors for discriminator values.
-    error_flag: c_bool = False
-    function_flag: c_uint8 = 0x18
-    response: c_bool = True
-
-    def __post_init__(self):
-        super().__init__()
+    error_flag: ClassVar[bool] = False
+    function_flag: ClassVar[int] = 0x18
+    response: ClassVar[bool] = True
 
     def serialize_modbus_pdu_child(self, write_buffer: WriteBuffer):
-        position_aware: PositionAware = write_buffer
-        start_pos: int = position_aware.get_pos()
         write_buffer.push_context("ModbusPDUReadFifoQueueResponse")
 
         # Implicit Field (byte_count) (Used for parsing, but its value is not stored as it's implicitly given by the objects content)
-        byte_count: c_uint16 = c_uint16(((((COUNT(self.fifo_value())) * (2))) + (2)))
-        write_implicit_field(
-            "byteCount", byte_count, write_unsigned_int(write_buffer, 16)
-        )
+        byte_count: int = (int(len(self.fifo_value)) * int(2)) + int(2)
+        write_buffer.write_unsigned_short(byte_count, logical_name="byteCount")
 
         # Implicit Field (fifo_count) (Used for parsing, but its value is not stored as it's implicitly given by the objects content)
-        fifo_count: c_uint16 = c_uint16(((((COUNT(self.fifo_value())) * (2))) / (2)))
-        write_implicit_field(
-            "fifoCount", fifo_count, write_unsigned_int(write_buffer, 16)
-        )
+        fifo_count: int = (int(len(self.fifo_value)) * int(2)) / int(2)
+        write_buffer.write_unsigned_short(fifo_count, logical_name="fifoCount")
 
         # Array Field (fifoValue)
-        write_simple_type_array_field(
-            "fifoValue", self.fifo_value, write_unsigned_int(write_buffer, 16)
+        write_buffer.write_simple_array(
+            self.fifo_value, write_buffer.write_unsigned_short, logical_name="fifoValue"
         )
 
         write_buffer.pop_context("ModbusPDUReadFifoQueueResponse")
 
     def length_in_bytes(self) -> int:
-        return int(math.ceil(float(self.get_length_in_bits() / 8.0)))
+        return int(math.ceil(float(self.length_in_bits() / 8.0)))
 
-    def get_length_in_bits(self) -> int:
-        length_in_bits: int = super().get_length_in_bits()
+    def length_in_bits(self) -> int:
+        length_in_bits: int = super().length_in_bits()
         _value: ModbusPDUReadFifoQueueResponse = self
 
         # Implicit Field (byteCount)
@@ -79,30 +72,30 @@ class ModbusPDUReadFifoQueueResponse(PlcMessage, ModbusPDU):
 
         # Array field
         if self.fifo_value is not None:
-            length_in_bits += 16 * self.fifo_value.size()
+            length_in_bits += 16 * len(self.fifo_value)
 
         return length_in_bits
 
     @staticmethod
-    def static_parse_builder(read_buffer: ReadBuffer, response: c_bool):
-        read_buffer.pull_context("ModbusPDUReadFifoQueueResponse")
-        position_aware: PositionAware = read_buffer
-        start_pos: int = position_aware.get_pos()
-        cur_pos: int = 0
+    def static_parse_builder(read_buffer: ReadBuffer, response: bool):
+        read_buffer.push_context("ModbusPDUReadFifoQueueResponse")
 
-        byte_count: c_uint16 = read_implicit_field(
-            "byteCount", read_unsigned_int(read_buffer, 16)
+        byte_count: int = read_buffer.read_unsigned_short(
+            logical_name="byteCount", response=response
         )
 
-        fifo_count: c_uint16 = read_implicit_field(
-            "fifoCount", read_unsigned_int(read_buffer, 16)
+        fifo_count: int = read_buffer.read_unsigned_short(
+            logical_name="fifoCount", response=response
         )
 
-        fifo_value: List[c_uint16] = read_count_array_field(
-            "fifoValue", read_unsigned_int(read_buffer, 16), fifo_count
+        fifo_value: List[Any] = read_buffer.read_array_field(
+            logical_name="fifoValue",
+            read_function=read_buffer.read_unsigned_short,
+            count=fifo_count,
+            response=response,
         )
 
-        read_buffer.close_context("ModbusPDUReadFifoQueueResponse")
+        read_buffer.pop_context("ModbusPDUReadFifoQueueResponse")
         # Create the instance
         return ModbusPDUReadFifoQueueResponseBuilder(fifo_value)
 
@@ -120,21 +113,19 @@ class ModbusPDUReadFifoQueueResponse(PlcMessage, ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        try:
-            write_buffer_box_based.writeSerializable(self)
-        except SerializationException as e:
-            raise RuntimeException(e)
+        pass
+        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
+        # try:
+        #    write_buffer_box_based.writeSerializable(self)
+        # except SerializationException as e:
+        #    raise PlcRuntimeException(e)
 
-        return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
 
 
 @dataclass
-class ModbusPDUReadFifoQueueResponseBuilder(ModbusPDUBuilder):
-    fifoValue: List[c_uint16]
-
-    def __post_init__(self):
-        pass
+class ModbusPDUReadFifoQueueResponseBuilder:
+    fifo_value: List[int]
 
     def build(
         self,

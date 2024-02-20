@@ -68,8 +68,7 @@ public class ProfinetModuleItem implements ProfinetDeviceItem {
         if (dt == null) {
             throw new UnsupportedOperationException("Data type " + dataType + " not supported");
         }
-        Integer dataTypeSize = (int) dt.getDataTypeSize();
-        return dataTypeSize;
+        return dt.getDataTypeSize();
     }
 
     public Integer getInputDataLength() {
@@ -78,7 +77,7 @@ public class ProfinetModuleItem implements ProfinetDeviceItem {
             if (module.getIoData() != null && module.getIoData().getInput() != null) {
                 for (ProfinetIoDataInput inputIoData : module.getIoData().getInput()) {
                     for (ProfinetDataItem dataItem : inputIoData.getDataItemList()) {
-                        length += ProfinetModuleItem.getLengthSimpleType(dataItem.getDataType());
+                        length += dataItem.getLength() * ProfinetModuleItem.getLengthSimpleType(dataItem.getDataType());
                     }
                 }
             }
@@ -92,7 +91,7 @@ public class ProfinetModuleItem implements ProfinetDeviceItem {
             if (module.getIoData() != null && module.getIoData().getOutput() != null) {
                 for (ProfinetIoDataOutput outputIoData : module.getIoData().getOutput()) {
                     for (ProfinetDataItem dataItem : outputIoData.getDataItemList()) {
-                        length += ProfinetModuleItem.getLengthSimpleType(dataItem.getDataType());
+                        length += dataItem.getLength() * ProfinetModuleItem.getLengthSimpleType(dataItem.getDataType());
                     }
                 }
             }

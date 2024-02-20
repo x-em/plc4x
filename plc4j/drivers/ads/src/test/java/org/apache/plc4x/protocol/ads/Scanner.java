@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public class Scanner {
 
-    private static Logger logger = LoggerFactory.getLogger(Scanner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Scanner.class);
 
     public static void main(String[] args) throws Exception {
         if (args.length != 5) {
@@ -61,8 +61,8 @@ public class Scanner {
         // Establish a connection to the plc using the url provided as first argument
         try (PlcConnection plcConnection = new DefaultPlcDriverManager().getConnection(connectionString)) {
             PlcConnectionMetadata metadata = plcConnection.getMetadata();
-            System.out.println("read: " + metadata.canRead());
-            System.out.println("write: " + metadata.canWrite());
+            System.out.println("read: " + metadata.isReadSupported());
+            System.out.println("write: " + metadata.isWriteSupported());
 
             // read symbols
             System.out.println("Reading symbol info");

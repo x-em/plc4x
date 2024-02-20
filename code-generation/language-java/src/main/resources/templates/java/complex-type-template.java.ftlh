@@ -254,7 +254,9 @@ public<#if type.isDiscriminatedParentTypeDefinition()> abstract</#if> class ${ty
             throw new SerializationException("Unknown field not serializable");
         <#else>
             boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
+            <#if helper.requiresStartPos() || helper.requiresCurPos()>
             int startPos = positionAware.getPos();
+            </#if>
             writeBuffer.pushContext("${type.name}");
             <#assign reservedFieldIndex=0>
             <#list type.fields as field>
@@ -610,8 +612,10 @@ public<#if type.isDiscriminatedParentTypeDefinition()> abstract</#if> class ${ty
     public static <#if type.isDiscriminatedChildTypeDefinition()>${type.parentType.orElseThrow().name}Builder staticParse${type.parentType.orElseThrow().name}Builder<#else>${type.name} staticParse</#if>(ReadBuffer readBuffer<#if hasParserArguments>, ${parserArgumentList}</#if>) throws ParseException {
         readBuffer.pullContext("${type.name}");
         PositionAware positionAware = readBuffer;
+        <#if helper.requiresStartPos() || helper.requiresCurPos()>
         int startPos = positionAware.getPos();
         int curPos;
+        </#if>
         boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     <#assign reservedFieldIndex=0>
     <#list type.fields as field>
@@ -669,7 +673,11 @@ public<#if type.isDiscriminatedParentTypeDefinition()> abstract</#if> class ${ty
                 <#assign typedField = field.asTypedField().orElseThrow()>
                 <#assign namedField = field.asNamedField().orElseThrow()>
 
-                ${helper.getLanguageTypeNameForField(field)} ${namedField.name} = read${field.typeName?cap_first}Field("${namedField.name}", ${helper.getDataReaderCall(typedField.type)}${helper.getFieldOptions(typedField, parserArguments)});
+                <#if typedField.type.isEnumTypeReference()>
+                    ${helper.getLanguageTypeNameForField(field)} ${namedField.name} = readDiscriminatorEnumField("${namedField.name}", "${typedField.type.asEnumTypeReference().orElseThrow().typeDefinition.name}", ${helper.getDataReaderCall(typedField.type)}${helper.getFieldOptions(typedField, parserArguments)});
+                <#else>
+                    ${helper.getLanguageTypeNameForField(field)} ${namedField.name} = read${field.typeName?cap_first}Field("${namedField.name}", ${helper.getDataReaderCall(typedField.type)}${helper.getFieldOptions(typedField, parserArguments)});
+                </#if>
                 <#break>
             <#case "enum">
                 <#assign enumField = field.asEnumField().orElseThrow()>

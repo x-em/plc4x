@@ -19,63 +19,55 @@
 
 from dataclasses import dataclass
 
-from ctypes import c_bool
-from ctypes import c_byte
-from ctypes import c_uint16
-from ctypes import c_uint8
+from plc4py.api.exceptions.exceptions import PlcRuntimeException
+from plc4py.api.exceptions.exceptions import SerializationException
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
-from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDUBuilder
+from plc4py.spi.generation.ReadBuffer import ReadBuffer
+from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from typing import Any
+from typing import ClassVar
 from typing import List
 import math
 
 
 @dataclass
-class ModbusPDUWriteMultipleHoldingRegistersRequest(PlcMessage, ModbusPDU):
-    starting_address: c_uint16
-    quantity: c_uint16
-    value: List[c_byte]
+class ModbusPDUWriteMultipleHoldingRegistersRequest(ModbusPDU):
+    starting_address: int
+    quantity: int
+    value: List[int]
     # Accessors for discriminator values.
-    error_flag: c_bool = False
-    function_flag: c_uint8 = 0x10
-    response: c_bool = False
-
-    def __post_init__(self):
-        super().__init__()
+    error_flag: ClassVar[bool] = False
+    function_flag: ClassVar[int] = 0x10
+    response: ClassVar[bool] = False
 
     def serialize_modbus_pdu_child(self, write_buffer: WriteBuffer):
-        position_aware: PositionAware = write_buffer
-        start_pos: int = position_aware.get_pos()
         write_buffer.push_context("ModbusPDUWriteMultipleHoldingRegistersRequest")
 
         # Simple Field (startingAddress)
-        write_simple_field(
-            "startingAddress",
-            self.starting_address,
-            write_unsigned_int(write_buffer, 16),
+        write_buffer.write_unsigned_short(
+            self.starting_address, bit_length=16, logical_name="startingAddress"
         )
 
         # Simple Field (quantity)
-        write_simple_field(
-            "quantity", self.quantity, write_unsigned_int(write_buffer, 16)
+        write_buffer.write_unsigned_short(
+            self.quantity, bit_length=16, logical_name="quantity"
         )
 
         # Implicit Field (byte_count) (Used for parsing, but its value is not stored as it's implicitly given by the objects content)
-        byte_count: c_uint8 = c_uint8((COUNT(self.value())))
-        write_implicit_field(
-            "byteCount", byte_count, write_unsigned_short(write_buffer, 8)
-        )
+        byte_count: int = int(len(self.value))
+        write_buffer.write_unsigned_byte(byte_count, logical_name="byteCount")
 
         # Array Field (value)
-        write_byte_array_field("value", self.value, writeByteArray(write_buffer, 8))
+        write_buffer.write_byte_array(self.value, logical_name="value")
 
         write_buffer.pop_context("ModbusPDUWriteMultipleHoldingRegistersRequest")
 
     def length_in_bytes(self) -> int:
-        return int(math.ceil(float(self.get_length_in_bits() / 8.0)))
+        return int(math.ceil(float(self.length_in_bits() / 8.0)))
 
-    def get_length_in_bits(self) -> int:
-        length_in_bits: int = super().get_length_in_bits()
+    def length_in_bits(self) -> int:
+        length_in_bits: int = super().length_in_bits()
         _value: ModbusPDUWriteMultipleHoldingRegistersRequest = self
 
         # Simple field (startingAddress)
@@ -89,32 +81,34 @@ class ModbusPDUWriteMultipleHoldingRegistersRequest(PlcMessage, ModbusPDU):
 
         # Array field
         if self.value is not None:
-            length_in_bits += 8 * self.value.length
+            length_in_bits += 8 * len(self.value)
 
         return length_in_bits
 
     @staticmethod
-    def static_parse_builder(read_buffer: ReadBuffer, response: c_bool):
-        read_buffer.pull_context("ModbusPDUWriteMultipleHoldingRegistersRequest")
-        position_aware: PositionAware = read_buffer
-        start_pos: int = position_aware.get_pos()
-        cur_pos: int = 0
+    def static_parse_builder(read_buffer: ReadBuffer, response: bool):
+        read_buffer.push_context("ModbusPDUWriteMultipleHoldingRegistersRequest")
 
-        starting_address: c_uint16 = read_simple_field(
-            "startingAddress", read_unsigned_int(read_buffer, 16)
+        starting_address: int = read_buffer.read_unsigned_short(
+            logical_name="startingAddress", bit_length=16, response=response
         )
 
-        quantity: c_uint16 = read_simple_field(
-            "quantity", read_unsigned_int(read_buffer, 16)
+        quantity: int = read_buffer.read_unsigned_short(
+            logical_name="quantity", bit_length=16, response=response
         )
 
-        byte_count: c_uint8 = read_implicit_field(
-            "byteCount", read_unsigned_short(read_buffer, 8)
+        byte_count: int = read_buffer.read_unsigned_byte(
+            logical_name="byteCount", response=response
         )
 
-        value: List[c_byte] = read_buffer.read_byte_array("value", int(byteCount))
+        value: List[Any] = read_buffer.read_array_field(
+            logical_name="value",
+            read_function=read_buffer.read_byte,
+            count=byte_count,
+            response=response,
+        )
 
-        read_buffer.close_context("ModbusPDUWriteMultipleHoldingRegistersRequest")
+        read_buffer.pop_context("ModbusPDUWriteMultipleHoldingRegistersRequest")
         # Create the instance
         return ModbusPDUWriteMultipleHoldingRegistersRequestBuilder(
             starting_address, quantity, value
@@ -142,28 +136,28 @@ class ModbusPDUWriteMultipleHoldingRegistersRequest(PlcMessage, ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        try:
-            write_buffer_box_based.writeSerializable(self)
-        except SerializationException as e:
-            raise RuntimeException(e)
+        pass
+        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
+        # try:
+        #    write_buffer_box_based.writeSerializable(self)
+        # except SerializationException as e:
+        #    raise PlcRuntimeException(e)
 
-        return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
 
 
 @dataclass
-class ModbusPDUWriteMultipleHoldingRegistersRequestBuilder(ModbusPDUBuilder):
-    startingAddress: c_uint16
-    quantity: c_uint16
-    value: List[c_byte]
-
-    def __post_init__(self):
-        pass
+class ModbusPDUWriteMultipleHoldingRegistersRequestBuilder:
+    starting_address: int
+    quantity: int
+    value: List[int]
 
     def build(
         self,
     ) -> ModbusPDUWriteMultipleHoldingRegistersRequest:
-        modbus_pdu_write_multiple_holding_registers_request: ModbusPDUWriteMultipleHoldingRegistersRequest = ModbusPDUWriteMultipleHoldingRegistersRequest(
+        modbus_pdu_write_multiple_holding_registers_request: (
+            ModbusPDUWriteMultipleHoldingRegistersRequest
+        ) = ModbusPDUWriteMultipleHoldingRegistersRequest(
             self.starting_address, self.quantity, self.value
         )
         return modbus_pdu_write_multiple_holding_registers_request

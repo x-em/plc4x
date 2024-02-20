@@ -19,70 +19,59 @@
 
 from dataclasses import dataclass
 
-from ctypes import c_bool
-from ctypes import c_uint8
+from plc4py.api.exceptions.exceptions import PlcRuntimeException
+from plc4py.api.exceptions.exceptions import SerializationException
 from plc4py.api.messages.PlcMessage import PlcMessage
+from plc4py.protocols.modbus import StaticHelper
 from plc4py.protocols.modbus.readwrite.DriverType import DriverType
 from plc4py.protocols.modbus.readwrite.ModbusADU import ModbusADU
-from plc4py.protocols.modbus.readwrite.ModbusADU import ModbusADUBuilder
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
+from plc4py.spi.generation.ReadBuffer import ReadBuffer
+from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.GenericTypes import ByteOrder
+from typing import ClassVar
 import math
 
 
 @dataclass
-class ModbusAsciiADU(PlcMessage, ModbusADU):
-    address: c_uint8
+class ModbusAsciiADU(ModbusADU):
+    address: int
     pdu: ModbusPDU
     # Arguments.
-    response: c_bool
+    response: bool
     # Accessors for discriminator values.
-    driver_type: DriverType = DriverType.MODBUS_ASCII
-
-    def __post_init__(self):
-        super().__init__(self.response)
+    driver_type: ClassVar[DriverType] = DriverType.MODBUS_ASCII
 
     def serialize_modbus_adu_child(self, write_buffer: WriteBuffer):
-        position_aware: PositionAware = write_buffer
-        start_pos: int = position_aware.get_pos()
         write_buffer.push_context("ModbusAsciiADU")
 
         # Simple Field (address)
-        write_simple_field(
-            "address",
-            self.address,
-            write_unsigned_short(write_buffer, 8),
-            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN),
+        write_buffer.write_unsigned_byte(
+            self.address, bit_length=8, logical_name="address"
         )
 
         # Simple Field (pdu)
-        write_simple_field(
-            "pdu",
-            self.pdu,
-            DataWriterComplexDefault(write_buffer),
-            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN),
-        )
+        write_buffer.write_serializable(self.pdu, logical_name="pdu")
 
         # Checksum Field (checksum) (Calculated)
-        write_checksum_field(
-            "crc",
-            c_uint8(modbus.readwrite.utils.StaticHelper.asciiLrcCheck(address, pdu)),
-            write_unsigned_short(write_buffer, 8),
+        write_buffer.write_unsigned_byte(
+            int(StaticHelper.ascii_lrc_check(address, pdu)), logical_name="crc"
         )
 
         write_buffer.pop_context("ModbusAsciiADU")
 
     def length_in_bytes(self) -> int:
-        return int(math.ceil(float(self.get_length_in_bits() / 8.0)))
+        return int(math.ceil(float(self.length_in_bits() / 8.0)))
 
-    def get_length_in_bits(self) -> int:
-        length_in_bits: int = super().get_length_in_bits()
+    def length_in_bits(self) -> int:
+        length_in_bits: int = super().length_in_bits()
         _value: ModbusAsciiADU = self
 
         # Simple field (address)
         length_in_bits += 8
 
         # Simple field (pdu)
-        length_in_bits += self.pdu.get_length_in_bits()
+        length_in_bits += self.pdu.length_in_bits()
 
         # Checksum Field (checksum)
         length_in_bits += 8
@@ -91,37 +80,36 @@ class ModbusAsciiADU(PlcMessage, ModbusADU):
 
     @staticmethod
     def static_parse_builder(
-        read_buffer: ReadBuffer, driver_type: DriverType, response: c_bool
+        read_buffer: ReadBuffer, driver_type: DriverType, response: bool
     ):
-        read_buffer.pull_context("ModbusAsciiADU")
-        position_aware: PositionAware = read_buffer
-        start_pos: int = position_aware.get_pos()
-        cur_pos: int = 0
+        read_buffer.push_context("ModbusAsciiADU")
 
-        address: c_uint8 = read_simple_field(
-            "address",
-            read_unsigned_short(read_buffer, 8),
-            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN),
+        address: int = read_buffer.read_unsigned_byte(
+            logical_name="address",
+            bit_length=8,
+            byte_order=ByteOrder.BIG_ENDIAN,
+            driver_type=driver_type,
+            response=response,
         )
 
-        pdu: ModbusPDU = read_simple_field(
-            "pdu",
-            DataReaderComplexDefault(
-                ModbusPDU.static_parse(read_buffer, c_bool(response)), read_buffer
-            ),
-            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN),
+        pdu: ModbusPDU = read_buffer.read_complex(
+            read_function=ModbusPDU.static_parse,
+            logical_name="pdu",
+            byte_order=ByteOrder.BIG_ENDIAN,
+            driver_type=driver_type,
+            response=response,
         )
 
-        crc: c_uint8 = read_checksum_field(
-            "crc",
-            read_unsigned_short(read_buffer, 8),
-            (c_uint8)(modbus.readwrite.utils.StaticHelper.asciiLrcCheck(address, pdu)),
-            WithOption.WithByteOrder(ByteOrder.BIG_ENDIAN),
+        crc: int = read_buffer.read_unsigned_byte(
+            logical_name="crc",
+            byte_order=ByteOrder.BIG_ENDIAN,
+            driver_type=driver_type,
+            response=response,
         )
 
-        read_buffer.close_context("ModbusAsciiADU")
+        read_buffer.pop_context("ModbusAsciiADU")
         # Create the instance
-        return ModbusAsciiADUBuilder(address, pdu, response)
+        return ModbusAsciiADUBuilder(address, pdu)
 
     def equals(self, o: object) -> bool:
         if self == o:
@@ -142,26 +130,26 @@ class ModbusAsciiADU(PlcMessage, ModbusADU):
         return hash(self)
 
     def __str__(self) -> str:
-        write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        try:
-            write_buffer_box_based.writeSerializable(self)
-        except SerializationException as e:
-            raise RuntimeException(e)
+        pass
+        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
+        # try:
+        #    write_buffer_box_based.writeSerializable(self)
+        # except SerializationException as e:
+        #    raise PlcRuntimeException(e)
 
-        return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
 
 
 @dataclass
-class ModbusAsciiADUBuilder(ModbusADUBuilder):
-    address: c_uint8
+class ModbusAsciiADUBuilder:
+    address: int
     pdu: ModbusPDU
-    response: c_bool
 
-    def __post_init__(self):
-        pass
-
-    def build(self, response: c_bool) -> ModbusAsciiADU:
+    def build(
+        self,
+        response: bool,
+    ) -> ModbusAsciiADU:
         modbus_ascii_adu: ModbusAsciiADU = ModbusAsciiADU(
-            self.address, self.pdu, response
+            response, self.address, self.pdu
         )
         return modbus_ascii_adu

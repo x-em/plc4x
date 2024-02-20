@@ -138,7 +138,6 @@ public abstract class AmsPacket implements Message {
   public void serialize(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
-    int startPos = positionAware.getPos();
     writeBuffer.pushContext("AmsPacket");
 
     // Simple Field (targetAmsNetId)
@@ -286,8 +285,6 @@ public abstract class AmsPacket implements Message {
   public static AmsPacket staticParse(ReadBuffer readBuffer) throws ParseException {
     readBuffer.pullContext("AmsPacket");
     PositionAware positionAware = readBuffer;
-    int startPos = positionAware.getPos();
-    int curPos;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     AmsNetId targetAmsNetId =
@@ -305,8 +302,9 @@ public abstract class AmsPacket implements Message {
     int sourceAmsPort = readSimpleField("sourceAmsPort", readUnsignedInt(readBuffer, 16));
 
     CommandId commandId =
-        readDiscriminatorField(
+        readDiscriminatorEnumField(
             "commandId",
+            "CommandId",
             new DataReaderEnumDefault<>(CommandId::enumForValue, readUnsignedInt(readBuffer, 16)));
 
     boolean initCommand =

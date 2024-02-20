@@ -25,9 +25,12 @@ import org.apache.nifi.reporting.InitializationException;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.apache.plc4x.nifi.address.AddressesAccessUtils;
+import org.apache.plc4x.nifi.address.FilePropertyAccessStrategy;
 import org.apache.plc4x.nifi.util.Plc4xCommonTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Plc4xSinkRecordProcessorTest {
 	
     private TestRunner testRunner;
-    private static int NUMBER_OF_CALLS = 5;
+    private static final int NUMBER_OF_CALLS = 5;
 
 	private final AvroReader readerService = new AvroReader();
     
@@ -46,7 +49,7 @@ public class Plc4xSinkRecordProcessorTest {
     	testRunner.setValidateExpressionUsage(false);
 
     	testRunner.setProperty(Plc4xSinkRecordProcessor.PLC_CONNECTION_STRING, "simulated://127.0.0.1");
-        testRunner.setProperty(Plc4xSinkRecordProcessor.PLC_WRITE_FUTURE_TIMEOUT_MILISECONDS, "1000");
+        testRunner.setProperty(Plc4xSinkRecordProcessor.PLC_FUTURE_TIMEOUT_MILISECONDS, "1000");
  
     	testRunner.addConnection(Plc4xSinkRecordProcessor.REL_SUCCESS);
     	testRunner.addConnection(Plc4xSinkRecordProcessor.REL_FAILURE);
@@ -91,4 +94,17 @@ public class Plc4xSinkRecordProcessorTest {
 		testRunner.setProperty(AddressesAccessUtils.ADDRESS_TEXT_PROPERTY, new ObjectMapper().writeValueAsString(Plc4xCommonTest.getAddressMap()).toString());
 		testAvroRecordReaderProcessor();
 	}
+
+	// Test addressess file property access strategy
+    @Test
+    public void testWithAdderessFile() throws InitializationException {
+        testRunner.setProperty(AddressesAccessUtils.ADDRESS_FILE_PROPERTY, "file");
+
+        try (MockedStatic<FilePropertyAccessStrategy> staticMock = Mockito.mockStatic(FilePropertyAccessStrategy.class)) {
+            staticMock.when(() -> FilePropertyAccessStrategy.extractAddressesFromFile("file"))
+                .thenReturn(Plc4xCommonTest.getAddressMap());
+
+            testAvroRecordReaderProcessor();
+        }
+    }
 }

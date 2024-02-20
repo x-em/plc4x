@@ -22,6 +22,7 @@ package bacnetip
 import (
 	"context"
 	"fmt"
+	"github.com/rs/zerolog"
 	"net"
 	"net/url"
 	"strconv"
@@ -29,7 +30,7 @@ import (
 	"time"
 
 	"github.com/IBM/netaddr"
-	internalModel "github.com/apache/plc4x/plc4go/spi/model"
+	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/libp2p/go-reuseport"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -42,6 +43,9 @@ import (
 
 type Discoverer struct {
 	messageCodec spi.MessageCodec
+
+	passLogToModel bool
+	log            zerolog.Logger
 }
 
 func NewDiscoverer() *Discoverer {
@@ -60,7 +64,7 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 		return errors.Wrap(err, "error extracting protocol specific options")
 	}
 
-	communicationChannels, err := buildupCommunicationChannels(interfaces, specificOptions.bacNetPort)
+	communicationChannels, err := buildupCommunicationChannels(ctx, interfaces, specificOptions.bacNetPort)
 	if err != nil {
 		return errors.Wrap(err, "error building communication channels")
 	}
@@ -70,7 +74,7 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	defer func() {
 		cancelFunc()
 	}()
-	incomingBVLCChannel, err := broadcastAndDiscover(ctx, communicationChannels, specificOptions)
+	incomingBVLCChannel, err := d.broadcastAndDiscover(ctx, communicationChannels, specificOptions)
 	if err != nil {
 		return errors.Wrap(err, "error broadcasting and discovering")
 	}
@@ -83,9 +87,12 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	return nil
 }
 
-func broadcastAndDiscover(ctx context.Context, communicationChannels []communicationChannel, specificOptions *protocolSpecificOptions) (chan receivedBvlcMessage, error) {
-	incomingBVLCChannel := make(chan receivedBvlcMessage, 0)
+func (d *Discoverer) broadcastAndDiscover(ctx context.Context, communicationChannels []communicationChannel, specificOptions *protocolSpecificOptions) (chan receivedBvlcMessage, error) {
+	incomingBVLCChannel := make(chan receivedBvlcMessage)
 	for _, communicationChannelInstance := range communicationChannels {
+		if err := ctx.Err(); err != nil {
+			return incomingBVLCChannel, err
+		}
 		// Prepare the discovery packet data
 		{
 			var lowLimit driverModel.BACnetContextTagUnsignedInteger
@@ -157,7 +164,11 @@ func broadcastAndDiscover(ctx context.Context, communicationChannels []communica
 
 		go func(communicationChannelInstance communicationChannel) {
 			for {
-				blockingReadChan := make(chan bool, 0)
+				if err := ctx.Err(); err != nil {
+					d.log.Debug().Err(err).Msg("ending")
+					return
+				}
+				blockingReadChan := make(chan bool)
 				go func() {
 					buf := make([]byte, 4096)
 					n, addr, err := communicationChannelInstance.unicastConnection.ReadFrom(buf)
@@ -167,7 +178,8 @@ func broadcastAndDiscover(ctx context.Context, communicationChannels []communica
 						return
 					}
 					log.Debug().Stringer("addr", addr).Msg("Received broadcast bvlc")
-					incomingBvlc, err := driverModel.BVLCParse(buf[:n])
+					ctxForModel := options.GetLoggerContextForModel(ctx, d.log, options.WithPassLoggerToModel(d.passLogToModel))
+					incomingBvlc, err := driverModel.BVLCParse(ctxForModel, buf[:n])
 					if err != nil {
 						log.Warn().Err(err).Msg("Could not parse bvlc")
 						blockingReadChan <- true
@@ -192,7 +204,11 @@ func broadcastAndDiscover(ctx context.Context, communicationChannels []communica
 
 		go func(communicationChannelInstance communicationChannel) {
 			for {
-				blockingReadChan := make(chan bool, 0)
+				if err := ctx.Err(); err != nil {
+					d.log.Debug().Err(err).Msg("ending")
+					return
+				}
+				blockingReadChan := make(chan bool)
 				go func() {
 					buf := make([]byte, 4096)
 					n, addr, err := communicationChannelInstance.broadcastConnection.ReadFrom(buf)
@@ -202,7 +218,8 @@ func broadcastAndDiscover(ctx context.Context, communicationChannels []communica
 						return
 					}
 					log.Debug().Stringer("addr", addr).Msg("Received broadcast bvlc")
-					incomingBvlc, err := driverModel.BVLCParse(buf[:n])
+					ctxForModel := options.GetLoggerContextForModel(ctx, d.log, options.WithPassLoggerToModel(d.passLogToModel))
+					incomingBvlc, err := driverModel.BVLCParse(ctxForModel, buf[:n])
 					if err != nil {
 						log.Warn().Err(err).Msg("Could not parse bvlc")
 						blockingReadChan <- true
@@ -229,6 +246,10 @@ func broadcastAndDiscover(ctx context.Context, communicationChannels []communica
 
 func handleIncomingBVLCs(ctx context.Context, callback func(event apiModel.PlcDiscoveryItem), incomingBVLCChannel chan receivedBvlcMessage) {
 	for {
+		if err := ctx.Err(); err != nil {
+			// TODO: maybe we log something, but maybe it is fine
+			return
+		}
 		select {
 		case receivedBvlc := <-incomingBVLCChannel:
 			var npdu driverModel.NPDU
@@ -238,12 +259,12 @@ func handleIncomingBVLCs(ctx context.Context, callback func(event apiModel.PlcDi
 			_ = npdu
 			if apdu := npdu.GetApdu(); apdu == nil {
 				nlm := npdu.GetNlm()
-				log.Debug().Msgf("Got nlm\n%v", nlm)
+				log.Debug().Stringer("nlm", nlm).Msg("Got nlm")
 				continue
 			}
 			apdu := npdu.GetApdu()
 			if _, ok := apdu.(driverModel.APDUConfirmedRequestExactly); ok {
-				log.Debug().Msgf("Got apdu \n%v", apdu)
+				log.Debug().Stringer("apdu", apdu).Msg("Got apdu")
 				continue
 			}
 			apduUnconfirmedRequest := apdu.(driverModel.APDUUnconfirmedRequestExactly)
@@ -255,12 +276,14 @@ func handleIncomingBVLCs(ctx context.Context, callback func(event apiModel.PlcDi
 				if err != nil {
 					log.Debug().Err(err).Msg("Error parsing url")
 				}
-				discoveryEvent := &internalModel.DefaultPlcDiscoveryItem{
-					ProtocolCode:  "bacnet-ip",
-					TransportCode: "udp",
-					TransportUrl:  *remoteUrl,
-					Name:          fmt.Sprintf("device %v:%v", iAm.GetDeviceIdentifier().GetObjectType(), iAm.GetDeviceIdentifier().GetInstanceNumber()),
-				}
+				discoveryEvent := spiModel.NewDefaultPlcDiscoveryItem(
+					"bacnet-ip",
+					"udp",
+					*remoteUrl,
+					nil,
+					fmt.Sprintf("device %v:%v", iAm.GetDeviceIdentifier().GetObjectType(), iAm.GetDeviceIdentifier().GetInstanceNumber()),
+					nil,
+				)
 
 				// Pass the event back to the callback
 				callback(discoveryEvent)
@@ -270,12 +293,14 @@ func handleIncomingBVLCs(ctx context.Context, callback func(event apiModel.PlcDi
 				if err != nil {
 					log.Debug().Err(err).Msg("Error parsing url")
 				}
-				discoveryEvent := &internalModel.DefaultPlcDiscoveryItem{
-					ProtocolCode:  "bacnet-ip",
-					TransportCode: "udp",
-					TransportUrl:  *remoteUrl,
-					Name:          fmt.Sprintf("device %v:%v with %v:%v and %v", iHave.GetDeviceIdentifier().GetObjectType(), iHave.GetDeviceIdentifier().GetInstanceNumber(), iHave.GetObjectIdentifier().GetObjectType(), iHave.GetObjectIdentifier().GetInstanceNumber(), iHave.GetObjectName().GetValue()),
-				}
+				discoveryEvent := spiModel.NewDefaultPlcDiscoveryItem(
+					"bacnet-ip",
+					"udp",
+					*remoteUrl,
+					nil,
+					fmt.Sprintf("device %v:%v with %v:%v and %v", iHave.GetDeviceIdentifier().GetObjectType(), iHave.GetDeviceIdentifier().GetInstanceNumber(), iHave.GetObjectIdentifier().GetObjectType(), iHave.GetObjectIdentifier().GetInstanceNumber(), iHave.GetObjectName().GetValue()),
+					nil,
+				)
 
 				// Pass the event back to the callback
 				callback(discoveryEvent)
@@ -287,15 +312,21 @@ func handleIncomingBVLCs(ctx context.Context, callback func(event apiModel.PlcDi
 	}
 }
 
-func buildupCommunicationChannels(interfaces []net.Interface, bacNetPort int) (communicationChannels []communicationChannel, err error) {
+func buildupCommunicationChannels(ctx context.Context, interfaces []net.Interface, bacNetPort int) (communicationChannels []communicationChannel, err error) {
 	// Iterate over all network devices of this system.
 	for _, networkInterface := range interfaces {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		unicastInterfaceAddress, err := networkInterface.Addrs()
 		if err != nil {
 			return nil, errors.Wrapf(err, "Error getting Addresses for %v", networkInterface)
 		}
 		// Iterate over all addresses the current interface has configured
 		for _, unicastAddress := range unicastInterfaceAddress {
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
 			var ipAddr net.IP
 			switch addr := unicastAddress.(type) {
 			// If the device is configured to communicate with a subnet
@@ -494,7 +525,7 @@ func whoHasObjectName(objectName string) option {
 	}
 }
 
-func NewProtocolSpecificOptions(options ...option) (*protocolSpecificOptions, error) {
+func newProtocolSpecificOptions(options ...option) (*protocolSpecificOptions, error) {
 	var specificOptions protocolSpecificOptions
 	for _, _option := range options {
 		if parseErr := _option(&specificOptions); parseErr != nil {
@@ -508,12 +539,12 @@ type option func(specificOptions *protocolSpecificOptions) error
 
 func extractProtocolSpecificOptions(discoveryOptions []options.WithDiscoveryOption) (*protocolSpecificOptions, error) {
 	var collectedOptions []option
-	filteredOptionMap := make(map[string][]interface{})
+	filteredOptionMap := make(map[string][]any)
 	for _, protocolSpecificOption := range options.FilterDiscoveryOptionProtocolSpecific(discoveryOptions) {
 		key := protocolSpecificOption.GetKey()
 		value := protocolSpecificOption.GetValue()
 		if _, ok := filteredOptionMap[key]; !ok {
-			filteredOptionMap[key] = make([]interface{}, 0)
+			filteredOptionMap[key] = make([]any, 0)
 		}
 		filteredOptionMap[key] = append(filteredOptionMap[key], value)
 	}
@@ -616,10 +647,10 @@ func extractProtocolSpecificOptions(discoveryOptions []options.WithDiscoveryOpti
 			collectedOptions = append(collectedOptions, whoHasObjectName(name))
 		}
 	}
-	return NewProtocolSpecificOptions(collectedOptions...)
+	return newProtocolSpecificOptions(collectedOptions...)
 }
 
-func exactlyOneInt(filteredOptionMap map[string][]interface{}, key string) (int, error) {
+func exactlyOneInt(filteredOptionMap map[string][]any, key string) (int, error) {
 	value, err := exactlyOne(filteredOptionMap, key)
 	if err != nil {
 		return 0, err
@@ -631,7 +662,7 @@ func exactlyOneInt(filteredOptionMap map[string][]interface{}, key string) (int,
 	return int(parsedInt), nil
 }
 
-func exactlyOneUint(filteredOptionMap map[string][]interface{}, key string) (uint, error) {
+func exactlyOneUint(filteredOptionMap map[string][]any, key string) (uint, error) {
 	value, err := exactlyOne(filteredOptionMap, key)
 	if err != nil {
 		return 0, err
@@ -642,7 +673,7 @@ func exactlyOneUint(filteredOptionMap map[string][]interface{}, key string) (uin
 	}
 	return uint(parsedInt), nil
 }
-func exactlyOneString(filteredOptionMap map[string][]interface{}, key string) (string, error) {
+func exactlyOneString(filteredOptionMap map[string][]any, key string) (string, error) {
 	value, err := exactlyOne(filteredOptionMap, key)
 	if err != nil {
 		return "", err
@@ -650,7 +681,7 @@ func exactlyOneString(filteredOptionMap map[string][]interface{}, key string) (s
 	return fmt.Sprintf("%v", value), nil
 }
 
-func exactlyOne(filteredOptionMap map[string][]interface{}, key string) (interface{}, error) {
+func exactlyOne(filteredOptionMap map[string][]any, key string) (any, error) {
 	values := filteredOptionMap[key]
 	if len(values) != 1 {
 		return nil, errors.Errorf("%s expects only one value", key)

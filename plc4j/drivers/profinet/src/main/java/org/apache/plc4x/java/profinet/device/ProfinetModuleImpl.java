@@ -40,12 +40,12 @@ public class ProfinetModuleImpl implements ProfinetModule {
     private final int ioCsOffset;
     private final int ioPsOffset;
     private final int slot;
-    private List<PnIoCm_IoDataObject> inputIoPsApiBlocks = new ArrayList<>();
-    private List<PnIoCm_IoCs> outputIoCsApiBlocks = new ArrayList<>();
-    private List<PnIoCm_Submodule> expectedSubModuleApiBlocks = new ArrayList<>();
+    private final List<PnIoCm_IoDataObject> inputIoPsApiBlocks = new ArrayList<>();
+    private final List<PnIoCm_IoCs> outputIoCsApiBlocks = new ArrayList<>();
+    private final List<PnIoCm_Submodule> expectedSubModuleApiBlocks = new ArrayList<>();
 
-    private List<PnIoCm_IoCs> inputIoCsApiBlocks = new ArrayList<>();
-    private List<PnIoCm_IoDataObject> outputIoPsApiBlocks = new ArrayList<>();
+    private final List<PnIoCm_IoCs> inputIoCsApiBlocks = new ArrayList<>();
+    private final List<PnIoCm_IoDataObject> outputIoPsApiBlocks = new ArrayList<>();
     private int ioPsSize;
     private int ioCsSize;
     private Integer inputCsSize = 0;
@@ -60,7 +60,9 @@ public class ProfinetModuleImpl implements ProfinetModule {
     }
 
     private void populateNode() {
+        // IOPS = IO Producer Status
         int inputIoPsOffset = ioPsOffset;
+        // IOCS = IO Consumer Status
         int outputIoCsOffset = ioCsOffset;
 
         for (ProfinetVirtualSubmoduleItem virtualItem : module.getVirtualSubmoduleList()) {
@@ -160,11 +162,7 @@ public class ProfinetModuleImpl implements ProfinetModule {
                 false,
                 false,
                 module.getInputDataLength(),
-                (short) 0x01,
-                (short) 0x01,
-                module.getOutputDataLength(),
-                (short) 0x01,
-                (short) 0x01
+                module.getOutputDataLength()
             ));
         } else if (module.getInputDataLength() != 0) {
             expectedSubModuleApiBlocks.add(new PnIoCm_Submodule_InputData(
@@ -174,9 +172,7 @@ public class ProfinetModuleImpl implements ProfinetModule {
                 false,
                 false,
                 false,
-                module.getInputDataLength(),
-                (short) 0x01,
-                (short) 0x01));
+                module.getInputDataLength()));
 
 
         } else if (module.getOutputDataLength() != 0) {
@@ -187,9 +183,7 @@ public class ProfinetModuleImpl implements ProfinetModule {
                 false,
                 false,
                 false,
-                module.getOutputDataLength(),
-                (short) 0x01,
-                (short) 0x01));
+                module.getOutputDataLength()));
         } else if (module.getInputDataLength() == 0 && module.getOutputDataLength() == 0) {
             expectedSubModuleApiBlocks.add(new PnIoCm_Submodule_NoInputNoOutputData(
                 0x01,

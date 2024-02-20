@@ -23,14 +23,17 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"time"
 
-	"github.com/apache/plc4x/plc4go/pkg/api/model"
-	"github.com/apache/plc4x/plc4go/pkg/api/values"
+	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
+	apiValues "github.com/apache/plc4x/plc4go/pkg/api/values"
 	readWriteModel "github.com/apache/plc4x/plc4go/protocols/cbus/readwrite/model"
-	model2 "github.com/apache/plc4x/plc4go/spi/model"
+	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
+//go:generate stringer -type StatusRequestType
+//go:generate go run ../../tools/plc4xlicenser/gen.go -type=StatusRequestType
 type StatusRequestType uint8
 
 const (
@@ -38,18 +41,8 @@ const (
 	StatusRequestTypeLevel
 )
 
-func (s StatusRequestType) String() string {
-	switch s {
-	case StatusRequestTypeBinaryState:
-		return "StatusRequestTypeBinaryState"
-	case StatusRequestTypeLevel:
-		return "StatusRequestTypeLevel"
-	}
-	return ""
-}
-
 type Tag interface {
-	model.PlcTag
+	apiModel.PlcTag
 
 	GetTagType() TagType
 }
@@ -128,7 +121,7 @@ type CALGetStatusTag interface {
 func NewCALGetStatusTag(unitAddress readWriteModel.UnitAddress, bridgeAddresses []readWriteModel.BridgeAddress, parameter readWriteModel.Parameter, count uint8, numElements uint16) CALGetStatusTag {
 	return &calGetStatusTag{
 		calTag:      calTag{bridgeAddresses, unitAddress},
-		tagType:     CAL_RECALL,
+		tagType:     CAL_GETSTATUS,
 		parameter:   parameter,
 		count:       count,
 		numElements: numElements,
@@ -154,15 +147,20 @@ func NewSALTag(bridgeAddresses []readWriteModel.BridgeAddress, application readW
 	}
 }
 
+type SubscriptionTag interface {
+	Tag
+	apiModel.PlcSubscriptionTag
+}
+
 // SALMonitorTag can be used to monitor sal tags
 type SALMonitorTag interface {
-	Tag
+	SubscriptionTag
 
-	GetUnitAddress() *readWriteModel.UnitAddress
+	GetUnitAddress() readWriteModel.UnitAddress
 	GetApplication() *readWriteModel.ApplicationIdContainer
 }
 
-func NewSALMonitorTag(unitAddress *readWriteModel.UnitAddress, application *readWriteModel.ApplicationIdContainer, numElements uint16) SALMonitorTag {
+func NewSALMonitorTag(unitAddress readWriteModel.UnitAddress, application *readWriteModel.ApplicationIdContainer, numElements uint16) SALMonitorTag {
 	return &salMonitorTag{
 		tagType:     SAL_MONITOR,
 		unitAddress: unitAddress,
@@ -173,13 +171,13 @@ func NewSALMonitorTag(unitAddress *readWriteModel.UnitAddress, application *read
 
 // MMIMonitorTag can be used to monitor mmi tags
 type MMIMonitorTag interface {
-	Tag
+	SubscriptionTag
 
-	GetUnitAddress() *readWriteModel.UnitAddress
+	GetUnitAddress() readWriteModel.UnitAddress
 	GetApplication() *readWriteModel.ApplicationIdContainer
 }
 
-func NewMMIMonitorTag(unitAddress *readWriteModel.UnitAddress, application *readWriteModel.ApplicationIdContainer, numElements uint16) SALMonitorTag {
+func NewMMIMonitorTag(unitAddress readWriteModel.UnitAddress, application *readWriteModel.ApplicationIdContainer, numElements uint16) MMIMonitorTag {
 	return &mmiMonitorTag{
 		tagType:     MMI_STATUS_MONITOR,
 		unitAddress: unitAddress,
@@ -241,16 +239,32 @@ type salTag struct {
 
 type salMonitorTag struct {
 	tagType     TagType
-	unitAddress *readWriteModel.UnitAddress
+	unitAddress readWriteModel.UnitAddress
 	application *readWriteModel.ApplicationIdContainer
 	numElements uint16
 }
 
+func (s salMonitorTag) GetPlcSubscriptionType() apiModel.PlcSubscriptionType {
+	return apiModel.SubscriptionEvent
+}
+
+func (s salMonitorTag) GetDuration() time.Duration {
+	return 0
+}
+
 type mmiMonitorTag struct {
 	tagType     TagType
-	unitAddress *readWriteModel.UnitAddress
+	unitAddress readWriteModel.UnitAddress
 	application *readWriteModel.ApplicationIdContainer
 	numElements uint16
+}
+
+func (m mmiMonitorTag) GetPlcSubscriptionType() apiModel.PlcSubscriptionType {
+	return apiModel.SubscriptionEvent
+}
+
+func (m mmiMonitorTag) GetDuration() time.Duration {
+	return 0
 }
 
 //
@@ -270,25 +284,29 @@ func (s statusTag) GetAddressString() string {
 		statusRequestType = "binary"
 	case StatusRequestTypeLevel:
 		statusRequestType = "level"
-		statusRequestType += fmt.Sprintf("=0x%x", *s.startingGroupAddressLabel)
+		if s.startingGroupAddressLabel != nil {
+			statusRequestType += fmt.Sprintf("=%#02x", *s.startingGroupAddressLabel)
+		}
+	default:
+		statusRequestType = "invalid"
 	}
 	return fmt.Sprintf("status/%s/%s", statusRequestType, s.application)
 }
 
-func (s statusTag) GetValueType() values.PlcValueType {
-	return values.NULL
+func (s statusTag) GetValueType() apiValues.PlcValueType {
+	return apiValues.NULL
 }
 
-func (s statusTag) GetArrayInfo() []model.ArrayInfo {
+func (s statusTag) GetArrayInfo() []apiModel.ArrayInfo {
 	if s.numElements != 1 {
-		return []model.ArrayInfo{
-			model2.DefaultArrayInfo{
+		return []apiModel.ArrayInfo{
+			&spiModel.DefaultArrayInfo{
 				LowerBound: 0,
 				UpperBound: uint32(s.numElements),
 			},
 		}
 	}
-	return []model.ArrayInfo{}
+	return []apiModel.ArrayInfo{}
 }
 
 func (s statusTag) GetTagType() TagType {
@@ -416,20 +434,20 @@ func (c calRecallTag) GetAddressString() string {
 	return fmt.Sprintf("cal/%d/recall=%s", c.unitAddress.GetAddress(), c.parameter)
 }
 
-func (c calRecallTag) GetValueType() values.PlcValueType {
-	return values.Struct
+func (c calRecallTag) GetValueType() apiValues.PlcValueType {
+	return apiValues.Struct
 }
 
-func (c calRecallTag) GetArrayInfo() []model.ArrayInfo {
+func (c calRecallTag) GetArrayInfo() []apiModel.ArrayInfo {
 	if c.count != 1 {
-		return []model.ArrayInfo{
-			model2.DefaultArrayInfo{
+		return []apiModel.ArrayInfo{
+			&spiModel.DefaultArrayInfo{
 				LowerBound: 0,
 				UpperBound: uint32(c.count),
 			},
 		}
 	}
-	return []model.ArrayInfo{}
+	return []apiModel.ArrayInfo{}
 }
 
 func (c calRecallTag) GetTagType() TagType {
@@ -483,20 +501,20 @@ func (c calIdentifyTag) GetAddressString() string {
 	return fmt.Sprintf("cal/%d/identify=%s", c.unitAddress.GetAddress(), c.GetAttribute())
 }
 
-func (c calIdentifyTag) GetValueType() values.PlcValueType {
-	return values.Struct
+func (c calIdentifyTag) GetValueType() apiValues.PlcValueType {
+	return apiValues.Struct
 }
 
-func (c calIdentifyTag) GetArrayInfo() []model.ArrayInfo {
+func (c calIdentifyTag) GetArrayInfo() []apiModel.ArrayInfo {
 	if c.numElements != 1 {
-		return []model.ArrayInfo{
-			model2.DefaultArrayInfo{
+		return []apiModel.ArrayInfo{
+			&spiModel.DefaultArrayInfo{
 				LowerBound: 0,
 				UpperBound: uint32(c.numElements),
 			},
 		}
 	}
-	return []model.ArrayInfo{}
+	return []apiModel.ArrayInfo{}
 }
 
 func (c calIdentifyTag) GetTagType() TagType {
@@ -550,20 +568,20 @@ func (c calGetStatusTag) GetAddressString() string {
 	return fmt.Sprintf("cal/getstatus=%s, %d", c.parameter, c.GetCount())
 }
 
-func (c calGetStatusTag) GetValueType() values.PlcValueType {
-	return values.Struct
+func (c calGetStatusTag) GetValueType() apiValues.PlcValueType {
+	return apiValues.Struct
 }
 
-func (c calGetStatusTag) GetArrayInfo() []model.ArrayInfo {
+func (c calGetStatusTag) GetArrayInfo() []apiModel.ArrayInfo {
 	if c.count != 1 {
-		return []model.ArrayInfo{
-			model2.DefaultArrayInfo{
+		return []apiModel.ArrayInfo{
+			&spiModel.DefaultArrayInfo{
 				LowerBound: 0,
 				UpperBound: uint32(c.count),
 			},
 		}
 	}
-	return []model.ArrayInfo{}
+	return []apiModel.ArrayInfo{}
 }
 
 func (c calGetStatusTag) GetTagType() TagType {
@@ -625,20 +643,20 @@ func (s salTag) GetAddressString() string {
 	return fmt.Sprintf("sal/%s/%s", s.application, s.salCommand)
 }
 
-func (s salTag) GetValueType() values.PlcValueType {
-	return values.Struct
+func (s salTag) GetValueType() apiValues.PlcValueType {
+	return apiValues.Struct
 }
 
-func (s salTag) GetArrayInfo() []model.ArrayInfo {
+func (s salTag) GetArrayInfo() []apiModel.ArrayInfo {
 	if s.numElements != 1 {
-		return []model.ArrayInfo{
-			model2.DefaultArrayInfo{
+		return []apiModel.ArrayInfo{
+			&spiModel.DefaultArrayInfo{
 				LowerBound: 0,
 				UpperBound: uint32(s.numElements),
 			},
 		}
 	}
-	return []model.ArrayInfo{}
+	return []apiModel.ArrayInfo{}
 }
 
 func (s salTag) GetTagType() TagType {
@@ -697,36 +715,36 @@ func (s salTag) String() string {
 func (s salMonitorTag) GetAddressString() string {
 	unitAddress := "*"
 	if s.unitAddress != nil {
-		unitAddress = fmt.Sprintf("%d", (*s.unitAddress).GetAddress())
+		unitAddress = fmt.Sprintf("%#02x", s.unitAddress.GetAddress())
 	}
 	application := "*"
 	if s.application != nil {
-		application = fmt.Sprintf("%d", *s.application)
+		application = fmt.Sprintf("%s", *s.application)
 	}
 	return fmt.Sprintf("salmonitor/%s/%s", unitAddress, application)
 }
 
-func (s salMonitorTag) GetValueType() values.PlcValueType {
-	return values.Struct
+func (s salMonitorTag) GetValueType() apiValues.PlcValueType {
+	return apiValues.Struct
 }
 
-func (s salMonitorTag) GetArrayInfo() []model.ArrayInfo {
+func (s salMonitorTag) GetArrayInfo() []apiModel.ArrayInfo {
 	if s.numElements != 1 {
-		return []model.ArrayInfo{
-			model2.DefaultArrayInfo{
+		return []apiModel.ArrayInfo{
+			&spiModel.DefaultArrayInfo{
 				LowerBound: 0,
 				UpperBound: uint32(s.numElements),
 			},
 		}
 	}
-	return []model.ArrayInfo{}
+	return []apiModel.ArrayInfo{}
 }
 
 func (s salMonitorTag) GetTagType() TagType {
 	return s.tagType
 }
 
-func (s salMonitorTag) GetUnitAddress() *readWriteModel.UnitAddress {
+func (s salMonitorTag) GetUnitAddress() readWriteModel.UnitAddress {
 	return s.unitAddress
 }
 
@@ -748,7 +766,7 @@ func (s salMonitorTag) SerializeWithWriteBuffer(ctx context.Context, writeBuffer
 	}
 
 	if unitAddress := s.unitAddress; unitAddress != nil {
-		if err := (*unitAddress).SerializeWithWriteBuffer(ctx, writeBuffer); err != nil {
+		if err := unitAddress.SerializeWithWriteBuffer(ctx, writeBuffer); err != nil {
 			return err
 		}
 	}
@@ -775,36 +793,36 @@ func (s salMonitorTag) String() string {
 func (m mmiMonitorTag) GetAddressString() string {
 	unitAddress := "*"
 	if m.unitAddress != nil {
-		unitAddress = fmt.Sprintf("%d", (*m.unitAddress).GetAddress())
+		unitAddress = fmt.Sprintf("%#02x", m.unitAddress.GetAddress())
 	}
 	application := "*"
 	if m.application != nil {
-		application = fmt.Sprintf("%d", *m.application)
+		application = fmt.Sprintf("%s", *m.application)
 	}
 	return fmt.Sprintf("mmimonitor/%s/%s", unitAddress, application)
 }
 
-func (m mmiMonitorTag) GetValueType() values.PlcValueType {
-	return values.Struct
+func (m mmiMonitorTag) GetValueType() apiValues.PlcValueType {
+	return apiValues.Struct
 }
 
-func (m mmiMonitorTag) GetArrayInfo() []model.ArrayInfo {
+func (m mmiMonitorTag) GetArrayInfo() []apiModel.ArrayInfo {
 	if m.numElements != 1 {
-		return []model.ArrayInfo{
-			model2.DefaultArrayInfo{
+		return []apiModel.ArrayInfo{
+			&spiModel.DefaultArrayInfo{
 				LowerBound: 0,
 				UpperBound: uint32(m.numElements),
 			},
 		}
 	}
-	return []model.ArrayInfo{}
+	return []apiModel.ArrayInfo{}
 }
 
 func (m mmiMonitorTag) GetTagType() TagType {
 	return m.tagType
 }
 
-func (m mmiMonitorTag) GetUnitAddress() *readWriteModel.UnitAddress {
+func (m mmiMonitorTag) GetUnitAddress() readWriteModel.UnitAddress {
 	return m.unitAddress
 }
 
@@ -826,7 +844,7 @@ func (m mmiMonitorTag) SerializeWithWriteBuffer(ctx context.Context, writeBuffer
 	}
 
 	if unitAddress := m.unitAddress; unitAddress != nil {
-		if err := (*unitAddress).SerializeWithWriteBuffer(ctx, writeBuffer); err != nil {
+		if err := unitAddress.SerializeWithWriteBuffer(ctx, writeBuffer); err != nil {
 			return err
 		}
 	}

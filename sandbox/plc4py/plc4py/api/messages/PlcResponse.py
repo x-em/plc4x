@@ -19,7 +19,7 @@
 from dataclasses import dataclass
 from typing import cast, List, Dict
 
-from plc4py.api.messages.PlcField import PlcField
+from plc4py.api.messages.PlcField import PlcTag
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.api.value.PlcValue import PlcValue, PlcResponseCode
 from plc4py.spi.messages.utils.ResponseItem import ResponseItem
@@ -36,24 +36,22 @@ class PlcResponse(PlcMessage):
 
 
 @dataclass
-class PlcFieldResponse(PlcResponse):
-    fields: List[PlcField]
+class PlcTagResponse(PlcResponse):
+    values: Dict[str, List[ResponseItem[PlcValue]]]
 
     @property
-    def field_names(self):
-        return [fld.name for fld in self.fields]
+    def tag_names(self):
+        return [tag_name for tag_name in self.values.keys()]
 
     def response_code(self, name: str) -> PlcResponseCode:
         pass
 
 
 @dataclass
-class PlcReadResponse(PlcFieldResponse):
+class PlcReadResponse(PlcTagResponse):
     """
     Response to a {@link PlcReadRequest}.
     """
-
-    values: Dict[str, List[ResponseItem[PlcValue]]]
 
     def get_plc_value(self, name: str, index: int = 0) -> PlcValue:
         return self.values[name][index].value
@@ -72,3 +70,21 @@ class PlcReadResponse(PlcFieldResponse):
 
     def get_int(self, name: str, index: int = 0) -> int:
         return cast(int, self.values[name][index].value.value)
+
+
+@dataclass
+class PlcQueryResponse(PlcResponse):
+    tags: Dict[str, List[ResponseItem[PlcTag]]]
+
+    @property
+    def tag_names(self):
+        return [tag_name for tag_name in self.tags.keys()]
+
+    def response_code(self, name: str) -> PlcResponseCode:
+        pass
+
+
+@dataclass
+class PlcBrowseResponse(PlcQueryResponse):
+    def get_tags(self) -> Dict[str, List[ResponseItem[PlcTag]]]:
+        return self.tags

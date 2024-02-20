@@ -30,4 +30,6 @@
   <root level="error">
     <appender-ref ref="STDOUT" />
   </root>
+
+  <logger name="org.apache.plc4x.java.spi.codegen" level="warn" />
 </configuration>

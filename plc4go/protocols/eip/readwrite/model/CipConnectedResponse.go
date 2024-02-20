@@ -21,8 +21,10 @@ package model
 
 import (
 	"context"
+	"fmt"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"io"
 )
 
@@ -30,6 +32,7 @@ import (
 
 // CipConnectedResponse is the corresponding interface of CipConnectedResponse
 type CipConnectedResponse interface {
+	fmt.Stringer
 	utils.LengthAware
 	utils.Serializable
 	CipService
@@ -121,7 +124,7 @@ func NewCipConnectedResponse(status uint8, additionalStatusWords uint8, data CIP
 }
 
 // Deprecated: use the interface for direct cast
-func CastCipConnectedResponse(structType interface{}) CipConnectedResponse {
+func CastCipConnectedResponse(structType any) CipConnectedResponse {
 	if casted, ok := structType.(CipConnectedResponse); ok {
 		return casted
 	}
@@ -159,13 +162,15 @@ func (m *_CipConnectedResponse) GetLengthInBytes(ctx context.Context) uint16 {
 	return m.GetLengthInBits(ctx) / 8
 }
 
-func CipConnectedResponseParse(theBytes []byte, connected bool, serviceLen uint16) (CipConnectedResponse, error) {
-	return CipConnectedResponseParseWithBuffer(context.Background(), utils.NewReadBufferByteBased(theBytes), connected, serviceLen)
+func CipConnectedResponseParse(ctx context.Context, theBytes []byte, connected bool, serviceLen uint16) (CipConnectedResponse, error) {
+	return CipConnectedResponseParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes), connected, serviceLen)
 }
 
 func CipConnectedResponseParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer, connected bool, serviceLen uint16) (CipConnectedResponse, error) {
 	positionAware := readBuffer
 	_ = positionAware
+	log := zerolog.Ctx(ctx)
+	_ = log
 	if pullErr := readBuffer.PullContext("CipConnectedResponse"); pullErr != nil {
 		return nil, errors.Wrap(pullErr, "Error pulling for CipConnectedResponse")
 	}
@@ -180,7 +185,7 @@ func CipConnectedResponseParseWithBuffer(ctx context.Context, readBuffer utils.R
 			return nil, errors.Wrap(_err, "Error parsing 'reserved' field of CipConnectedResponse")
 		}
 		if reserved != uint8(0x00) {
-			Plc4xModelLog.Info().Fields(map[string]interface{}{
+			log.Info().Fields(map[string]any{
 				"expected value": uint8(0x00),
 				"got value":      reserved,
 			}).Msg("Got unexpected response for reserved field.")
@@ -213,7 +218,7 @@ func CipConnectedResponseParseWithBuffer(ctx context.Context, readBuffer utils.R
 		_val, _err := CIPDataConnectedParseWithBuffer(ctx, readBuffer)
 		switch {
 		case errors.Is(_err, utils.ParseAssertError{}) || errors.Is(_err, io.EOF):
-			Plc4xModelLog.Debug().Err(_err).Msg("Resetting position because optional threw an error")
+			log.Debug().Err(_err).Msg("Resetting position because optional threw an error")
 			readBuffer.Reset(currentPos)
 		case _err != nil:
 			return nil, errors.Wrap(_err, "Error parsing 'data' field of CipConnectedResponse")
@@ -254,6 +259,8 @@ func (m *_CipConnectedResponse) Serialize() ([]byte, error) {
 func (m *_CipConnectedResponse) SerializeWithWriteBuffer(ctx context.Context, writeBuffer utils.WriteBuffer) error {
 	positionAware := writeBuffer
 	_ = positionAware
+	log := zerolog.Ctx(ctx)
+	_ = log
 	ser := func() error {
 		if pushErr := writeBuffer.PushContext("CipConnectedResponse"); pushErr != nil {
 			return errors.Wrap(pushErr, "Error pushing for CipConnectedResponse")
@@ -263,13 +270,13 @@ func (m *_CipConnectedResponse) SerializeWithWriteBuffer(ctx context.Context, wr
 		{
 			var reserved uint8 = uint8(0x00)
 			if m.reservedField0 != nil {
-				Plc4xModelLog.Info().Fields(map[string]interface{}{
+				log.Info().Fields(map[string]any{
 					"expected value": uint8(0x00),
 					"got value":      reserved,
 				}).Msg("Overriding reserved field with unexpected value.")
 				reserved = *m.reservedField0
 			}
-			_err := writeBuffer.WriteUint8("reserved", 8, reserved)
+			_err := writeBuffer.WriteUint8("reserved", 8, uint8(reserved))
 			if _err != nil {
 				return errors.Wrap(_err, "Error serializing 'reserved' field")
 			}
@@ -277,14 +284,14 @@ func (m *_CipConnectedResponse) SerializeWithWriteBuffer(ctx context.Context, wr
 
 		// Simple Field (status)
 		status := uint8(m.GetStatus())
-		_statusErr := writeBuffer.WriteUint8("status", 8, (status))
+		_statusErr := writeBuffer.WriteUint8("status", 8, uint8((status)))
 		if _statusErr != nil {
 			return errors.Wrap(_statusErr, "Error serializing 'status' field")
 		}
 
 		// Simple Field (additionalStatusWords)
 		additionalStatusWords := uint8(m.GetAdditionalStatusWords())
-		_additionalStatusWordsErr := writeBuffer.WriteUint8("additionalStatusWords", 8, (additionalStatusWords))
+		_additionalStatusWordsErr := writeBuffer.WriteUint8("additionalStatusWords", 8, uint8((additionalStatusWords)))
 		if _additionalStatusWordsErr != nil {
 			return errors.Wrap(_additionalStatusWordsErr, "Error serializing 'additionalStatusWords' field")
 		}

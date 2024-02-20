@@ -23,20 +23,21 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"net"
 	"net/url"
+	"runtime/debug"
 	"strconv"
 	"time"
 
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
-	"github.com/apache/plc4x/plc4go/pkg/api/values"
+	apiValues "github.com/apache/plc4x/plc4go/pkg/api/values"
 	"github.com/apache/plc4x/plc4go/protocols/ads/discovery/readwrite/model"
 	driverModel "github.com/apache/plc4x/plc4go/protocols/ads/readwrite/model"
-	"github.com/apache/plc4x/plc4go/spi"
-	internalModel "github.com/apache/plc4x/plc4go/spi/model"
+	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
-	values2 "github.com/apache/plc4x/plc4go/spi/values"
-	"github.com/rs/zerolog/log"
+	spiValues "github.com/apache/plc4x/plc4go/spi/values"
 )
 
 type discovery struct {
@@ -47,11 +48,17 @@ type discovery struct {
 }
 
 type Discoverer struct {
-	messageCodec spi.MessageCodec
+	passLogToModel bool
+	log            zerolog.Logger
 }
 
-func NewDiscoverer() *Discoverer {
-	return &Discoverer{}
+func NewDiscoverer(_options ...options.WithOption) *Discoverer {
+	passLoggerToModel, _ := options.ExtractPassLoggerToModel(_options...)
+	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
+	return &Discoverer{
+		passLogToModel: passLoggerToModel,
+		log:            customLogger,
+	}
 }
 
 func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.PlcDiscoveryItem), discoveryOptions ...options.WithDiscoveryOption) error {
@@ -70,7 +77,13 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	deviceNames := options.FilterDiscoveryOptionsDeviceName(discoveryOptions)
 	if len(deviceNames) > 0 {
 		for _, curInterface := range allInterfaces {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
 			for _, deviceNameOption := range deviceNames {
+				if err := ctx.Err(); err != nil {
+					return err
+				}
 				if curInterface.Name == deviceNameOption.GetDeviceName() {
 					interfaces = append(interfaces, curInterface)
 					break
@@ -84,6 +97,9 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	// Iterate over all selected network devices and filter out all the devices with IPv4 configured
 	var discoveryItems []*discovery
 	for _, interf := range interfaces {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		addrs, err := interf.Addrs()
 		if err != nil {
 			return err
@@ -92,6 +108,9 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 		// For ADS we're only interested in IPv4 addresses, as it doesn't
 		// seem to work with IPv6.
 		for _, addr := range addrs {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
 			var ipv4Addr net.IP
 			switch addr.(type) {
 			// If the device is configured to communicate with a subnet
@@ -129,27 +148,43 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 
 	// Open a listening udp socket for each of the discoveryItems
 	for _, discoveryItem := range discoveryItems {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		responseAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", discoveryItem.localAddress, model.AdsDiscoveryConstants_ADSDISCOVERYUDPDEFAULTPORT))
 		if err != nil {
-			panic(err)
+			return errors.Wrap(err, "error resolving udp")
 		}
 		socket, err := net.ListenUDP("udp4", responseAddr)
 		if err != nil {
-			panic(err)
+			return errors.Wrap(err, "error listening udp")
 		}
 		discoveryItem.socket = socket
 
 		// Start a worker to receive responses
 		go func(discoveryItem *discovery) {
+			defer func() {
+				if err := recover(); err != nil {
+					d.log.Error().
+						Str("stack", string(debug.Stack())).
+						Interface("err", err).
+						Msg("panic-ed")
+				}
+			}()
 			buf := make([]byte, 1024)
 			for {
+				if err := ctx.Err(); err != nil {
+					d.log.Debug().Err(ctx.Err()).Msg("ending")
+					return
+				}
 				length, fromAddr, err := socket.ReadFromUDP(buf)
 				if length == 0 {
 					continue
 				}
-				discoveryResponse, err := model.AdsDiscoveryParse(buf[0:length])
+				ctxForModel := options.GetLoggerContextForModel(ctx, d.log, options.WithPassLoggerToModel(d.passLogToModel))
+				discoveryResponse, err := model.AdsDiscoveryParse(ctxForModel, buf[0:length])
 				if err != nil {
-					log.Error().Err(err).Str("src-ip", fromAddr.String()).Msg("error decoding response")
+					d.log.Error().Err(err).Str("src-ip", fromAddr.String()).Msg("error decoding response")
 					continue
 				}
 
@@ -165,6 +200,10 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 				var versionBlock model.AdsDiscoveryBlockVersion
 				var fingerprintBlock model.AdsDiscoveryBlockFingerprint
 				for _, block := range discoveryResponse.GetBlocks() {
+					if err := ctx.Err(); err != nil {
+						d.log.Debug().Err(err).Msg("ending")
+						return
+					}
 					switch block.GetBlockType() {
 					case model.AdsDiscoveryBlockType_HOST_NAME:
 						hostNameBlock = block.(model.AdsDiscoveryBlockHostName)
@@ -193,15 +232,15 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 				// TODO: Check if this is legit, or if we can get the information from somewhere.
 				opts["targetAmsPort"] = []string{"851"}
 
-				attributes := make(map[string]values.PlcValue)
-				attributes["hostName"] = values2.NewPlcSTRING(hostNameBlock.GetHostName().GetText())
+				attributes := make(map[string]apiValues.PlcValue)
+				attributes["hostName"] = spiValues.NewPlcSTRING(hostNameBlock.GetHostName().GetText())
 				if versionBlock != nil {
 					versionData := versionBlock.GetVersionData()
 					patchVersion := (int(versionData[3])&0xFF)<<8 | (int(versionData[2]) & 0xFF)
-					attributes["twinCatVersion"] = values2.NewPlcSTRING(fmt.Sprintf("%d.%d.%d", int(versionData[0])&0xFF, int(versionData[1])&0xFF, patchVersion))
+					attributes["twinCatVersion"] = spiValues.NewPlcSTRING(fmt.Sprintf("%d.%d.%d", int(versionData[0])&0xFF, int(versionData[1])&0xFF, patchVersion))
 				}
 				if fingerprintBlock != nil {
-					attributes["fingerprint"] = values2.NewPlcSTRING(string(fingerprintBlock.GetData()))
+					attributes["fingerprint"] = spiValues.NewPlcSTRING(string(fingerprintBlock.GetData()))
 				}
 				// TODO: Find out how to handle the OS Data
 
@@ -212,14 +251,14 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 					strconv.Itoa(int(remoteAmsNetId.GetOctet4())) + ":" +
 					strconv.Itoa(int(driverModel.AdsConstants_ADSTCPDEFAULTPORT)))
 				if err2 == nil {
-					plcDiscoveryItem := &internalModel.DefaultPlcDiscoveryItem{
-						ProtocolCode:  "ads",
-						TransportCode: "tcp",
-						TransportUrl:  *remoteAddress,
-						Options:       opts,
-						Name:          hostNameBlock.GetHostName().GetText(),
-						Attributes:    attributes,
-					}
+					plcDiscoveryItem := spiModel.NewDefaultPlcDiscoveryItem(
+						"ads",
+						"tcp",
+						*remoteAddress,
+						opts,
+						hostNameBlock.GetHostName().GetText(),
+						attributes,
+					)
 
 					// Pass the event back to the callback
 					callback(plcDiscoveryItem)
@@ -229,8 +268,14 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 	}
 	defer func() {
 		for _, discoveryItem := range discoveryItems {
+			if err := ctx.Err(); err != nil {
+				d.log.Debug().Err(err).Msg("ending")
+				return
+			}
 			if discoveryItem.socket != nil {
-				discoveryItem.socket.Close()
+				if err := discoveryItem.socket.Close(); err != nil {
+					d.log.Debug().Err(err).Msg("errored")
+				}
 			}
 		}
 	}()
@@ -240,6 +285,9 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 
 	// Iterate over all network devices of this system.
 	for _, discoveryItem := range discoveryItems {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		// Prepare the discovery packet data
 		// Create the discovery request message for this device.
 		amsNetId := model.NewAmsNetId(discoveryItem.localAddress[0], discoveryItem.localAddress[1], discoveryItem.localAddress[2], discoveryItem.localAddress[3], uint8(1), uint8(1))
@@ -248,24 +296,24 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 		// Serialize the message
 		bytes, err := discoveryRequestMessage.Serialize()
 		if err != nil {
-			log.Error().Err(err).Str("broadcast-ip", discoveryItem.broadcastAddress.String()).Msg("Error serialising broadcast search packet")
+			d.log.Error().Err(err).Str("broadcast-ip", discoveryItem.broadcastAddress.String()).Msg("Error serialising broadcast search packet")
 			continue
 		}
 
 		// Create a not-connected UDP connection to the broadcast address
 		requestAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", discoveryItem.broadcastAddress.String(), model.AdsDiscoveryConstants_ADSDISCOVERYUDPDEFAULTPORT))
 		if err != nil {
-			log.Error().Err(err).Str("broadcast-ip", discoveryItem.broadcastAddress.String()).Msg("Error resolving target socket for broadcast search")
+			d.log.Error().Err(err).Str("broadcast-ip", discoveryItem.broadcastAddress.String()).Msg("Error resolving target socket for broadcast search")
 			continue
 		}
 		/*localAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", ipv4Addr.String(), model.AdsDiscoveryConstants_ADSDISCOVERYUDPDEFAULTPORT))
 		if err != nil {
-			log.Error().Err(err).Str("local-ip", ipv4Addr.String()).Msg("Error resolving local address for broadcast search")
+		m.log.Error().Err(err).Str("local-ip", ipv4Addr.String()).Msg("Error resolving local address for broadcast search")
 			continue
 		}
 		udp, err := net.DialUDP("udp4", localAddr, requestAddr)
 		if err != nil {
-			log.Error().Err(err).Str("local-ip", ipv4Addr.String()).Str("broadcast-ip", broadcastAddress.String()).
+		m.log.Error().Err(err).Str("local-ip", ipv4Addr.String()).Str("broadcast-ip", broadcastAddress.String()).
 				Msg("Error creating sending udp socket for broadcast search")
 			continue
 		}*/
@@ -273,7 +321,7 @@ func (d *Discoverer) Discover(ctx context.Context, callback func(event apiModel.
 		// Send out the message.
 		_, err = discoveryItem.socket.WriteTo(bytes, requestAddr)
 		if err != nil {
-			log.Error().Err(err).Str("broadcast-ip", discoveryItem.broadcastAddress.String()).Msg("Error sending request for broadcast search")
+			d.log.Error().Err(err).Str("broadcast-ip", discoveryItem.broadcastAddress.String()).Msg("Error sending request for broadcast search")
 			continue
 		}
 	}

@@ -25,7 +25,7 @@ setup(
     description="Plc4py The Python Industrial IOT Adapter",
     classifiers=[
         "Development Status :: 3 - Alpha",
-        "License :: OSI Approved :: Apache 2.0 License",
+        "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.8",
         "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
     ],
@@ -44,6 +44,7 @@ setup(
         "black",
         "pip",
         "aenum",
+        "bitarray",
     ],
     extras_require={
         "dev": [
@@ -59,6 +60,7 @@ setup(
         "plc4py.drivers": [
             "mock = plc4py.drivers.mock.MockConnection:MockDriverLoader",
             "modbus = plc4py.drivers.modbus.ModbusConnection:ModbusDriverLoader",
+            "umas = plc4py.drivers.umas.UmasConnection:UmasDriverLoader",
         ]
     },
 )

@@ -5945,11 +5945,11 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
                     }
                 }
 
-                // Simple Field (validityHeightPosition)
-                var validityHeightPosition = readBuffer.ReadBit("");
-
                 // Simple Field (validitySlatsPosition)
                 var validitySlatsPosition = readBuffer.ReadBit("");
+
+                // Simple Field (validityHeightPosition)
+                var validityHeightPosition = readBuffer.ReadBit("");
 
                 var _map = new Dictionary<string, IPlcValue>();
 
@@ -6341,6 +6341,14 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
                     }
                 }
 
+                // Reserved Field (Compartmentalized so the "reserved" variable can't leak)
+                {
+                    var reserved = readBuffer.ReadByte("", 4);
+                    if(reserved != 0x00) {
+                        Logger.Info("Expected constant value {expected} but got {got} for reserved field.", 0x00, reserved);
+                    }
+                }
+
                 // Simple Field (maskcw)
                 var maskcw = readBuffer.ReadBit("");
 
@@ -6409,14 +6417,6 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
                 // Simple Field (stepCodeColourRed)
                 var stepCodeColourRed = readBuffer.ReadByte("", 3);
 
-                // Reserved Field (Compartmentalized so the "reserved" variable can't leak)
-                {
-                    var reserved = readBuffer.ReadByte("", 4);
-                    if(reserved != 0x00) {
-                        Logger.Info("Expected constant value {expected} but got {got} for reserved field.", 0x00, reserved);
-                    }
-                }
-
                 var _map = new Dictionary<string, IPlcValue>();
 
                 return new PlcStruct(_map);
@@ -6425,6 +6425,14 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
                 // Reserved Field (Compartmentalized so the "reserved" variable can't leak)
                 {
                     var reserved = readBuffer.ReadByte("", 8);
+                    if(reserved != 0x00) {
+                        Logger.Info("Expected constant value {expected} but got {got} for reserved field.", 0x00, reserved);
+                    }
+                }
+
+                // Reserved Field (Compartmentalized so the "reserved" variable can't leak)
+                {
+                    var reserved = readBuffer.ReadByte("", 4);
                     if(reserved != 0x00) {
                         Logger.Info("Expected constant value {expected} but got {got} for reserved field.", 0x00, reserved);
                     }
@@ -6463,14 +6471,6 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
 
                 // Simple Field (stepCodeColourRed)
                 var stepCodeColourRed = readBuffer.ReadByte("", 3);
-
-                // Reserved Field (Compartmentalized so the "reserved" variable can't leak)
-                {
-                    var reserved = readBuffer.ReadByte("", 4);
-                    if(reserved != 0x00) {
-                        Logger.Info("Expected constant value {expected} but got {got} for reserved field.", 0x00, reserved);
-                    }
-                }
 
                 var _map = new Dictionary<string, IPlcValue>();
 
@@ -10468,12 +10468,12 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
                 writeBuffer.WriteByte("", 8, (byte) (slatsPosition));
                 // Reserved Field
                 writeBuffer.WriteByte("", 6, (byte) 0x00);
-                // Simple Field (validityHeightPosition)
-                var validityHeightPosition = (bool) _value.GetStruct()["validityHeightPosition"].GetBool();
-                writeBuffer.WriteBit("", (validityHeightPosition));
                 // Simple Field (validitySlatsPosition)
                 var validitySlatsPosition = (bool) _value.GetStruct()["validitySlatsPosition"].GetBool();
                 writeBuffer.WriteBit("", (validitySlatsPosition));
+                // Simple Field (validityHeightPosition)
+                var validityHeightPosition = (bool) _value.GetStruct()["validityHeightPosition"].GetBool();
+                writeBuffer.WriteBit("", (validityHeightPosition));
             return writeBuffer;
         } else if( datapointType == KnxDatapointType.DPT_StatusSAB ) { // Struct
                 var writeBuffer = new WriteBuffer();
@@ -10729,6 +10729,8 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
 
                 // Reserved Field
                 writeBuffer.WriteByte("", 8, (byte) 0x00);
+                // Reserved Field
+                writeBuffer.WriteByte("", 4, (byte) 0x00);
                 // Simple Field (maskcw)
                 var maskcw = (bool) _value.GetStruct()["maskcw"].GetBool();
                 writeBuffer.WriteBit("", (maskcw));
@@ -10773,14 +10775,14 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
                 // Simple Field (stepCodeColourRed)
                 var stepCodeColourRed = (byte) _value.GetStruct()["stepCodeColourRed"].GetByte();
                 writeBuffer.WriteByte("", 3, (byte) (stepCodeColourRed));
-                // Reserved Field
-                writeBuffer.WriteByte("", 4, (byte) 0x00);
             return writeBuffer;
         } else if( datapointType == KnxDatapointType.DPT_Relative_Control_RGB ) { // Struct
                 var writeBuffer = new WriteBuffer();
 
                 // Reserved Field
                 writeBuffer.WriteByte("", 8, (byte) 0x00);
+                // Reserved Field
+                writeBuffer.WriteByte("", 4, (byte) 0x00);
                 // Simple Field (cb)
                 var cb = (bool) _value.GetStruct()["cb"].GetBool();
                 writeBuffer.WriteBit("", (cb));
@@ -10803,8 +10805,6 @@ if( datapointType == KnxDatapointType.BOOL ) { // BOOL
                 // Simple Field (stepCodeColourRed)
                 var stepCodeColourRed = (byte) _value.GetStruct()["stepCodeColourRed"].GetByte();
                 writeBuffer.WriteByte("", 3, (byte) (stepCodeColourRed));
-                // Reserved Field
-                writeBuffer.WriteByte("", 4, (byte) 0x00);
             return writeBuffer;
         } else if( datapointType == KnxDatapointType.DPT_GeographicalLocation ) { // Struct
                 var writeBuffer = new WriteBuffer();

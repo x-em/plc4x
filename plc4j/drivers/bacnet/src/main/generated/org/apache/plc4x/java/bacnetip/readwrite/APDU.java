@@ -53,7 +53,6 @@ public abstract class APDU implements Message {
   public void serialize(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
-    int startPos = positionAware.getPos();
     writeBuffer.pushContext("APDU");
 
     // Discriminator Field (apduType) (Used as input to a switch field)
@@ -111,13 +110,12 @@ public abstract class APDU implements Message {
   public static APDU staticParse(ReadBuffer readBuffer, Integer apduLength) throws ParseException {
     readBuffer.pullContext("APDU");
     PositionAware positionAware = readBuffer;
-    int startPos = positionAware.getPos();
-    int curPos;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     ApduType apduType =
-        readDiscriminatorField(
+        readDiscriminatorEnumField(
             "apduType",
+            "ApduType",
             new DataReaderEnumDefault<>(ApduType::enumForValue, readUnsignedByte(readBuffer, 4)));
 
     // Switch Field (Depending on the discriminator values, passes the instantiation to a sub-type)

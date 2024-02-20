@@ -38,8 +38,8 @@ import org.apache.plc4x.java.spi.generation.*;
 public class GetAttributeSingleRequest extends CipService implements Message {
 
   // Accessors for discriminator values.
-  public Short getService() {
-    return (short) 0x0E;
+  public Byte getService() {
+    return (byte) 0x0E;
   }
 
   public Boolean getResponse() {
@@ -58,7 +58,6 @@ public class GetAttributeSingleRequest extends CipService implements Message {
   protected void serializeCipServiceChild(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
-    int startPos = positionAware.getPos();
     writeBuffer.pushContext("GetAttributeSingleRequest");
 
     writeBuffer.popContext("GetAttributeSingleRequest");
@@ -82,8 +81,6 @@ public class GetAttributeSingleRequest extends CipService implements Message {
       ReadBuffer readBuffer, Boolean connected, Integer serviceLen) throws ParseException {
     readBuffer.pullContext("GetAttributeSingleRequest");
     PositionAware positionAware = readBuffer;
-    int startPos = positionAware.getPos();
-    int curPos;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     readBuffer.closeContext("GetAttributeSingleRequest");

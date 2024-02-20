@@ -38,8 +38,8 @@ import org.apache.plc4x.java.spi.generation.*;
 public class CipConnectionManagerCloseRequest extends CipService implements Message {
 
   // Accessors for discriminator values.
-  public Short getService() {
-    return (short) 0x4E;
+  public Byte getService() {
+    return (byte) 0x4E;
   }
 
   public Boolean getResponse() {
@@ -137,7 +137,6 @@ public class CipConnectionManagerCloseRequest extends CipService implements Mess
   protected void serializeCipServiceChild(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
-    int startPos = positionAware.getPos();
     writeBuffer.pushContext("CipConnectionManagerCloseRequest");
 
     // Simple Field (requestPathSize)
@@ -240,8 +239,6 @@ public class CipConnectionManagerCloseRequest extends CipService implements Mess
       ReadBuffer readBuffer, Boolean connected, Integer serviceLen) throws ParseException {
     readBuffer.pullContext("CipConnectionManagerCloseRequest");
     PositionAware positionAware = readBuffer;
-    int startPos = positionAware.getPos();
-    int curPos;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     short requestPathSize = readSimpleField("requestPathSize", readUnsignedShort(readBuffer, 8));

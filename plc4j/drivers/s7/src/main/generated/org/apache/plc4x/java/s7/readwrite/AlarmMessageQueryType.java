@@ -88,7 +88,6 @@ public class AlarmMessageQueryType implements Message {
   public void serialize(WriteBuffer writeBuffer) throws SerializationException {
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
-    int startPos = positionAware.getPos();
     writeBuffer.pushContext("AlarmMessageQueryType");
 
     // Simple Field (functionId)
@@ -117,8 +116,8 @@ public class AlarmMessageQueryType implements Message {
             DataTransportSize::name,
             writeUnsignedShort(writeBuffer, 8)));
 
-    // Const Field (DataLength)
-    writeConstField("DataLength", DATALENGTH, writeUnsignedInt(writeBuffer, 16));
+    // Const Field (dataLength)
+    writeConstField("dataLength", DATALENGTH, writeUnsignedInt(writeBuffer, 16));
 
     // Array Field (messageObjects)
     writeComplexTypeArrayField("messageObjects", messageObjects, writeBuffer);
@@ -149,7 +148,7 @@ public class AlarmMessageQueryType implements Message {
     // Simple field (transportSize)
     lengthInBits += 8;
 
-    // Const Field (DataLength)
+    // Const Field (dataLength)
     lengthInBits += 16;
 
     // Array field
@@ -173,8 +172,6 @@ public class AlarmMessageQueryType implements Message {
   public static AlarmMessageQueryType staticParse(ReadBuffer readBuffer) throws ParseException {
     readBuffer.pullContext("AlarmMessageQueryType");
     PositionAware positionAware = readBuffer;
-    int startPos = positionAware.getPos();
-    int curPos;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
     short functionId = readSimpleField("functionId", readUnsignedShort(readBuffer, 8));
@@ -195,9 +192,9 @@ public class AlarmMessageQueryType implements Message {
             new DataReaderEnumDefault<>(
                 DataTransportSize::enumForValue, readUnsignedShort(readBuffer, 8)));
 
-    int DataLength =
+    int dataLength =
         readConstField(
-            "DataLength", readUnsignedInt(readBuffer, 16), AlarmMessageQueryType.DATALENGTH);
+            "dataLength", readUnsignedInt(readBuffer, 16), AlarmMessageQueryType.DATALENGTH);
 
     List<AlarmMessageObjectQueryType> messageObjects =
         readCountArrayField(

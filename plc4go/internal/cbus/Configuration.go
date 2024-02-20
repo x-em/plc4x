@@ -20,13 +20,16 @@
 package cbus
 
 import (
+	"github.com/rs/zerolog"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"reflect"
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
+//go:generate go run ../../tools/plc4xgenerator/gen.go -type=Configuration
 type Configuration struct {
 	Srchk    bool
 	Exstat   bool
@@ -43,13 +46,14 @@ type Configuration struct {
 	MonitoredApplication2 byte
 }
 
-func ParseFromOptions(options map[string][]string) (Configuration, error) {
+func ParseFromOptions(log zerolog.Logger, options map[string][]string) (Configuration, error) {
+	titleOptions(options)
 	configuration := createDefaultConfiguration()
 	reflectConfiguration := reflect.ValueOf(&configuration).Elem()
 	for i := 0; i < reflectConfiguration.NumField(); i++ {
 		field := reflectConfiguration.Type().Field(i)
 		key := field.Name
-		if optionValue := getFromOptions(options, key); optionValue != "" {
+		if optionValue := getFromOptions(log, options, key); optionValue != "" {
 			switch field.Type.Kind() {
 			case reflect.Uint8:
 				parseUint, err := strconv.ParseUint(optionValue, 0, 8)
@@ -71,6 +75,13 @@ func ParseFromOptions(options map[string][]string) (Configuration, error) {
 	return configuration, nil
 }
 
+func titleOptions(options map[string][]string) {
+	caser := cases.Title(language.AmericanEnglish)
+	for key, value := range options {
+		options[caser.String(key)] = value
+	}
+}
+
 func createDefaultConfiguration() Configuration {
 	return Configuration{
 		Exstat:   true,
@@ -86,13 +97,13 @@ func createDefaultConfiguration() Configuration {
 	}
 }
 
-func getFromOptions(options map[string][]string, key string) string {
+func getFromOptions(localLog zerolog.Logger, options map[string][]string, key string) string {
 	if optionValues, ok := options[key]; ok {
 		if len(optionValues) <= 0 {
 			return ""
 		}
 		if len(optionValues) > 1 {
-			log.Warn().Msgf("Options %s must be unique", key)
+			localLog.Warn().Str("key", key).Msg("Options key must be unique")
 		}
 		return optionValues[0]
 	}
