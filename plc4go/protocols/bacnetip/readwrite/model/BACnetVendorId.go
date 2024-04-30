@@ -635,7 +635,7 @@ const (
 	BACnetVendorId_HOME_SYSTEMS_CONSULTING_SPA                                                  BACnetVendorId = 590
 	BACnetVendorId_SOCOMEC                                                                      BACnetVendorId = 591
 	BACnetVendorId_EVEREX_COMMUNICATIONS_INC                                                    BACnetVendorId = 592
-	BACnetVendorId_CEIEC_ELECTRIC_TECHNOLOGY                                                    BACnetVendorId = 593
+	BACnetVendorId_CET_ELECTRIC_TECHNOLOGY_INC                                                  BACnetVendorId = 593
 	BACnetVendorId_ATRILA_GMBH                                                                  BACnetVendorId = 594
 	BACnetVendorId_WING_TECHS                                                                   BACnetVendorId = 595
 	BACnetVendorId_SHENZHEN_MEK_INTELLISYS_PTE_LTD                                              BACnetVendorId = 596
@@ -1497,6 +1497,18 @@ const (
 	BACnetVendorId_DELTA_FIRE_LTDA                                                              BACnetVendorId = 1460
 	BACnetVendorId_BOCK_WATER_HEATERS_INC                                                       BACnetVendorId = 1461
 	BACnetVendorId_CLEAVER_BROOKS                                                               BACnetVendorId = 1462
+	BACnetVendorId_SCANALYTICS_INC                                                              BACnetVendorId = 1463
+	BACnetVendorId_WILABS                                                                       BACnetVendorId = 1464
+	BACnetVendorId_ACT_SYSTEM_CO_LTD                                                            BACnetVendorId = 1465
+	BACnetVendorId_VERGE_SENSE                                                                  BACnetVendorId = 1466
+	BACnetVendorId_SYSTEMAIR_MFG_INC                                                            BACnetVendorId = 1467
+	BACnetVendorId_SEELEY_INTERNATIONAL                                                         BACnetVendorId = 1468
+	BACnetVendorId_CRANE_BUILDING_SERVICES_UTILITIES                                            BACnetVendorId = 1469
+	BACnetVendorId_BRADY_CORPORATION                                                            BACnetVendorId = 1470
+	BACnetVendorId_QINGDAO_HISENSE_HITACHI_AIR_CONDITIONING_SYSTEMS_CO_LTD                      BACnetVendorId = 1471
+	BACnetVendorId_GOLDEN_QUALITY_CO_LTD                                                        BACnetVendorId = 1472
+	BACnetVendorId_ELVACOAB                                                                     BACnetVendorId = 1473
+	BACnetVendorId_STRONG_TECHNOLOGYLLC                                                         BACnetVendorId = 1474
 	BACnetVendorId_UNKNOWN_VENDOR                                                               BACnetVendorId = 0xFFFF
 )
 
@@ -2097,7 +2109,7 @@ func init() {
 		BACnetVendorId_HOME_SYSTEMS_CONSULTING_SPA,
 		BACnetVendorId_SOCOMEC,
 		BACnetVendorId_EVEREX_COMMUNICATIONS_INC,
-		BACnetVendorId_CEIEC_ELECTRIC_TECHNOLOGY,
+		BACnetVendorId_CET_ELECTRIC_TECHNOLOGY_INC,
 		BACnetVendorId_ATRILA_GMBH,
 		BACnetVendorId_WING_TECHS,
 		BACnetVendorId_SHENZHEN_MEK_INTELLISYS_PTE_LTD,
@@ -2959,6 +2971,18 @@ func init() {
 		BACnetVendorId_DELTA_FIRE_LTDA,
 		BACnetVendorId_BOCK_WATER_HEATERS_INC,
 		BACnetVendorId_CLEAVER_BROOKS,
+		BACnetVendorId_SCANALYTICS_INC,
+		BACnetVendorId_WILABS,
+		BACnetVendorId_ACT_SYSTEM_CO_LTD,
+		BACnetVendorId_VERGE_SENSE,
+		BACnetVendorId_SYSTEMAIR_MFG_INC,
+		BACnetVendorId_SEELEY_INTERNATIONAL,
+		BACnetVendorId_CRANE_BUILDING_SERVICES_UTILITIES,
+		BACnetVendorId_BRADY_CORPORATION,
+		BACnetVendorId_QINGDAO_HISENSE_HITACHI_AIR_CONDITIONING_SYSTEMS_CO_LTD,
+		BACnetVendorId_GOLDEN_QUALITY_CO_LTD,
+		BACnetVendorId_ELVACOAB,
+		BACnetVendorId_STRONG_TECHNOLOGYLLC,
 		BACnetVendorId_UNKNOWN_VENDOR,
 	}
 }
@@ -5025,9 +5049,57 @@ func (e BACnetVendorId) VendorId() uint16 {
 		{ /* '1462' */
 			return 1462
 		}
+	case 1463:
+		{ /* '1463' */
+			return 1463
+		}
+	case 1464:
+		{ /* '1464' */
+			return 1464
+		}
+	case 1465:
+		{ /* '1465' */
+			return 1465
+		}
+	case 1466:
+		{ /* '1466' */
+			return 1466
+		}
+	case 1467:
+		{ /* '1467' */
+			return 1467
+		}
+	case 1468:
+		{ /* '1468' */
+			return 1468
+		}
+	case 1469:
+		{ /* '1469' */
+			return 1469
+		}
 	case 147:
 		{ /* '147' */
 			return 147
+		}
+	case 1470:
+		{ /* '1470' */
+			return 1470
+		}
+	case 1471:
+		{ /* '1471' */
+			return 1471
+		}
+	case 1472:
+		{ /* '1472' */
+			return 1472
+		}
+	case 1473:
+		{ /* '1473' */
+			return 1473
+		}
+	case 1474:
+		{ /* '1474' */
+			return 1474
 		}
 	case 148:
 		{ /* '148' */
@@ -10863,9 +10935,57 @@ func (e BACnetVendorId) VendorName() string {
 		{ /* '1462' */
 			return "Cleaver-Brooks"
 		}
+	case 1463:
+		{ /* '1463' */
+			return "Scanalytics, Inc."
+		}
+	case 1464:
+		{ /* '1464' */
+			return "WI6LABS"
+		}
+	case 1465:
+		{ /* '1465' */
+			return "AC&T System Co., Ltd"
+		}
+	case 1466:
+		{ /* '1466' */
+			return "VergeSense"
+		}
+	case 1467:
+		{ /* '1467' */
+			return "Systemair Mfg. Inc."
+		}
+	case 1468:
+		{ /* '1468' */
+			return "Seeley International"
+		}
+	case 1469:
+		{ /* '1469' */
+			return "Crane Building Services & Utilities"
+		}
 	case 147:
 		{ /* '147' */
 			return "Integrated Information Systems, Inc."
+		}
+	case 1470:
+		{ /* '1470' */
+			return "Brady Corporation"
+		}
+	case 1471:
+		{ /* '1471' */
+			return "Qingdao Hisense Hitachi Air-Conditioning Systems Co., Ltd."
+		}
+	case 1472:
+		{ /* '1472' */
+			return "Golden Quality Co. Ltd."
+		}
+	case 1473:
+		{ /* '1473' */
+			return "Elvaco AB"
+		}
+	case 1474:
+		{ /* '1474' */
+			return "Strong Technology, LLC"
 		}
 	case 148:
 		{ /* '148' */
@@ -12841,7 +12961,7 @@ func (e BACnetVendorId) VendorName() string {
 		}
 	case 593:
 		{ /* '593' */
-			return "Ceiec Electric Technology"
+			return "CET Electric Technology, Inc."
 		}
 	case 594:
 		{ /* '594' */
@@ -15670,8 +15790,32 @@ func BACnetVendorIdByValue(value uint16) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_BOCK_WATER_HEATERS_INC, true
 	case 1462:
 		return BACnetVendorId_CLEAVER_BROOKS, true
+	case 1463:
+		return BACnetVendorId_SCANALYTICS_INC, true
+	case 1464:
+		return BACnetVendorId_WILABS, true
+	case 1465:
+		return BACnetVendorId_ACT_SYSTEM_CO_LTD, true
+	case 1466:
+		return BACnetVendorId_VERGE_SENSE, true
+	case 1467:
+		return BACnetVendorId_SYSTEMAIR_MFG_INC, true
+	case 1468:
+		return BACnetVendorId_SEELEY_INTERNATIONAL, true
+	case 1469:
+		return BACnetVendorId_CRANE_BUILDING_SERVICES_UTILITIES, true
 	case 147:
 		return BACnetVendorId_INTEGRATED_INFORMATION_SYSTEMS_INC, true
+	case 1470:
+		return BACnetVendorId_BRADY_CORPORATION, true
+	case 1471:
+		return BACnetVendorId_QINGDAO_HISENSE_HITACHI_AIR_CONDITIONING_SYSTEMS_CO_LTD, true
+	case 1472:
+		return BACnetVendorId_GOLDEN_QUALITY_CO_LTD, true
+	case 1473:
+		return BACnetVendorId_ELVACOAB, true
+	case 1474:
+		return BACnetVendorId_STRONG_TECHNOLOGYLLC, true
 	case 148:
 		return BACnetVendorId_TEMCO_CONTROLS_LTD, true
 	case 149:
@@ -16659,7 +16803,7 @@ func BACnetVendorIdByValue(value uint16) (enum BACnetVendorId, ok bool) {
 	case 592:
 		return BACnetVendorId_EVEREX_COMMUNICATIONS_INC, true
 	case 593:
-		return BACnetVendorId_CEIEC_ELECTRIC_TECHNOLOGY, true
+		return BACnetVendorId_CET_ELECTRIC_TECHNOLOGY_INC, true
 	case 594:
 		return BACnetVendorId_ATRILA_GMBH, true
 	case 595:
@@ -18586,8 +18730,32 @@ func BACnetVendorIdByName(value string) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_BOCK_WATER_HEATERS_INC, true
 	case "CLEAVER_BROOKS":
 		return BACnetVendorId_CLEAVER_BROOKS, true
+	case "SCANALYTICS_INC":
+		return BACnetVendorId_SCANALYTICS_INC, true
+	case "WILABS":
+		return BACnetVendorId_WILABS, true
+	case "ACT_SYSTEM_CO_LTD":
+		return BACnetVendorId_ACT_SYSTEM_CO_LTD, true
+	case "VERGE_SENSE":
+		return BACnetVendorId_VERGE_SENSE, true
+	case "SYSTEMAIR_MFG_INC":
+		return BACnetVendorId_SYSTEMAIR_MFG_INC, true
+	case "SEELEY_INTERNATIONAL":
+		return BACnetVendorId_SEELEY_INTERNATIONAL, true
+	case "CRANE_BUILDING_SERVICES_UTILITIES":
+		return BACnetVendorId_CRANE_BUILDING_SERVICES_UTILITIES, true
 	case "INTEGRATED_INFORMATION_SYSTEMS_INC":
 		return BACnetVendorId_INTEGRATED_INFORMATION_SYSTEMS_INC, true
+	case "BRADY_CORPORATION":
+		return BACnetVendorId_BRADY_CORPORATION, true
+	case "QINGDAO_HISENSE_HITACHI_AIR_CONDITIONING_SYSTEMS_CO_LTD":
+		return BACnetVendorId_QINGDAO_HISENSE_HITACHI_AIR_CONDITIONING_SYSTEMS_CO_LTD, true
+	case "GOLDEN_QUALITY_CO_LTD":
+		return BACnetVendorId_GOLDEN_QUALITY_CO_LTD, true
+	case "ELVACOAB":
+		return BACnetVendorId_ELVACOAB, true
+	case "STRONG_TECHNOLOGYLLC":
+		return BACnetVendorId_STRONG_TECHNOLOGYLLC, true
 	case "TEMCO_CONTROLS_LTD":
 		return BACnetVendorId_TEMCO_CONTROLS_LTD, true
 	case "AIRTEK_INTERNATIONAL_INC":
@@ -19574,8 +19742,8 @@ func BACnetVendorIdByName(value string) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_SOCOMEC, true
 	case "EVEREX_COMMUNICATIONS_INC":
 		return BACnetVendorId_EVEREX_COMMUNICATIONS_INC, true
-	case "CEIEC_ELECTRIC_TECHNOLOGY":
-		return BACnetVendorId_CEIEC_ELECTRIC_TECHNOLOGY, true
+	case "CET_ELECTRIC_TECHNOLOGY_INC":
+		return BACnetVendorId_CET_ELECTRIC_TECHNOLOGY_INC, true
 	case "ATRILA_GMBH":
 		return BACnetVendorId_ATRILA_GMBH, true
 	case "WING_TECHS":
@@ -21563,8 +21731,32 @@ func (e BACnetVendorId) PLC4XEnumName() string {
 		return "BOCK_WATER_HEATERS_INC"
 	case BACnetVendorId_CLEAVER_BROOKS:
 		return "CLEAVER_BROOKS"
+	case BACnetVendorId_SCANALYTICS_INC:
+		return "SCANALYTICS_INC"
+	case BACnetVendorId_WILABS:
+		return "WILABS"
+	case BACnetVendorId_ACT_SYSTEM_CO_LTD:
+		return "ACT_SYSTEM_CO_LTD"
+	case BACnetVendorId_VERGE_SENSE:
+		return "VERGE_SENSE"
+	case BACnetVendorId_SYSTEMAIR_MFG_INC:
+		return "SYSTEMAIR_MFG_INC"
+	case BACnetVendorId_SEELEY_INTERNATIONAL:
+		return "SEELEY_INTERNATIONAL"
+	case BACnetVendorId_CRANE_BUILDING_SERVICES_UTILITIES:
+		return "CRANE_BUILDING_SERVICES_UTILITIES"
 	case BACnetVendorId_INTEGRATED_INFORMATION_SYSTEMS_INC:
 		return "INTEGRATED_INFORMATION_SYSTEMS_INC"
+	case BACnetVendorId_BRADY_CORPORATION:
+		return "BRADY_CORPORATION"
+	case BACnetVendorId_QINGDAO_HISENSE_HITACHI_AIR_CONDITIONING_SYSTEMS_CO_LTD:
+		return "QINGDAO_HISENSE_HITACHI_AIR_CONDITIONING_SYSTEMS_CO_LTD"
+	case BACnetVendorId_GOLDEN_QUALITY_CO_LTD:
+		return "GOLDEN_QUALITY_CO_LTD"
+	case BACnetVendorId_ELVACOAB:
+		return "ELVACOAB"
+	case BACnetVendorId_STRONG_TECHNOLOGYLLC:
+		return "STRONG_TECHNOLOGYLLC"
 	case BACnetVendorId_TEMCO_CONTROLS_LTD:
 		return "TEMCO_CONTROLS_LTD"
 	case BACnetVendorId_AIRTEK_INTERNATIONAL_INC:
@@ -22551,8 +22743,8 @@ func (e BACnetVendorId) PLC4XEnumName() string {
 		return "SOCOMEC"
 	case BACnetVendorId_EVEREX_COMMUNICATIONS_INC:
 		return "EVEREX_COMMUNICATIONS_INC"
-	case BACnetVendorId_CEIEC_ELECTRIC_TECHNOLOGY:
-		return "CEIEC_ELECTRIC_TECHNOLOGY"
+	case BACnetVendorId_CET_ELECTRIC_TECHNOLOGY_INC:
+		return "CET_ELECTRIC_TECHNOLOGY_INC"
 	case BACnetVendorId_ATRILA_GMBH:
 		return "ATRILA_GMBH"
 	case BACnetVendorId_WING_TECHS:

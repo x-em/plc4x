@@ -513,7 +513,7 @@ public enum KnxManufacturer {
   M_ONEHOME((int) 448, (int) 501, (String) "1Home"),
   M_EOS_SAUNATECHNIK_GMBH((int) 449, (int) 502, (String) "EOS Saunatechnik GmbH"),
   M_KUSATEK_GMBH((int) 450, (int) 503, (String) "KUSATEK GmbH"),
-  M_EISBAER_SCADA((int) 451, (int) 504, (String) "EisBär Scada"),
+  M_ALEXANDER_MAIER_GMBH((int) 451, (int) 504, (String) "Alexander Maier GmbH"),
   M_AUTOMATISMI_BENINCA_S_P_A_((int) 452, (int) 505, (String) "AUTOMATISMI BENINCA S.P.A."),
   M_BLENDOM((int) 453, (int) 506, (String) "Blendom"),
   M_MADEL_AIR_TECHNICAL_DIFFUSION((int) 454, (int) 507, (String) "Madel Air Technical diffusion"),
@@ -578,7 +578,7 @@ public enum KnxManufacturer {
   M_AUTOMATIONPlus((int) 501, (int) 556, (String) "Automation+"),
   M_BLUE_AND_RED((int) 502, (int) 557, (String) "blue and red"),
   M_FROGBLUE((int) 503, (int) 558, (String) "frogblue"),
-  M_SAVESOR((int) 504, (int) 559, (String) "SAVESOR"),
+  M_LUXIO((int) 504, (int) 559, (String) "LUXIO"),
   M_APP_TECH((int) 505, (int) 560, (String) "App Tech"),
   M_SENSORTEC_AG((int) 506, (int) 561, (String) "sensortec AG"),
   M_NYSA_TECHNOLOGY_AND_SOLUTIONS((int) 507, (int) 562, (String) "nysa technology & solutions"),
@@ -763,14 +763,25 @@ public enum KnxManufacturer {
   M_FOSHAN_HAYDN_TECHNOLOGY_LIGHTING_CO__LTD_(
       (int) 662, (int) 720, (String) "Foshan Haydn Technology Lighting Co.,Ltd."),
   M_KNXES_COMPANY_LIMITED((int) 663, (int) 721, (String) "KNXES COMPANY LIMITED"),
-  M_THE_AKUVOX_COMPANY((int) 664, (int) 722, (String) "The Akuvox Company"),
+  M_AKUVOX((int) 664, (int) 722, (String) "Akuvox"),
   M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_(
       (int) 665, (int) 723, (String) "NingBo Yinzhou ShengRuiJie Electronics Co. Ltd."),
   M_SHENZHEN_HAIZHICHUANG_TECHNOLOGY_CO___LTD(
       (int) 666, (int) 724, (String) "Shenzhen Haizhichuang Technology Co., Ltd"),
-  M_ABB___RESERVED((int) 667, (int) 43954, (String) "ABB - reserved"),
+  M_SHENZHEN_EASYDETEK_TECHNOLOGY_CO_LTD(
+      (int) 667, (int) 725, (String) "Shenzhen easydetek technology Co.Ltd"),
+  M_MUTLUSAN_ELECTRIC((int) 668, (int) 726, (String) "Mutlusan Electric"),
+  M_HANGZHOU_BROADLINK_TECHNOLOGY_CO__LTD_(
+      (int) 669, (int) 727, (String) "Hangzhou BroadLink Technology Co.,Ltd."),
+  M_MARLEY_DEUTSCHLAND_GMBH((int) 670, (int) 728, (String) "Marley Deutschland GmbH"),
+  M_CREATROL((int) 671, (int) 729, (String) "Creatrol"),
+  M_EUTELSAT((int) 672, (int) 730, (String) "EUTELSAT"),
+  M_TECNIKABEL((int) 673, (int) 731, (String) "TECNIKABEL"),
+  M_ATIOS_AG((int) 674, (int) 732, (String) "Atios AG"),
+  M_SMARTLICHT((int) 675, (int) 733, (String) "SmartLicht"),
+  M_ABB___RESERVED((int) 676, (int) 43954, (String) "ABB - reserved"),
   M_BUSCH_JAEGER_ELEKTRO___RESERVED(
-      (int) 668, (int) 43959, (String) "Busch-Jaeger Elektro - reserved");
+      (int) 677, (int) 43959, (String) "Busch-Jaeger Elektro - reserved");
   private static final Map<Integer, KnxManufacturer> map;
 
   static {

@@ -28,27 +28,33 @@ import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.apache.plc4x.java.api.model.PlcSubscriptionTag;
 import org.apache.plc4x.java.api.model.PlcTag;
 import org.apache.plc4x.java.api.value.PlcValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class LeasedPlcConnection implements PlcConnection {
 
+    private static final Logger log = LoggerFactory.getLogger(LeasedPlcConnection.class);
     private final ConnectionContainer connectionContainer;
     private final AtomicReference<PlcConnection> connection;
     private boolean invalidateConnection;
     private final Timer usageTimer;
+    private final Duration maxUseDuration;
 
     LeasedPlcConnection(ConnectionContainer connectionContainer, PlcConnection connection, Duration maxUseTime) {
         this.connectionContainer = connectionContainer;
         this.connection = new AtomicReference<>(connection);
         this.invalidateConnection = false;
         this.usageTimer = new Timer();
+        this.maxUseDuration = maxUseTime;
         this.usageTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -73,6 +79,16 @@ public class LeasedPlcConnection implements PlcConnection {
         // Tell the connection container that the connection is free to be reused.
         connectionContainer.returnConnection(this, invalidateConnection);
     }
+
+    @Override
+    public Optional<PlcTag> parseTagAddress(String tagAddress) {
+        PlcConnection plcConnection = connection.get();
+        if(plcConnection == null) {
+            throw new PlcRuntimeException("Error using leased connection after returning it to the cache.");
+        }
+        return plcConnection.parseTagAddress(tagAddress);
+    }
+
 
     @Override
     public void connect() throws PlcConnectionException {
@@ -120,7 +136,8 @@ public class LeasedPlcConnection implements PlcConnection {
                 return new PlcReadRequest(){
                     @Override
                     public CompletableFuture<? extends PlcReadResponse> execute() {
-                        CompletableFuture<? extends PlcReadResponse> future = innerPlcReadRequest.execute();
+                        CompletableFuture<? extends PlcReadResponse> future =
+                            innerPlcReadRequest.execute().orTimeout(Math.min(1000,maxUseDuration.toMillis()), TimeUnit.MILLISECONDS);
                         final CompletableFuture<PlcReadResponse> responseFuture = new CompletableFuture<>();
                         future.handle((plcReadResponse, throwable) -> {
                             if (throwable == null) {
@@ -128,6 +145,9 @@ public class LeasedPlcConnection implements PlcConnection {
                             } else {
                                 // Mark the connection as invalid.
                                 invalidateConnection = true;
+                                log.debug("ReadRequest execution completed exceptionally invalidateConnection={} t={}",
+                                    invalidateConnection,
+                                    throwable);
                                 responseFuture.completeExceptionally(throwable);
                             }
                             return null;
