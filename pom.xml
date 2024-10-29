@@ -154,7 +154,7 @@
 
     <!-- Site properties -->
     <asciidoctor.maven.plugin.version>2.2.6</asciidoctor.maven.plugin.version>
-    <asciidoctorj.version>2.5.13</asciidoctorj.version>
+    <asciidoctorj.version>2.5.11</asciidoctorj.version>
     <asciidoctorj.diagram.version>2.3.1</asciidoctorj.diagram.version>
 
     <skip-code-generation>false</skip-code-generation>
@@ -1273,7 +1273,7 @@
             <relativizeDecorationLinks>false</relativizeDecorationLinks>
             <locales>en</locales>
             <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
-            <outputEncoding>${project.reporting.outputencoding}</outputEncoding>
+            <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
             <!--
               IntelliJ can't find the asciidoc config option in the site plugin, which is correct.
               However, this config section is used by the asciidoctor site plugin extension. So please

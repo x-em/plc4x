@@ -15,7 +15,7 @@
 //  limitations under the License.
 //
 
-== Current language support for protocols
+= Current language support for protocols
 :icons: font
 |===
 |Protocol | C | C# | Go | Java | Python
@@ -169,7 +169,7 @@ Legend:
 - icon:check[role="red"] Not implemented yet
 - icon:question[role="red"] Unsure
 
-== Features
+= Features
 :icons: font
 
 The following table contains a list of operations and the protocols that support them:
