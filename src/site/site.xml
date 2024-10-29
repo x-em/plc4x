@@ -63,6 +63,7 @@
         <item name="Using SNAPSHOTS" href="users/getting-started/using-snapshots.html"/>
         <item name="General Concepts" href="users/getting-started/general-concepts.html"/>
         <item name="Virtual Modbus" href="users/getting-started/virtual-modbus.html"/>
+        <item name="OPC UA Client Certificate" href="users/getting-started/opcua-client-certificate.html"/>
       </item>
       <item name="Blogs, Videos and Slides" href="users/blogs-videos-and-slides.html"/>
       <item name="Protocols" href="users/protocols/index.html">
