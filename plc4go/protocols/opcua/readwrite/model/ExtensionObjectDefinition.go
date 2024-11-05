@@ -5072,6 +5072,10 @@ func (m *_ExtensionObjectDefinition) getLengthInBits(ctx context.Context) uint16
 	return lengthInBits
 }
 
+func (m *_ExtensionObjectDefinition) GetLengthInBits(ctx context.Context) uint16 {
+	return m._SubType.GetLengthInBits(ctx)
+}
+
 func (m *_ExtensionObjectDefinition) GetLengthInBytes(ctx context.Context) uint16 {
 	return m._SubType.GetLengthInBits(ctx) / 8
 }

@@ -348,6 +348,10 @@ func (m *_NodeIdTypeDefinition) getLengthInBits(ctx context.Context) uint16 {
 	return lengthInBits
 }
 
+func (m *_NodeIdTypeDefinition) GetLengthInBits(ctx context.Context) uint16 {
+	return m._SubType.GetLengthInBits(ctx)
+}
+
 func (m *_NodeIdTypeDefinition) GetLengthInBytes(ctx context.Context) uint16 {
 	return m._SubType.GetLengthInBits(ctx) / 8
 }

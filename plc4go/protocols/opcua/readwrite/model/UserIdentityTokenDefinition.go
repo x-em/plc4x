@@ -284,6 +284,10 @@ func (m *_UserIdentityTokenDefinition) getLengthInBits(ctx context.Context) uint
 	return lengthInBits
 }
 
+func (m *_UserIdentityTokenDefinition) GetLengthInBits(ctx context.Context) uint16 {
+	return m._SubType.GetLengthInBits(ctx)
+}
+
 func (m *_UserIdentityTokenDefinition) GetLengthInBytes(ctx context.Context) uint16 {
 	return m._SubType.GetLengthInBits(ctx) / 8
 }

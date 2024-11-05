@@ -300,6 +300,10 @@ func (m *_Payload) getLengthInBits(ctx context.Context) uint16 {
 	return lengthInBits
 }
 
+func (m *_Payload) GetLengthInBits(ctx context.Context) uint16 {
+	return m._SubType.GetLengthInBits(ctx)
+}
+
 func (m *_Payload) GetLengthInBytes(ctx context.Context) uint16 {
 	return m._SubType.GetLengthInBits(ctx) / 8
 }
