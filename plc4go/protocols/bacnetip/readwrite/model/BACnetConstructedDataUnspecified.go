@@ -89,6 +89,8 @@ type BACnetConstructedDataUnspecifiedBuilder interface {
 	WithOptionalNumberOfDataElementsBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataUnspecifiedBuilder
 	// WithData adds Data (property field)
 	WithData(...BACnetConstructedDataElement) BACnetConstructedDataUnspecifiedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataUnspecified or returns an error if something is wrong
 	Build() (BACnetConstructedDataUnspecified, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetConstructedDataUnspecifiedBuilder) MustBuild() BACnetConstructed
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataUnspecifiedBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

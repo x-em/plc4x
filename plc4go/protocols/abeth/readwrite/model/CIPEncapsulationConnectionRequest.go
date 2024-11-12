@@ -72,6 +72,8 @@ type CIPEncapsulationConnectionRequestBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() CIPEncapsulationConnectionRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CIPEncapsulationPacketBuilder
 	// Build builds the CIPEncapsulationConnectionRequest or returns an error if something is wrong
 	Build() (CIPEncapsulationConnectionRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -116,8 +118,10 @@ func (b *_CIPEncapsulationConnectionRequestBuilder) MustBuild() CIPEncapsulation
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CIPEncapsulationConnectionRequestBuilder) Done() CIPEncapsulationPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCIPEncapsulationPacketBuilder().(*_CIPEncapsulationPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

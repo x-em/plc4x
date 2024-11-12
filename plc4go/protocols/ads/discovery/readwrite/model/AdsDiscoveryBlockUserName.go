@@ -84,6 +84,8 @@ type AdsDiscoveryBlockUserNameBuilder interface {
 	WithUserName(AmsString) AdsDiscoveryBlockUserNameBuilder
 	// WithUserNameBuilder adds UserName (property field) which is build by the builder
 	WithUserNameBuilder(func(AmsStringBuilder) AmsStringBuilder) AdsDiscoveryBlockUserNameBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsDiscoveryBlockBuilder
 	// Build builds the AdsDiscoveryBlockUserName or returns an error if something is wrong
 	Build() (AdsDiscoveryBlockUserName, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_AdsDiscoveryBlockUserNameBuilder) MustBuild() AdsDiscoveryBlockUserNam
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDiscoveryBlockUserNameBuilder) Done() AdsDiscoveryBlockBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsDiscoveryBlockBuilder().(*_AdsDiscoveryBlockBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -79,6 +79,8 @@ type KnxNetIpCoreBuilder interface {
 	WithMandatoryFields(version uint8) KnxNetIpCoreBuilder
 	// WithVersion adds Version (property field)
 	WithVersion(uint8) KnxNetIpCoreBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ServiceIdBuilder
 	// Build builds the KnxNetIpCore or returns an error if something is wrong
 	Build() (KnxNetIpCore, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_KnxNetIpCoreBuilder) MustBuild() KnxNetIpCore {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_KnxNetIpCoreBuilder) Done() ServiceIdBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewServiceIdBuilder().(*_ServiceIdBuilder)
+	}
 	return b.parentBuilder
 }
 

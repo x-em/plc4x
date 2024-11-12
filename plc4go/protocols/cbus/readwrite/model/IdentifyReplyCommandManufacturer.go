@@ -79,6 +79,8 @@ type IdentifyReplyCommandManufacturerBuilder interface {
 	WithMandatoryFields(manufacturerName string) IdentifyReplyCommandManufacturerBuilder
 	// WithManufacturerName adds ManufacturerName (property field)
 	WithManufacturerName(string) IdentifyReplyCommandManufacturerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandManufacturer or returns an error if something is wrong
 	Build() (IdentifyReplyCommandManufacturer, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_IdentifyReplyCommandManufacturerBuilder) MustBuild() IdentifyReplyComm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandManufacturerBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

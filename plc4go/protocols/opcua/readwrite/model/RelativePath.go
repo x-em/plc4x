@@ -79,6 +79,8 @@ type RelativePathBuilder interface {
 	WithMandatoryFields(elements []RelativePathElement) RelativePathBuilder
 	// WithElements adds Elements (property field)
 	WithElements(...RelativePathElement) RelativePathBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RelativePath or returns an error if something is wrong
 	Build() (RelativePath, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_RelativePathBuilder) MustBuild() RelativePath {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RelativePathBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

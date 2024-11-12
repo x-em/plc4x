@@ -86,6 +86,8 @@ type BACnetConstructedDataModificationDateBuilder interface {
 	WithModificationDate(BACnetDateTime) BACnetConstructedDataModificationDateBuilder
 	// WithModificationDateBuilder adds ModificationDate (property field) which is build by the builder
 	WithModificationDateBuilder(func(BACnetDateTimeBuilder) BACnetDateTimeBuilder) BACnetConstructedDataModificationDateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataModificationDate or returns an error if something is wrong
 	Build() (BACnetConstructedDataModificationDate, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataModificationDateBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataModificationDateBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

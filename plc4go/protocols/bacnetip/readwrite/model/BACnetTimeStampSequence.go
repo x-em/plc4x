@@ -84,6 +84,8 @@ type BACnetTimeStampSequenceBuilder interface {
 	WithSequenceNumber(BACnetContextTagUnsignedInteger) BACnetTimeStampSequenceBuilder
 	// WithSequenceNumberBuilder adds SequenceNumber (property field) which is build by the builder
 	WithSequenceNumberBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) BACnetTimeStampSequenceBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetTimeStampBuilder
 	// Build builds the BACnetTimeStampSequence or returns an error if something is wrong
 	Build() (BACnetTimeStampSequence, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetTimeStampSequenceBuilder) MustBuild() BACnetTimeStampSequence {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetTimeStampSequenceBuilder) Done() BACnetTimeStampBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetTimeStampBuilder().(*_BACnetTimeStampBuilder)
+	}
 	return b.parentBuilder
 }
 

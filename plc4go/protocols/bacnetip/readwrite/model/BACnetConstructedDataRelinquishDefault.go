@@ -86,6 +86,8 @@ type BACnetConstructedDataRelinquishDefaultBuilder interface {
 	WithRelinquishDefault(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataRelinquishDefaultBuilder
 	// WithRelinquishDefaultBuilder adds RelinquishDefault (property field) which is build by the builder
 	WithRelinquishDefaultBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataRelinquishDefaultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataRelinquishDefault or returns an error if something is wrong
 	Build() (BACnetConstructedDataRelinquishDefault, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataRelinquishDefaultBuilder) MustBuild() BACnetConst
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataRelinquishDefaultBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

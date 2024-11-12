@@ -112,6 +112,8 @@ type CipConnectionManagerCloseResponseBuilder interface {
 	WithOriginatorSerialNumber(uint32) CipConnectionManagerCloseResponseBuilder
 	// WithApplicationReplySize adds ApplicationReplySize (property field)
 	WithApplicationReplySize(uint8) CipConnectionManagerCloseResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipConnectionManagerCloseResponse or returns an error if something is wrong
 	Build() (CipConnectionManagerCloseResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -186,8 +188,10 @@ func (b *_CipConnectionManagerCloseResponseBuilder) MustBuild() CipConnectionMan
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipConnectionManagerCloseResponseBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetPropertyStatesUnitsBuilder interface {
 	WithUnits(BACnetEngineeringUnitsTagged) BACnetPropertyStatesUnitsBuilder
 	// WithUnitsBuilder adds Units (property field) which is build by the builder
 	WithUnitsBuilder(func(BACnetEngineeringUnitsTaggedBuilder) BACnetEngineeringUnitsTaggedBuilder) BACnetPropertyStatesUnitsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesUnits or returns an error if something is wrong
 	Build() (BACnetPropertyStatesUnits, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesUnitsBuilder) MustBuild() BACnetPropertyStatesUnit
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesUnitsBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

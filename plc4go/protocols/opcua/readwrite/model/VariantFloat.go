@@ -85,6 +85,8 @@ type VariantFloatBuilder interface {
 	WithOptionalArrayLength(int32) VariantFloatBuilder
 	// WithValue adds Value (property field)
 	WithValue(...float32) VariantFloatBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantFloat or returns an error if something is wrong
 	Build() (VariantFloat, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantFloatBuilder) MustBuild() VariantFloat {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantFloatBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

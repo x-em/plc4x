@@ -109,6 +109,8 @@ type RelativePathElementBuilder interface {
 	WithTargetName(QualifiedName) RelativePathElementBuilder
 	// WithTargetNameBuilder adds TargetName (property field) which is build by the builder
 	WithTargetNameBuilder(func(QualifiedNameBuilder) QualifiedNameBuilder) RelativePathElementBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RelativePathElement or returns an error if something is wrong
 	Build() (RelativePathElement, error)
 	// MustBuild does the same as Build but panics on error
@@ -211,8 +213,10 @@ func (b *_RelativePathElementBuilder) MustBuild() RelativePathElement {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RelativePathElementBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataCarPositionBuilder interface {
 	WithCarPosition(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataCarPositionBuilder
 	// WithCarPositionBuilder adds CarPosition (property field) which is build by the builder
 	WithCarPositionBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataCarPositionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataCarPosition or returns an error if something is wrong
 	Build() (BACnetConstructedDataCarPosition, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataCarPositionBuilder) MustBuild() BACnetConstructed
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataCarPositionBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

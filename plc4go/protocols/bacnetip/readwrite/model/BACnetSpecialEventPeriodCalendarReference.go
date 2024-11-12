@@ -84,6 +84,8 @@ type BACnetSpecialEventPeriodCalendarReferenceBuilder interface {
 	WithCalendarReference(BACnetContextTagObjectIdentifier) BACnetSpecialEventPeriodCalendarReferenceBuilder
 	// WithCalendarReferenceBuilder adds CalendarReference (property field) which is build by the builder
 	WithCalendarReferenceBuilder(func(BACnetContextTagObjectIdentifierBuilder) BACnetContextTagObjectIdentifierBuilder) BACnetSpecialEventPeriodCalendarReferenceBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetSpecialEventPeriodBuilder
 	// Build builds the BACnetSpecialEventPeriodCalendarReference or returns an error if something is wrong
 	Build() (BACnetSpecialEventPeriodCalendarReference, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetSpecialEventPeriodCalendarReferenceBuilder) MustBuild() BACnetSp
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetSpecialEventPeriodCalendarReferenceBuilder) Done() BACnetSpecialEventPeriodBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetSpecialEventPeriodBuilder().(*_BACnetSpecialEventPeriodBuilder)
+	}
 	return b.parentBuilder
 }
 

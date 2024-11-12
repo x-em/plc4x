@@ -71,6 +71,8 @@ type BACnetApplicationTagNullBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() BACnetApplicationTagNullBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetApplicationTagBuilder
 	// Build builds the BACnetApplicationTagNull or returns an error if something is wrong
 	Build() (BACnetApplicationTagNull, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_BACnetApplicationTagNullBuilder) MustBuild() BACnetApplicationTagNull 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetApplicationTagNullBuilder) Done() BACnetApplicationTagBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetApplicationTagBuilder().(*_BACnetApplicationTagBuilder)
+	}
 	return b.parentBuilder
 }
 

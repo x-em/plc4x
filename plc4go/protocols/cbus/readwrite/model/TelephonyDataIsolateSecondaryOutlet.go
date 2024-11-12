@@ -83,6 +83,8 @@ type TelephonyDataIsolateSecondaryOutletBuilder interface {
 	WithMandatoryFields(isolateStatus byte) TelephonyDataIsolateSecondaryOutletBuilder
 	// WithIsolateStatus adds IsolateStatus (property field)
 	WithIsolateStatus(byte) TelephonyDataIsolateSecondaryOutletBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TelephonyDataBuilder
 	// Build builds the TelephonyDataIsolateSecondaryOutlet or returns an error if something is wrong
 	Build() (TelephonyDataIsolateSecondaryOutlet, error)
 	// MustBuild does the same as Build but panics on error
@@ -132,8 +134,10 @@ func (b *_TelephonyDataIsolateSecondaryOutletBuilder) MustBuild() TelephonyDataI
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TelephonyDataIsolateSecondaryOutletBuilder) Done() TelephonyDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTelephonyDataBuilder().(*_TelephonyDataBuilder)
+	}
 	return b.parentBuilder
 }
 

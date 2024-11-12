@@ -86,6 +86,8 @@ type BACnetConstructedDataBitStringValueRelinquishDefaultBuilder interface {
 	WithRelinquishDefault(BACnetApplicationTagBitString) BACnetConstructedDataBitStringValueRelinquishDefaultBuilder
 	// WithRelinquishDefaultBuilder adds RelinquishDefault (property field) which is build by the builder
 	WithRelinquishDefaultBuilder(func(BACnetApplicationTagBitStringBuilder) BACnetApplicationTagBitStringBuilder) BACnetConstructedDataBitStringValueRelinquishDefaultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataBitStringValueRelinquishDefault or returns an error if something is wrong
 	Build() (BACnetConstructedDataBitStringValueRelinquishDefault, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataBitStringValueRelinquishDefaultBuilder) MustBuild
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataBitStringValueRelinquishDefaultBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

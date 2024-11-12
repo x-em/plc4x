@@ -90,6 +90,8 @@ type PublishRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) PublishRequestBuilder
 	// WithSubscriptionAcknowledgements adds SubscriptionAcknowledgements (property field)
 	WithSubscriptionAcknowledgements(...SubscriptionAcknowledgement) PublishRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PublishRequest or returns an error if something is wrong
 	Build() (PublishRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_PublishRequestBuilder) MustBuild() PublishRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PublishRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataExpirationTimeBuilder interface {
 	WithExpirationTime(BACnetDateTime) BACnetConstructedDataExpirationTimeBuilder
 	// WithExpirationTimeBuilder adds ExpirationTime (property field) which is build by the builder
 	WithExpirationTimeBuilder(func(BACnetDateTimeBuilder) BACnetDateTimeBuilder) BACnetConstructedDataExpirationTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataExpirationTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataExpirationTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataExpirationTimeBuilder) MustBuild() BACnetConstruc
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataExpirationTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

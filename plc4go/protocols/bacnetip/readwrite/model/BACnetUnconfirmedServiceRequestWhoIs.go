@@ -89,6 +89,8 @@ type BACnetUnconfirmedServiceRequestWhoIsBuilder interface {
 	WithOptionalDeviceInstanceRangeHighLimit(BACnetContextTagUnsignedInteger) BACnetUnconfirmedServiceRequestWhoIsBuilder
 	// WithOptionalDeviceInstanceRangeHighLimitBuilder adds DeviceInstanceRangeHighLimit (property field) which is build by the builder
 	WithOptionalDeviceInstanceRangeHighLimitBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) BACnetUnconfirmedServiceRequestWhoIsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetUnconfirmedServiceRequestBuilder
 	// Build builds the BACnetUnconfirmedServiceRequestWhoIs or returns an error if something is wrong
 	Build() (BACnetUnconfirmedServiceRequestWhoIs, error)
 	// MustBuild does the same as Build but panics on error
@@ -169,8 +171,10 @@ func (b *_BACnetUnconfirmedServiceRequestWhoIsBuilder) MustBuild() BACnetUnconfi
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetUnconfirmedServiceRequestWhoIsBuilder) Done() BACnetUnconfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetUnconfirmedServiceRequestBuilder().(*_BACnetUnconfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

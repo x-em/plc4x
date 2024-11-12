@@ -96,6 +96,8 @@ type CALDataWriteBuilder interface {
 	WithParameterValue(ParameterValue) CALDataWriteBuilder
 	// WithParameterValueBuilder adds ParameterValue (property field) which is build by the builder
 	WithParameterValueBuilder(func(ParameterValueBuilder) ParameterValueBuilder) CALDataWriteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataWrite or returns an error if something is wrong
 	Build() (CALDataWrite, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_CALDataWriteBuilder) MustBuild() CALDataWrite {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataWriteBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

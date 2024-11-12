@@ -85,6 +85,8 @@ type COTPPacketDataBuilder interface {
 	WithEot(bool) COTPPacketDataBuilder
 	// WithTpduRef adds TpduRef (property field)
 	WithTpduRef(uint8) COTPPacketDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() COTPPacketBuilder
 	// Build builds the COTPPacketData or returns an error if something is wrong
 	Build() (COTPPacketData, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_COTPPacketDataBuilder) MustBuild() COTPPacketData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_COTPPacketDataBuilder) Done() COTPPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCOTPPacketBuilder().(*_COTPPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

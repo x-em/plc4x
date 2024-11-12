@@ -71,6 +71,8 @@ type SecurityDataGasAlarmClearedBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() SecurityDataGasAlarmClearedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataGasAlarmCleared or returns an error if something is wrong
 	Build() (SecurityDataGasAlarmCleared, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_SecurityDataGasAlarmClearedBuilder) MustBuild() SecurityDataGasAlarmCl
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataGasAlarmClearedBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

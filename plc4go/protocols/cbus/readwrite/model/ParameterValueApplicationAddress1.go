@@ -90,6 +90,8 @@ type ParameterValueApplicationAddress1Builder interface {
 	WithValueBuilder(func(ApplicationAddress1Builder) ApplicationAddress1Builder) ParameterValueApplicationAddress1Builder
 	// WithData adds Data (property field)
 	WithData(...byte) ParameterValueApplicationAddress1Builder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ParameterValueBuilder
 	// Build builds the ParameterValueApplicationAddress1 or returns an error if something is wrong
 	Build() (ParameterValueApplicationAddress1, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_ParameterValueApplicationAddress1Builder) MustBuild() ParameterValueAp
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ParameterValueApplicationAddress1Builder) Done() ParameterValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewParameterValueBuilder().(*_ParameterValueBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetLogDataLogDataEntryEnumeratedValueBuilder interface {
 	WithEnumeratedValue(BACnetContextTagEnumerated) BACnetLogDataLogDataEntryEnumeratedValueBuilder
 	// WithEnumeratedValueBuilder adds EnumeratedValue (property field) which is build by the builder
 	WithEnumeratedValueBuilder(func(BACnetContextTagEnumeratedBuilder) BACnetContextTagEnumeratedBuilder) BACnetLogDataLogDataEntryEnumeratedValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLogDataLogDataEntryBuilder
 	// Build builds the BACnetLogDataLogDataEntryEnumeratedValue or returns an error if something is wrong
 	Build() (BACnetLogDataLogDataEntryEnumeratedValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLogDataLogDataEntryEnumeratedValueBuilder) MustBuild() BACnetLog
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLogDataLogDataEntryEnumeratedValueBuilder) Done() BACnetLogDataLogDataEntryBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLogDataLogDataEntryBuilder().(*_BACnetLogDataLogDataEntryBuilder)
+	}
 	return b.parentBuilder
 }
 

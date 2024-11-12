@@ -85,6 +85,8 @@ type VariantExpandedNodeIdBuilder interface {
 	WithOptionalArrayLength(int32) VariantExpandedNodeIdBuilder
 	// WithValue adds Value (property field)
 	WithValue(...ExpandedNodeId) VariantExpandedNodeIdBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantExpandedNodeId or returns an error if something is wrong
 	Build() (VariantExpandedNodeId, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantExpandedNodeIdBuilder) MustBuild() VariantExpandedNodeId {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantExpandedNodeIdBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

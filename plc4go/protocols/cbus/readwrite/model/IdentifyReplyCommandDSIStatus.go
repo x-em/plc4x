@@ -133,6 +133,8 @@ type IdentifyReplyCommandDSIStatusBuilder interface {
 	WithUnitStatus(UnitStatus) IdentifyReplyCommandDSIStatusBuilder
 	// WithDimmingUCRevisionNumber adds DimmingUCRevisionNumber (property field)
 	WithDimmingUCRevisionNumber(byte) IdentifyReplyCommandDSIStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandDSIStatus or returns an error if something is wrong
 	Build() (IdentifyReplyCommandDSIStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -227,8 +229,10 @@ func (b *_IdentifyReplyCommandDSIStatusBuilder) MustBuild() IdentifyReplyCommand
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandDSIStatusBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

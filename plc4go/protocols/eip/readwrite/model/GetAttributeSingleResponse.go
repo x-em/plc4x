@@ -71,6 +71,8 @@ type GetAttributeSingleResponseBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() GetAttributeSingleResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the GetAttributeSingleResponse or returns an error if something is wrong
 	Build() (GetAttributeSingleResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_GetAttributeSingleResponseBuilder) MustBuild() GetAttributeSingleRespo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_GetAttributeSingleResponseBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

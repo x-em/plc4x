@@ -84,6 +84,8 @@ type BACnetPropertyStatesNotifyTypeBuilder interface {
 	WithNotifyType(BACnetNotifyTypeTagged) BACnetPropertyStatesNotifyTypeBuilder
 	// WithNotifyTypeBuilder adds NotifyType (property field) which is build by the builder
 	WithNotifyTypeBuilder(func(BACnetNotifyTypeTaggedBuilder) BACnetNotifyTypeTaggedBuilder) BACnetPropertyStatesNotifyTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesNotifyType or returns an error if something is wrong
 	Build() (BACnetPropertyStatesNotifyType, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesNotifyTypeBuilder) MustBuild() BACnetPropertyState
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesNotifyTypeBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataLowerDeckBuilder interface {
 	WithLowerDeck(BACnetApplicationTagObjectIdentifier) BACnetConstructedDataLowerDeckBuilder
 	// WithLowerDeckBuilder adds LowerDeck (property field) which is build by the builder
 	WithLowerDeckBuilder(func(BACnetApplicationTagObjectIdentifierBuilder) BACnetApplicationTagObjectIdentifierBuilder) BACnetConstructedDataLowerDeckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataLowerDeck or returns an error if something is wrong
 	Build() (BACnetConstructedDataLowerDeck, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataLowerDeckBuilder) MustBuild() BACnetConstructedDa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataLowerDeckBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

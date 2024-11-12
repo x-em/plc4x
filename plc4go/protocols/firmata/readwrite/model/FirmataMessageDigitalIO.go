@@ -87,6 +87,8 @@ type FirmataMessageDigitalIOBuilder interface {
 	WithPinBlock(uint8) FirmataMessageDigitalIOBuilder
 	// WithData adds Data (property field)
 	WithData(...int8) FirmataMessageDigitalIOBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() FirmataMessageBuilder
 	// Build builds the FirmataMessageDigitalIO or returns an error if something is wrong
 	Build() (FirmataMessageDigitalIO, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_FirmataMessageDigitalIOBuilder) MustBuild() FirmataMessageDigitalIO {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_FirmataMessageDigitalIOBuilder) Done() FirmataMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewFirmataMessageBuilder().(*_FirmataMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

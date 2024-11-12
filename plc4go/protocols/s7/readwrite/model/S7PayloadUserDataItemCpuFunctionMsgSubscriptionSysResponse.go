@@ -85,6 +85,8 @@ type S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder interface
 	WithResult(uint8) S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder
 	// WithReserved01 adds Reserved01 (property field)
 	WithReserved01(uint8) S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadUserDataItemBuilder
 	// Build builds the S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse or returns an error if something is wrong
 	Build() (S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder) Mus
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder) Done() S7PayloadUserDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadUserDataItemBuilder().(*_S7PayloadUserDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetLogRecordLogDatumBooleanValueBuilder interface {
 	WithBooleanValue(BACnetContextTagBoolean) BACnetLogRecordLogDatumBooleanValueBuilder
 	// WithBooleanValueBuilder adds BooleanValue (property field) which is build by the builder
 	WithBooleanValueBuilder(func(BACnetContextTagBooleanBuilder) BACnetContextTagBooleanBuilder) BACnetLogRecordLogDatumBooleanValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLogRecordLogDatumBuilder
 	// Build builds the BACnetLogRecordLogDatumBooleanValue or returns an error if something is wrong
 	Build() (BACnetLogRecordLogDatumBooleanValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLogRecordLogDatumBooleanValueBuilder) MustBuild() BACnetLogRecor
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLogRecordLogDatumBooleanValueBuilder) Done() BACnetLogRecordLogDatumBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLogRecordLogDatumBuilder().(*_BACnetLogRecordLogDatumBuilder)
+	}
 	return b.parentBuilder
 }
 

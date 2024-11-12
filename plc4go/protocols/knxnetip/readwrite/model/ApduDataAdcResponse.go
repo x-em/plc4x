@@ -71,6 +71,8 @@ type ApduDataAdcResponseBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ApduDataAdcResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataBuilder
 	// Build builds the ApduDataAdcResponse or returns an error if something is wrong
 	Build() (ApduDataAdcResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_ApduDataAdcResponseBuilder) MustBuild() ApduDataAdcResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataAdcResponseBuilder) Done() ApduDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataBuilder().(*_ApduDataBuilder)
+	}
 	return b.parentBuilder
 }
 

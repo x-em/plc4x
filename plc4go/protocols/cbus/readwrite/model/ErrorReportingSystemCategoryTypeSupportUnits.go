@@ -79,6 +79,8 @@ type ErrorReportingSystemCategoryTypeSupportUnitsBuilder interface {
 	WithMandatoryFields(categoryForType ErrorReportingSystemCategoryTypeForSupportUnits) ErrorReportingSystemCategoryTypeSupportUnitsBuilder
 	// WithCategoryForType adds CategoryForType (property field)
 	WithCategoryForType(ErrorReportingSystemCategoryTypeForSupportUnits) ErrorReportingSystemCategoryTypeSupportUnitsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ErrorReportingSystemCategoryTypeBuilder
 	// Build builds the ErrorReportingSystemCategoryTypeSupportUnits or returns an error if something is wrong
 	Build() (ErrorReportingSystemCategoryTypeSupportUnits, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ErrorReportingSystemCategoryTypeSupportUnitsBuilder) MustBuild() Error
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ErrorReportingSystemCategoryTypeSupportUnitsBuilder) Done() ErrorReportingSystemCategoryTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewErrorReportingSystemCategoryTypeBuilder().(*_ErrorReportingSystemCategoryTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

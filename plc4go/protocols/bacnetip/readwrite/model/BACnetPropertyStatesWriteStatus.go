@@ -84,6 +84,8 @@ type BACnetPropertyStatesWriteStatusBuilder interface {
 	WithWriteStatus(BACnetWriteStatusTagged) BACnetPropertyStatesWriteStatusBuilder
 	// WithWriteStatusBuilder adds WriteStatus (property field) which is build by the builder
 	WithWriteStatusBuilder(func(BACnetWriteStatusTaggedBuilder) BACnetWriteStatusTaggedBuilder) BACnetPropertyStatesWriteStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesWriteStatus or returns an error if something is wrong
 	Build() (BACnetPropertyStatesWriteStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesWriteStatusBuilder) MustBuild() BACnetPropertyStat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesWriteStatusBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

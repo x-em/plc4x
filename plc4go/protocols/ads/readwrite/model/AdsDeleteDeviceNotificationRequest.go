@@ -79,6 +79,8 @@ type AdsDeleteDeviceNotificationRequestBuilder interface {
 	WithMandatoryFields(notificationHandle uint32) AdsDeleteDeviceNotificationRequestBuilder
 	// WithNotificationHandle adds NotificationHandle (property field)
 	WithNotificationHandle(uint32) AdsDeleteDeviceNotificationRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AmsPacketBuilder
 	// Build builds the AdsDeleteDeviceNotificationRequest or returns an error if something is wrong
 	Build() (AdsDeleteDeviceNotificationRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_AdsDeleteDeviceNotificationRequestBuilder) MustBuild() AdsDeleteDevice
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDeleteDeviceNotificationRequestBuilder) Done() AmsPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAmsPacketBuilder().(*_AmsPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

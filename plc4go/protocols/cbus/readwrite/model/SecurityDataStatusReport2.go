@@ -79,6 +79,8 @@ type SecurityDataStatusReport2Builder interface {
 	WithMandatoryFields(zoneStatus []ZoneStatus) SecurityDataStatusReport2Builder
 	// WithZoneStatus adds ZoneStatus (property field)
 	WithZoneStatus(...ZoneStatus) SecurityDataStatusReport2Builder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataStatusReport2 or returns an error if something is wrong
 	Build() (SecurityDataStatusReport2, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_SecurityDataStatusReport2Builder) MustBuild() SecurityDataStatusReport
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataStatusReport2Builder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

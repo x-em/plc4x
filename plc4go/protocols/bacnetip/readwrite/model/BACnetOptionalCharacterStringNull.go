@@ -84,6 +84,8 @@ type BACnetOptionalCharacterStringNullBuilder interface {
 	WithNullValue(BACnetApplicationTagNull) BACnetOptionalCharacterStringNullBuilder
 	// WithNullValueBuilder adds NullValue (property field) which is build by the builder
 	WithNullValueBuilder(func(BACnetApplicationTagNullBuilder) BACnetApplicationTagNullBuilder) BACnetOptionalCharacterStringNullBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetOptionalCharacterStringBuilder
 	// Build builds the BACnetOptionalCharacterStringNull or returns an error if something is wrong
 	Build() (BACnetOptionalCharacterStringNull, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetOptionalCharacterStringNullBuilder) MustBuild() BACnetOptionalCh
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetOptionalCharacterStringNullBuilder) Done() BACnetOptionalCharacterStringBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetOptionalCharacterStringBuilder().(*_BACnetOptionalCharacterStringBuilder)
+	}
 	return b.parentBuilder
 }
 

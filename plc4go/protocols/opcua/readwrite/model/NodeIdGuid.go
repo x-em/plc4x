@@ -89,6 +89,8 @@ type NodeIdGuidBuilder interface {
 	WithNamespaceIndex(uint16) NodeIdGuidBuilder
 	// WithId adds Id (property field)
 	WithId(...byte) NodeIdGuidBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NodeIdTypeDefinitionBuilder
 	// Build builds the NodeIdGuid or returns an error if something is wrong
 	Build() (NodeIdGuid, error)
 	// MustBuild does the same as Build but panics on error
@@ -143,8 +145,10 @@ func (b *_NodeIdGuidBuilder) MustBuild() NodeIdGuid {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NodeIdGuidBuilder) Done() NodeIdTypeDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNodeIdTypeDefinitionBuilder().(*_NodeIdTypeDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

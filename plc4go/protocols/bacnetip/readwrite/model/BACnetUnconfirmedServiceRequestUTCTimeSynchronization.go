@@ -95,6 +95,8 @@ type BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder interface {
 	WithSynchronizedTime(BACnetApplicationTagTime) BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder
 	// WithSynchronizedTimeBuilder adds SynchronizedTime (property field) which is build by the builder
 	WithSynchronizedTimeBuilder(func(BACnetApplicationTagTimeBuilder) BACnetApplicationTagTimeBuilder) BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetUnconfirmedServiceRequestBuilder
 	// Build builds the BACnetUnconfirmedServiceRequestUTCTimeSynchronization or returns an error if something is wrong
 	Build() (BACnetUnconfirmedServiceRequestUTCTimeSynchronization, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder) MustBuil
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder) Done() BACnetUnconfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetUnconfirmedServiceRequestBuilder().(*_BACnetUnconfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

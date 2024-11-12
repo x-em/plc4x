@@ -127,6 +127,8 @@ type MonitoredSALLongFormSmartModeBuilder interface {
 	WithOptionalSalData(SALData) MonitoredSALLongFormSmartModeBuilder
 	// WithOptionalSalDataBuilder adds SalData (property field) which is build by the builder
 	WithOptionalSalDataBuilder(func(SALDataBuilder) SALDataBuilder) MonitoredSALLongFormSmartModeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MonitoredSALBuilder
 	// Build builds the MonitoredSALLongFormSmartMode or returns an error if something is wrong
 	Build() (MonitoredSALLongFormSmartMode, error)
 	// MustBuild does the same as Build but panics on error
@@ -258,8 +260,10 @@ func (b *_MonitoredSALLongFormSmartModeBuilder) MustBuild() MonitoredSALLongForm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MonitoredSALLongFormSmartModeBuilder) Done() MonitoredSALBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMonitoredSALBuilder().(*_MonitoredSALBuilder)
+	}
 	return b.parentBuilder
 }
 

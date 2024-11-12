@@ -71,6 +71,8 @@ type NullListServicesResponseBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() NullListServicesResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() EipPacketBuilder
 	// Build builds the NullListServicesResponse or returns an error if something is wrong
 	Build() (NullListServicesResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_NullListServicesResponseBuilder) MustBuild() NullListServicesResponse 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NullListServicesResponseBuilder) Done() EipPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewEipPacketBuilder().(*_EipPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

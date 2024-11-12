@@ -84,6 +84,8 @@ type BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder interface 
 	WithPropertyAccessError(ErrorEnclosed) BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder
 	// WithPropertyAccessErrorBuilder adds PropertyAccessError (property field) which is build by the builder
 	WithPropertyAccessErrorBuilder(func(ErrorEnclosedBuilder) ErrorEnclosedBuilder) BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyAccessResultAccessResultBuilder
 	// Build builds the BACnetPropertyAccessResultAccessResultPropertyAccessError or returns an error if something is wrong
 	Build() (BACnetPropertyAccessResultAccessResultPropertyAccessError, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder) Must
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder) Done() BACnetPropertyAccessResultAccessResultBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyAccessResultAccessResultBuilder().(*_BACnetPropertyAccessResultAccessResultBuilder)
+	}
 	return b.parentBuilder
 }
 

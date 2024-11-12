@@ -114,6 +114,8 @@ type BACnetUnconfirmedServiceRequestWriteGroupBuilder interface {
 	WithOptionalInhibitDelay(BACnetContextTagUnsignedInteger) BACnetUnconfirmedServiceRequestWriteGroupBuilder
 	// WithOptionalInhibitDelayBuilder adds InhibitDelay (property field) which is build by the builder
 	WithOptionalInhibitDelayBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) BACnetUnconfirmedServiceRequestWriteGroupBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetUnconfirmedServiceRequestBuilder
 	// Build builds the BACnetUnconfirmedServiceRequestWriteGroup or returns an error if something is wrong
 	Build() (BACnetUnconfirmedServiceRequestWriteGroup, error)
 	// MustBuild does the same as Build but panics on error
@@ -248,8 +250,10 @@ func (b *_BACnetUnconfirmedServiceRequestWriteGroupBuilder) MustBuild() BACnetUn
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetUnconfirmedServiceRequestWriteGroupBuilder) Done() BACnetUnconfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetUnconfirmedServiceRequestBuilder().(*_BACnetUnconfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

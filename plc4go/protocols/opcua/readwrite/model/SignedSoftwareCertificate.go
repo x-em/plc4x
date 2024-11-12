@@ -95,6 +95,8 @@ type SignedSoftwareCertificateBuilder interface {
 	WithSignature(PascalByteString) SignedSoftwareCertificateBuilder
 	// WithSignatureBuilder adds Signature (property field) which is build by the builder
 	WithSignatureBuilder(func(PascalByteStringBuilder) PascalByteStringBuilder) SignedSoftwareCertificateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SignedSoftwareCertificate or returns an error if something is wrong
 	Build() (SignedSoftwareCertificate, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_SignedSoftwareCertificateBuilder) MustBuild() SignedSoftwareCertificat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SignedSoftwareCertificateBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

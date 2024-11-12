@@ -85,6 +85,8 @@ type VariantByteStringBuilder interface {
 	WithOptionalArrayLength(int32) VariantByteStringBuilder
 	// WithValue adds Value (property field)
 	WithValue(...ByteStringArray) VariantByteStringBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantByteString or returns an error if something is wrong
 	Build() (VariantByteString, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantByteStringBuilder) MustBuild() VariantByteString {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantByteStringBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

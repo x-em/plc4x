@@ -91,6 +91,8 @@ type SysexCommandReportFirmwareResponseBuilder interface {
 	WithMinorVersion(uint8) SysexCommandReportFirmwareResponseBuilder
 	// WithFileName adds FileName (property field)
 	WithFileName(...byte) SysexCommandReportFirmwareResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SysexCommandBuilder
 	// Build builds the SysexCommandReportFirmwareResponse or returns an error if something is wrong
 	Build() (SysexCommandReportFirmwareResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_SysexCommandReportFirmwareResponseBuilder) MustBuild() SysexCommandRep
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SysexCommandReportFirmwareResponseBuilder) Done() SysexCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSysexCommandBuilder().(*_SysexCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

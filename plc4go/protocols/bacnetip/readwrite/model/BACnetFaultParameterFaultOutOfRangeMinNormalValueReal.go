@@ -84,6 +84,8 @@ type BACnetFaultParameterFaultOutOfRangeMinNormalValueRealBuilder interface {
 	WithRealValue(BACnetApplicationTagReal) BACnetFaultParameterFaultOutOfRangeMinNormalValueRealBuilder
 	// WithRealValueBuilder adds RealValue (property field) which is build by the builder
 	WithRealValueBuilder(func(BACnetApplicationTagRealBuilder) BACnetApplicationTagRealBuilder) BACnetFaultParameterFaultOutOfRangeMinNormalValueRealBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetFaultParameterFaultOutOfRangeMinNormalValueBuilder
 	// Build builds the BACnetFaultParameterFaultOutOfRangeMinNormalValueReal or returns an error if something is wrong
 	Build() (BACnetFaultParameterFaultOutOfRangeMinNormalValueReal, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetFaultParameterFaultOutOfRangeMinNormalValueRealBuilder) MustBuil
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetFaultParameterFaultOutOfRangeMinNormalValueRealBuilder) Done() BACnetFaultParameterFaultOutOfRangeMinNormalValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetFaultParameterFaultOutOfRangeMinNormalValueBuilder().(*_BACnetFaultParameterFaultOutOfRangeMinNormalValueBuilder)
+	}
 	return b.parentBuilder
 }
 

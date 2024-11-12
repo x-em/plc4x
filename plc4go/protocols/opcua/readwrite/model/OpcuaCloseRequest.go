@@ -95,6 +95,8 @@ type OpcuaCloseRequestBuilder interface {
 	WithMessage(Payload) OpcuaCloseRequestBuilder
 	// WithMessageBuilder adds Message (property field) which is build by the builder
 	WithMessageBuilder(func(PayloadBuilder) PayloadBuilder) OpcuaCloseRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MessagePDUBuilder
 	// Build builds the OpcuaCloseRequest or returns an error if something is wrong
 	Build() (OpcuaCloseRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_OpcuaCloseRequestBuilder) MustBuild() OpcuaCloseRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_OpcuaCloseRequestBuilder) Done() MessagePDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMessagePDUBuilder().(*_MessagePDUBuilder)
+	}
 	return b.parentBuilder
 }
 

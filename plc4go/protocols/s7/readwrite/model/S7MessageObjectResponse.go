@@ -87,6 +87,8 @@ type S7MessageObjectResponseBuilder interface {
 	WithReturnCode(DataTransportErrorCode) S7MessageObjectResponseBuilder
 	// WithTransportSize adds TransportSize (property field)
 	WithTransportSize(DataTransportSize) S7MessageObjectResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7DataAlarmMessageBuilder
 	// Build builds the S7MessageObjectResponse or returns an error if something is wrong
 	Build() (S7MessageObjectResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_S7MessageObjectResponseBuilder) MustBuild() S7MessageObjectResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7MessageObjectResponseBuilder) Done() S7DataAlarmMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7DataAlarmMessageBuilder().(*_S7DataAlarmMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

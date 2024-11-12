@@ -85,6 +85,8 @@ type PortSegmentNormalBuilder interface {
 	WithPort(uint8) PortSegmentNormalBuilder
 	// WithLinkAddress adds LinkAddress (property field)
 	WithLinkAddress(uint8) PortSegmentNormalBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() PortSegmentTypeBuilder
 	// Build builds the PortSegmentNormal or returns an error if something is wrong
 	Build() (PortSegmentNormal, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_PortSegmentNormalBuilder) MustBuild() PortSegmentNormal {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PortSegmentNormalBuilder) Done() PortSegmentTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewPortSegmentTypeBuilder().(*_PortSegmentTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

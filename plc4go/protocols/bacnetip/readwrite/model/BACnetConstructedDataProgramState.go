@@ -86,6 +86,8 @@ type BACnetConstructedDataProgramStateBuilder interface {
 	WithProgramState(BACnetProgramStateTagged) BACnetConstructedDataProgramStateBuilder
 	// WithProgramStateBuilder adds ProgramState (property field) which is build by the builder
 	WithProgramStateBuilder(func(BACnetProgramStateTaggedBuilder) BACnetProgramStateTaggedBuilder) BACnetConstructedDataProgramStateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataProgramState or returns an error if something is wrong
 	Build() (BACnetConstructedDataProgramState, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataProgramStateBuilder) MustBuild() BACnetConstructe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataProgramStateBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

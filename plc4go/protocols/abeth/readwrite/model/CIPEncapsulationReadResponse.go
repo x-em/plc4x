@@ -89,6 +89,8 @@ type CIPEncapsulationReadResponseBuilder interface {
 	WithResponse(DF1ResponseMessage) CIPEncapsulationReadResponseBuilder
 	// WithResponseBuilder adds Response (property field) which is build by the builder
 	WithResponseBuilder(func(DF1ResponseMessageBuilder) DF1ResponseMessageBuilder) CIPEncapsulationReadResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CIPEncapsulationPacketBuilder
 	// Build builds the CIPEncapsulationReadResponse or returns an error if something is wrong
 	Build() (CIPEncapsulationReadResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -157,8 +159,10 @@ func (b *_CIPEncapsulationReadResponseBuilder) MustBuild() CIPEncapsulationReadR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CIPEncapsulationReadResponseBuilder) Done() CIPEncapsulationPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCIPEncapsulationPacketBuilder().(*_CIPEncapsulationPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

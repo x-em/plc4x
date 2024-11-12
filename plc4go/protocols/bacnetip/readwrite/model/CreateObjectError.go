@@ -95,6 +95,8 @@ type CreateObjectErrorBuilder interface {
 	WithFirstFailedElementNumber(BACnetContextTagUnsignedInteger) CreateObjectErrorBuilder
 	// WithFirstFailedElementNumberBuilder adds FirstFailedElementNumber (property field) which is build by the builder
 	WithFirstFailedElementNumberBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) CreateObjectErrorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetErrorBuilder
 	// Build builds the CreateObjectError or returns an error if something is wrong
 	Build() (CreateObjectError, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_CreateObjectErrorBuilder) MustBuild() CreateObjectError {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CreateObjectErrorBuilder) Done() BACnetErrorBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetErrorBuilder().(*_BACnetErrorBuilder)
+	}
 	return b.parentBuilder
 }
 

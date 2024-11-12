@@ -84,6 +84,8 @@ type BACnetPropertyStatesLiftFaultBuilder interface {
 	WithLiftFault(BACnetLiftFaultTagged) BACnetPropertyStatesLiftFaultBuilder
 	// WithLiftFaultBuilder adds LiftFault (property field) which is build by the builder
 	WithLiftFaultBuilder(func(BACnetLiftFaultTaggedBuilder) BACnetLiftFaultTaggedBuilder) BACnetPropertyStatesLiftFaultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesLiftFault or returns an error if something is wrong
 	Build() (BACnetPropertyStatesLiftFault, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesLiftFaultBuilder) MustBuild() BACnetPropertyStates
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesLiftFaultBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -119,6 +119,8 @@ type ObjectAttributesBuilder interface {
 	WithUserWriteMask(uint32) ObjectAttributesBuilder
 	// WithEventNotifier adds EventNotifier (property field)
 	WithEventNotifier(uint8) ObjectAttributesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ObjectAttributes or returns an error if something is wrong
 	Build() (ObjectAttributes, error)
 	// MustBuild does the same as Build but panics on error
@@ -231,8 +233,10 @@ func (b *_ObjectAttributesBuilder) MustBuild() ObjectAttributes {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ObjectAttributesBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

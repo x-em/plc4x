@@ -84,6 +84,8 @@ type BACnetApplicationTagOctetStringBuilder interface {
 	WithPayload(BACnetTagPayloadOctetString) BACnetApplicationTagOctetStringBuilder
 	// WithPayloadBuilder adds Payload (property field) which is build by the builder
 	WithPayloadBuilder(func(BACnetTagPayloadOctetStringBuilder) BACnetTagPayloadOctetStringBuilder) BACnetApplicationTagOctetStringBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetApplicationTagBuilder
 	// Build builds the BACnetApplicationTagOctetString or returns an error if something is wrong
 	Build() (BACnetApplicationTagOctetString, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetApplicationTagOctetStringBuilder) MustBuild() BACnetApplicationT
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetApplicationTagOctetStringBuilder) Done() BACnetApplicationTagBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetApplicationTagBuilder().(*_BACnetApplicationTagBuilder)
+	}
 	return b.parentBuilder
 }
 

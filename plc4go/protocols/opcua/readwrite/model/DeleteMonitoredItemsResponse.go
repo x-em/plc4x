@@ -96,6 +96,8 @@ type DeleteMonitoredItemsResponseBuilder interface {
 	WithResults(...StatusCode) DeleteMonitoredItemsResponseBuilder
 	// WithDiagnosticInfos adds DiagnosticInfos (property field)
 	WithDiagnosticInfos(...DiagnosticInfo) DeleteMonitoredItemsResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DeleteMonitoredItemsResponse or returns an error if something is wrong
 	Build() (DeleteMonitoredItemsResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_DeleteMonitoredItemsResponseBuilder) MustBuild() DeleteMonitoredItemsR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DeleteMonitoredItemsResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -97,6 +97,8 @@ type ApduDataExtPropertyValueReadBuilder interface {
 	WithCount(uint8) ApduDataExtPropertyValueReadBuilder
 	// WithIndex adds Index (property field)
 	WithIndex(uint16) ApduDataExtPropertyValueReadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataExtBuilder
 	// Build builds the ApduDataExtPropertyValueRead or returns an error if something is wrong
 	Build() (ApduDataExtPropertyValueRead, error)
 	// MustBuild does the same as Build but panics on error
@@ -161,8 +163,10 @@ func (b *_ApduDataExtPropertyValueReadBuilder) MustBuild() ApduDataExtPropertyVa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataExtPropertyValueReadBuilder) Done() ApduDataExtBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataExtBuilder().(*_ApduDataExtBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -97,6 +97,8 @@ type MediaTransportControlDataTotalTracksBuilder interface {
 	WithTotalTracksMLSB(byte) MediaTransportControlDataTotalTracksBuilder
 	// WithTotalTracksLSB adds TotalTracksLSB (property field)
 	WithTotalTracksLSB(byte) MediaTransportControlDataTotalTracksBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataTotalTracks or returns an error if something is wrong
 	Build() (MediaTransportControlDataTotalTracks, error)
 	// MustBuild does the same as Build but panics on error
@@ -161,8 +163,10 @@ func (b *_MediaTransportControlDataTotalTracksBuilder) MustBuild() MediaTranspor
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataTotalTracksBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

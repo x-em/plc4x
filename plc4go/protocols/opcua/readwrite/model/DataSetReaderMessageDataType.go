@@ -71,6 +71,8 @@ type DataSetReaderMessageDataTypeBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() DataSetReaderMessageDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DataSetReaderMessageDataType or returns an error if something is wrong
 	Build() (DataSetReaderMessageDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_DataSetReaderMessageDataTypeBuilder) MustBuild() DataSetReaderMessageD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DataSetReaderMessageDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

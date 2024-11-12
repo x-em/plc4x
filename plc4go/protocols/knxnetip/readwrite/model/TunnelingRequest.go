@@ -100,6 +100,8 @@ type TunnelingRequestBuilder interface {
 	WithCemi(CEMI) TunnelingRequestBuilder
 	// WithCemiBuilder adds Cemi (property field) which is build by the builder
 	WithCemiBuilder(func(CEMIBuilder) CEMIBuilder) TunnelingRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the TunnelingRequest or returns an error if something is wrong
 	Build() (TunnelingRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -192,8 +194,10 @@ func (b *_TunnelingRequestBuilder) MustBuild() TunnelingRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TunnelingRequestBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

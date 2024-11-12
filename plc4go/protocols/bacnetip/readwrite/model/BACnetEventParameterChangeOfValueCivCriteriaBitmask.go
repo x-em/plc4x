@@ -84,6 +84,8 @@ type BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder interface {
 	WithBitmask(BACnetContextTagBitString) BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder
 	// WithBitmaskBuilder adds Bitmask (property field) which is build by the builder
 	WithBitmaskBuilder(func(BACnetContextTagBitStringBuilder) BACnetContextTagBitStringBuilder) BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetEventParameterChangeOfValueCivCriteriaBuilder
 	// Build builds the BACnetEventParameterChangeOfValueCivCriteriaBitmask or returns an error if something is wrong
 	Build() (BACnetEventParameterChangeOfValueCivCriteriaBitmask, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder) MustBuild(
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder) Done() BACnetEventParameterChangeOfValueCivCriteriaBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetEventParameterChangeOfValueCivCriteriaBuilder().(*_BACnetEventParameterChangeOfValueCivCriteriaBuilder)
+	}
 	return b.parentBuilder
 }
 

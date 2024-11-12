@@ -111,6 +111,8 @@ type BACnetServiceAckReadPropertyBuilder interface {
 	WithOptionalValues(BACnetConstructedData) BACnetServiceAckReadPropertyBuilder
 	// WithOptionalValuesBuilder adds Values (property field) which is build by the builder
 	WithOptionalValuesBuilder(func(BACnetConstructedDataBuilder) BACnetConstructedDataBuilder) BACnetServiceAckReadPropertyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckReadProperty or returns an error if something is wrong
 	Build() (BACnetServiceAckReadProperty, error)
 	// MustBuild does the same as Build but panics on error
@@ -239,8 +241,10 @@ func (b *_BACnetServiceAckReadPropertyBuilder) MustBuild() BACnetServiceAckReadP
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckReadPropertyBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

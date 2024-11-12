@@ -86,6 +86,8 @@ type BACnetConstructedDataAckedTransitionsBuilder interface {
 	WithAckedTransitions(BACnetEventTransitionBitsTagged) BACnetConstructedDataAckedTransitionsBuilder
 	// WithAckedTransitionsBuilder adds AckedTransitions (property field) which is build by the builder
 	WithAckedTransitionsBuilder(func(BACnetEventTransitionBitsTaggedBuilder) BACnetEventTransitionBitsTaggedBuilder) BACnetConstructedDataAckedTransitionsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAckedTransitions or returns an error if something is wrong
 	Build() (BACnetConstructedDataAckedTransitions, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataAckedTransitionsBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAckedTransitionsBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

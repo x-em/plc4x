@@ -71,6 +71,8 @@ type TDataIndividualReqBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() TDataIndividualReqBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CEMIBuilder
 	// Build builds the TDataIndividualReq or returns an error if something is wrong
 	Build() (TDataIndividualReq, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_TDataIndividualReqBuilder) MustBuild() TDataIndividualReq {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TDataIndividualReqBuilder) Done() CEMIBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCEMIBuilder().(*_CEMIBuilder)
+	}
 	return b.parentBuilder
 }
 

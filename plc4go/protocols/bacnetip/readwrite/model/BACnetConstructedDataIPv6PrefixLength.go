@@ -86,6 +86,8 @@ type BACnetConstructedDataIPv6PrefixLengthBuilder interface {
 	WithIpv6PrefixLength(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataIPv6PrefixLengthBuilder
 	// WithIpv6PrefixLengthBuilder adds Ipv6PrefixLength (property field) which is build by the builder
 	WithIpv6PrefixLengthBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataIPv6PrefixLengthBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataIPv6PrefixLength or returns an error if something is wrong
 	Build() (BACnetConstructedDataIPv6PrefixLength, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataIPv6PrefixLengthBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataIPv6PrefixLengthBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

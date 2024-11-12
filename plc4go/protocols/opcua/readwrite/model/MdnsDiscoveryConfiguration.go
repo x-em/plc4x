@@ -90,6 +90,8 @@ type MdnsDiscoveryConfigurationBuilder interface {
 	WithMdnsServerNameBuilder(func(PascalStringBuilder) PascalStringBuilder) MdnsDiscoveryConfigurationBuilder
 	// WithServerCapabilities adds ServerCapabilities (property field)
 	WithServerCapabilities(...PascalString) MdnsDiscoveryConfigurationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the MdnsDiscoveryConfiguration or returns an error if something is wrong
 	Build() (MdnsDiscoveryConfiguration, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_MdnsDiscoveryConfigurationBuilder) MustBuild() MdnsDiscoveryConfigurat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MdnsDiscoveryConfigurationBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

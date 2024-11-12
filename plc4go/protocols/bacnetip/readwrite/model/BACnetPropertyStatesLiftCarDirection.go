@@ -84,6 +84,8 @@ type BACnetPropertyStatesLiftCarDirectionBuilder interface {
 	WithLiftCarDirection(BACnetLiftCarDirectionTagged) BACnetPropertyStatesLiftCarDirectionBuilder
 	// WithLiftCarDirectionBuilder adds LiftCarDirection (property field) which is build by the builder
 	WithLiftCarDirectionBuilder(func(BACnetLiftCarDirectionTaggedBuilder) BACnetLiftCarDirectionTaggedBuilder) BACnetPropertyStatesLiftCarDirectionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesLiftCarDirection or returns an error if something is wrong
 	Build() (BACnetPropertyStatesLiftCarDirection, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesLiftCarDirectionBuilder) MustBuild() BACnetPropert
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesLiftCarDirectionBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

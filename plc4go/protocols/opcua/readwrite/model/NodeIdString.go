@@ -94,6 +94,8 @@ type NodeIdStringBuilder interface {
 	WithId(PascalString) NodeIdStringBuilder
 	// WithIdBuilder adds Id (property field) which is build by the builder
 	WithIdBuilder(func(PascalStringBuilder) PascalStringBuilder) NodeIdStringBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NodeIdTypeDefinitionBuilder
 	// Build builds the NodeIdString or returns an error if something is wrong
 	Build() (NodeIdString, error)
 	// MustBuild does the same as Build but panics on error
@@ -167,8 +169,10 @@ func (b *_NodeIdStringBuilder) MustBuild() NodeIdString {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NodeIdStringBuilder) Done() NodeIdTypeDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNodeIdTypeDefinitionBuilder().(*_NodeIdTypeDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

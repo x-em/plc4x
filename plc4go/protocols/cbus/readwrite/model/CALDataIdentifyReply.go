@@ -90,6 +90,8 @@ type CALDataIdentifyReplyBuilder interface {
 	WithIdentifyReplyCommand(IdentifyReplyCommand) CALDataIdentifyReplyBuilder
 	// WithIdentifyReplyCommandBuilder adds IdentifyReplyCommand (property field) which is build by the builder
 	WithIdentifyReplyCommandBuilder(func(IdentifyReplyCommandBuilder) IdentifyReplyCommandBuilder) CALDataIdentifyReplyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataIdentifyReply or returns an error if something is wrong
 	Build() (CALDataIdentifyReply, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_CALDataIdentifyReplyBuilder) MustBuild() CALDataIdentifyReply {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataIdentifyReplyBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

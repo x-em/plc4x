@@ -84,6 +84,8 @@ type BACnetPropertyStatesReliabilityBuilder interface {
 	WithReliability(BACnetReliabilityTagged) BACnetPropertyStatesReliabilityBuilder
 	// WithReliabilityBuilder adds Reliability (property field) which is build by the builder
 	WithReliabilityBuilder(func(BACnetReliabilityTaggedBuilder) BACnetReliabilityTaggedBuilder) BACnetPropertyStatesReliabilityBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesReliability or returns an error if something is wrong
 	Build() (BACnetPropertyStatesReliability, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesReliabilityBuilder) MustBuild() BACnetPropertyStat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesReliabilityBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

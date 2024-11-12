@@ -86,6 +86,8 @@ type BACnetConstructedDataFirmwareRevisionBuilder interface {
 	WithFirmwareRevision(BACnetApplicationTagCharacterString) BACnetConstructedDataFirmwareRevisionBuilder
 	// WithFirmwareRevisionBuilder adds FirmwareRevision (property field) which is build by the builder
 	WithFirmwareRevisionBuilder(func(BACnetApplicationTagCharacterStringBuilder) BACnetApplicationTagCharacterStringBuilder) BACnetConstructedDataFirmwareRevisionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataFirmwareRevision or returns an error if something is wrong
 	Build() (BACnetConstructedDataFirmwareRevision, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataFirmwareRevisionBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataFirmwareRevisionBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

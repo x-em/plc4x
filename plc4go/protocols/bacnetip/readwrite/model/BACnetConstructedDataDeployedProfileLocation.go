@@ -86,6 +86,8 @@ type BACnetConstructedDataDeployedProfileLocationBuilder interface {
 	WithDeployedProfileLocation(BACnetApplicationTagCharacterString) BACnetConstructedDataDeployedProfileLocationBuilder
 	// WithDeployedProfileLocationBuilder adds DeployedProfileLocation (property field) which is build by the builder
 	WithDeployedProfileLocationBuilder(func(BACnetApplicationTagCharacterStringBuilder) BACnetApplicationTagCharacterStringBuilder) BACnetConstructedDataDeployedProfileLocationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataDeployedProfileLocation or returns an error if something is wrong
 	Build() (BACnetConstructedDataDeployedProfileLocation, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataDeployedProfileLocationBuilder) MustBuild() BACne
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataDeployedProfileLocationBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

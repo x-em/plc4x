@@ -84,6 +84,8 @@ type BACnetPropertyStatesTimerTransitionBuilder interface {
 	WithTimerTransition(BACnetTimerTransitionTagged) BACnetPropertyStatesTimerTransitionBuilder
 	// WithTimerTransitionBuilder adds TimerTransition (property field) which is build by the builder
 	WithTimerTransitionBuilder(func(BACnetTimerTransitionTaggedBuilder) BACnetTimerTransitionTaggedBuilder) BACnetPropertyStatesTimerTransitionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesTimerTransition or returns an error if something is wrong
 	Build() (BACnetPropertyStatesTimerTransition, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesTimerTransitionBuilder) MustBuild() BACnetProperty
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesTimerTransitionBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

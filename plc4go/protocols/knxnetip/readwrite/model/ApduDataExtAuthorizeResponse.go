@@ -79,6 +79,8 @@ type ApduDataExtAuthorizeResponseBuilder interface {
 	WithMandatoryFields(level uint8) ApduDataExtAuthorizeResponseBuilder
 	// WithLevel adds Level (property field)
 	WithLevel(uint8) ApduDataExtAuthorizeResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataExtBuilder
 	// Build builds the ApduDataExtAuthorizeResponse or returns an error if something is wrong
 	Build() (ApduDataExtAuthorizeResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ApduDataExtAuthorizeResponseBuilder) MustBuild() ApduDataExtAuthorizeR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataExtAuthorizeResponseBuilder) Done() ApduDataExtBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataExtBuilder().(*_ApduDataExtBuilder)
+	}
 	return b.parentBuilder
 }
 

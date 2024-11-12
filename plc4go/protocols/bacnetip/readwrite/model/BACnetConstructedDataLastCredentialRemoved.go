@@ -86,6 +86,8 @@ type BACnetConstructedDataLastCredentialRemovedBuilder interface {
 	WithLastCredentialRemoved(BACnetDeviceObjectReference) BACnetConstructedDataLastCredentialRemovedBuilder
 	// WithLastCredentialRemovedBuilder adds LastCredentialRemoved (property field) which is build by the builder
 	WithLastCredentialRemovedBuilder(func(BACnetDeviceObjectReferenceBuilder) BACnetDeviceObjectReferenceBuilder) BACnetConstructedDataLastCredentialRemovedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataLastCredentialRemoved or returns an error if something is wrong
 	Build() (BACnetConstructedDataLastCredentialRemoved, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataLastCredentialRemovedBuilder) MustBuild() BACnetC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataLastCredentialRemovedBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

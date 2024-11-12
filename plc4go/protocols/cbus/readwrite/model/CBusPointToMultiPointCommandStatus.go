@@ -87,6 +87,8 @@ type CBusPointToMultiPointCommandStatusBuilder interface {
 	WithStatusRequest(StatusRequest) CBusPointToMultiPointCommandStatusBuilder
 	// WithStatusRequestBuilder adds StatusRequest (property field) which is build by the builder
 	WithStatusRequestBuilder(func(StatusRequestBuilder) StatusRequestBuilder) CBusPointToMultiPointCommandStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CBusPointToMultiPointCommandBuilder
 	// Build builds the CBusPointToMultiPointCommandStatus or returns an error if something is wrong
 	Build() (CBusPointToMultiPointCommandStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,8 +157,10 @@ func (b *_CBusPointToMultiPointCommandStatusBuilder) MustBuild() CBusPointToMult
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CBusPointToMultiPointCommandStatusBuilder) Done() CBusPointToMultiPointCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCBusPointToMultiPointCommandBuilder().(*_CBusPointToMultiPointCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

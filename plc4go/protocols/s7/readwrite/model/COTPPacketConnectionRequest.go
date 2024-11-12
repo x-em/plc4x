@@ -91,6 +91,8 @@ type COTPPacketConnectionRequestBuilder interface {
 	WithSourceReference(uint16) COTPPacketConnectionRequestBuilder
 	// WithProtocolClass adds ProtocolClass (property field)
 	WithProtocolClass(COTPProtocolClass) COTPPacketConnectionRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() COTPPacketBuilder
 	// Build builds the COTPPacketConnectionRequest or returns an error if something is wrong
 	Build() (COTPPacketConnectionRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_COTPPacketConnectionRequestBuilder) MustBuild() COTPPacketConnectionRe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_COTPPacketConnectionRequestBuilder) Done() COTPPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCOTPPacketBuilder().(*_COTPPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

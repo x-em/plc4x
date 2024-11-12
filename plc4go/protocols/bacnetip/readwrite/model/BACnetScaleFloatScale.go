@@ -84,6 +84,8 @@ type BACnetScaleFloatScaleBuilder interface {
 	WithFloatScale(BACnetContextTagReal) BACnetScaleFloatScaleBuilder
 	// WithFloatScaleBuilder adds FloatScale (property field) which is build by the builder
 	WithFloatScaleBuilder(func(BACnetContextTagRealBuilder) BACnetContextTagRealBuilder) BACnetScaleFloatScaleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetScaleBuilder
 	// Build builds the BACnetScaleFloatScale or returns an error if something is wrong
 	Build() (BACnetScaleFloatScale, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetScaleFloatScaleBuilder) MustBuild() BACnetScaleFloatScale {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetScaleFloatScaleBuilder) Done() BACnetScaleBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetScaleBuilder().(*_BACnetScaleBuilder)
+	}
 	return b.parentBuilder
 }
 

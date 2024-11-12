@@ -79,6 +79,8 @@ type BACnetConstructedDataDeviceAddressBindingBuilder interface {
 	WithMandatoryFields(deviceAddressBinding []BACnetAddressBinding) BACnetConstructedDataDeviceAddressBindingBuilder
 	// WithDeviceAddressBinding adds DeviceAddressBinding (property field)
 	WithDeviceAddressBinding(...BACnetAddressBinding) BACnetConstructedDataDeviceAddressBindingBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataDeviceAddressBinding or returns an error if something is wrong
 	Build() (BACnetConstructedDataDeviceAddressBinding, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataDeviceAddressBindingBuilder) MustBuild() BACnetCo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataDeviceAddressBindingBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

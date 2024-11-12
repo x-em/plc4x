@@ -84,6 +84,8 @@ type BACnetLogRecordLogDatumTimeChangeBuilder interface {
 	WithTimeChange(BACnetContextTagReal) BACnetLogRecordLogDatumTimeChangeBuilder
 	// WithTimeChangeBuilder adds TimeChange (property field) which is build by the builder
 	WithTimeChangeBuilder(func(BACnetContextTagRealBuilder) BACnetContextTagRealBuilder) BACnetLogRecordLogDatumTimeChangeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLogRecordLogDatumBuilder
 	// Build builds the BACnetLogRecordLogDatumTimeChange or returns an error if something is wrong
 	Build() (BACnetLogRecordLogDatumTimeChange, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLogRecordLogDatumTimeChangeBuilder) MustBuild() BACnetLogRecordL
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLogRecordLogDatumTimeChangeBuilder) Done() BACnetLogRecordLogDatumBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLogRecordLogDatumBuilder().(*_BACnetLogRecordLogDatumBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetPropertyAccessResultAccessResultPropertyValueBuilder interface {
 	WithPropertyValue(BACnetConstructedData) BACnetPropertyAccessResultAccessResultPropertyValueBuilder
 	// WithPropertyValueBuilder adds PropertyValue (property field) which is build by the builder
 	WithPropertyValueBuilder(func(BACnetConstructedDataBuilder) BACnetConstructedDataBuilder) BACnetPropertyAccessResultAccessResultPropertyValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyAccessResultAccessResultBuilder
 	// Build builds the BACnetPropertyAccessResultAccessResultPropertyValue or returns an error if something is wrong
 	Build() (BACnetPropertyAccessResultAccessResultPropertyValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyAccessResultAccessResultPropertyValueBuilder) MustBuild(
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyAccessResultAccessResultPropertyValueBuilder) Done() BACnetPropertyAccessResultAccessResultBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyAccessResultAccessResultBuilder().(*_BACnetPropertyAccessResultAccessResultBuilder)
+	}
 	return b.parentBuilder
 }
 

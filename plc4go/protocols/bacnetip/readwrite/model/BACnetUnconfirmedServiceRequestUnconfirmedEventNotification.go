@@ -204,6 +204,8 @@ type BACnetUnconfirmedServiceRequestUnconfirmedEventNotificationBuilder interfac
 	WithOptionalEventValues(BACnetNotificationParameters) BACnetUnconfirmedServiceRequestUnconfirmedEventNotificationBuilder
 	// WithOptionalEventValuesBuilder adds EventValues (property field) which is build by the builder
 	WithOptionalEventValuesBuilder(func(BACnetNotificationParametersBuilder) BACnetNotificationParametersBuilder) BACnetUnconfirmedServiceRequestUnconfirmedEventNotificationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetUnconfirmedServiceRequestBuilder
 	// Build builds the BACnetUnconfirmedServiceRequestUnconfirmedEventNotification or returns an error if something is wrong
 	Build() (BACnetUnconfirmedServiceRequestUnconfirmedEventNotification, error)
 	// MustBuild does the same as Build but panics on error
@@ -536,8 +538,10 @@ func (b *_BACnetUnconfirmedServiceRequestUnconfirmedEventNotificationBuilder) Mu
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetUnconfirmedServiceRequestUnconfirmedEventNotificationBuilder) Done() BACnetUnconfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetUnconfirmedServiceRequestBuilder().(*_BACnetUnconfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

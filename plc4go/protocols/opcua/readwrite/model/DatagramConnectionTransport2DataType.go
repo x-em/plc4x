@@ -113,6 +113,8 @@ type DatagramConnectionTransport2DataTypeBuilder interface {
 	WithQosCategoryBuilder(func(PascalStringBuilder) PascalStringBuilder) DatagramConnectionTransport2DataTypeBuilder
 	// WithDatagramQos adds DatagramQos (property field)
 	WithDatagramQos(...ExtensionObject) DatagramConnectionTransport2DataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DatagramConnectionTransport2DataType or returns an error if something is wrong
 	Build() (DatagramConnectionTransport2DataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -220,8 +222,10 @@ func (b *_DatagramConnectionTransport2DataTypeBuilder) MustBuild() DatagramConne
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DatagramConnectionTransport2DataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

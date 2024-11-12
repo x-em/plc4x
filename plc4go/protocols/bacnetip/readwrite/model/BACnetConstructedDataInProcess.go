@@ -86,6 +86,8 @@ type BACnetConstructedDataInProcessBuilder interface {
 	WithInProcess(BACnetApplicationTagBoolean) BACnetConstructedDataInProcessBuilder
 	// WithInProcessBuilder adds InProcess (property field) which is build by the builder
 	WithInProcessBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataInProcessBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataInProcess or returns an error if something is wrong
 	Build() (BACnetConstructedDataInProcess, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataInProcessBuilder) MustBuild() BACnetConstructedDa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataInProcessBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

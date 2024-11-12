@@ -158,6 +158,8 @@ type BACnetNotificationParametersAccessEventBuilder interface {
 	WithInnerClosingTag(BACnetClosingTag) BACnetNotificationParametersAccessEventBuilder
 	// WithInnerClosingTagBuilder adds InnerClosingTag (property field) which is build by the builder
 	WithInnerClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetNotificationParametersAccessEventBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetNotificationParametersBuilder
 	// Build builds the BACnetNotificationParametersAccessEvent or returns an error if something is wrong
 	Build() (BACnetNotificationParametersAccessEvent, error)
 	// MustBuild does the same as Build but panics on error
@@ -388,8 +390,10 @@ func (b *_BACnetNotificationParametersAccessEventBuilder) MustBuild() BACnetNoti
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetNotificationParametersAccessEventBuilder) Done() BACnetNotificationParametersBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetNotificationParametersBuilder().(*_BACnetNotificationParametersBuilder)
+	}
 	return b.parentBuilder
 }
 

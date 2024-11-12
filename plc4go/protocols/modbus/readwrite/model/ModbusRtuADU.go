@@ -92,6 +92,8 @@ type ModbusRtuADUBuilder interface {
 	WithPdu(ModbusPDU) ModbusRtuADUBuilder
 	// WithPduBuilder adds Pdu (property field) which is build by the builder
 	WithPduBuilder(func(ModbusPDUBuilder) ModbusPDUBuilder) ModbusRtuADUBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusADUBuilder
 	// Build builds the ModbusRtuADU or returns an error if something is wrong
 	Build() (ModbusRtuADU, error)
 	// MustBuild does the same as Build but panics on error
@@ -165,8 +167,10 @@ func (b *_ModbusRtuADUBuilder) MustBuild() ModbusRtuADU {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusRtuADUBuilder) Done() ModbusADUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusADUBuilder().(*_ModbusADUBuilder)
+	}
 	return b.parentBuilder
 }
 

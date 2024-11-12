@@ -170,6 +170,8 @@ type ProgramDiagnostic2DataTypeBuilder interface {
 	WithLastMethodReturnStatus(StatusCode) ProgramDiagnostic2DataTypeBuilder
 	// WithLastMethodReturnStatusBuilder adds LastMethodReturnStatus (property field) which is build by the builder
 	WithLastMethodReturnStatusBuilder(func(StatusCodeBuilder) StatusCodeBuilder) ProgramDiagnostic2DataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ProgramDiagnostic2DataType or returns an error if something is wrong
 	Build() (ProgramDiagnostic2DataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -369,8 +371,10 @@ func (b *_ProgramDiagnostic2DataTypeBuilder) MustBuild() ProgramDiagnostic2DataT
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ProgramDiagnostic2DataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

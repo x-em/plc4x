@@ -117,6 +117,8 @@ type HistoryReadValueIdBuilder interface {
 	WithContinuationPoint(PascalByteString) HistoryReadValueIdBuilder
 	// WithContinuationPointBuilder adds ContinuationPoint (property field) which is build by the builder
 	WithContinuationPointBuilder(func(PascalByteStringBuilder) PascalByteStringBuilder) HistoryReadValueIdBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the HistoryReadValueId or returns an error if something is wrong
 	Build() (HistoryReadValueId, error)
 	// MustBuild does the same as Build but panics on error
@@ -257,8 +259,10 @@ func (b *_HistoryReadValueIdBuilder) MustBuild() HistoryReadValueId {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_HistoryReadValueIdBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -94,6 +94,8 @@ type RequestDirectCommandAccessBuilder interface {
 	WithOptionalAlpha(Alpha) RequestDirectCommandAccessBuilder
 	// WithOptionalAlphaBuilder adds Alpha (property field) which is build by the builder
 	WithOptionalAlphaBuilder(func(AlphaBuilder) AlphaBuilder) RequestDirectCommandAccessBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() RequestBuilder
 	// Build builds the RequestDirectCommandAccess or returns an error if something is wrong
 	Build() (RequestDirectCommandAccess, error)
 	// MustBuild does the same as Build but panics on error
@@ -180,8 +182,10 @@ func (b *_RequestDirectCommandAccessBuilder) MustBuild() RequestDirectCommandAcc
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RequestDirectCommandAccessBuilder) Done() RequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewRequestBuilder().(*_RequestBuilder)
+	}
 	return b.parentBuilder
 }
 

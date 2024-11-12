@@ -103,6 +103,8 @@ type BACnetServiceAckConfirmedPrivateTransferBuilder interface {
 	WithOptionalResultBlock(BACnetConstructedData) BACnetServiceAckConfirmedPrivateTransferBuilder
 	// WithOptionalResultBlockBuilder adds ResultBlock (property field) which is build by the builder
 	WithOptionalResultBlockBuilder(func(BACnetConstructedDataBuilder) BACnetConstructedDataBuilder) BACnetServiceAckConfirmedPrivateTransferBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckConfirmedPrivateTransfer or returns an error if something is wrong
 	Build() (BACnetServiceAckConfirmedPrivateTransfer, error)
 	// MustBuild does the same as Build but panics on error
@@ -213,8 +215,10 @@ func (b *_BACnetServiceAckConfirmedPrivateTransferBuilder) MustBuild() BACnetSer
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckConfirmedPrivateTransferBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -135,6 +135,8 @@ type PubSubConfiguration2DataTypeBuilder interface {
 	WithConfigurationVersion(uint32) PubSubConfiguration2DataTypeBuilder
 	// WithConfigurationProperties adds ConfigurationProperties (property field)
 	WithConfigurationProperties(...KeyValuePair) PubSubConfiguration2DataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PubSubConfiguration2DataType or returns an error if something is wrong
 	Build() (PubSubConfiguration2DataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -229,8 +231,10 @@ func (b *_PubSubConfiguration2DataTypeBuilder) MustBuild() PubSubConfiguration2D
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PubSubConfiguration2DataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

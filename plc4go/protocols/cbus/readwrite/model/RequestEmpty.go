@@ -71,6 +71,8 @@ type RequestEmptyBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() RequestEmptyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() RequestBuilder
 	// Build builds the RequestEmpty or returns an error if something is wrong
 	Build() (RequestEmpty, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_RequestEmptyBuilder) MustBuild() RequestEmpty {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RequestEmptyBuilder) Done() RequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewRequestBuilder().(*_RequestBuilder)
+	}
 	return b.parentBuilder
 }
 

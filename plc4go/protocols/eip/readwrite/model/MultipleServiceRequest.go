@@ -88,6 +88,8 @@ type MultipleServiceRequestBuilder interface {
 	WithData(Services) MultipleServiceRequestBuilder
 	// WithDataBuilder adds Data (property field) which is build by the builder
 	WithDataBuilder(func(ServicesBuilder) ServicesBuilder) MultipleServiceRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the MultipleServiceRequest or returns an error if something is wrong
 	Build() (MultipleServiceRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_MultipleServiceRequestBuilder) MustBuild() MultipleServiceRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MultipleServiceRequestBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

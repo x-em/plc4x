@@ -85,6 +85,8 @@ type NLMRequestMasterKeyBuilder interface {
 	WithNumberOfSupportedKeyAlgorithms(uint8) NLMRequestMasterKeyBuilder
 	// WithEncryptionAndSignatureAlgorithms adds EncryptionAndSignatureAlgorithms (property field)
 	WithEncryptionAndSignatureAlgorithms(...byte) NLMRequestMasterKeyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMRequestMasterKey or returns an error if something is wrong
 	Build() (NLMRequestMasterKey, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_NLMRequestMasterKeyBuilder) MustBuild() NLMRequestMasterKey {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMRequestMasterKeyBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

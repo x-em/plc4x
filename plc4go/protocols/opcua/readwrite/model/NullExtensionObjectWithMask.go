@@ -74,6 +74,8 @@ type NullExtensionObjectWithMaskBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() NullExtensionObjectWithMaskBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectWithMaskBuilder
 	// Build builds the NullExtensionObjectWithMask or returns an error if something is wrong
 	Build() (NullExtensionObjectWithMask, error)
 	// MustBuild does the same as Build but panics on error
@@ -118,8 +120,10 @@ func (b *_NullExtensionObjectWithMaskBuilder) MustBuild() NullExtensionObjectWit
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NullExtensionObjectWithMaskBuilder) Done() ExtensionObjectWithMaskBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectWithMaskBuilder().(*_ExtensionObjectWithMaskBuilder)
+	}
 	return b.parentBuilder
 }
 

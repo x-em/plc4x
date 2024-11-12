@@ -79,6 +79,8 @@ type AirConditioningDataSetZoneGroupOnBuilder interface {
 	WithMandatoryFields(zoneGroup byte) AirConditioningDataSetZoneGroupOnBuilder
 	// WithZoneGroup adds ZoneGroup (property field)
 	WithZoneGroup(byte) AirConditioningDataSetZoneGroupOnBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AirConditioningDataBuilder
 	// Build builds the AirConditioningDataSetZoneGroupOn or returns an error if something is wrong
 	Build() (AirConditioningDataSetZoneGroupOn, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_AirConditioningDataSetZoneGroupOnBuilder) MustBuild() AirConditioningD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AirConditioningDataSetZoneGroupOnBuilder) Done() AirConditioningDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAirConditioningDataBuilder().(*_AirConditioningDataBuilder)
+	}
 	return b.parentBuilder
 }
 

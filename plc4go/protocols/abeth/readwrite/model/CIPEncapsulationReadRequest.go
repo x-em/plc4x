@@ -86,6 +86,8 @@ type CIPEncapsulationReadRequestBuilder interface {
 	WithRequest(DF1RequestMessage) CIPEncapsulationReadRequestBuilder
 	// WithRequestBuilder adds Request (property field) which is build by the builder
 	WithRequestBuilder(func(DF1RequestMessageBuilder) DF1RequestMessageBuilder) CIPEncapsulationReadRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CIPEncapsulationPacketBuilder
 	// Build builds the CIPEncapsulationReadRequest or returns an error if something is wrong
 	Build() (CIPEncapsulationReadRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_CIPEncapsulationReadRequestBuilder) MustBuild() CIPEncapsulationReadRe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CIPEncapsulationReadRequestBuilder) Done() CIPEncapsulationPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCIPEncapsulationPacketBuilder().(*_CIPEncapsulationPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

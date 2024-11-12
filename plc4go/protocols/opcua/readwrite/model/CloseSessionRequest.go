@@ -92,6 +92,8 @@ type CloseSessionRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) CloseSessionRequestBuilder
 	// WithDeleteSubscriptions adds DeleteSubscriptions (property field)
 	WithDeleteSubscriptions(bool) CloseSessionRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CloseSessionRequest or returns an error if something is wrong
 	Build() (CloseSessionRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -165,8 +167,10 @@ func (b *_CloseSessionRequestBuilder) MustBuild() CloseSessionRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CloseSessionRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

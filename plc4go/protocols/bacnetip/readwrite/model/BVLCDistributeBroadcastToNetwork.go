@@ -89,6 +89,8 @@ type BVLCDistributeBroadcastToNetworkBuilder interface {
 	WithNpdu(NPDU) BVLCDistributeBroadcastToNetworkBuilder
 	// WithNpduBuilder adds Npdu (property field) which is build by the builder
 	WithNpduBuilder(func(NPDUBuilder) NPDUBuilder) BVLCDistributeBroadcastToNetworkBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCDistributeBroadcastToNetwork or returns an error if something is wrong
 	Build() (BVLCDistributeBroadcastToNetwork, error)
 	// MustBuild does the same as Build but panics on error
@@ -157,8 +159,10 @@ func (b *_BVLCDistributeBroadcastToNetworkBuilder) MustBuild() BVLCDistributeBro
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCDistributeBroadcastToNetworkBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 

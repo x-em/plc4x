@@ -90,6 +90,8 @@ type RolePermissionTypeBuilder interface {
 	WithRoleIdBuilder(func(NodeIdBuilder) NodeIdBuilder) RolePermissionTypeBuilder
 	// WithPermissions adds Permissions (property field)
 	WithPermissions(PermissionType) RolePermissionTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RolePermissionType or returns an error if something is wrong
 	Build() (RolePermissionType, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_RolePermissionTypeBuilder) MustBuild() RolePermissionType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RolePermissionTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

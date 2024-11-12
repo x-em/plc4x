@@ -123,6 +123,8 @@ type UserTokenPolicyBuilder interface {
 	WithSecurityPolicyUri(PascalString) UserTokenPolicyBuilder
 	// WithSecurityPolicyUriBuilder adds SecurityPolicyUri (property field) which is build by the builder
 	WithSecurityPolicyUriBuilder(func(PascalStringBuilder) PascalStringBuilder) UserTokenPolicyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the UserTokenPolicy or returns an error if something is wrong
 	Build() (UserTokenPolicy, error)
 	// MustBuild does the same as Build but panics on error
@@ -268,8 +270,10 @@ func (b *_UserTokenPolicyBuilder) MustBuild() UserTokenPolicy {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_UserTokenPolicyBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

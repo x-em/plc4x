@@ -87,6 +87,8 @@ type ConnectionStateResponseBuilder interface {
 	WithCommunicationChannelId(uint8) ConnectionStateResponseBuilder
 	// WithStatus adds Status (property field)
 	WithStatus(Status) ConnectionStateResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the ConnectionStateResponse or returns an error if something is wrong
 	Build() (ConnectionStateResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_ConnectionStateResponseBuilder) MustBuild() ConnectionStateResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ConnectionStateResponseBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type VariantGuidBuilder interface {
 	WithOptionalArrayLength(int32) VariantGuidBuilder
 	// WithValue adds Value (property field)
 	WithValue(...GuidValue) VariantGuidBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantGuid or returns an error if something is wrong
 	Build() (VariantGuid, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantGuidBuilder) MustBuild() VariantGuid {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantGuidBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

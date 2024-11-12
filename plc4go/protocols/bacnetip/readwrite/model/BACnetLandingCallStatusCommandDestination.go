@@ -84,6 +84,8 @@ type BACnetLandingCallStatusCommandDestinationBuilder interface {
 	WithDestination(BACnetContextTagUnsignedInteger) BACnetLandingCallStatusCommandDestinationBuilder
 	// WithDestinationBuilder adds Destination (property field) which is build by the builder
 	WithDestinationBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) BACnetLandingCallStatusCommandDestinationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLandingCallStatusCommandBuilder
 	// Build builds the BACnetLandingCallStatusCommandDestination or returns an error if something is wrong
 	Build() (BACnetLandingCallStatusCommandDestination, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLandingCallStatusCommandDestinationBuilder) MustBuild() BACnetLa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLandingCallStatusCommandDestinationBuilder) Done() BACnetLandingCallStatusCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLandingCallStatusCommandBuilder().(*_BACnetLandingCallStatusCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

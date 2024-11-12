@@ -84,6 +84,8 @@ type BACnetTimerStateChangeValueDoubleBuilder interface {
 	WithDoubleValue(BACnetApplicationTagDouble) BACnetTimerStateChangeValueDoubleBuilder
 	// WithDoubleValueBuilder adds DoubleValue (property field) which is build by the builder
 	WithDoubleValueBuilder(func(BACnetApplicationTagDoubleBuilder) BACnetApplicationTagDoubleBuilder) BACnetTimerStateChangeValueDoubleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetTimerStateChangeValueBuilder
 	// Build builds the BACnetTimerStateChangeValueDouble or returns an error if something is wrong
 	Build() (BACnetTimerStateChangeValueDouble, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetTimerStateChangeValueDoubleBuilder) MustBuild() BACnetTimerState
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetTimerStateChangeValueDoubleBuilder) Done() BACnetTimerStateChangeValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetTimerStateChangeValueBuilder().(*_BACnetTimerStateChangeValueBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -93,6 +93,8 @@ type MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder interfac
 	WithEnumerateType(byte) MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder
 	// WithStart adds Start (property field)
 	WithStart(uint8) MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataEnumerateCategoriesSelectionTracks or returns an error if something is wrong
 	Build() (MediaTransportControlDataEnumerateCategoriesSelectionTracks, error)
 	// MustBuild does the same as Build but panics on error
@@ -147,8 +149,10 @@ func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) Mu
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type VariantDoubleBuilder interface {
 	WithOptionalArrayLength(int32) VariantDoubleBuilder
 	// WithValue adds Value (property field)
 	WithValue(...float64) VariantDoubleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantDouble or returns an error if something is wrong
 	Build() (VariantDouble, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantDoubleBuilder) MustBuild() VariantDouble {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantDoubleBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

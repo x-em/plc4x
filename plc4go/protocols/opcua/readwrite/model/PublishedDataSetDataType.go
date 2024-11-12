@@ -118,6 +118,8 @@ type PublishedDataSetDataTypeBuilder interface {
 	WithDataSetSource(ExtensionObject) PublishedDataSetDataTypeBuilder
 	// WithDataSetSourceBuilder adds DataSetSource (property field) which is build by the builder
 	WithDataSetSourceBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) PublishedDataSetDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PublishedDataSetDataType or returns an error if something is wrong
 	Build() (PublishedDataSetDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -244,8 +246,10 @@ func (b *_PublishedDataSetDataTypeBuilder) MustBuild() PublishedDataSetDataType 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PublishedDataSetDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

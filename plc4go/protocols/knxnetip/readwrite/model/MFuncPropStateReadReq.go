@@ -71,6 +71,8 @@ type MFuncPropStateReadReqBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() MFuncPropStateReadReqBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CEMIBuilder
 	// Build builds the MFuncPropStateReadReq or returns an error if something is wrong
 	Build() (MFuncPropStateReadReq, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_MFuncPropStateReadReqBuilder) MustBuild() MFuncPropStateReadReq {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MFuncPropStateReadReqBuilder) Done() CEMIBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCEMIBuilder().(*_CEMIBuilder)
+	}
 	return b.parentBuilder
 }
 

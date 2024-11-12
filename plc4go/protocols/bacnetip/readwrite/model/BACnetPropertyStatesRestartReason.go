@@ -84,6 +84,8 @@ type BACnetPropertyStatesRestartReasonBuilder interface {
 	WithRestartReason(BACnetRestartReasonTagged) BACnetPropertyStatesRestartReasonBuilder
 	// WithRestartReasonBuilder adds RestartReason (property field) which is build by the builder
 	WithRestartReasonBuilder(func(BACnetRestartReasonTaggedBuilder) BACnetRestartReasonTaggedBuilder) BACnetPropertyStatesRestartReasonBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesRestartReason or returns an error if something is wrong
 	Build() (BACnetPropertyStatesRestartReason, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesRestartReasonBuilder) MustBuild() BACnetPropertySt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesRestartReasonBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

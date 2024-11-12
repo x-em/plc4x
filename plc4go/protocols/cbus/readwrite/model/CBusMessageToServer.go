@@ -84,6 +84,8 @@ type CBusMessageToServerBuilder interface {
 	WithRequest(Request) CBusMessageToServerBuilder
 	// WithRequestBuilder adds Request (property field) which is build by the builder
 	WithRequestBuilder(func(RequestBuilder) RequestBuilder) CBusMessageToServerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CBusMessageBuilder
 	// Build builds the CBusMessageToServer or returns an error if something is wrong
 	Build() (CBusMessageToServer, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_CBusMessageToServerBuilder) MustBuild() CBusMessageToServer {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CBusMessageToServerBuilder) Done() CBusMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCBusMessageBuilder().(*_CBusMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

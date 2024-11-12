@@ -117,6 +117,8 @@ type UserNameIdentityTokenBuilder interface {
 	WithEncryptionAlgorithm(PascalString) UserNameIdentityTokenBuilder
 	// WithEncryptionAlgorithmBuilder adds EncryptionAlgorithm (property field) which is build by the builder
 	WithEncryptionAlgorithmBuilder(func(PascalStringBuilder) PascalStringBuilder) UserNameIdentityTokenBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the UserNameIdentityToken or returns an error if something is wrong
 	Build() (UserNameIdentityToken, error)
 	// MustBuild does the same as Build but panics on error
@@ -257,8 +259,10 @@ func (b *_UserNameIdentityTokenBuilder) MustBuild() UserNameIdentityToken {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_UserNameIdentityTokenBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

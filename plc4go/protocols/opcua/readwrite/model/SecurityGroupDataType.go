@@ -142,6 +142,8 @@ type SecurityGroupDataTypeBuilder interface {
 	WithRolePermissions(...RolePermissionType) SecurityGroupDataTypeBuilder
 	// WithGroupProperties adds GroupProperties (property field)
 	WithGroupProperties(...KeyValuePair) SecurityGroupDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SecurityGroupDataType or returns an error if something is wrong
 	Build() (SecurityGroupDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -288,8 +290,10 @@ func (b *_SecurityGroupDataTypeBuilder) MustBuild() SecurityGroupDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityGroupDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

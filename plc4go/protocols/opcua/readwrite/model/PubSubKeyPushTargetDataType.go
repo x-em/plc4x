@@ -147,6 +147,8 @@ type PubSubKeyPushTargetDataTypeBuilder interface {
 	WithPushTargetProperties(...KeyValuePair) PubSubKeyPushTargetDataTypeBuilder
 	// WithSecurityGroups adds SecurityGroups (property field)
 	WithSecurityGroups(...PascalString) PubSubKeyPushTargetDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PubSubKeyPushTargetDataType or returns an error if something is wrong
 	Build() (PubSubKeyPushTargetDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -312,8 +314,10 @@ func (b *_PubSubKeyPushTargetDataTypeBuilder) MustBuild() PubSubKeyPushTargetDat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PubSubKeyPushTargetDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

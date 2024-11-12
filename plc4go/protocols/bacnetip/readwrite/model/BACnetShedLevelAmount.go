@@ -84,6 +84,8 @@ type BACnetShedLevelAmountBuilder interface {
 	WithAmount(BACnetContextTagReal) BACnetShedLevelAmountBuilder
 	// WithAmountBuilder adds Amount (property field) which is build by the builder
 	WithAmountBuilder(func(BACnetContextTagRealBuilder) BACnetContextTagRealBuilder) BACnetShedLevelAmountBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetShedLevelBuilder
 	// Build builds the BACnetShedLevelAmount or returns an error if something is wrong
 	Build() (BACnetShedLevelAmount, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetShedLevelAmountBuilder) MustBuild() BACnetShedLevelAmount {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetShedLevelAmountBuilder) Done() BACnetShedLevelBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetShedLevelBuilder().(*_BACnetShedLevelBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -113,6 +113,8 @@ type AirConditioningDataZoneHumidityPlantStatusBuilder interface {
 	WithHumidityStatusBuilder(func(HVACHumidityStatusFlagsBuilder) HVACHumidityStatusFlagsBuilder) AirConditioningDataZoneHumidityPlantStatusBuilder
 	// WithHumidityErrorCode adds HumidityErrorCode (property field)
 	WithHumidityErrorCode(HVACHumidityError) AirConditioningDataZoneHumidityPlantStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AirConditioningDataBuilder
 	// Build builds the AirConditioningDataZoneHumidityPlantStatus or returns an error if something is wrong
 	Build() (AirConditioningDataZoneHumidityPlantStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -220,8 +222,10 @@ func (b *_AirConditioningDataZoneHumidityPlantStatusBuilder) MustBuild() AirCond
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AirConditioningDataZoneHumidityPlantStatusBuilder) Done() AirConditioningDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAirConditioningDataBuilder().(*_AirConditioningDataBuilder)
+	}
 	return b.parentBuilder
 }
 

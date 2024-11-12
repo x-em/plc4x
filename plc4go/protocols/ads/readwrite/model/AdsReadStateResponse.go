@@ -91,6 +91,8 @@ type AdsReadStateResponseBuilder interface {
 	WithAdsState(uint16) AdsReadStateResponseBuilder
 	// WithDeviceState adds DeviceState (property field)
 	WithDeviceState(uint16) AdsReadStateResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AmsPacketBuilder
 	// Build builds the AdsReadStateResponse or returns an error if something is wrong
 	Build() (AdsReadStateResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_AdsReadStateResponseBuilder) MustBuild() AdsReadStateResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsReadStateResponseBuilder) Done() AmsPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAmsPacketBuilder().(*_AmsPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

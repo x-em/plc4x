@@ -95,6 +95,8 @@ type RepublishResponseBuilder interface {
 	WithNotificationMessage(NotificationMessage) RepublishResponseBuilder
 	// WithNotificationMessageBuilder adds NotificationMessage (property field) which is build by the builder
 	WithNotificationMessageBuilder(func(NotificationMessageBuilder) NotificationMessageBuilder) RepublishResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RepublishResponse or returns an error if something is wrong
 	Build() (RepublishResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_RepublishResponseBuilder) MustBuild() RepublishResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RepublishResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

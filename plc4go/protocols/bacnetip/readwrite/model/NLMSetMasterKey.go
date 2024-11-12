@@ -84,6 +84,8 @@ type NLMSetMasterKeyBuilder interface {
 	WithKey(NLMUpdateKeyUpdateKeyEntry) NLMSetMasterKeyBuilder
 	// WithKeyBuilder adds Key (property field) which is build by the builder
 	WithKeyBuilder(func(NLMUpdateKeyUpdateKeyEntryBuilder) NLMUpdateKeyUpdateKeyEntryBuilder) NLMSetMasterKeyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMSetMasterKey or returns an error if something is wrong
 	Build() (NLMSetMasterKey, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_NLMSetMasterKeyBuilder) MustBuild() NLMSetMasterKey {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMSetMasterKeyBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

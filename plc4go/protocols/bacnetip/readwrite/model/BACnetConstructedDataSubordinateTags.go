@@ -89,6 +89,8 @@ type BACnetConstructedDataSubordinateTagsBuilder interface {
 	WithOptionalNumberOfDataElementsBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataSubordinateTagsBuilder
 	// WithSubordinateList adds SubordinateList (property field)
 	WithSubordinateList(...BACnetNameValueCollection) BACnetConstructedDataSubordinateTagsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataSubordinateTags or returns an error if something is wrong
 	Build() (BACnetConstructedDataSubordinateTags, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetConstructedDataSubordinateTagsBuilder) MustBuild() BACnetConstru
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataSubordinateTagsBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

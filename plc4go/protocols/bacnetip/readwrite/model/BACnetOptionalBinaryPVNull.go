@@ -84,6 +84,8 @@ type BACnetOptionalBinaryPVNullBuilder interface {
 	WithNullValue(BACnetApplicationTagNull) BACnetOptionalBinaryPVNullBuilder
 	// WithNullValueBuilder adds NullValue (property field) which is build by the builder
 	WithNullValueBuilder(func(BACnetApplicationTagNullBuilder) BACnetApplicationTagNullBuilder) BACnetOptionalBinaryPVNullBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetOptionalBinaryPVBuilder
 	// Build builds the BACnetOptionalBinaryPVNull or returns an error if something is wrong
 	Build() (BACnetOptionalBinaryPVNull, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetOptionalBinaryPVNullBuilder) MustBuild() BACnetOptionalBinaryPVN
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetOptionalBinaryPVNullBuilder) Done() BACnetOptionalBinaryPVBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetOptionalBinaryPVBuilder().(*_BACnetOptionalBinaryPVBuilder)
+	}
 	return b.parentBuilder
 }
 

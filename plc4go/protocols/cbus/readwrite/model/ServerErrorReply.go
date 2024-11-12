@@ -76,6 +76,8 @@ type ServerErrorReplyBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ServerErrorReplyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ReplyOrConfirmationBuilder
 	// Build builds the ServerErrorReply or returns an error if something is wrong
 	Build() (ServerErrorReply, error)
 	// MustBuild does the same as Build but panics on error
@@ -120,8 +122,10 @@ func (b *_ServerErrorReplyBuilder) MustBuild() ServerErrorReply {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ServerErrorReplyBuilder) Done() ReplyOrConfirmationBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewReplyOrConfirmationBuilder().(*_ReplyOrConfirmationBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -96,6 +96,8 @@ type S7PayloadUserDataItemClkFResponseBuilder interface {
 	WithTimeStamp(DateAndTime) S7PayloadUserDataItemClkFResponseBuilder
 	// WithTimeStampBuilder adds TimeStamp (property field) which is build by the builder
 	WithTimeStampBuilder(func(DateAndTimeBuilder) DateAndTimeBuilder) S7PayloadUserDataItemClkFResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadUserDataItemBuilder
 	// Build builds the S7PayloadUserDataItemClkFResponse or returns an error if something is wrong
 	Build() (S7PayloadUserDataItemClkFResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_S7PayloadUserDataItemClkFResponseBuilder) MustBuild() S7PayloadUserDat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadUserDataItemClkFResponseBuilder) Done() S7PayloadUserDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadUserDataItemBuilder().(*_S7PayloadUserDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

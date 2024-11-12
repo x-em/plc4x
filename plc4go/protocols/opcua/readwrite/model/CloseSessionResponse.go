@@ -84,6 +84,8 @@ type CloseSessionResponseBuilder interface {
 	WithResponseHeader(ResponseHeader) CloseSessionResponseBuilder
 	// WithResponseHeaderBuilder adds ResponseHeader (property field) which is build by the builder
 	WithResponseHeaderBuilder(func(ResponseHeaderBuilder) ResponseHeaderBuilder) CloseSessionResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CloseSessionResponse or returns an error if something is wrong
 	Build() (CloseSessionResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_CloseSessionResponseBuilder) MustBuild() CloseSessionResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CloseSessionResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

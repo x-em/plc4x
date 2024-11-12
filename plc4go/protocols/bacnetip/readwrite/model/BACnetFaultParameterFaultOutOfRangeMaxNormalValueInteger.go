@@ -84,6 +84,8 @@ type BACnetFaultParameterFaultOutOfRangeMaxNormalValueIntegerBuilder interface {
 	WithIntegerValue(BACnetApplicationTagSignedInteger) BACnetFaultParameterFaultOutOfRangeMaxNormalValueIntegerBuilder
 	// WithIntegerValueBuilder adds IntegerValue (property field) which is build by the builder
 	WithIntegerValueBuilder(func(BACnetApplicationTagSignedIntegerBuilder) BACnetApplicationTagSignedIntegerBuilder) BACnetFaultParameterFaultOutOfRangeMaxNormalValueIntegerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder
 	// Build builds the BACnetFaultParameterFaultOutOfRangeMaxNormalValueInteger or returns an error if something is wrong
 	Build() (BACnetFaultParameterFaultOutOfRangeMaxNormalValueInteger, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetFaultParameterFaultOutOfRangeMaxNormalValueIntegerBuilder) MustB
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetFaultParameterFaultOutOfRangeMaxNormalValueIntegerBuilder) Done() BACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder().(*_BACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder)
+	}
 	return b.parentBuilder
 }
 

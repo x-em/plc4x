@@ -79,6 +79,8 @@ type NLMReservedBuilder interface {
 	WithMandatoryFields(unknownBytes []byte) NLMReservedBuilder
 	// WithUnknownBytes adds UnknownBytes (property field)
 	WithUnknownBytes(...byte) NLMReservedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMReserved or returns an error if something is wrong
 	Build() (NLMReserved, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_NLMReservedBuilder) MustBuild() NLMReserved {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMReservedBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

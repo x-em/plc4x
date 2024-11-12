@@ -102,6 +102,8 @@ type IdentifyReplyCommandOutputUnitSummaryBuilder interface {
 	WithOptionalGavStoreEnabledByte2(byte) IdentifyReplyCommandOutputUnitSummaryBuilder
 	// WithTimeFromLastRecoverOfMainsInSeconds adds TimeFromLastRecoverOfMainsInSeconds (property field)
 	WithTimeFromLastRecoverOfMainsInSeconds(uint8) IdentifyReplyCommandOutputUnitSummaryBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandOutputUnitSummary or returns an error if something is wrong
 	Build() (IdentifyReplyCommandOutputUnitSummary, error)
 	// MustBuild does the same as Build but panics on error
@@ -185,8 +187,10 @@ func (b *_IdentifyReplyCommandOutputUnitSummaryBuilder) MustBuild() IdentifyRepl
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandOutputUnitSummaryBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

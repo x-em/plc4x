@@ -101,6 +101,8 @@ type CallMethodRequestBuilder interface {
 	WithMethodIdBuilder(func(NodeIdBuilder) NodeIdBuilder) CallMethodRequestBuilder
 	// WithInputArguments adds InputArguments (property field)
 	WithInputArguments(...Variant) CallMethodRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CallMethodRequest or returns an error if something is wrong
 	Build() (CallMethodRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_CallMethodRequestBuilder) MustBuild() CallMethodRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CallMethodRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

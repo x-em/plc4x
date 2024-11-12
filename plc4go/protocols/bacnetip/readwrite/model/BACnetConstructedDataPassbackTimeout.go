@@ -86,6 +86,8 @@ type BACnetConstructedDataPassbackTimeoutBuilder interface {
 	WithPassbackTimeout(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPassbackTimeoutBuilder
 	// WithPassbackTimeoutBuilder adds PassbackTimeout (property field) which is build by the builder
 	WithPassbackTimeoutBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataPassbackTimeoutBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataPassbackTimeout or returns an error if something is wrong
 	Build() (BACnetConstructedDataPassbackTimeout, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataPassbackTimeoutBuilder) MustBuild() BACnetConstru
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataPassbackTimeoutBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

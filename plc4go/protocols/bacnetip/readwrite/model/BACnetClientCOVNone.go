@@ -84,6 +84,8 @@ type BACnetClientCOVNoneBuilder interface {
 	WithDefaultIncrement(BACnetApplicationTagNull) BACnetClientCOVNoneBuilder
 	// WithDefaultIncrementBuilder adds DefaultIncrement (property field) which is build by the builder
 	WithDefaultIncrementBuilder(func(BACnetApplicationTagNullBuilder) BACnetApplicationTagNullBuilder) BACnetClientCOVNoneBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetClientCOVBuilder
 	// Build builds the BACnetClientCOVNone or returns an error if something is wrong
 	Build() (BACnetClientCOVNone, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetClientCOVNoneBuilder) MustBuild() BACnetClientCOVNone {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetClientCOVNoneBuilder) Done() BACnetClientCOVBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetClientCOVBuilder().(*_BACnetClientCOVBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -97,6 +97,8 @@ type DescriptionResponseBuilder interface {
 	WithDibSuppSvcFamilies(DIBSuppSvcFamilies) DescriptionResponseBuilder
 	// WithDibSuppSvcFamiliesBuilder adds DibSuppSvcFamilies (property field) which is build by the builder
 	WithDibSuppSvcFamiliesBuilder(func(DIBSuppSvcFamiliesBuilder) DIBSuppSvcFamiliesBuilder) DescriptionResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the DescriptionResponse or returns an error if something is wrong
 	Build() (DescriptionResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -189,8 +191,10 @@ func (b *_DescriptionResponseBuilder) MustBuild() DescriptionResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DescriptionResponseBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

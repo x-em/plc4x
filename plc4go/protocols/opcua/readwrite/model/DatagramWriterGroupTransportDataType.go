@@ -85,6 +85,8 @@ type DatagramWriterGroupTransportDataTypeBuilder interface {
 	WithMessageRepeatCount(uint8) DatagramWriterGroupTransportDataTypeBuilder
 	// WithMessageRepeatDelay adds MessageRepeatDelay (property field)
 	WithMessageRepeatDelay(float64) DatagramWriterGroupTransportDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DatagramWriterGroupTransportDataType or returns an error if something is wrong
 	Build() (DatagramWriterGroupTransportDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_DatagramWriterGroupTransportDataTypeBuilder) MustBuild() DatagramWrite
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DatagramWriterGroupTransportDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

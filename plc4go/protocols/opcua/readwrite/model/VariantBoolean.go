@@ -85,6 +85,8 @@ type VariantBooleanBuilder interface {
 	WithOptionalArrayLength(int32) VariantBooleanBuilder
 	// WithValue adds Value (property field)
 	WithValue(...byte) VariantBooleanBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantBoolean or returns an error if something is wrong
 	Build() (VariantBoolean, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantBooleanBuilder) MustBuild() VariantBoolean {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantBooleanBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

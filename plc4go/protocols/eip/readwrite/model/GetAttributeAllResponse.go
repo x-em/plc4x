@@ -95,6 +95,8 @@ type GetAttributeAllResponseBuilder interface {
 	WithOptionalAttributes(CIPAttributes) GetAttributeAllResponseBuilder
 	// WithOptionalAttributesBuilder adds Attributes (property field) which is build by the builder
 	WithOptionalAttributesBuilder(func(CIPAttributesBuilder) CIPAttributesBuilder) GetAttributeAllResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the GetAttributeAllResponse or returns an error if something is wrong
 	Build() (GetAttributeAllResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -167,8 +169,10 @@ func (b *_GetAttributeAllResponseBuilder) MustBuild() GetAttributeAllResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_GetAttributeAllResponseBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

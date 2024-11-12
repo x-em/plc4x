@@ -98,6 +98,8 @@ type SetPublishingModeRequestBuilder interface {
 	WithPublishingEnabled(bool) SetPublishingModeRequestBuilder
 	// WithSubscriptionIds adds SubscriptionIds (property field)
 	WithSubscriptionIds(...uint32) SetPublishingModeRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SetPublishingModeRequest or returns an error if something is wrong
 	Build() (SetPublishingModeRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -176,8 +178,10 @@ func (b *_SetPublishingModeRequestBuilder) MustBuild() SetPublishingModeRequest 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SetPublishingModeRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

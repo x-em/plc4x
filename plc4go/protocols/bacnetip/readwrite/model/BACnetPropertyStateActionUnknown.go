@@ -84,6 +84,8 @@ type BACnetPropertyStateActionUnknownBuilder interface {
 	WithUnknownValue(BACnetContextTagUnknown) BACnetPropertyStateActionUnknownBuilder
 	// WithUnknownValueBuilder adds UnknownValue (property field) which is build by the builder
 	WithUnknownValueBuilder(func(BACnetContextTagUnknownBuilder) BACnetContextTagUnknownBuilder) BACnetPropertyStateActionUnknownBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStateActionUnknown or returns an error if something is wrong
 	Build() (BACnetPropertyStateActionUnknown, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStateActionUnknownBuilder) MustBuild() BACnetPropertySta
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStateActionUnknownBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

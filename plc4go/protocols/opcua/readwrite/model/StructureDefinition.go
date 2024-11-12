@@ -107,6 +107,8 @@ type StructureDefinitionBuilder interface {
 	WithStructureType(StructureType) StructureDefinitionBuilder
 	// WithFields adds Fields (property field)
 	WithFields(...StructureField) StructureDefinitionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the StructureDefinition or returns an error if something is wrong
 	Build() (StructureDefinition, error)
 	// MustBuild does the same as Build but panics on error
@@ -209,8 +211,10 @@ func (b *_StructureDefinitionBuilder) MustBuild() StructureDefinition {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_StructureDefinitionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

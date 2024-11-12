@@ -217,6 +217,8 @@ type DataSetReaderDataTypeBuilder interface {
 	WithSubscribedDataSet(ExtensionObject) DataSetReaderDataTypeBuilder
 	// WithSubscribedDataSetBuilder adds SubscribedDataSet (property field) which is build by the builder
 	WithSubscribedDataSetBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) DataSetReaderDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DataSetReaderDataType or returns an error if something is wrong
 	Build() (DataSetReaderDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -498,8 +500,10 @@ func (b *_DataSetReaderDataTypeBuilder) MustBuild() DataSetReaderDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DataSetReaderDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

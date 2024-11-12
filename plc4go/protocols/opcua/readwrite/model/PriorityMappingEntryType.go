@@ -107,6 +107,8 @@ type PriorityMappingEntryTypeBuilder interface {
 	WithPriorityValue_PCP(uint8) PriorityMappingEntryTypeBuilder
 	// WithPriorityValue_DSCP adds PriorityValue_DSCP (property field)
 	WithPriorityValue_DSCP(uint32) PriorityMappingEntryTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PriorityMappingEntryType or returns an error if something is wrong
 	Build() (PriorityMappingEntryType, error)
 	// MustBuild does the same as Build but panics on error
@@ -209,8 +211,10 @@ func (b *_PriorityMappingEntryTypeBuilder) MustBuild() PriorityMappingEntryType 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PriorityMappingEntryTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

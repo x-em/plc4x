@@ -118,6 +118,8 @@ type AxisInformationBuilder interface {
 	WithAxisScaleType(AxisScaleEnumeration) AxisInformationBuilder
 	// WithAxisSteps adds AxisSteps (property field)
 	WithAxisSteps(...float64) AxisInformationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the AxisInformation or returns an error if something is wrong
 	Build() (AxisInformation, error)
 	// MustBuild does the same as Build but panics on error
@@ -244,8 +246,10 @@ func (b *_AxisInformationBuilder) MustBuild() AxisInformation {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AxisInformationBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

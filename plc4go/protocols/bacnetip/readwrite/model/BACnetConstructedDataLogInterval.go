@@ -86,6 +86,8 @@ type BACnetConstructedDataLogIntervalBuilder interface {
 	WithLogInterval(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataLogIntervalBuilder
 	// WithLogIntervalBuilder adds LogInterval (property field) which is build by the builder
 	WithLogIntervalBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataLogIntervalBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataLogInterval or returns an error if something is wrong
 	Build() (BACnetConstructedDataLogInterval, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataLogIntervalBuilder) MustBuild() BACnetConstructed
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataLogIntervalBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

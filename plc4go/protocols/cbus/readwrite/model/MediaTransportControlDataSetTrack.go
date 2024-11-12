@@ -97,6 +97,8 @@ type MediaTransportControlDataSetTrackBuilder interface {
 	WithTrackMLSB(byte) MediaTransportControlDataSetTrackBuilder
 	// WithTrackLSB adds TrackLSB (property field)
 	WithTrackLSB(byte) MediaTransportControlDataSetTrackBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataSetTrack or returns an error if something is wrong
 	Build() (MediaTransportControlDataSetTrack, error)
 	// MustBuild does the same as Build but panics on error
@@ -161,8 +163,10 @@ func (b *_MediaTransportControlDataSetTrackBuilder) MustBuild() MediaTransportCo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataSetTrackBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

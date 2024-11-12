@@ -87,6 +87,8 @@ type RootExtensionObjectBuilder interface {
 	WithBody(ExtensionObjectDefinition) RootExtensionObjectBuilder
 	// WithBodyBuilder adds Body (property field) which is build by the builder
 	WithBodyBuilder(func(ExtensionObjectDefinitionBuilder) ExtensionObjectDefinitionBuilder) RootExtensionObjectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectBuilder
 	// Build builds the RootExtensionObject or returns an error if something is wrong
 	Build() (RootExtensionObject, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,8 +157,10 @@ func (b *_RootExtensionObjectBuilder) MustBuild() RootExtensionObject {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RootExtensionObjectBuilder) Done() ExtensionObjectBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectBuilder().(*_ExtensionObjectBuilder)
+	}
 	return b.parentBuilder
 }
 

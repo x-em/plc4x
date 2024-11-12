@@ -85,6 +85,8 @@ type ComplexNumberTypeBuilder interface {
 	WithReal(float32) ComplexNumberTypeBuilder
 	// WithImaginary adds Imaginary (property field)
 	WithImaginary(float32) ComplexNumberTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ComplexNumberType or returns an error if something is wrong
 	Build() (ComplexNumberType, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ComplexNumberTypeBuilder) MustBuild() ComplexNumberType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ComplexNumberTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

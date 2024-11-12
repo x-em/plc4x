@@ -101,6 +101,8 @@ type AnnotationBuilder interface {
 	WithUserNameBuilder(func(PascalStringBuilder) PascalStringBuilder) AnnotationBuilder
 	// WithAnnotationTime adds AnnotationTime (property field)
 	WithAnnotationTime(int64) AnnotationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the Annotation or returns an error if something is wrong
 	Build() (Annotation, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_AnnotationBuilder) MustBuild() Annotation {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AnnotationBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

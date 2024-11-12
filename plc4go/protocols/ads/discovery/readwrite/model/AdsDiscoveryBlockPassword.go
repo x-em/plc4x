@@ -84,6 +84,8 @@ type AdsDiscoveryBlockPasswordBuilder interface {
 	WithPassword(AmsString) AdsDiscoveryBlockPasswordBuilder
 	// WithPasswordBuilder adds Password (property field) which is build by the builder
 	WithPasswordBuilder(func(AmsStringBuilder) AmsStringBuilder) AdsDiscoveryBlockPasswordBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsDiscoveryBlockBuilder
 	// Build builds the AdsDiscoveryBlockPassword or returns an error if something is wrong
 	Build() (AdsDiscoveryBlockPassword, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_AdsDiscoveryBlockPasswordBuilder) MustBuild() AdsDiscoveryBlockPasswor
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDiscoveryBlockPasswordBuilder) Done() AdsDiscoveryBlockBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsDiscoveryBlockBuilder().(*_AdsDiscoveryBlockBuilder)
+	}
 	return b.parentBuilder
 }
 

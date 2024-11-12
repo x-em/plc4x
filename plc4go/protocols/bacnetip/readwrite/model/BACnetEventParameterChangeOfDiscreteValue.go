@@ -106,6 +106,8 @@ type BACnetEventParameterChangeOfDiscreteValueBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetEventParameterChangeOfDiscreteValueBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetEventParameterChangeOfDiscreteValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetEventParameterBuilder
 	// Build builds the BACnetEventParameterChangeOfDiscreteValue or returns an error if something is wrong
 	Build() (BACnetEventParameterChangeOfDiscreteValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -222,8 +224,10 @@ func (b *_BACnetEventParameterChangeOfDiscreteValueBuilder) MustBuild() BACnetEv
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetEventParameterChangeOfDiscreteValueBuilder) Done() BACnetEventParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetEventParameterBuilder().(*_BACnetEventParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

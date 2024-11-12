@@ -82,6 +82,8 @@ type BACnetConfirmedServiceRequestUnknownBuilder interface {
 	WithMandatoryFields(unknownBytes []byte) BACnetConfirmedServiceRequestUnknownBuilder
 	// WithUnknownBytes adds UnknownBytes (property field)
 	WithUnknownBytes(...byte) BACnetConfirmedServiceRequestUnknownBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestUnknown or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestUnknown, error)
 	// MustBuild does the same as Build but panics on error
@@ -131,8 +133,10 @@ func (b *_BACnetConfirmedServiceRequestUnknownBuilder) MustBuild() BACnetConfirm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestUnknownBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

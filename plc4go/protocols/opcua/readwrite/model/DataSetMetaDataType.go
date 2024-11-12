@@ -147,6 +147,8 @@ type DataSetMetaDataTypeBuilder interface {
 	WithConfigurationVersion(ConfigurationVersionDataType) DataSetMetaDataTypeBuilder
 	// WithConfigurationVersionBuilder adds ConfigurationVersion (property field) which is build by the builder
 	WithConfigurationVersionBuilder(func(ConfigurationVersionDataTypeBuilder) ConfigurationVersionDataTypeBuilder) DataSetMetaDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DataSetMetaDataType or returns an error if something is wrong
 	Build() (DataSetMetaDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -312,8 +314,10 @@ func (b *_DataSetMetaDataTypeBuilder) MustBuild() DataSetMetaDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DataSetMetaDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

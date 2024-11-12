@@ -84,6 +84,8 @@ type BACnetPropertyStatesPolarityBuilder interface {
 	WithPolarity(BACnetPolarityTagged) BACnetPropertyStatesPolarityBuilder
 	// WithPolarityBuilder adds Polarity (property field) which is build by the builder
 	WithPolarityBuilder(func(BACnetPolarityTaggedBuilder) BACnetPolarityTaggedBuilder) BACnetPropertyStatesPolarityBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesPolarity or returns an error if something is wrong
 	Build() (BACnetPropertyStatesPolarity, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesPolarityBuilder) MustBuild() BACnetPropertyStatesP
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesPolarityBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

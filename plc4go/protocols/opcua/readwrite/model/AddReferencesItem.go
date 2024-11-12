@@ -131,6 +131,8 @@ type AddReferencesItemBuilder interface {
 	WithTargetNodeIdBuilder(func(ExpandedNodeIdBuilder) ExpandedNodeIdBuilder) AddReferencesItemBuilder
 	// WithTargetNodeClass adds TargetNodeClass (property field)
 	WithTargetNodeClass(NodeClass) AddReferencesItemBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the AddReferencesItem or returns an error if something is wrong
 	Build() (AddReferencesItem, error)
 	// MustBuild does the same as Build but panics on error
@@ -281,8 +283,10 @@ func (b *_AddReferencesItemBuilder) MustBuild() AddReferencesItem {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AddReferencesItemBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

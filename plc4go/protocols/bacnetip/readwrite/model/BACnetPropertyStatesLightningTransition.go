@@ -84,6 +84,8 @@ type BACnetPropertyStatesLightningTransitionBuilder interface {
 	WithLightningTransition(BACnetLightingTransitionTagged) BACnetPropertyStatesLightningTransitionBuilder
 	// WithLightningTransitionBuilder adds LightningTransition (property field) which is build by the builder
 	WithLightningTransitionBuilder(func(BACnetLightingTransitionTaggedBuilder) BACnetLightingTransitionTaggedBuilder) BACnetPropertyStatesLightningTransitionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesLightningTransition or returns an error if something is wrong
 	Build() (BACnetPropertyStatesLightningTransition, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesLightningTransitionBuilder) MustBuild() BACnetProp
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesLightningTransitionBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -91,6 +91,8 @@ type AdsReadRequestBuilder interface {
 	WithIndexOffset(uint32) AdsReadRequestBuilder
 	// WithLength adds Length (property field)
 	WithLength(uint32) AdsReadRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AmsPacketBuilder
 	// Build builds the AdsReadRequest or returns an error if something is wrong
 	Build() (AdsReadRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_AdsReadRequestBuilder) MustBuild() AdsReadRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsReadRequestBuilder) Done() AmsPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAmsPacketBuilder().(*_AmsPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

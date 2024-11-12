@@ -90,6 +90,8 @@ type AddNodesRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) AddNodesRequestBuilder
 	// WithNodesToAdd adds NodesToAdd (property field)
 	WithNodesToAdd(...AddNodesItem) AddNodesRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the AddNodesRequest or returns an error if something is wrong
 	Build() (AddNodesRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_AddNodesRequestBuilder) MustBuild() AddNodesRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AddNodesRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

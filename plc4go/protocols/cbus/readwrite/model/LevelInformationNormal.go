@@ -89,6 +89,8 @@ type LevelInformationNormalBuilder interface {
 	WithPair1(LevelInformationNibblePair) LevelInformationNormalBuilder
 	// WithPair2 adds Pair2 (property field)
 	WithPair2(LevelInformationNibblePair) LevelInformationNormalBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() LevelInformationBuilder
 	// Build builds the LevelInformationNormal or returns an error if something is wrong
 	Build() (LevelInformationNormal, error)
 	// MustBuild does the same as Build but panics on error
@@ -143,8 +145,10 @@ func (b *_LevelInformationNormalBuilder) MustBuild() LevelInformationNormal {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LevelInformationNormalBuilder) Done() LevelInformationBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewLevelInformationBuilder().(*_LevelInformationBuilder)
+	}
 	return b.parentBuilder
 }
 

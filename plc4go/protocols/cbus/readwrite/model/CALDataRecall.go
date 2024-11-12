@@ -85,6 +85,8 @@ type CALDataRecallBuilder interface {
 	WithParamNo(Parameter) CALDataRecallBuilder
 	// WithCount adds Count (property field)
 	WithCount(uint8) CALDataRecallBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataRecall or returns an error if something is wrong
 	Build() (CALDataRecall, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_CALDataRecallBuilder) MustBuild() CALDataRecall {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataRecallBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

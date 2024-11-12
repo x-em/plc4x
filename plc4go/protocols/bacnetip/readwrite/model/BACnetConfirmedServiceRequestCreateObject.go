@@ -92,6 +92,8 @@ type BACnetConfirmedServiceRequestCreateObjectBuilder interface {
 	WithOptionalListOfValues(BACnetPropertyValues) BACnetConfirmedServiceRequestCreateObjectBuilder
 	// WithOptionalListOfValuesBuilder adds ListOfValues (property field) which is build by the builder
 	WithOptionalListOfValuesBuilder(func(BACnetPropertyValuesBuilder) BACnetPropertyValuesBuilder) BACnetConfirmedServiceRequestCreateObjectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestCreateObject or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestCreateObject, error)
 	// MustBuild does the same as Build but panics on error
@@ -178,8 +180,10 @@ func (b *_BACnetConfirmedServiceRequestCreateObjectBuilder) MustBuild() BACnetCo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestCreateObjectBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

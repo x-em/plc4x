@@ -83,6 +83,8 @@ type MediaTransportControlDataNextPreviousTrackBuilder interface {
 	WithMandatoryFields(operation byte) MediaTransportControlDataNextPreviousTrackBuilder
 	// WithOperation adds Operation (property field)
 	WithOperation(byte) MediaTransportControlDataNextPreviousTrackBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataNextPreviousTrack or returns an error if something is wrong
 	Build() (MediaTransportControlDataNextPreviousTrack, error)
 	// MustBuild does the same as Build but panics on error
@@ -132,8 +134,10 @@ func (b *_MediaTransportControlDataNextPreviousTrackBuilder) MustBuild() MediaTr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataNextPreviousTrackBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

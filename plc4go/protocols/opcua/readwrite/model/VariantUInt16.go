@@ -85,6 +85,8 @@ type VariantUInt16Builder interface {
 	WithOptionalArrayLength(int32) VariantUInt16Builder
 	// WithValue adds Value (property field)
 	WithValue(...uint16) VariantUInt16Builder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantUInt16 or returns an error if something is wrong
 	Build() (VariantUInt16, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantUInt16Builder) MustBuild() VariantUInt16 {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantUInt16Builder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

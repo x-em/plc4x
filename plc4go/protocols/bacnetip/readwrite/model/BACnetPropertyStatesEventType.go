@@ -84,6 +84,8 @@ type BACnetPropertyStatesEventTypeBuilder interface {
 	WithEventType(BACnetEventTypeTagged) BACnetPropertyStatesEventTypeBuilder
 	// WithEventTypeBuilder adds EventType (property field) which is build by the builder
 	WithEventTypeBuilder(func(BACnetEventTypeTaggedBuilder) BACnetEventTypeTaggedBuilder) BACnetPropertyStatesEventTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesEventType or returns an error if something is wrong
 	Build() (BACnetPropertyStatesEventType, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesEventTypeBuilder) MustBuild() BACnetPropertyStates
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesEventTypeBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

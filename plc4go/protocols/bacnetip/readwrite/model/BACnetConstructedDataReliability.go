@@ -86,6 +86,8 @@ type BACnetConstructedDataReliabilityBuilder interface {
 	WithReliability(BACnetReliabilityTagged) BACnetConstructedDataReliabilityBuilder
 	// WithReliabilityBuilder adds Reliability (property field) which is build by the builder
 	WithReliabilityBuilder(func(BACnetReliabilityTaggedBuilder) BACnetReliabilityTaggedBuilder) BACnetConstructedDataReliabilityBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataReliability or returns an error if something is wrong
 	Build() (BACnetConstructedDataReliability, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataReliabilityBuilder) MustBuild() BACnetConstructed
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataReliabilityBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

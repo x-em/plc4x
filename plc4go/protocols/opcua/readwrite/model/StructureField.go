@@ -132,6 +132,8 @@ type StructureFieldBuilder interface {
 	WithMaxStringLength(uint32) StructureFieldBuilder
 	// WithIsOptional adds IsOptional (property field)
 	WithIsOptional(bool) StructureFieldBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the StructureField or returns an error if something is wrong
 	Build() (StructureField, error)
 	// MustBuild does the same as Build but panics on error
@@ -268,8 +270,10 @@ func (b *_StructureFieldBuilder) MustBuild() StructureField {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_StructureFieldBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

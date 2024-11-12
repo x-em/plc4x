@@ -86,6 +86,8 @@ type BACnetContextTagSignedIntegerBuilder interface {
 	WithPayload(BACnetTagPayloadSignedInteger) BACnetContextTagSignedIntegerBuilder
 	// WithPayloadBuilder adds Payload (property field) which is build by the builder
 	WithPayloadBuilder(func(BACnetTagPayloadSignedIntegerBuilder) BACnetTagPayloadSignedIntegerBuilder) BACnetContextTagSignedIntegerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetContextTagBuilder
 	// Build builds the BACnetContextTagSignedInteger or returns an error if something is wrong
 	Build() (BACnetContextTagSignedInteger, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetContextTagSignedIntegerBuilder) MustBuild() BACnetContextTagSign
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetContextTagSignedIntegerBuilder) Done() BACnetContextTagBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetContextTagBuilder().(*_BACnetContextTagBuilder)
+	}
 	return b.parentBuilder
 }
 

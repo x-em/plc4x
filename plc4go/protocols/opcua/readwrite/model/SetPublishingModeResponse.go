@@ -96,6 +96,8 @@ type SetPublishingModeResponseBuilder interface {
 	WithResults(...StatusCode) SetPublishingModeResponseBuilder
 	// WithDiagnosticInfos adds DiagnosticInfos (property field)
 	WithDiagnosticInfos(...DiagnosticInfo) SetPublishingModeResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SetPublishingModeResponse or returns an error if something is wrong
 	Build() (SetPublishingModeResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_SetPublishingModeResponseBuilder) MustBuild() SetPublishingModeRespons
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SetPublishingModeResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

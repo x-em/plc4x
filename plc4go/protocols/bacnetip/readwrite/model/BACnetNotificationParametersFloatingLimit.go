@@ -139,6 +139,8 @@ type BACnetNotificationParametersFloatingLimitBuilder interface {
 	WithInnerClosingTag(BACnetClosingTag) BACnetNotificationParametersFloatingLimitBuilder
 	// WithInnerClosingTagBuilder adds InnerClosingTag (property field) which is build by the builder
 	WithInnerClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetNotificationParametersFloatingLimitBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetNotificationParametersBuilder
 	// Build builds the BACnetNotificationParametersFloatingLimit or returns an error if something is wrong
 	Build() (BACnetNotificationParametersFloatingLimit, error)
 	// MustBuild does the same as Build but panics on error
@@ -327,8 +329,10 @@ func (b *_BACnetNotificationParametersFloatingLimitBuilder) MustBuild() BACnetNo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetNotificationParametersFloatingLimitBuilder) Done() BACnetNotificationParametersBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetNotificationParametersBuilder().(*_BACnetNotificationParametersBuilder)
+	}
 	return b.parentBuilder
 }
 

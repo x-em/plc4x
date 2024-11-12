@@ -86,6 +86,8 @@ type BACnetConstructedDataAccompanimentTimeBuilder interface {
 	WithAccompanimentTime(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAccompanimentTimeBuilder
 	// WithAccompanimentTimeBuilder adds AccompanimentTime (property field) which is build by the builder
 	WithAccompanimentTimeBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataAccompanimentTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAccompanimentTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataAccompanimentTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataAccompanimentTimeBuilder) MustBuild() BACnetConst
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAccompanimentTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

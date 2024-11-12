@@ -79,6 +79,8 @@ type SecurityDataZoneShortBuilder interface {
 	WithMandatoryFields(zoneNumber uint8) SecurityDataZoneShortBuilder
 	// WithZoneNumber adds ZoneNumber (property field)
 	WithZoneNumber(uint8) SecurityDataZoneShortBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataZoneShort or returns an error if something is wrong
 	Build() (SecurityDataZoneShort, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_SecurityDataZoneShortBuilder) MustBuild() SecurityDataZoneShort {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataZoneShortBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

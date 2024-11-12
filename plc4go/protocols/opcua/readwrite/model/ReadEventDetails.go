@@ -102,6 +102,8 @@ type ReadEventDetailsBuilder interface {
 	WithFilter(EventFilter) ReadEventDetailsBuilder
 	// WithFilterBuilder adds Filter (property field) which is build by the builder
 	WithFilterBuilder(func(EventFilterBuilder) EventFilterBuilder) ReadEventDetailsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ReadEventDetails or returns an error if something is wrong
 	Build() (ReadEventDetails, error)
 	// MustBuild does the same as Build but panics on error
@@ -185,8 +187,10 @@ func (b *_ReadEventDetailsBuilder) MustBuild() ReadEventDetails {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ReadEventDetailsBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

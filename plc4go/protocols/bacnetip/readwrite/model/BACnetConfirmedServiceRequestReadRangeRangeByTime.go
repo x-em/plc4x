@@ -95,6 +95,8 @@ type BACnetConfirmedServiceRequestReadRangeRangeByTimeBuilder interface {
 	WithCount(BACnetApplicationTagSignedInteger) BACnetConfirmedServiceRequestReadRangeRangeByTimeBuilder
 	// WithCountBuilder adds Count (property field) which is build by the builder
 	WithCountBuilder(func(BACnetApplicationTagSignedIntegerBuilder) BACnetApplicationTagSignedIntegerBuilder) BACnetConfirmedServiceRequestReadRangeRangeByTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestReadRangeRangeBuilder
 	// Build builds the BACnetConfirmedServiceRequestReadRangeRangeByTime or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestReadRangeRangeByTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_BACnetConfirmedServiceRequestReadRangeRangeByTimeBuilder) MustBuild() 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestReadRangeRangeByTimeBuilder) Done() BACnetConfirmedServiceRequestReadRangeRangeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestReadRangeRangeBuilder().(*_BACnetConfirmedServiceRequestReadRangeRangeBuilder)
+	}
 	return b.parentBuilder
 }
 

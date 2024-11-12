@@ -79,6 +79,8 @@ type DF1CommandResponseMessageProtectedTypedLogicalReadBuilder interface {
 	WithMandatoryFields(data []uint8) DF1CommandResponseMessageProtectedTypedLogicalReadBuilder
 	// WithData adds Data (property field)
 	WithData(...uint8) DF1CommandResponseMessageProtectedTypedLogicalReadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() DF1ResponseMessageBuilder
 	// Build builds the DF1CommandResponseMessageProtectedTypedLogicalRead or returns an error if something is wrong
 	Build() (DF1CommandResponseMessageProtectedTypedLogicalRead, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_DF1CommandResponseMessageProtectedTypedLogicalReadBuilder) MustBuild()
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DF1CommandResponseMessageProtectedTypedLogicalReadBuilder) Done() DF1ResponseMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewDF1ResponseMessageBuilder().(*_DF1ResponseMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

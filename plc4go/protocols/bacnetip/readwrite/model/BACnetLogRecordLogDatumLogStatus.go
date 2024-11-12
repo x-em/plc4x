@@ -84,6 +84,8 @@ type BACnetLogRecordLogDatumLogStatusBuilder interface {
 	WithLogStatus(BACnetLogStatusTagged) BACnetLogRecordLogDatumLogStatusBuilder
 	// WithLogStatusBuilder adds LogStatus (property field) which is build by the builder
 	WithLogStatusBuilder(func(BACnetLogStatusTaggedBuilder) BACnetLogStatusTaggedBuilder) BACnetLogRecordLogDatumLogStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLogRecordLogDatumBuilder
 	// Build builds the BACnetLogRecordLogDatumLogStatus or returns an error if something is wrong
 	Build() (BACnetLogRecordLogDatumLogStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLogRecordLogDatumLogStatusBuilder) MustBuild() BACnetLogRecordLo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLogRecordLogDatumLogStatusBuilder) Done() BACnetLogRecordLogDatumBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLogRecordLogDatumBuilder().(*_BACnetLogRecordLogDatumBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -72,6 +72,8 @@ type DF1SymbolMessageFrameACKBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() DF1SymbolMessageFrameACKBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() DF1SymbolBuilder
 	// Build builds the DF1SymbolMessageFrameACK or returns an error if something is wrong
 	Build() (DF1SymbolMessageFrameACK, error)
 	// MustBuild does the same as Build but panics on error
@@ -116,8 +118,10 @@ func (b *_DF1SymbolMessageFrameACKBuilder) MustBuild() DF1SymbolMessageFrameACK 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DF1SymbolMessageFrameACKBuilder) Done() DF1SymbolBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewDF1SymbolBuilder().(*_DF1SymbolBuilder)
+	}
 	return b.parentBuilder
 }
 

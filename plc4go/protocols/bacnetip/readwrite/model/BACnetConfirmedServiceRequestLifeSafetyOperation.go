@@ -114,6 +114,8 @@ type BACnetConfirmedServiceRequestLifeSafetyOperationBuilder interface {
 	WithOptionalObjectIdentifier(BACnetContextTagObjectIdentifier) BACnetConfirmedServiceRequestLifeSafetyOperationBuilder
 	// WithOptionalObjectIdentifierBuilder adds ObjectIdentifier (property field) which is build by the builder
 	WithOptionalObjectIdentifierBuilder(func(BACnetContextTagObjectIdentifierBuilder) BACnetContextTagObjectIdentifierBuilder) BACnetConfirmedServiceRequestLifeSafetyOperationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestLifeSafetyOperation or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestLifeSafetyOperation, error)
 	// MustBuild does the same as Build but panics on error
@@ -248,8 +250,10 @@ func (b *_BACnetConfirmedServiceRequestLifeSafetyOperationBuilder) MustBuild() B
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestLifeSafetyOperationBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

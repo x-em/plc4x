@@ -86,6 +86,8 @@ type BACnetConstructedDataAccessEventAuthenticationFactorBuilder interface {
 	WithAccessEventAuthenticationFactor(BACnetAuthenticationFactor) BACnetConstructedDataAccessEventAuthenticationFactorBuilder
 	// WithAccessEventAuthenticationFactorBuilder adds AccessEventAuthenticationFactor (property field) which is build by the builder
 	WithAccessEventAuthenticationFactorBuilder(func(BACnetAuthenticationFactorBuilder) BACnetAuthenticationFactorBuilder) BACnetConstructedDataAccessEventAuthenticationFactorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAccessEventAuthenticationFactor or returns an error if something is wrong
 	Build() (BACnetConstructedDataAccessEventAuthenticationFactor, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataAccessEventAuthenticationFactorBuilder) MustBuild
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAccessEventAuthenticationFactorBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

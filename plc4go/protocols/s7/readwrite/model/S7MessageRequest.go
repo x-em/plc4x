@@ -71,6 +71,8 @@ type S7MessageRequestBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() S7MessageRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7MessageBuilder
 	// Build builds the S7MessageRequest or returns an error if something is wrong
 	Build() (S7MessageRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_S7MessageRequestBuilder) MustBuild() S7MessageRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7MessageRequestBuilder) Done() S7MessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7MessageBuilder().(*_S7MessageBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type LiteralOperandBuilder interface {
 	WithValue(Variant) LiteralOperandBuilder
 	// WithValueBuilder adds Value (property field) which is build by the builder
 	WithValueBuilder(func(VariantBuilder) VariantBuilder) LiteralOperandBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the LiteralOperand or returns an error if something is wrong
 	Build() (LiteralOperand, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_LiteralOperandBuilder) MustBuild() LiteralOperand {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LiteralOperandBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

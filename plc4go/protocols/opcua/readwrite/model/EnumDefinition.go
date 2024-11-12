@@ -79,6 +79,8 @@ type EnumDefinitionBuilder interface {
 	WithMandatoryFields(fields []EnumField) EnumDefinitionBuilder
 	// WithFields adds Fields (property field)
 	WithFields(...EnumField) EnumDefinitionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the EnumDefinition or returns an error if something is wrong
 	Build() (EnumDefinition, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_EnumDefinitionBuilder) MustBuild() EnumDefinition {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_EnumDefinitionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

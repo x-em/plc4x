@@ -106,6 +106,8 @@ type BACnetServiceAckVTDataBuilder interface {
 	WithVtDataFlag(BACnetApplicationTagUnsignedInteger) BACnetServiceAckVTDataBuilder
 	// WithVtDataFlagBuilder adds VtDataFlag (property field) which is build by the builder
 	WithVtDataFlagBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetServiceAckVTDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckVTData or returns an error if something is wrong
 	Build() (BACnetServiceAckVTData, error)
 	// MustBuild does the same as Build but panics on error
@@ -222,8 +224,10 @@ func (b *_BACnetServiceAckVTDataBuilder) MustBuild() BACnetServiceAckVTData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckVTDataBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

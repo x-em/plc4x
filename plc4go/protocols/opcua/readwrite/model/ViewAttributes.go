@@ -127,6 +127,8 @@ type ViewAttributesBuilder interface {
 	WithContainsNoLoops(bool) ViewAttributesBuilder
 	// WithEventNotifier adds EventNotifier (property field)
 	WithEventNotifier(uint8) ViewAttributesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ViewAttributes or returns an error if something is wrong
 	Build() (ViewAttributes, error)
 	// MustBuild does the same as Build but panics on error
@@ -244,8 +246,10 @@ func (b *_ViewAttributesBuilder) MustBuild() ViewAttributes {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ViewAttributesBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

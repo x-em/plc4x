@@ -84,6 +84,8 @@ type MonitoredSALReplyBuilder interface {
 	WithMonitoredSAL(MonitoredSAL) MonitoredSALReplyBuilder
 	// WithMonitoredSALBuilder adds MonitoredSAL (property field) which is build by the builder
 	WithMonitoredSALBuilder(func(MonitoredSALBuilder) MonitoredSALBuilder) MonitoredSALReplyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() EncodedReplyBuilder
 	// Build builds the MonitoredSALReply or returns an error if something is wrong
 	Build() (MonitoredSALReply, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_MonitoredSALReplyBuilder) MustBuild() MonitoredSALReply {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MonitoredSALReplyBuilder) Done() EncodedReplyBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewEncodedReplyBuilder().(*_EncodedReplyBuilder)
+	}
 	return b.parentBuilder
 }
 

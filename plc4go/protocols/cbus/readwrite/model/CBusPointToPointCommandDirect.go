@@ -86,6 +86,8 @@ type CBusPointToPointCommandDirectBuilder interface {
 	WithUnitAddress(UnitAddress) CBusPointToPointCommandDirectBuilder
 	// WithUnitAddressBuilder adds UnitAddress (property field) which is build by the builder
 	WithUnitAddressBuilder(func(UnitAddressBuilder) UnitAddressBuilder) CBusPointToPointCommandDirectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CBusPointToPointCommandBuilder
 	// Build builds the CBusPointToPointCommandDirect or returns an error if something is wrong
 	Build() (CBusPointToPointCommandDirect, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_CBusPointToPointCommandDirectBuilder) MustBuild() CBusPointToPointComm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CBusPointToPointCommandDirectBuilder) Done() CBusPointToPointCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCBusPointToPointCommandBuilder().(*_CBusPointToPointCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetPropertyStatesLiftGroupModeBuilder interface {
 	WithLiftGroupMode(BACnetLiftGroupModeTagged) BACnetPropertyStatesLiftGroupModeBuilder
 	// WithLiftGroupModeBuilder adds LiftGroupMode (property field) which is build by the builder
 	WithLiftGroupModeBuilder(func(BACnetLiftGroupModeTaggedBuilder) BACnetLiftGroupModeTaggedBuilder) BACnetPropertyStatesLiftGroupModeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesLiftGroupMode or returns an error if something is wrong
 	Build() (BACnetPropertyStatesLiftGroupMode, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesLiftGroupModeBuilder) MustBuild() BACnetPropertySt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesLiftGroupModeBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

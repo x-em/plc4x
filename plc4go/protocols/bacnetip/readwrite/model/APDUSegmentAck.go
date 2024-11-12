@@ -105,6 +105,8 @@ type APDUSegmentAckBuilder interface {
 	WithSequenceNumber(uint8) APDUSegmentAckBuilder
 	// WithActualWindowSize adds ActualWindowSize (property field)
 	WithActualWindowSize(uint8) APDUSegmentAckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() APDUBuilder
 	// Build builds the APDUSegmentAck or returns an error if something is wrong
 	Build() (APDUSegmentAck, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_APDUSegmentAckBuilder) MustBuild() APDUSegmentAck {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_APDUSegmentAckBuilder) Done() APDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAPDUBuilder().(*_APDUBuilder)
+	}
 	return b.parentBuilder
 }
 

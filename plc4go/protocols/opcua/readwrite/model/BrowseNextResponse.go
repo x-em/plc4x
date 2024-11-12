@@ -96,6 +96,8 @@ type BrowseNextResponseBuilder interface {
 	WithResults(...BrowseResult) BrowseNextResponseBuilder
 	// WithDiagnosticInfos adds DiagnosticInfos (property field)
 	WithDiagnosticInfos(...DiagnosticInfo) BrowseNextResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the BrowseNextResponse or returns an error if something is wrong
 	Build() (BrowseNextResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_BrowseNextResponseBuilder) MustBuild() BrowseNextResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BrowseNextResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type ApduDataMemoryReadBuilder interface {
 	WithNumBytes(uint8) ApduDataMemoryReadBuilder
 	// WithAddress adds Address (property field)
 	WithAddress(uint16) ApduDataMemoryReadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataBuilder
 	// Build builds the ApduDataMemoryRead or returns an error if something is wrong
 	Build() (ApduDataMemoryRead, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ApduDataMemoryReadBuilder) MustBuild() ApduDataMemoryRead {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataMemoryReadBuilder) Done() ApduDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataBuilder().(*_ApduDataBuilder)
+	}
 	return b.parentBuilder
 }
 

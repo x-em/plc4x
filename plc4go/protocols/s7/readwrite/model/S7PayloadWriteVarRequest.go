@@ -79,6 +79,8 @@ type S7PayloadWriteVarRequestBuilder interface {
 	WithMandatoryFields(items []S7VarPayloadDataItem) S7PayloadWriteVarRequestBuilder
 	// WithItems adds Items (property field)
 	WithItems(...S7VarPayloadDataItem) S7PayloadWriteVarRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadBuilder
 	// Build builds the S7PayloadWriteVarRequest or returns an error if something is wrong
 	Build() (S7PayloadWriteVarRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_S7PayloadWriteVarRequestBuilder) MustBuild() S7PayloadWriteVarRequest 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadWriteVarRequestBuilder) Done() S7PayloadBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadBuilder().(*_S7PayloadBuilder)
+	}
 	return b.parentBuilder
 }
 

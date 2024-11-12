@@ -85,6 +85,8 @@ type CycServiceItemDbReadTypeBuilder interface {
 	WithNumberOfAreas(uint8) CycServiceItemDbReadTypeBuilder
 	// WithItems adds Items (property field)
 	WithItems(...SubItem) CycServiceItemDbReadTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CycServiceItemTypeBuilder
 	// Build builds the CycServiceItemDbReadType or returns an error if something is wrong
 	Build() (CycServiceItemDbReadType, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_CycServiceItemDbReadTypeBuilder) MustBuild() CycServiceItemDbReadType 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CycServiceItemDbReadTypeBuilder) Done() CycServiceItemTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCycServiceItemTypeBuilder().(*_CycServiceItemTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

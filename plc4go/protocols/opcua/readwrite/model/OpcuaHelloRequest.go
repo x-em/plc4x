@@ -101,6 +101,8 @@ type OpcuaHelloRequestBuilder interface {
 	WithEndpoint(PascalString) OpcuaHelloRequestBuilder
 	// WithEndpointBuilder adds Endpoint (property field) which is build by the builder
 	WithEndpointBuilder(func(PascalStringBuilder) PascalStringBuilder) OpcuaHelloRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MessagePDUBuilder
 	// Build builds the OpcuaHelloRequest or returns an error if something is wrong
 	Build() (OpcuaHelloRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_OpcuaHelloRequestBuilder) MustBuild() OpcuaHelloRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_OpcuaHelloRequestBuilder) Done() MessagePDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMessagePDUBuilder().(*_MessagePDUBuilder)
+	}
 	return b.parentBuilder
 }
 

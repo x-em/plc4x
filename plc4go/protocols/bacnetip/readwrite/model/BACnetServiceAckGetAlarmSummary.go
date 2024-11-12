@@ -106,6 +106,8 @@ type BACnetServiceAckGetAlarmSummaryBuilder interface {
 	WithAcknowledgedTransitions(BACnetEventTransitionBitsTagged) BACnetServiceAckGetAlarmSummaryBuilder
 	// WithAcknowledgedTransitionsBuilder adds AcknowledgedTransitions (property field) which is build by the builder
 	WithAcknowledgedTransitionsBuilder(func(BACnetEventTransitionBitsTaggedBuilder) BACnetEventTransitionBitsTaggedBuilder) BACnetServiceAckGetAlarmSummaryBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckGetAlarmSummary or returns an error if something is wrong
 	Build() (BACnetServiceAckGetAlarmSummary, error)
 	// MustBuild does the same as Build but panics on error
@@ -222,8 +224,10 @@ func (b *_BACnetServiceAckGetAlarmSummaryBuilder) MustBuild() BACnetServiceAckGe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckGetAlarmSummaryBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

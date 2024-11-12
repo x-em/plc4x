@@ -112,6 +112,8 @@ type CEMIAdditionalInformationBusmonitorInfoBuilder interface {
 	WithLostFlag(bool) CEMIAdditionalInformationBusmonitorInfoBuilder
 	// WithSequenceNumber adds SequenceNumber (property field)
 	WithSequenceNumber(uint8) CEMIAdditionalInformationBusmonitorInfoBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CEMIAdditionalInformationBuilder
 	// Build builds the CEMIAdditionalInformationBusmonitorInfo or returns an error if something is wrong
 	Build() (CEMIAdditionalInformationBusmonitorInfo, error)
 	// MustBuild does the same as Build but panics on error
@@ -186,8 +188,10 @@ func (b *_CEMIAdditionalInformationBusmonitorInfoBuilder) MustBuild() CEMIAdditi
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CEMIAdditionalInformationBusmonitorInfoBuilder) Done() CEMIAdditionalInformationBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCEMIAdditionalInformationBuilder().(*_CEMIAdditionalInformationBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type AdsDiscoveryBlockHostNameBuilder interface {
 	WithHostName(AmsString) AdsDiscoveryBlockHostNameBuilder
 	// WithHostNameBuilder adds HostName (property field) which is build by the builder
 	WithHostNameBuilder(func(AmsStringBuilder) AmsStringBuilder) AdsDiscoveryBlockHostNameBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsDiscoveryBlockBuilder
 	// Build builds the AdsDiscoveryBlockHostName or returns an error if something is wrong
 	Build() (AdsDiscoveryBlockHostName, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_AdsDiscoveryBlockHostNameBuilder) MustBuild() AdsDiscoveryBlockHostNam
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDiscoveryBlockHostNameBuilder) Done() AdsDiscoveryBlockBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsDiscoveryBlockBuilder().(*_AdsDiscoveryBlockBuilder)
+	}
 	return b.parentBuilder
 }
 

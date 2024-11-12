@@ -79,6 +79,8 @@ type TelephonyDataDialOutFailureBuilder interface {
 	WithMandatoryFields(reason DialOutFailureReason) TelephonyDataDialOutFailureBuilder
 	// WithReason adds Reason (property field)
 	WithReason(DialOutFailureReason) TelephonyDataDialOutFailureBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TelephonyDataBuilder
 	// Build builds the TelephonyDataDialOutFailure or returns an error if something is wrong
 	Build() (TelephonyDataDialOutFailure, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_TelephonyDataDialOutFailureBuilder) MustBuild() TelephonyDataDialOutFa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TelephonyDataDialOutFailureBuilder) Done() TelephonyDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTelephonyDataBuilder().(*_TelephonyDataBuilder)
+	}
 	return b.parentBuilder
 }
 

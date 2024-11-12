@@ -79,6 +79,8 @@ type SecurityDataArmReadyNotReadyBuilder interface {
 	WithMandatoryFields(zoneNumber uint8) SecurityDataArmReadyNotReadyBuilder
 	// WithZoneNumber adds ZoneNumber (property field)
 	WithZoneNumber(uint8) SecurityDataArmReadyNotReadyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataArmReadyNotReady or returns an error if something is wrong
 	Build() (SecurityDataArmReadyNotReady, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_SecurityDataArmReadyNotReadyBuilder) MustBuild() SecurityDataArmReadyN
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataArmReadyNotReadyBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

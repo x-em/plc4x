@@ -84,6 +84,8 @@ type BACnetPropertyStatesSilencedStateBuilder interface {
 	WithSilencedState(BACnetSilencedStateTagged) BACnetPropertyStatesSilencedStateBuilder
 	// WithSilencedStateBuilder adds SilencedState (property field) which is build by the builder
 	WithSilencedStateBuilder(func(BACnetSilencedStateTaggedBuilder) BACnetSilencedStateTaggedBuilder) BACnetPropertyStatesSilencedStateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesSilencedState or returns an error if something is wrong
 	Build() (BACnetPropertyStatesSilencedState, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesSilencedStateBuilder) MustBuild() BACnetPropertySt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesSilencedStateBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type SALDataEnableControlBuilder interface {
 	WithEnableControlData(EnableControlData) SALDataEnableControlBuilder
 	// WithEnableControlDataBuilder adds EnableControlData (property field) which is build by the builder
 	WithEnableControlDataBuilder(func(EnableControlDataBuilder) EnableControlDataBuilder) SALDataEnableControlBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataEnableControl or returns an error if something is wrong
 	Build() (SALDataEnableControl, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_SALDataEnableControlBuilder) MustBuild() SALDataEnableControl {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataEnableControlBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

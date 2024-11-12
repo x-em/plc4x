@@ -121,6 +121,8 @@ type S7ParameterUserDataItemCPUFunctionsBuilder interface {
 	WithOptionalLastDataUnit(uint8) S7ParameterUserDataItemCPUFunctionsBuilder
 	// WithErrorCode adds ErrorCode (property field)
 	WithOptionalErrorCode(uint16) S7ParameterUserDataItemCPUFunctionsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7ParameterUserDataItemBuilder
 	// Build builds the S7ParameterUserDataItemCPUFunctions or returns an error if something is wrong
 	Build() (S7ParameterUserDataItemCPUFunctions, error)
 	// MustBuild does the same as Build but panics on error
@@ -205,8 +207,10 @@ func (b *_S7ParameterUserDataItemCPUFunctionsBuilder) MustBuild() S7ParameterUse
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7ParameterUserDataItemCPUFunctionsBuilder) Done() S7ParameterUserDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7ParameterUserDataItemBuilder().(*_S7ParameterUserDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

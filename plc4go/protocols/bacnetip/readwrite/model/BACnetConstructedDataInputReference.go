@@ -86,6 +86,8 @@ type BACnetConstructedDataInputReferenceBuilder interface {
 	WithInputReference(BACnetObjectPropertyReference) BACnetConstructedDataInputReferenceBuilder
 	// WithInputReferenceBuilder adds InputReference (property field) which is build by the builder
 	WithInputReferenceBuilder(func(BACnetObjectPropertyReferenceBuilder) BACnetObjectPropertyReferenceBuilder) BACnetConstructedDataInputReferenceBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataInputReference or returns an error if something is wrong
 	Build() (BACnetConstructedDataInputReference, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataInputReferenceBuilder) MustBuild() BACnetConstruc
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataInputReferenceBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

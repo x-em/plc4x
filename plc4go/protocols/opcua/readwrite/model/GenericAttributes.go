@@ -119,6 +119,8 @@ type GenericAttributesBuilder interface {
 	WithUserWriteMask(uint32) GenericAttributesBuilder
 	// WithAttributeValues adds AttributeValues (property field)
 	WithAttributeValues(...GenericAttributeValue) GenericAttributesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the GenericAttributes or returns an error if something is wrong
 	Build() (GenericAttributes, error)
 	// MustBuild does the same as Build but panics on error
@@ -231,8 +233,10 @@ func (b *_GenericAttributesBuilder) MustBuild() GenericAttributes {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_GenericAttributesBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

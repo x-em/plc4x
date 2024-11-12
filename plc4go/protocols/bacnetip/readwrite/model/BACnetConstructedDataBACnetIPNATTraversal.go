@@ -86,6 +86,8 @@ type BACnetConstructedDataBACnetIPNATTraversalBuilder interface {
 	WithBacnetIPNATTraversal(BACnetApplicationTagBoolean) BACnetConstructedDataBACnetIPNATTraversalBuilder
 	// WithBacnetIPNATTraversalBuilder adds BacnetIPNATTraversal (property field) which is build by the builder
 	WithBacnetIPNATTraversalBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataBACnetIPNATTraversalBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataBACnetIPNATTraversal or returns an error if something is wrong
 	Build() (BACnetConstructedDataBACnetIPNATTraversal, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataBACnetIPNATTraversalBuilder) MustBuild() BACnetCo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataBACnetIPNATTraversalBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

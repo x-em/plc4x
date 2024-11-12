@@ -85,6 +85,8 @@ type NLMInitializeRoutingTableAckBuilder interface {
 	WithNumberOfPorts(uint8) NLMInitializeRoutingTableAckBuilder
 	// WithPortMappings adds PortMappings (property field)
 	WithPortMappings(...NLMInitializeRoutingTablePortMapping) NLMInitializeRoutingTableAckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMInitializeRoutingTableAck or returns an error if something is wrong
 	Build() (NLMInitializeRoutingTableAck, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_NLMInitializeRoutingTableAckBuilder) MustBuild() NLMInitializeRoutingT
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMInitializeRoutingTableAckBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

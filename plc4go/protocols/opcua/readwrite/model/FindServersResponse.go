@@ -90,6 +90,8 @@ type FindServersResponseBuilder interface {
 	WithResponseHeaderBuilder(func(ResponseHeaderBuilder) ResponseHeaderBuilder) FindServersResponseBuilder
 	// WithServers adds Servers (property field)
 	WithServers(...ApplicationDescription) FindServersResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the FindServersResponse or returns an error if something is wrong
 	Build() (FindServersResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_FindServersResponseBuilder) MustBuild() FindServersResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_FindServersResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

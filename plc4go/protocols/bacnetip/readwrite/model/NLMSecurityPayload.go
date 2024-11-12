@@ -85,6 +85,8 @@ type NLMSecurityPayloadBuilder interface {
 	WithPayloadLength(uint16) NLMSecurityPayloadBuilder
 	// WithPayload adds Payload (property field)
 	WithPayload(...byte) NLMSecurityPayloadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMSecurityPayload or returns an error if something is wrong
 	Build() (NLMSecurityPayload, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_NLMSecurityPayloadBuilder) MustBuild() NLMSecurityPayload {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMSecurityPayloadBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

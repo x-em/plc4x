@@ -356,12 +356,16 @@ type ${type.name}Builder interface {
 <#if type.isAbstract()>
 	<#list type.switchField.orElseThrow().cases as case>
 	// As${case.name} converts this build to a subType of ${type.name}. It is always possible to return to current builder using Done()
-	As${case.name}() interface{${case.name}Builder;Done()${type.name}Builder}
+	As${case.name}() ${case.name}Builder
 	</#list>
 	// Build builds the ${type.name} or returns an error if something is wrong
 	PartialBuild() (${type.name}Contract,error)
 	// MustBuild does the same as Build but panics on error
 	PartialMustBuild() ${type.name}Contract
+</#if>
+<#if type.isDiscriminatedChildTypeDefinition()>
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() (${type.parentType.orElseThrow().name}Builder)
 </#if>
 	// Build builds the ${type.name} or returns an error if something is wrong
 	Build() (${type.name},error)
@@ -475,8 +479,8 @@ func (b *_${type.name}Builder) <#if type.isAbstract()>Partial</#if>MustBuild() $
 
 <#if type.isAbstract()>
 	<#list type.switchField.orElseThrow().cases as case>
-func (b *_${type.name}Builder) As${case.name}() interface{${case.name}Builder;Done()${type.name}Builder} {
-	if cb, ok := b.childBuilder.(interface{${case.name}Builder;Done()${type.name}Builder}); ok {
+func (b *_${type.name}Builder) As${case.name}() ${case.name}Builder {
+	if cb, ok := b.childBuilder.(${case.name}Builder); ok {
 		return cb
 	}
 	cb := New${case.name}Builder().(*_${case.name}Builder)
@@ -491,8 +495,10 @@ func (b *_${type.name}Builder) As${case.name}() interface{${case.name}Builder;Do
 <#if type.isDiscriminatedChildTypeDefinition()>
 	<#assign parentType=type.getParentType().orElseThrow()>
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_${type.name}Builder) Done() ${parentType.name}Builder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = New${parentType.name}Builder().(*_${parentType.name}Builder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetPropertyStatesBinaryLightningValueBuilder interface {
 	WithBinaryLightningValue(BACnetBinaryLightingPVTagged) BACnetPropertyStatesBinaryLightningValueBuilder
 	// WithBinaryLightningValueBuilder adds BinaryLightningValue (property field) which is build by the builder
 	WithBinaryLightningValueBuilder(func(BACnetBinaryLightingPVTaggedBuilder) BACnetBinaryLightingPVTaggedBuilder) BACnetPropertyStatesBinaryLightningValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesBinaryLightningValue or returns an error if something is wrong
 	Build() (BACnetPropertyStatesBinaryLightningValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesBinaryLightningValueBuilder) MustBuild() BACnetPro
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesBinaryLightningValueBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

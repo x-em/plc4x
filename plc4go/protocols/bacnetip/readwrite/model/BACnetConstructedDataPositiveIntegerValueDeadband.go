@@ -86,6 +86,8 @@ type BACnetConstructedDataPositiveIntegerValueDeadbandBuilder interface {
 	WithDeadband(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPositiveIntegerValueDeadbandBuilder
 	// WithDeadbandBuilder adds Deadband (property field) which is build by the builder
 	WithDeadbandBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataPositiveIntegerValueDeadbandBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataPositiveIntegerValueDeadband or returns an error if something is wrong
 	Build() (BACnetConstructedDataPositiveIntegerValueDeadband, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataPositiveIntegerValueDeadbandBuilder) MustBuild() 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataPositiveIntegerValueDeadbandBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

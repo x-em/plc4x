@@ -501,6 +501,8 @@ type SessionDiagnosticsDataTypeBuilder interface {
 	WithUnregisterNodesCount(ServiceCounterDataType) SessionDiagnosticsDataTypeBuilder
 	// WithUnregisterNodesCountBuilder adds UnregisterNodesCount (property field) which is build by the builder
 	WithUnregisterNodesCountBuilder(func(ServiceCounterDataTypeBuilder) ServiceCounterDataTypeBuilder) SessionDiagnosticsDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SessionDiagnosticsDataType or returns an error if something is wrong
 	Build() (SessionDiagnosticsDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -1406,8 +1408,10 @@ func (b *_SessionDiagnosticsDataTypeBuilder) MustBuild() SessionDiagnosticsDataT
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SessionDiagnosticsDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

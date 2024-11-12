@@ -84,6 +84,8 @@ type UnConnectedDataItemBuilder interface {
 	WithService(CipService) UnConnectedDataItemBuilder
 	// WithServiceBuilder adds Service (property field) which is build by the builder
 	WithServiceBuilder(func(CipServiceBuilder) CipServiceBuilder) UnConnectedDataItemBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TypeIdBuilder
 	// Build builds the UnConnectedDataItem or returns an error if something is wrong
 	Build() (UnConnectedDataItem, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_UnConnectedDataItemBuilder) MustBuild() UnConnectedDataItem {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_UnConnectedDataItemBuilder) Done() TypeIdBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTypeIdBuilder().(*_TypeIdBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -87,6 +87,8 @@ type DisconnectResponseBuilder interface {
 	WithCommunicationChannelId(uint8) DisconnectResponseBuilder
 	// WithStatus adds Status (property field)
 	WithStatus(Status) DisconnectResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the DisconnectResponse or returns an error if something is wrong
 	Build() (DisconnectResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_DisconnectResponseBuilder) MustBuild() DisconnectResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DisconnectResponseBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

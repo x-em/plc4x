@@ -85,6 +85,8 @@ type NLMICouldBeRouterToNetworkBuilder interface {
 	WithDestinationNetworkAddress(uint16) NLMICouldBeRouterToNetworkBuilder
 	// WithPerformanceIndex adds PerformanceIndex (property field)
 	WithPerformanceIndex(uint8) NLMICouldBeRouterToNetworkBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMICouldBeRouterToNetwork or returns an error if something is wrong
 	Build() (NLMICouldBeRouterToNetwork, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_NLMICouldBeRouterToNetworkBuilder) MustBuild() NLMICouldBeRouterToNetw
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMICouldBeRouterToNetworkBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

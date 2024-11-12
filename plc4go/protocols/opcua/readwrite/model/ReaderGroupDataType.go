@@ -155,6 +155,8 @@ type ReaderGroupDataTypeBuilder interface {
 	WithMessageSettingsBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) ReaderGroupDataTypeBuilder
 	// WithDataSetReaders adds DataSetReaders (property field)
 	WithDataSetReaders(...DataSetReaderDataType) ReaderGroupDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ReaderGroupDataType or returns an error if something is wrong
 	Build() (ReaderGroupDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -325,8 +327,10 @@ func (b *_ReaderGroupDataTypeBuilder) MustBuild() ReaderGroupDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ReaderGroupDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

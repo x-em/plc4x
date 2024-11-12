@@ -124,6 +124,8 @@ type CALReplyLongBuilder interface {
 	WithOptionalReplyNetwork(ReplyNetwork) CALReplyLongBuilder
 	// WithOptionalReplyNetworkBuilder adds ReplyNetwork (property field) which is build by the builder
 	WithOptionalReplyNetworkBuilder(func(ReplyNetworkBuilder) ReplyNetworkBuilder) CALReplyLongBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALReplyBuilder
 	// Build builds the CALReplyLong or returns an error if something is wrong
 	Build() (CALReplyLong, error)
 	// MustBuild does the same as Build but panics on error
@@ -256,8 +258,10 @@ func (b *_CALReplyLongBuilder) MustBuild() CALReplyLong {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALReplyLongBuilder) Done() CALReplyBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALReplyBuilder().(*_CALReplyBuilder)
+	}
 	return b.parentBuilder
 }
 

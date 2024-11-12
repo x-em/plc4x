@@ -86,6 +86,8 @@ type BACnetConstructedDataProfileNameBuilder interface {
 	WithProfileName(BACnetApplicationTagCharacterString) BACnetConstructedDataProfileNameBuilder
 	// WithProfileNameBuilder adds ProfileName (property field) which is build by the builder
 	WithProfileNameBuilder(func(BACnetApplicationTagCharacterStringBuilder) BACnetApplicationTagCharacterStringBuilder) BACnetConstructedDataProfileNameBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataProfileName or returns an error if something is wrong
 	Build() (BACnetConstructedDataProfileName, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataProfileNameBuilder) MustBuild() BACnetConstructed
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataProfileNameBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

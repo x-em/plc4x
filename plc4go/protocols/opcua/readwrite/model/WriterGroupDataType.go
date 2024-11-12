@@ -196,6 +196,8 @@ type WriterGroupDataTypeBuilder interface {
 	WithMessageSettingsBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) WriterGroupDataTypeBuilder
 	// WithDataSetWriters adds DataSetWriters (property field)
 	WithDataSetWriters(...DataSetWriterDataType) WriterGroupDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the WriterGroupDataType or returns an error if something is wrong
 	Build() (WriterGroupDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -415,8 +417,10 @@ func (b *_WriterGroupDataTypeBuilder) MustBuild() WriterGroupDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_WriterGroupDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

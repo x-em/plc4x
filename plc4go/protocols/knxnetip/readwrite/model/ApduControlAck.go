@@ -71,6 +71,8 @@ type ApduControlAckBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ApduControlAckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduControlBuilder
 	// Build builds the ApduControlAck or returns an error if something is wrong
 	Build() (ApduControlAck, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_ApduControlAckBuilder) MustBuild() ApduControlAck {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduControlAckBuilder) Done() ApduControlBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduControlBuilder().(*_ApduControlBuilder)
+	}
 	return b.parentBuilder
 }
 

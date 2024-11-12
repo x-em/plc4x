@@ -85,6 +85,8 @@ type ClassIDBuilder interface {
 	WithFormat(uint8) ClassIDBuilder
 	// WithSegmentClass adds SegmentClass (property field)
 	WithSegmentClass(uint8) ClassIDBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() LogicalSegmentTypeBuilder
 	// Build builds the ClassID or returns an error if something is wrong
 	Build() (ClassID, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ClassIDBuilder) MustBuild() ClassID {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ClassIDBuilder) Done() LogicalSegmentTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewLogicalSegmentTypeBuilder().(*_LogicalSegmentTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

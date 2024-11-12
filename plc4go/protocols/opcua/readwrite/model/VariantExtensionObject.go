@@ -85,6 +85,8 @@ type VariantExtensionObjectBuilder interface {
 	WithOptionalArrayLength(int32) VariantExtensionObjectBuilder
 	// WithValue adds Value (property field)
 	WithValue(...ExtensionObject) VariantExtensionObjectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantExtensionObject or returns an error if something is wrong
 	Build() (VariantExtensionObject, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantExtensionObjectBuilder) MustBuild() VariantExtensionObject {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantExtensionObjectBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

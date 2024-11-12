@@ -85,6 +85,8 @@ type S7MessageResponseDataBuilder interface {
 	WithErrorClass(uint8) S7MessageResponseDataBuilder
 	// WithErrorCode adds ErrorCode (property field)
 	WithErrorCode(uint8) S7MessageResponseDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7MessageBuilder
 	// Build builds the S7MessageResponseData or returns an error if something is wrong
 	Build() (S7MessageResponseData, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_S7MessageResponseDataBuilder) MustBuild() S7MessageResponseData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7MessageResponseDataBuilder) Done() S7MessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7MessageBuilder().(*_S7MessageBuilder)
+	}
 	return b.parentBuilder
 }
 

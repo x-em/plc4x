@@ -86,6 +86,8 @@ type BACnetConstructedDataTimeSynchronizationIntervalBuilder interface {
 	WithTimeSynchronization(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataTimeSynchronizationIntervalBuilder
 	// WithTimeSynchronizationBuilder adds TimeSynchronization (property field) which is build by the builder
 	WithTimeSynchronizationBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataTimeSynchronizationIntervalBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataTimeSynchronizationInterval or returns an error if something is wrong
 	Build() (BACnetConstructedDataTimeSynchronizationInterval, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataTimeSynchronizationIntervalBuilder) MustBuild() B
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataTimeSynchronizationIntervalBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

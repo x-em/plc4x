@@ -89,6 +89,8 @@ type BACnetConstructedDataGroupMemberNamesBuilder interface {
 	WithOptionalNumberOfDataElementsBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataGroupMemberNamesBuilder
 	// WithGroupMemberNames adds GroupMemberNames (property field)
 	WithGroupMemberNames(...BACnetApplicationTagCharacterString) BACnetConstructedDataGroupMemberNamesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataGroupMemberNames or returns an error if something is wrong
 	Build() (BACnetConstructedDataGroupMemberNames, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetConstructedDataGroupMemberNamesBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataGroupMemberNamesBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

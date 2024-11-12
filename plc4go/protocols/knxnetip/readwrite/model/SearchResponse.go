@@ -108,6 +108,8 @@ type SearchResponseBuilder interface {
 	WithDibSuppSvcFamilies(DIBSuppSvcFamilies) SearchResponseBuilder
 	// WithDibSuppSvcFamiliesBuilder adds DibSuppSvcFamilies (property field) which is build by the builder
 	WithDibSuppSvcFamiliesBuilder(func(DIBSuppSvcFamiliesBuilder) DIBSuppSvcFamiliesBuilder) SearchResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the SearchResponse or returns an error if something is wrong
 	Build() (SearchResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -224,8 +226,10 @@ func (b *_SearchResponseBuilder) MustBuild() SearchResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SearchResponseBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

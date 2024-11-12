@@ -84,6 +84,8 @@ type BACnetPropertyStatesEscalatorFaultBuilder interface {
 	WithEscalatorFault(BACnetEscalatorFaultTagged) BACnetPropertyStatesEscalatorFaultBuilder
 	// WithEscalatorFaultBuilder adds EscalatorFault (property field) which is build by the builder
 	WithEscalatorFaultBuilder(func(BACnetEscalatorFaultTaggedBuilder) BACnetEscalatorFaultTaggedBuilder) BACnetPropertyStatesEscalatorFaultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesEscalatorFault or returns an error if something is wrong
 	Build() (BACnetPropertyStatesEscalatorFault, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesEscalatorFaultBuilder) MustBuild() BACnetPropertyS
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesEscalatorFaultBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

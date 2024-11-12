@@ -84,6 +84,8 @@ type BACnetServiceAckCreateObjectBuilder interface {
 	WithObjectIdentifier(BACnetApplicationTagObjectIdentifier) BACnetServiceAckCreateObjectBuilder
 	// WithObjectIdentifierBuilder adds ObjectIdentifier (property field) which is build by the builder
 	WithObjectIdentifierBuilder(func(BACnetApplicationTagObjectIdentifierBuilder) BACnetApplicationTagObjectIdentifierBuilder) BACnetServiceAckCreateObjectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckCreateObject or returns an error if something is wrong
 	Build() (BACnetServiceAckCreateObject, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetServiceAckCreateObjectBuilder) MustBuild() BACnetServiceAckCreat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckCreateObjectBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

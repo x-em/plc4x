@@ -103,6 +103,8 @@ type MPropReadReqBuilder interface {
 	WithNumberOfElements(uint8) MPropReadReqBuilder
 	// WithStartIndex adds StartIndex (property field)
 	WithStartIndex(uint16) MPropReadReqBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CEMIBuilder
 	// Build builds the MPropReadReq or returns an error if something is wrong
 	Build() (MPropReadReq, error)
 	// MustBuild does the same as Build but panics on error
@@ -172,8 +174,10 @@ func (b *_MPropReadReqBuilder) MustBuild() MPropReadReq {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MPropReadReqBuilder) Done() CEMIBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCEMIBuilder().(*_CEMIBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetServiceAckVTOpenBuilder interface {
 	WithRemoteVtSessionIdentifier(BACnetApplicationTagUnsignedInteger) BACnetServiceAckVTOpenBuilder
 	// WithRemoteVtSessionIdentifierBuilder adds RemoteVtSessionIdentifier (property field) which is build by the builder
 	WithRemoteVtSessionIdentifierBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetServiceAckVTOpenBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckVTOpen or returns an error if something is wrong
 	Build() (BACnetServiceAckVTOpen, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetServiceAckVTOpenBuilder) MustBuild() BACnetServiceAckVTOpen {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckVTOpenBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

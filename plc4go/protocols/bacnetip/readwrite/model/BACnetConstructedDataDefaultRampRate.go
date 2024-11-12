@@ -86,6 +86,8 @@ type BACnetConstructedDataDefaultRampRateBuilder interface {
 	WithDefaultRampRate(BACnetApplicationTagReal) BACnetConstructedDataDefaultRampRateBuilder
 	// WithDefaultRampRateBuilder adds DefaultRampRate (property field) which is build by the builder
 	WithDefaultRampRateBuilder(func(BACnetApplicationTagRealBuilder) BACnetApplicationTagRealBuilder) BACnetConstructedDataDefaultRampRateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataDefaultRampRate or returns an error if something is wrong
 	Build() (BACnetConstructedDataDefaultRampRate, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataDefaultRampRateBuilder) MustBuild() BACnetConstru
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataDefaultRampRateBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

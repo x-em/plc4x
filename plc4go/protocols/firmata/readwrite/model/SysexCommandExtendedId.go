@@ -79,6 +79,8 @@ type SysexCommandExtendedIdBuilder interface {
 	WithMandatoryFields(id []int8) SysexCommandExtendedIdBuilder
 	// WithId adds Id (property field)
 	WithId(...int8) SysexCommandExtendedIdBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SysexCommandBuilder
 	// Build builds the SysexCommandExtendedId or returns an error if something is wrong
 	Build() (SysexCommandExtendedId, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_SysexCommandExtendedIdBuilder) MustBuild() SysexCommandExtendedId {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SysexCommandExtendedIdBuilder) Done() SysexCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSysexCommandBuilder().(*_SysexCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

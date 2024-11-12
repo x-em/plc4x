@@ -84,6 +84,8 @@ type BACnetPropertyStatesFileAccessMethodBuilder interface {
 	WithFileAccessMethod(BACnetFileAccessMethodTagged) BACnetPropertyStatesFileAccessMethodBuilder
 	// WithFileAccessMethodBuilder adds FileAccessMethod (property field) which is build by the builder
 	WithFileAccessMethodBuilder(func(BACnetFileAccessMethodTaggedBuilder) BACnetFileAccessMethodTaggedBuilder) BACnetPropertyStatesFileAccessMethodBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesFileAccessMethod or returns an error if something is wrong
 	Build() (BACnetPropertyStatesFileAccessMethod, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesFileAccessMethodBuilder) MustBuild() BACnetPropert
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesFileAccessMethodBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

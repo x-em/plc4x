@@ -100,6 +100,8 @@ type ServicesResponseBuilder interface {
 	WithSupportsUDP(bool) ServicesResponseBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) ServicesResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TypeIdBuilder
 	// Build builds the ServicesResponse or returns an error if something is wrong
 	Build() (ServicesResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -164,8 +166,10 @@ func (b *_ServicesResponseBuilder) MustBuild() ServicesResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ServicesResponseBuilder) Done() TypeIdBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTypeIdBuilder().(*_TypeIdBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -98,6 +98,8 @@ type BrowseNextRequestBuilder interface {
 	WithReleaseContinuationPoints(bool) BrowseNextRequestBuilder
 	// WithContinuationPoints adds ContinuationPoints (property field)
 	WithContinuationPoints(...PascalByteString) BrowseNextRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the BrowseNextRequest or returns an error if something is wrong
 	Build() (BrowseNextRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -176,8 +178,10 @@ func (b *_BrowseNextRequestBuilder) MustBuild() BrowseNextRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BrowseNextRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

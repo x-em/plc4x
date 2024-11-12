@@ -71,6 +71,8 @@ type MResetReqBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() MResetReqBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CEMIBuilder
 	// Build builds the MResetReq or returns an error if something is wrong
 	Build() (MResetReq, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_MResetReqBuilder) MustBuild() MResetReq {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MResetReqBuilder) Done() CEMIBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCEMIBuilder().(*_CEMIBuilder)
+	}
 	return b.parentBuilder
 }
 

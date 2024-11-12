@@ -84,6 +84,8 @@ type BACnetPropertyStatesDoorSecuredStatusBuilder interface {
 	WithDoorSecuredStatus(BACnetDoorSecuredStatusTagged) BACnetPropertyStatesDoorSecuredStatusBuilder
 	// WithDoorSecuredStatusBuilder adds DoorSecuredStatus (property field) which is build by the builder
 	WithDoorSecuredStatusBuilder(func(BACnetDoorSecuredStatusTaggedBuilder) BACnetDoorSecuredStatusTaggedBuilder) BACnetPropertyStatesDoorSecuredStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesDoorSecuredStatus or returns an error if something is wrong
 	Build() (BACnetPropertyStatesDoorSecuredStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesDoorSecuredStatusBuilder) MustBuild() BACnetProper
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesDoorSecuredStatusBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

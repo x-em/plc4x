@@ -86,6 +86,8 @@ type BACnetConstructedDataGlobalIdentifierBuilder interface {
 	WithGlobalIdentifier(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataGlobalIdentifierBuilder
 	// WithGlobalIdentifierBuilder adds GlobalIdentifier (property field) which is build by the builder
 	WithGlobalIdentifierBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataGlobalIdentifierBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataGlobalIdentifier or returns an error if something is wrong
 	Build() (BACnetConstructedDataGlobalIdentifier, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataGlobalIdentifierBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataGlobalIdentifierBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -75,6 +75,8 @@ type LevelInformationAbsentBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() LevelInformationAbsentBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() LevelInformationBuilder
 	// Build builds the LevelInformationAbsent or returns an error if something is wrong
 	Build() (LevelInformationAbsent, error)
 	// MustBuild does the same as Build but panics on error
@@ -119,8 +121,10 @@ func (b *_LevelInformationAbsentBuilder) MustBuild() LevelInformationAbsent {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LevelInformationAbsentBuilder) Done() LevelInformationBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewLevelInformationBuilder().(*_LevelInformationBuilder)
+	}
 	return b.parentBuilder
 }
 

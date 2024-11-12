@@ -98,6 +98,8 @@ type S7MessageObjectRequestBuilder interface {
 	WithQueryType(QueryType) S7MessageObjectRequestBuilder
 	// WithAlarmType adds AlarmType (property field)
 	WithAlarmType(AlarmType) S7MessageObjectRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7DataAlarmMessageBuilder
 	// Build builds the S7MessageObjectRequest or returns an error if something is wrong
 	Build() (S7MessageObjectRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -157,8 +159,10 @@ func (b *_S7MessageObjectRequestBuilder) MustBuild() S7MessageObjectRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7MessageObjectRequestBuilder) Done() S7DataAlarmMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7DataAlarmMessageBuilder().(*_S7DataAlarmMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -79,6 +79,8 @@ type BACnetConstructedDataBBMDBroadcastDistributionTableBuilder interface {
 	WithMandatoryFields(bbmdBroadcastDistributionTable []BACnetBDTEntry) BACnetConstructedDataBBMDBroadcastDistributionTableBuilder
 	// WithBbmdBroadcastDistributionTable adds BbmdBroadcastDistributionTable (property field)
 	WithBbmdBroadcastDistributionTable(...BACnetBDTEntry) BACnetConstructedDataBBMDBroadcastDistributionTableBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataBBMDBroadcastDistributionTable or returns an error if something is wrong
 	Build() (BACnetConstructedDataBBMDBroadcastDistributionTable, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataBBMDBroadcastDistributionTableBuilder) MustBuild(
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataBBMDBroadcastDistributionTableBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

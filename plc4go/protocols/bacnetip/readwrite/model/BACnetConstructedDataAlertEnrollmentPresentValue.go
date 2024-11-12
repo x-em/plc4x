@@ -86,6 +86,8 @@ type BACnetConstructedDataAlertEnrollmentPresentValueBuilder interface {
 	WithPresentValue(BACnetApplicationTagObjectIdentifier) BACnetConstructedDataAlertEnrollmentPresentValueBuilder
 	// WithPresentValueBuilder adds PresentValue (property field) which is build by the builder
 	WithPresentValueBuilder(func(BACnetApplicationTagObjectIdentifierBuilder) BACnetApplicationTagObjectIdentifierBuilder) BACnetConstructedDataAlertEnrollmentPresentValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAlertEnrollmentPresentValue or returns an error if something is wrong
 	Build() (BACnetConstructedDataAlertEnrollmentPresentValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataAlertEnrollmentPresentValueBuilder) MustBuild() B
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAlertEnrollmentPresentValueBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type ParameterValueCustomTypesBuilder interface {
 	WithValue(CustomTypes) ParameterValueCustomTypesBuilder
 	// WithValueBuilder adds Value (property field) which is build by the builder
 	WithValueBuilder(func(CustomTypesBuilder) CustomTypesBuilder) ParameterValueCustomTypesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ParameterValueBuilder
 	// Build builds the ParameterValueCustomTypes or returns an error if something is wrong
 	Build() (ParameterValueCustomTypes, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_ParameterValueCustomTypesBuilder) MustBuild() ParameterValueCustomType
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ParameterValueCustomTypesBuilder) Done() ParameterValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewParameterValueBuilder().(*_ParameterValueBuilder)
+	}
 	return b.parentBuilder
 }
 

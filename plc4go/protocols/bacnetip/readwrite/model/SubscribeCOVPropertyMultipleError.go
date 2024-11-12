@@ -95,6 +95,8 @@ type SubscribeCOVPropertyMultipleErrorBuilder interface {
 	WithFirstFailedSubscription(SubscribeCOVPropertyMultipleErrorFirstFailedSubscription) SubscribeCOVPropertyMultipleErrorBuilder
 	// WithFirstFailedSubscriptionBuilder adds FirstFailedSubscription (property field) which is build by the builder
 	WithFirstFailedSubscriptionBuilder(func(SubscribeCOVPropertyMultipleErrorFirstFailedSubscriptionBuilder) SubscribeCOVPropertyMultipleErrorFirstFailedSubscriptionBuilder) SubscribeCOVPropertyMultipleErrorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetErrorBuilder
 	// Build builds the SubscribeCOVPropertyMultipleError or returns an error if something is wrong
 	Build() (SubscribeCOVPropertyMultipleError, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_SubscribeCOVPropertyMultipleErrorBuilder) MustBuild() SubscribeCOVProp
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SubscribeCOVPropertyMultipleErrorBuilder) Done() BACnetErrorBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetErrorBuilder().(*_BACnetErrorBuilder)
+	}
 	return b.parentBuilder
 }
 

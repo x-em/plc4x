@@ -79,6 +79,8 @@ type COTPParameterCallingTsapBuilder interface {
 	WithMandatoryFields(tsapId uint16) COTPParameterCallingTsapBuilder
 	// WithTsapId adds TsapId (property field)
 	WithTsapId(uint16) COTPParameterCallingTsapBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() COTPParameterBuilder
 	// Build builds the COTPParameterCallingTsap or returns an error if something is wrong
 	Build() (COTPParameterCallingTsap, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_COTPParameterCallingTsapBuilder) MustBuild() COTPParameterCallingTsap 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_COTPParameterCallingTsapBuilder) Done() COTPParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCOTPParameterBuilder().(*_COTPParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

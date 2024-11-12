@@ -78,6 +78,8 @@ type DF1UnprotectedReadResponseBuilder interface {
 	WithMandatoryFields(data []byte) DF1UnprotectedReadResponseBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) DF1UnprotectedReadResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() DF1CommandBuilder
 	// Build builds the DF1UnprotectedReadResponse or returns an error if something is wrong
 	Build() (DF1UnprotectedReadResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -127,8 +129,10 @@ func (b *_DF1UnprotectedReadResponseBuilder) MustBuild() DF1UnprotectedReadRespo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DF1UnprotectedReadResponseBuilder) Done() DF1CommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewDF1CommandBuilder().(*_DF1CommandBuilder)
+	}
 	return b.parentBuilder
 }
 

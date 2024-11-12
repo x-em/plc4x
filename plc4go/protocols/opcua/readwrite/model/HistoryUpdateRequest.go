@@ -90,6 +90,8 @@ type HistoryUpdateRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) HistoryUpdateRequestBuilder
 	// WithHistoryUpdateDetails adds HistoryUpdateDetails (property field)
 	WithHistoryUpdateDetails(...ExtensionObject) HistoryUpdateRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the HistoryUpdateRequest or returns an error if something is wrong
 	Build() (HistoryUpdateRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_HistoryUpdateRequestBuilder) MustBuild() HistoryUpdateRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_HistoryUpdateRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

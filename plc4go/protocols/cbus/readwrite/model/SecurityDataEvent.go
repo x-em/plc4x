@@ -79,6 +79,8 @@ type SecurityDataEventBuilder interface {
 	WithMandatoryFields(data []byte) SecurityDataEventBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) SecurityDataEventBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataEvent or returns an error if something is wrong
 	Build() (SecurityDataEvent, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_SecurityDataEventBuilder) MustBuild() SecurityDataEvent {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataEventBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

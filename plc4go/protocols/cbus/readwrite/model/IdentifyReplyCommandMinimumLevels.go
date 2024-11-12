@@ -79,6 +79,8 @@ type IdentifyReplyCommandMinimumLevelsBuilder interface {
 	WithMandatoryFields(minimumLevels []byte) IdentifyReplyCommandMinimumLevelsBuilder
 	// WithMinimumLevels adds MinimumLevels (property field)
 	WithMinimumLevels(...byte) IdentifyReplyCommandMinimumLevelsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandMinimumLevels or returns an error if something is wrong
 	Build() (IdentifyReplyCommandMinimumLevels, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_IdentifyReplyCommandMinimumLevelsBuilder) MustBuild() IdentifyReplyCom
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandMinimumLevelsBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

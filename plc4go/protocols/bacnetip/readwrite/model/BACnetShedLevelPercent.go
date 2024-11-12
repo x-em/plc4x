@@ -84,6 +84,8 @@ type BACnetShedLevelPercentBuilder interface {
 	WithPercent(BACnetContextTagUnsignedInteger) BACnetShedLevelPercentBuilder
 	// WithPercentBuilder adds Percent (property field) which is build by the builder
 	WithPercentBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) BACnetShedLevelPercentBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetShedLevelBuilder
 	// Build builds the BACnetShedLevelPercent or returns an error if something is wrong
 	Build() (BACnetShedLevelPercent, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetShedLevelPercentBuilder) MustBuild() BACnetShedLevelPercent {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetShedLevelPercentBuilder) Done() BACnetShedLevelBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetShedLevelBuilder().(*_BACnetShedLevelBuilder)
+	}
 	return b.parentBuilder
 }
 

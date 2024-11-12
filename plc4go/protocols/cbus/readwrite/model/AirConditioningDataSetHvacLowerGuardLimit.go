@@ -112,6 +112,8 @@ type AirConditioningDataSetHvacLowerGuardLimitBuilder interface {
 	WithHvacModeAndFlags(HVACModeAndFlags) AirConditioningDataSetHvacLowerGuardLimitBuilder
 	// WithHvacModeAndFlagsBuilder adds HvacModeAndFlags (property field) which is build by the builder
 	WithHvacModeAndFlagsBuilder(func(HVACModeAndFlagsBuilder) HVACModeAndFlagsBuilder) AirConditioningDataSetHvacLowerGuardLimitBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AirConditioningDataBuilder
 	// Build builds the AirConditioningDataSetHvacLowerGuardLimit or returns an error if something is wrong
 	Build() (AirConditioningDataSetHvacLowerGuardLimit, error)
 	// MustBuild does the same as Build but panics on error
@@ -233,8 +235,10 @@ func (b *_AirConditioningDataSetHvacLowerGuardLimitBuilder) MustBuild() AirCondi
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AirConditioningDataSetHvacLowerGuardLimitBuilder) Done() AirConditioningDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAirConditioningDataBuilder().(*_AirConditioningDataBuilder)
+	}
 	return b.parentBuilder
 }
 

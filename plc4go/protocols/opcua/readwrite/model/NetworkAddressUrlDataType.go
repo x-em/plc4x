@@ -95,6 +95,8 @@ type NetworkAddressUrlDataTypeBuilder interface {
 	WithUrl(PascalString) NetworkAddressUrlDataTypeBuilder
 	// WithUrlBuilder adds Url (property field) which is build by the builder
 	WithUrlBuilder(func(PascalStringBuilder) PascalStringBuilder) NetworkAddressUrlDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the NetworkAddressUrlDataType or returns an error if something is wrong
 	Build() (NetworkAddressUrlDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_NetworkAddressUrlDataTypeBuilder) MustBuild() NetworkAddressUrlDataTyp
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NetworkAddressUrlDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

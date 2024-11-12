@@ -104,6 +104,8 @@ type RequestCommandBuilder interface {
 	WithOptionalAlpha(Alpha) RequestCommandBuilder
 	// WithOptionalAlphaBuilder adds Alpha (property field) which is build by the builder
 	WithOptionalAlphaBuilder(func(AlphaBuilder) AlphaBuilder) RequestCommandBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() RequestBuilder
 	// Build builds the RequestCommand or returns an error if something is wrong
 	Build() (RequestCommand, error)
 	// MustBuild does the same as Build but panics on error
@@ -214,8 +216,10 @@ func (b *_RequestCommandBuilder) MustBuild() RequestCommand {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RequestCommandBuilder) Done() RequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewRequestBuilder().(*_RequestBuilder)
+	}
 	return b.parentBuilder
 }
 

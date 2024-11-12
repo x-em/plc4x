@@ -86,6 +86,8 @@ type BACnetConstructedDataMachineRoomIDBuilder interface {
 	WithMachineRoomId(BACnetApplicationTagObjectIdentifier) BACnetConstructedDataMachineRoomIDBuilder
 	// WithMachineRoomIdBuilder adds MachineRoomId (property field) which is build by the builder
 	WithMachineRoomIdBuilder(func(BACnetApplicationTagObjectIdentifierBuilder) BACnetApplicationTagObjectIdentifierBuilder) BACnetConstructedDataMachineRoomIDBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataMachineRoomID or returns an error if something is wrong
 	Build() (BACnetConstructedDataMachineRoomID, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataMachineRoomIDBuilder) MustBuild() BACnetConstruct
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataMachineRoomIDBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

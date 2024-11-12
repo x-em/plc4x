@@ -84,6 +84,8 @@ type SALDataMediaTransportBuilder interface {
 	WithMediaTransportControlData(MediaTransportControlData) SALDataMediaTransportBuilder
 	// WithMediaTransportControlDataBuilder adds MediaTransportControlData (property field) which is build by the builder
 	WithMediaTransportControlDataBuilder(func(MediaTransportControlDataBuilder) MediaTransportControlDataBuilder) SALDataMediaTransportBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataMediaTransport or returns an error if something is wrong
 	Build() (SALDataMediaTransport, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_SALDataMediaTransportBuilder) MustBuild() SALDataMediaTransport {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataMediaTransportBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

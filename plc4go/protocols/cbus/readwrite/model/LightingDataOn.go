@@ -79,6 +79,8 @@ type LightingDataOnBuilder interface {
 	WithMandatoryFields(group byte) LightingDataOnBuilder
 	// WithGroup adds Group (property field)
 	WithGroup(byte) LightingDataOnBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() LightingDataBuilder
 	// Build builds the LightingDataOn or returns an error if something is wrong
 	Build() (LightingDataOn, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_LightingDataOnBuilder) MustBuild() LightingDataOn {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LightingDataOnBuilder) Done() LightingDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewLightingDataBuilder().(*_LightingDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetOptionalBinaryPVValueBuilder interface {
 	WithBinaryPv(BACnetBinaryPVTagged) BACnetOptionalBinaryPVValueBuilder
 	// WithBinaryPvBuilder adds BinaryPv (property field) which is build by the builder
 	WithBinaryPvBuilder(func(BACnetBinaryPVTaggedBuilder) BACnetBinaryPVTaggedBuilder) BACnetOptionalBinaryPVValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetOptionalBinaryPVBuilder
 	// Build builds the BACnetOptionalBinaryPVValue or returns an error if something is wrong
 	Build() (BACnetOptionalBinaryPVValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetOptionalBinaryPVValueBuilder) MustBuild() BACnetOptionalBinaryPV
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetOptionalBinaryPVValueBuilder) Done() BACnetOptionalBinaryPVBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetOptionalBinaryPVBuilder().(*_BACnetOptionalBinaryPVBuilder)
+	}
 	return b.parentBuilder
 }
 

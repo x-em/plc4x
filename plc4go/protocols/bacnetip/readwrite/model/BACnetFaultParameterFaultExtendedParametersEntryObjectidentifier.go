@@ -84,6 +84,8 @@ type BACnetFaultParameterFaultExtendedParametersEntryObjectidentifierBuilder int
 	WithObjectidentifierValue(BACnetApplicationTagObjectIdentifier) BACnetFaultParameterFaultExtendedParametersEntryObjectidentifierBuilder
 	// WithObjectidentifierValueBuilder adds ObjectidentifierValue (property field) which is build by the builder
 	WithObjectidentifierValueBuilder(func(BACnetApplicationTagObjectIdentifierBuilder) BACnetApplicationTagObjectIdentifierBuilder) BACnetFaultParameterFaultExtendedParametersEntryObjectidentifierBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetFaultParameterFaultExtendedParametersEntryBuilder
 	// Build builds the BACnetFaultParameterFaultExtendedParametersEntryObjectidentifier or returns an error if something is wrong
 	Build() (BACnetFaultParameterFaultExtendedParametersEntryObjectidentifier, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetFaultParameterFaultExtendedParametersEntryObjectidentifierBuilde
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryObjectidentifierBuilder) Done() BACnetFaultParameterFaultExtendedParametersEntryBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetFaultParameterFaultExtendedParametersEntryBuilder().(*_BACnetFaultParameterFaultExtendedParametersEntryBuilder)
+	}
 	return b.parentBuilder
 }
 

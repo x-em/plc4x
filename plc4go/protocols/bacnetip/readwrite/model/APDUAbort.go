@@ -98,6 +98,8 @@ type APDUAbortBuilder interface {
 	WithAbortReason(BACnetAbortReasonTagged) APDUAbortBuilder
 	// WithAbortReasonBuilder adds AbortReason (property field) which is build by the builder
 	WithAbortReasonBuilder(func(BACnetAbortReasonTaggedBuilder) BACnetAbortReasonTaggedBuilder) APDUAbortBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() APDUBuilder
 	// Build builds the APDUAbort or returns an error if something is wrong
 	Build() (APDUAbort, error)
 	// MustBuild does the same as Build but panics on error
@@ -176,8 +178,10 @@ func (b *_APDUAbortBuilder) MustBuild() APDUAbort {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_APDUAbortBuilder) Done() APDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAPDUBuilder().(*_APDUBuilder)
+	}
 	return b.parentBuilder
 }
 

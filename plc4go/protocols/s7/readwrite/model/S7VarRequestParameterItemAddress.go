@@ -84,6 +84,8 @@ type S7VarRequestParameterItemAddressBuilder interface {
 	WithAddress(S7Address) S7VarRequestParameterItemAddressBuilder
 	// WithAddressBuilder adds Address (property field) which is build by the builder
 	WithAddressBuilder(func(S7AddressBuilder) S7AddressBuilder) S7VarRequestParameterItemAddressBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7VarRequestParameterItemBuilder
 	// Build builds the S7VarRequestParameterItemAddress or returns an error if something is wrong
 	Build() (S7VarRequestParameterItemAddress, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_S7VarRequestParameterItemAddressBuilder) MustBuild() S7VarRequestParam
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7VarRequestParameterItemAddressBuilder) Done() S7VarRequestParameterItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7VarRequestParameterItemBuilder().(*_S7VarRequestParameterItemBuilder)
+	}
 	return b.parentBuilder
 }
 

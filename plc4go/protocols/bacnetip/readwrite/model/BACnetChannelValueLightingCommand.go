@@ -84,6 +84,8 @@ type BACnetChannelValueLightingCommandBuilder interface {
 	WithLigthingCommandValue(BACnetLightingCommandEnclosed) BACnetChannelValueLightingCommandBuilder
 	// WithLigthingCommandValueBuilder adds LigthingCommandValue (property field) which is build by the builder
 	WithLigthingCommandValueBuilder(func(BACnetLightingCommandEnclosedBuilder) BACnetLightingCommandEnclosedBuilder) BACnetChannelValueLightingCommandBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetChannelValueBuilder
 	// Build builds the BACnetChannelValueLightingCommand or returns an error if something is wrong
 	Build() (BACnetChannelValueLightingCommand, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetChannelValueLightingCommandBuilder) MustBuild() BACnetChannelVal
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetChannelValueLightingCommandBuilder) Done() BACnetChannelValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetChannelValueBuilder().(*_BACnetChannelValueBuilder)
+	}
 	return b.parentBuilder
 }
 

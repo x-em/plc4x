@@ -84,6 +84,8 @@ type BACnetPropertyStatesEscalatorOperationDirectionBuilder interface {
 	WithEscalatorOperationDirection(BACnetEscalatorOperationDirectionTagged) BACnetPropertyStatesEscalatorOperationDirectionBuilder
 	// WithEscalatorOperationDirectionBuilder adds EscalatorOperationDirection (property field) which is build by the builder
 	WithEscalatorOperationDirectionBuilder(func(BACnetEscalatorOperationDirectionTaggedBuilder) BACnetEscalatorOperationDirectionTaggedBuilder) BACnetPropertyStatesEscalatorOperationDirectionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesEscalatorOperationDirection or returns an error if something is wrong
 	Build() (BACnetPropertyStatesEscalatorOperationDirection, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesEscalatorOperationDirectionBuilder) MustBuild() BA
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesEscalatorOperationDirectionBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

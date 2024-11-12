@@ -79,6 +79,8 @@ type AdsDiscoveryBlockFingerprintBuilder interface {
 	WithMandatoryFields(data []byte) AdsDiscoveryBlockFingerprintBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) AdsDiscoveryBlockFingerprintBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsDiscoveryBlockBuilder
 	// Build builds the AdsDiscoveryBlockFingerprint or returns an error if something is wrong
 	Build() (AdsDiscoveryBlockFingerprint, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_AdsDiscoveryBlockFingerprintBuilder) MustBuild() AdsDiscoveryBlockFing
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDiscoveryBlockFingerprintBuilder) Done() AdsDiscoveryBlockBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsDiscoveryBlockBuilder().(*_AdsDiscoveryBlockBuilder)
+	}
 	return b.parentBuilder
 }
 

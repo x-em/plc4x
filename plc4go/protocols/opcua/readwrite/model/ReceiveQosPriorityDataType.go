@@ -84,6 +84,8 @@ type ReceiveQosPriorityDataTypeBuilder interface {
 	WithPriorityLabel(PascalString) ReceiveQosPriorityDataTypeBuilder
 	// WithPriorityLabelBuilder adds PriorityLabel (property field) which is build by the builder
 	WithPriorityLabelBuilder(func(PascalStringBuilder) PascalStringBuilder) ReceiveQosPriorityDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ReceiveQosPriorityDataType or returns an error if something is wrong
 	Build() (ReceiveQosPriorityDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_ReceiveQosPriorityDataTypeBuilder) MustBuild() ReceiveQosPriorityDataT
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ReceiveQosPriorityDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

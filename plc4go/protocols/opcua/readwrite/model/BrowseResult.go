@@ -101,6 +101,8 @@ type BrowseResultBuilder interface {
 	WithContinuationPointBuilder(func(PascalByteStringBuilder) PascalByteStringBuilder) BrowseResultBuilder
 	// WithReferences adds References (property field)
 	WithReferences(...ReferenceDescription) BrowseResultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the BrowseResult or returns an error if something is wrong
 	Build() (BrowseResult, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_BrowseResultBuilder) MustBuild() BrowseResult {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BrowseResultBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

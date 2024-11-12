@@ -84,6 +84,8 @@ type ApduControlContainerBuilder interface {
 	WithControlApdu(ApduControl) ApduControlContainerBuilder
 	// WithControlApduBuilder adds ControlApdu (property field) which is build by the builder
 	WithControlApduBuilder(func(ApduControlBuilder) ApduControlBuilder) ApduControlContainerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduBuilder
 	// Build builds the ApduControlContainer or returns an error if something is wrong
 	Build() (ApduControlContainer, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_ApduControlContainerBuilder) MustBuild() ApduControlContainer {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduControlContainerBuilder) Done() ApduBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduBuilder().(*_ApduBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetPropertyStatesLockStatusBuilder interface {
 	WithLockStatus(BACnetLockStatusTagged) BACnetPropertyStatesLockStatusBuilder
 	// WithLockStatusBuilder adds LockStatus (property field) which is build by the builder
 	WithLockStatusBuilder(func(BACnetLockStatusTaggedBuilder) BACnetLockStatusTaggedBuilder) BACnetPropertyStatesLockStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesLockStatus or returns an error if something is wrong
 	Build() (BACnetPropertyStatesLockStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesLockStatusBuilder) MustBuild() BACnetPropertyState
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesLockStatusBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

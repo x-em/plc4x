@@ -84,6 +84,8 @@ type BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumericBuilder
 	WithNumericValue(BACnetContextTagUnsignedInteger) BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumericBuilder
 	// WithNumericValueBuilder adds NumericValue (property field) which is build by the builder
 	WithNumericValueBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumericBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder
 	// Build builds the BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumeric or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumeric, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumericBu
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumericBuilder) Done() BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder().(*_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder)
+	}
 	return b.parentBuilder
 }
 

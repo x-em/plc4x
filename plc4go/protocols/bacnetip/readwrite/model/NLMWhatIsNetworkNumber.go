@@ -71,6 +71,8 @@ type NLMWhatIsNetworkNumberBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() NLMWhatIsNetworkNumberBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMWhatIsNetworkNumber or returns an error if something is wrong
 	Build() (NLMWhatIsNetworkNumber, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_NLMWhatIsNetworkNumberBuilder) MustBuild() NLMWhatIsNetworkNumber {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMWhatIsNetworkNumberBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

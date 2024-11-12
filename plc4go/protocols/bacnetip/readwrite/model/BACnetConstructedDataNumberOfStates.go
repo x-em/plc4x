@@ -86,6 +86,8 @@ type BACnetConstructedDataNumberOfStatesBuilder interface {
 	WithNumberOfState(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataNumberOfStatesBuilder
 	// WithNumberOfStateBuilder adds NumberOfState (property field) which is build by the builder
 	WithNumberOfStateBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataNumberOfStatesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataNumberOfStates or returns an error if something is wrong
 	Build() (BACnetConstructedDataNumberOfStates, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataNumberOfStatesBuilder) MustBuild() BACnetConstruc
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataNumberOfStatesBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -98,6 +98,8 @@ type LPollDataBuilder interface {
 	WithTargetAddress(...byte) LPollDataBuilder
 	// WithNumberExpectedPollData adds NumberExpectedPollData (property field)
 	WithNumberExpectedPollData(uint8) LPollDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() LDataFrameBuilder
 	// Build builds the LPollData or returns an error if something is wrong
 	Build() (LPollData, error)
 	// MustBuild does the same as Build but panics on error
@@ -176,8 +178,10 @@ func (b *_LPollDataBuilder) MustBuild() LPollData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LPollDataBuilder) Done() LDataFrameBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewLDataFrameBuilder().(*_LDataFrameBuilder)
+	}
 	return b.parentBuilder
 }
 

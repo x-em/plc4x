@@ -84,6 +84,8 @@ type SALDataClockAndTimekeepingBuilder interface {
 	WithClockAndTimekeepingData(ClockAndTimekeepingData) SALDataClockAndTimekeepingBuilder
 	// WithClockAndTimekeepingDataBuilder adds ClockAndTimekeepingData (property field) which is build by the builder
 	WithClockAndTimekeepingDataBuilder(func(ClockAndTimekeepingDataBuilder) ClockAndTimekeepingDataBuilder) SALDataClockAndTimekeepingBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataClockAndTimekeeping or returns an error if something is wrong
 	Build() (SALDataClockAndTimekeeping, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_SALDataClockAndTimekeepingBuilder) MustBuild() SALDataClockAndTimekeep
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataClockAndTimekeepingBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

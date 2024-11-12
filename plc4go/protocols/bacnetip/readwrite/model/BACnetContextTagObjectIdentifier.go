@@ -88,6 +88,8 @@ type BACnetContextTagObjectIdentifierBuilder interface {
 	WithPayload(BACnetTagPayloadObjectIdentifier) BACnetContextTagObjectIdentifierBuilder
 	// WithPayloadBuilder adds Payload (property field) which is build by the builder
 	WithPayloadBuilder(func(BACnetTagPayloadObjectIdentifierBuilder) BACnetTagPayloadObjectIdentifierBuilder) BACnetContextTagObjectIdentifierBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetContextTagBuilder
 	// Build builds the BACnetContextTagObjectIdentifier or returns an error if something is wrong
 	Build() (BACnetContextTagObjectIdentifier, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetContextTagObjectIdentifierBuilder) MustBuild() BACnetContextTagO
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetContextTagObjectIdentifierBuilder) Done() BACnetContextTagBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetContextTagBuilder().(*_BACnetContextTagBuilder)
+	}
 	return b.parentBuilder
 }
 

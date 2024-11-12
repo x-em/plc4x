@@ -101,6 +101,8 @@ type QueryDataSetBuilder interface {
 	WithTypeDefinitionNodeBuilder(func(ExpandedNodeIdBuilder) ExpandedNodeIdBuilder) QueryDataSetBuilder
 	// WithValues adds Values (property field)
 	WithValues(...Variant) QueryDataSetBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the QueryDataSet or returns an error if something is wrong
 	Build() (QueryDataSet, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_QueryDataSetBuilder) MustBuild() QueryDataSet {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_QueryDataSetBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

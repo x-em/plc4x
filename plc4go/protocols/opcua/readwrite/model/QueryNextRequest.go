@@ -103,6 +103,8 @@ type QueryNextRequestBuilder interface {
 	WithContinuationPoint(PascalByteString) QueryNextRequestBuilder
 	// WithContinuationPointBuilder adds ContinuationPoint (property field) which is build by the builder
 	WithContinuationPointBuilder(func(PascalByteStringBuilder) PascalByteStringBuilder) QueryNextRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the QueryNextRequest or returns an error if something is wrong
 	Build() (QueryNextRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -200,8 +202,10 @@ func (b *_QueryNextRequestBuilder) MustBuild() QueryNextRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_QueryNextRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

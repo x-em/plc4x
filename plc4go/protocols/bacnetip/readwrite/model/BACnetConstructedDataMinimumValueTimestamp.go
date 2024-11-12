@@ -86,6 +86,8 @@ type BACnetConstructedDataMinimumValueTimestampBuilder interface {
 	WithMinimumValueTimestamp(BACnetDateTime) BACnetConstructedDataMinimumValueTimestampBuilder
 	// WithMinimumValueTimestampBuilder adds MinimumValueTimestamp (property field) which is build by the builder
 	WithMinimumValueTimestampBuilder(func(BACnetDateTimeBuilder) BACnetDateTimeBuilder) BACnetConstructedDataMinimumValueTimestampBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataMinimumValueTimestamp or returns an error if something is wrong
 	Build() (BACnetConstructedDataMinimumValueTimestamp, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataMinimumValueTimestampBuilder) MustBuild() BACnetC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataMinimumValueTimestampBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

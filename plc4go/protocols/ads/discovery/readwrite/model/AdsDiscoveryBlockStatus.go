@@ -82,6 +82,8 @@ type AdsDiscoveryBlockStatusBuilder interface {
 	WithMandatoryFields(status Status) AdsDiscoveryBlockStatusBuilder
 	// WithStatus adds Status (property field)
 	WithStatus(Status) AdsDiscoveryBlockStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsDiscoveryBlockBuilder
 	// Build builds the AdsDiscoveryBlockStatus or returns an error if something is wrong
 	Build() (AdsDiscoveryBlockStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -131,8 +133,10 @@ func (b *_AdsDiscoveryBlockStatusBuilder) MustBuild() AdsDiscoveryBlockStatus {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDiscoveryBlockStatusBuilder) Done() AdsDiscoveryBlockBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsDiscoveryBlockBuilder().(*_AdsDiscoveryBlockBuilder)
+	}
 	return b.parentBuilder
 }
 

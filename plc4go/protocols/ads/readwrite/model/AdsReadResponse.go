@@ -85,6 +85,8 @@ type AdsReadResponseBuilder interface {
 	WithResult(ReturnCode) AdsReadResponseBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) AdsReadResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AmsPacketBuilder
 	// Build builds the AdsReadResponse or returns an error if something is wrong
 	Build() (AdsReadResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_AdsReadResponseBuilder) MustBuild() AdsReadResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsReadResponseBuilder) Done() AmsPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAmsPacketBuilder().(*_AmsPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

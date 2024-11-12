@@ -146,6 +146,8 @@ type EndpointDescriptionBuilder interface {
 	WithTransportProfileUriBuilder(func(PascalStringBuilder) PascalStringBuilder) EndpointDescriptionBuilder
 	// WithSecurityLevel adds SecurityLevel (property field)
 	WithSecurityLevel(uint8) EndpointDescriptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the EndpointDescription or returns an error if something is wrong
 	Build() (EndpointDescription, error)
 	// MustBuild does the same as Build but panics on error
@@ -325,8 +327,10 @@ func (b *_EndpointDescriptionBuilder) MustBuild() EndpointDescription {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_EndpointDescriptionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

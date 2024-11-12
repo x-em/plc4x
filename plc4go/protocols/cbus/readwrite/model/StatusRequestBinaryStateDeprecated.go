@@ -82,6 +82,8 @@ type StatusRequestBinaryStateDeprecatedBuilder interface {
 	WithMandatoryFields(application ApplicationIdContainer) StatusRequestBinaryStateDeprecatedBuilder
 	// WithApplication adds Application (property field)
 	WithApplication(ApplicationIdContainer) StatusRequestBinaryStateDeprecatedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() StatusRequestBuilder
 	// Build builds the StatusRequestBinaryStateDeprecated or returns an error if something is wrong
 	Build() (StatusRequestBinaryStateDeprecated, error)
 	// MustBuild does the same as Build but panics on error
@@ -131,8 +133,10 @@ func (b *_StatusRequestBinaryStateDeprecatedBuilder) MustBuild() StatusRequestBi
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_StatusRequestBinaryStateDeprecatedBuilder) Done() StatusRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewStatusRequestBuilder().(*_StatusRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -79,6 +79,8 @@ type S7ParameterReadVarRequestBuilder interface {
 	WithMandatoryFields(items []S7VarRequestParameterItem) S7ParameterReadVarRequestBuilder
 	// WithItems adds Items (property field)
 	WithItems(...S7VarRequestParameterItem) S7ParameterReadVarRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7ParameterBuilder
 	// Build builds the S7ParameterReadVarRequest or returns an error if something is wrong
 	Build() (S7ParameterReadVarRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_S7ParameterReadVarRequestBuilder) MustBuild() S7ParameterReadVarReques
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7ParameterReadVarRequestBuilder) Done() S7ParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7ParameterBuilder().(*_S7ParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

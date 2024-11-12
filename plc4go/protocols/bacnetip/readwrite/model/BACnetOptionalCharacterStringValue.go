@@ -84,6 +84,8 @@ type BACnetOptionalCharacterStringValueBuilder interface {
 	WithCharacterstring(BACnetApplicationTagCharacterString) BACnetOptionalCharacterStringValueBuilder
 	// WithCharacterstringBuilder adds Characterstring (property field) which is build by the builder
 	WithCharacterstringBuilder(func(BACnetApplicationTagCharacterStringBuilder) BACnetApplicationTagCharacterStringBuilder) BACnetOptionalCharacterStringValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetOptionalCharacterStringBuilder
 	// Build builds the BACnetOptionalCharacterStringValue or returns an error if something is wrong
 	Build() (BACnetOptionalCharacterStringValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetOptionalCharacterStringValueBuilder) MustBuild() BACnetOptionalC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetOptionalCharacterStringValueBuilder) Done() BACnetOptionalCharacterStringBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetOptionalCharacterStringBuilder().(*_BACnetOptionalCharacterStringBuilder)
+	}
 	return b.parentBuilder
 }
 

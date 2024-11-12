@@ -79,6 +79,8 @@ type ModbusPDUReadFifoQueueResponseBuilder interface {
 	WithMandatoryFields(fifoValue []uint16) ModbusPDUReadFifoQueueResponseBuilder
 	// WithFifoValue adds FifoValue (property field)
 	WithFifoValue(...uint16) ModbusPDUReadFifoQueueResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUReadFifoQueueResponse or returns an error if something is wrong
 	Build() (ModbusPDUReadFifoQueueResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ModbusPDUReadFifoQueueResponseBuilder) MustBuild() ModbusPDUReadFifoQu
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUReadFifoQueueResponseBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -91,6 +91,8 @@ type IdentifyReplyCommandSummaryBuilder interface {
 	WithUnitServiceType(byte) IdentifyReplyCommandSummaryBuilder
 	// WithVersion adds Version (property field)
 	WithVersion(string) IdentifyReplyCommandSummaryBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandSummary or returns an error if something is wrong
 	Build() (IdentifyReplyCommandSummary, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_IdentifyReplyCommandSummaryBuilder) MustBuild() IdentifyReplyCommandSu
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandSummaryBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

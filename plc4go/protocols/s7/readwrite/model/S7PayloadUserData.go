@@ -79,6 +79,8 @@ type S7PayloadUserDataBuilder interface {
 	WithMandatoryFields(items []S7PayloadUserDataItem) S7PayloadUserDataBuilder
 	// WithItems adds Items (property field)
 	WithItems(...S7PayloadUserDataItem) S7PayloadUserDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadBuilder
 	// Build builds the S7PayloadUserData or returns an error if something is wrong
 	Build() (S7PayloadUserData, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_S7PayloadUserDataBuilder) MustBuild() S7PayloadUserData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadUserDataBuilder) Done() S7PayloadBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadBuilder().(*_S7PayloadBuilder)
+	}
 	return b.parentBuilder
 }
 

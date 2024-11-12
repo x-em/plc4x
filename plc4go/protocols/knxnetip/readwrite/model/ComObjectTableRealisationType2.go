@@ -91,6 +91,8 @@ type ComObjectTableRealisationType2Builder interface {
 	WithRamFlagsTablePointer(uint8) ComObjectTableRealisationType2Builder
 	// WithComObjectDescriptors adds ComObjectDescriptors (property field)
 	WithComObjectDescriptors(...GroupObjectDescriptorRealisationType2) ComObjectTableRealisationType2Builder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ComObjectTableBuilder
 	// Build builds the ComObjectTableRealisationType2 or returns an error if something is wrong
 	Build() (ComObjectTableRealisationType2, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_ComObjectTableRealisationType2Builder) MustBuild() ComObjectTableReali
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ComObjectTableRealisationType2Builder) Done() ComObjectTableBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewComObjectTableBuilder().(*_ComObjectTableBuilder)
+	}
 	return b.parentBuilder
 }
 

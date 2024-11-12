@@ -84,6 +84,8 @@ type ApduDataContainerBuilder interface {
 	WithDataApdu(ApduData) ApduDataContainerBuilder
 	// WithDataApduBuilder adds DataApdu (property field) which is build by the builder
 	WithDataApduBuilder(func(ApduDataBuilder) ApduDataBuilder) ApduDataContainerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduBuilder
 	// Build builds the ApduDataContainer or returns an error if something is wrong
 	Build() (ApduDataContainer, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_ApduDataContainerBuilder) MustBuild() ApduDataContainer {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataContainerBuilder) Done() ApduBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduBuilder().(*_ApduBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -79,6 +79,8 @@ type ListServicesResponseBuilder interface {
 	WithMandatoryFields(typeIds []TypeId) ListServicesResponseBuilder
 	// WithTypeIds adds TypeIds (property field)
 	WithTypeIds(...TypeId) ListServicesResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() EipPacketBuilder
 	// Build builds the ListServicesResponse or returns an error if something is wrong
 	Build() (ListServicesResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ListServicesResponseBuilder) MustBuild() ListServicesResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ListServicesResponseBuilder) Done() EipPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewEipPacketBuilder().(*_EipPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

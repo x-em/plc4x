@@ -124,6 +124,8 @@ type ApduDataExtPropertyDescriptionResponseBuilder interface {
 	WithReadLevel(AccessLevel) ApduDataExtPropertyDescriptionResponseBuilder
 	// WithWriteLevel adds WriteLevel (property field)
 	WithWriteLevel(AccessLevel) ApduDataExtPropertyDescriptionResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataExtBuilder
 	// Build builds the ApduDataExtPropertyDescriptionResponse or returns an error if something is wrong
 	Build() (ApduDataExtPropertyDescriptionResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -208,8 +210,10 @@ func (b *_ApduDataExtPropertyDescriptionResponseBuilder) MustBuild() ApduDataExt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataExtPropertyDescriptionResponseBuilder) Done() ApduDataExtBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataExtBuilder().(*_ApduDataExtBuilder)
+	}
 	return b.parentBuilder
 }
 

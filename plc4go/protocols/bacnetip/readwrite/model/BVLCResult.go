@@ -81,6 +81,8 @@ type BVLCResultBuilder interface {
 	WithMandatoryFields(code BVLCResultCode) BVLCResultBuilder
 	// WithCode adds Code (property field)
 	WithCode(BVLCResultCode) BVLCResultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCResult or returns an error if something is wrong
 	Build() (BVLCResult, error)
 	// MustBuild does the same as Build but panics on error
@@ -130,8 +132,10 @@ func (b *_BVLCResultBuilder) MustBuild() BVLCResult {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCResultBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 

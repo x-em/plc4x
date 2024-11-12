@@ -86,6 +86,8 @@ type BACnetConstructedDataValueChangeTimeBuilder interface {
 	WithValueChangeTime(BACnetDateTime) BACnetConstructedDataValueChangeTimeBuilder
 	// WithValueChangeTimeBuilder adds ValueChangeTime (property field) which is build by the builder
 	WithValueChangeTimeBuilder(func(BACnetDateTimeBuilder) BACnetDateTimeBuilder) BACnetConstructedDataValueChangeTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataValueChangeTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataValueChangeTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataValueChangeTimeBuilder) MustBuild() BACnetConstru
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataValueChangeTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

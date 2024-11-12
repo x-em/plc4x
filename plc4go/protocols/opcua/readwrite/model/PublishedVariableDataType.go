@@ -136,6 +136,8 @@ type PublishedVariableDataTypeBuilder interface {
 	WithSubstituteValueBuilder(func(VariantBuilder) VariantBuilder) PublishedVariableDataTypeBuilder
 	// WithMetaDataProperties adds MetaDataProperties (property field)
 	WithMetaDataProperties(...QualifiedName) PublishedVariableDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PublishedVariableDataType or returns an error if something is wrong
 	Build() (PublishedVariableDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -277,8 +279,10 @@ func (b *_PublishedVariableDataTypeBuilder) MustBuild() PublishedVariableDataTyp
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PublishedVariableDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataEnableBuilder interface {
 	WithEnable(BACnetApplicationTagBoolean) BACnetConstructedDataEnableBuilder
 	// WithEnableBuilder adds Enable (property field) which is build by the builder
 	WithEnableBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataEnableBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataEnable or returns an error if something is wrong
 	Build() (BACnetConstructedDataEnable, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataEnableBuilder) MustBuild() BACnetConstructedDataE
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataEnableBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

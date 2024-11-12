@@ -86,6 +86,8 @@ type BACnetConstructedDataCurrentCommandPriorityBuilder interface {
 	WithCurrentCommandPriority(BACnetOptionalUnsigned) BACnetConstructedDataCurrentCommandPriorityBuilder
 	// WithCurrentCommandPriorityBuilder adds CurrentCommandPriority (property field) which is build by the builder
 	WithCurrentCommandPriorityBuilder(func(BACnetOptionalUnsignedBuilder) BACnetOptionalUnsignedBuilder) BACnetConstructedDataCurrentCommandPriorityBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataCurrentCommandPriority or returns an error if something is wrong
 	Build() (BACnetConstructedDataCurrentCommandPriority, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataCurrentCommandPriorityBuilder) MustBuild() BACnet
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataCurrentCommandPriorityBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

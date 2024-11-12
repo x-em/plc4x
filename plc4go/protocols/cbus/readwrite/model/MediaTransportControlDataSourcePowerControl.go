@@ -83,6 +83,8 @@ type MediaTransportControlDataSourcePowerControlBuilder interface {
 	WithMandatoryFields(state byte) MediaTransportControlDataSourcePowerControlBuilder
 	// WithState adds State (property field)
 	WithState(byte) MediaTransportControlDataSourcePowerControlBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataSourcePowerControl or returns an error if something is wrong
 	Build() (MediaTransportControlDataSourcePowerControl, error)
 	// MustBuild does the same as Build but panics on error
@@ -132,8 +134,10 @@ func (b *_MediaTransportControlDataSourcePowerControlBuilder) MustBuild() MediaT
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataSourcePowerControlBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

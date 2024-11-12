@@ -147,6 +147,8 @@ type APDUConfirmedRequestBuilder interface {
 	WithOptionalSegmentServiceChoice(BACnetConfirmedServiceChoice) APDUConfirmedRequestBuilder
 	// WithSegment adds Segment (property field)
 	WithSegment(...byte) APDUConfirmedRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() APDUBuilder
 	// Build builds the APDUConfirmedRequest or returns an error if something is wrong
 	Build() (APDUConfirmedRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -259,8 +261,10 @@ func (b *_APDUConfirmedRequestBuilder) MustBuild() APDUConfirmedRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_APDUConfirmedRequestBuilder) Done() APDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAPDUBuilder().(*_APDUBuilder)
+	}
 	return b.parentBuilder
 }
 

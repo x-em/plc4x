@@ -96,6 +96,8 @@ type AddReferencesResponseBuilder interface {
 	WithResults(...StatusCode) AddReferencesResponseBuilder
 	// WithDiagnosticInfos adds DiagnosticInfos (property field)
 	WithDiagnosticInfos(...DiagnosticInfo) AddReferencesResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the AddReferencesResponse or returns an error if something is wrong
 	Build() (AddReferencesResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_AddReferencesResponseBuilder) MustBuild() AddReferencesResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AddReferencesResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

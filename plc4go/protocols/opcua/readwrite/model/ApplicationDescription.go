@@ -140,6 +140,8 @@ type ApplicationDescriptionBuilder interface {
 	WithDiscoveryProfileUriBuilder(func(PascalStringBuilder) PascalStringBuilder) ApplicationDescriptionBuilder
 	// WithDiscoveryUrls adds DiscoveryUrls (property field)
 	WithDiscoveryUrls(...PascalString) ApplicationDescriptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ApplicationDescription or returns an error if something is wrong
 	Build() (ApplicationDescription, error)
 	// MustBuild does the same as Build but panics on error
@@ -314,8 +316,10 @@ func (b *_ApplicationDescriptionBuilder) MustBuild() ApplicationDescription {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApplicationDescriptionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

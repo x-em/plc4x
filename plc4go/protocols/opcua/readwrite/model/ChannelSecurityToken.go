@@ -97,6 +97,8 @@ type ChannelSecurityTokenBuilder interface {
 	WithCreatedAt(int64) ChannelSecurityTokenBuilder
 	// WithRevisedLifetime adds RevisedLifetime (property field)
 	WithRevisedLifetime(uint32) ChannelSecurityTokenBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ChannelSecurityToken or returns an error if something is wrong
 	Build() (ChannelSecurityToken, error)
 	// MustBuild does the same as Build but panics on error
@@ -161,8 +163,10 @@ func (b *_ChannelSecurityTokenBuilder) MustBuild() ChannelSecurityToken {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ChannelSecurityTokenBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

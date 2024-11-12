@@ -79,6 +79,8 @@ type MediaTransportControlDataTrackNameBuilder interface {
 	WithMandatoryFields(trackName string) MediaTransportControlDataTrackNameBuilder
 	// WithTrackName adds TrackName (property field)
 	WithTrackName(string) MediaTransportControlDataTrackNameBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataTrackName or returns an error if something is wrong
 	Build() (MediaTransportControlDataTrackName, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_MediaTransportControlDataTrackNameBuilder) MustBuild() MediaTransportC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataTrackNameBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

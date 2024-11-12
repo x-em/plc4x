@@ -79,6 +79,8 @@ type MeteringDataOtherWaterConsumptionBuilder interface {
 	WithMandatoryFields(kL uint32) MeteringDataOtherWaterConsumptionBuilder
 	// WithKL adds KL (property field)
 	WithKL(uint32) MeteringDataOtherWaterConsumptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MeteringDataBuilder
 	// Build builds the MeteringDataOtherWaterConsumption or returns an error if something is wrong
 	Build() (MeteringDataOtherWaterConsumption, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_MeteringDataOtherWaterConsumptionBuilder) MustBuild() MeteringDataOthe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MeteringDataOtherWaterConsumptionBuilder) Done() MeteringDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMeteringDataBuilder().(*_MeteringDataBuilder)
+	}
 	return b.parentBuilder
 }
 

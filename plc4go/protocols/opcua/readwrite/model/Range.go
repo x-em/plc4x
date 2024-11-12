@@ -85,6 +85,8 @@ type RangeBuilder interface {
 	WithLow(float64) RangeBuilder
 	// WithHigh adds High (property field)
 	WithHigh(float64) RangeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the Range or returns an error if something is wrong
 	Build() (Range, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_RangeBuilder) MustBuild() Range {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RangeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

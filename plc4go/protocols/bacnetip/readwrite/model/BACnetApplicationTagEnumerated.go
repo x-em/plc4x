@@ -86,6 +86,8 @@ type BACnetApplicationTagEnumeratedBuilder interface {
 	WithPayload(BACnetTagPayloadEnumerated) BACnetApplicationTagEnumeratedBuilder
 	// WithPayloadBuilder adds Payload (property field) which is build by the builder
 	WithPayloadBuilder(func(BACnetTagPayloadEnumeratedBuilder) BACnetTagPayloadEnumeratedBuilder) BACnetApplicationTagEnumeratedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetApplicationTagBuilder
 	// Build builds the BACnetApplicationTagEnumerated or returns an error if something is wrong
 	Build() (BACnetApplicationTagEnumerated, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetApplicationTagEnumeratedBuilder) MustBuild() BACnetApplicationTa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetApplicationTagEnumeratedBuilder) Done() BACnetApplicationTagBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetApplicationTagBuilder().(*_BACnetApplicationTagBuilder)
+	}
 	return b.parentBuilder
 }
 

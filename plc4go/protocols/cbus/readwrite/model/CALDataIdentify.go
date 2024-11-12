@@ -79,6 +79,8 @@ type CALDataIdentifyBuilder interface {
 	WithMandatoryFields(attribute Attribute) CALDataIdentifyBuilder
 	// WithAttribute adds Attribute (property field)
 	WithAttribute(Attribute) CALDataIdentifyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataIdentify or returns an error if something is wrong
 	Build() (CALDataIdentify, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_CALDataIdentifyBuilder) MustBuild() CALDataIdentify {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataIdentifyBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

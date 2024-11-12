@@ -86,6 +86,8 @@ type BACnetConstructedDataApplicationSoftwareVersionBuilder interface {
 	WithApplicationSoftwareVersion(BACnetApplicationTagCharacterString) BACnetConstructedDataApplicationSoftwareVersionBuilder
 	// WithApplicationSoftwareVersionBuilder adds ApplicationSoftwareVersion (property field) which is build by the builder
 	WithApplicationSoftwareVersionBuilder(func(BACnetApplicationTagCharacterStringBuilder) BACnetApplicationTagCharacterStringBuilder) BACnetConstructedDataApplicationSoftwareVersionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataApplicationSoftwareVersion or returns an error if something is wrong
 	Build() (BACnetConstructedDataApplicationSoftwareVersion, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataApplicationSoftwareVersionBuilder) MustBuild() BA
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataApplicationSoftwareVersionBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

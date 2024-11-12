@@ -86,6 +86,8 @@ type BACnetConstructedDataAccumulatorFaultHighLimitBuilder interface {
 	WithFaultHighLimit(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAccumulatorFaultHighLimitBuilder
 	// WithFaultHighLimitBuilder adds FaultHighLimit (property field) which is build by the builder
 	WithFaultHighLimitBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataAccumulatorFaultHighLimitBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAccumulatorFaultHighLimit or returns an error if something is wrong
 	Build() (BACnetConstructedDataAccumulatorFaultHighLimit, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataAccumulatorFaultHighLimitBuilder) MustBuild() BAC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAccumulatorFaultHighLimitBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

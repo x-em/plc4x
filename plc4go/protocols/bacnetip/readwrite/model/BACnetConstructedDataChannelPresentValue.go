@@ -86,6 +86,8 @@ type BACnetConstructedDataChannelPresentValueBuilder interface {
 	WithPresentValue(BACnetChannelValue) BACnetConstructedDataChannelPresentValueBuilder
 	// WithPresentValueBuilder adds PresentValue (property field) which is build by the builder
 	WithPresentValueBuilder(func(BACnetChannelValueBuilder) BACnetChannelValueBuilder) BACnetConstructedDataChannelPresentValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataChannelPresentValue or returns an error if something is wrong
 	Build() (BACnetConstructedDataChannelPresentValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataChannelPresentValueBuilder) MustBuild() BACnetCon
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataChannelPresentValueBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

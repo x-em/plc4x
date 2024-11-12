@@ -79,6 +79,8 @@ type AdsDiscoveryBlockVersionBuilder interface {
 	WithMandatoryFields(versionData []byte) AdsDiscoveryBlockVersionBuilder
 	// WithVersionData adds VersionData (property field)
 	WithVersionData(...byte) AdsDiscoveryBlockVersionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsDiscoveryBlockBuilder
 	// Build builds the AdsDiscoveryBlockVersion or returns an error if something is wrong
 	Build() (AdsDiscoveryBlockVersion, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_AdsDiscoveryBlockVersionBuilder) MustBuild() AdsDiscoveryBlockVersion 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDiscoveryBlockVersionBuilder) Done() AdsDiscoveryBlockBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsDiscoveryBlockBuilder().(*_AdsDiscoveryBlockBuilder)
+	}
 	return b.parentBuilder
 }
 

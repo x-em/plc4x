@@ -89,6 +89,8 @@ type BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder interfa
 	WithOptionalNumberOfDataElementsBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder
 	// WithGroupMembers adds GroupMembers (property field)
 	WithGroupMembers(...BACnetDeviceObjectPropertyReference) BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataTrendLogMultipleLogDeviceObjectProperty or returns an error if something is wrong
 	Build() (BACnetConstructedDataTrendLogMultipleLogDeviceObjectProperty, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder) M
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -79,6 +79,8 @@ type IdentifyReplyCommandFirmwareVersionBuilder interface {
 	WithMandatoryFields(firmwareVersion string) IdentifyReplyCommandFirmwareVersionBuilder
 	// WithFirmwareVersion adds FirmwareVersion (property field)
 	WithFirmwareVersion(string) IdentifyReplyCommandFirmwareVersionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandFirmwareVersion or returns an error if something is wrong
 	Build() (IdentifyReplyCommandFirmwareVersion, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_IdentifyReplyCommandFirmwareVersionBuilder) MustBuild() IdentifyReplyC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandFirmwareVersionBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -139,6 +139,8 @@ type BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder interface {
 	WithTimeOfAcknowledgment(BACnetTimeStampEnclosed) BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder
 	// WithTimeOfAcknowledgmentBuilder adds TimeOfAcknowledgment (property field) which is build by the builder
 	WithTimeOfAcknowledgmentBuilder(func(BACnetTimeStampEnclosedBuilder) BACnetTimeStampEnclosedBuilder) BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestAcknowledgeAlarm or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestAcknowledgeAlarm, error)
 	// MustBuild does the same as Build but panics on error
@@ -327,8 +329,10 @@ func (b *_BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder) MustBuild() BACn
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

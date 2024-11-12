@@ -84,6 +84,8 @@ type BACnetLandingCallStatusCommandDirectionBuilder interface {
 	WithDirection(BACnetLiftCarDirectionTagged) BACnetLandingCallStatusCommandDirectionBuilder
 	// WithDirectionBuilder adds Direction (property field) which is build by the builder
 	WithDirectionBuilder(func(BACnetLiftCarDirectionTaggedBuilder) BACnetLiftCarDirectionTaggedBuilder) BACnetLandingCallStatusCommandDirectionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLandingCallStatusCommandBuilder
 	// Build builds the BACnetLandingCallStatusCommandDirection or returns an error if something is wrong
 	Build() (BACnetLandingCallStatusCommandDirection, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLandingCallStatusCommandDirectionBuilder) MustBuild() BACnetLand
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLandingCallStatusCommandDirectionBuilder) Done() BACnetLandingCallStatusCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLandingCallStatusCommandBuilder().(*_BACnetLandingCallStatusCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

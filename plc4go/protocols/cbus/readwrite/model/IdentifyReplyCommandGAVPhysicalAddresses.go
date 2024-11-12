@@ -79,6 +79,8 @@ type IdentifyReplyCommandGAVPhysicalAddressesBuilder interface {
 	WithMandatoryFields(values []byte) IdentifyReplyCommandGAVPhysicalAddressesBuilder
 	// WithValues adds Values (property field)
 	WithValues(...byte) IdentifyReplyCommandGAVPhysicalAddressesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandGAVPhysicalAddresses or returns an error if something is wrong
 	Build() (IdentifyReplyCommandGAVPhysicalAddresses, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_IdentifyReplyCommandGAVPhysicalAddressesBuilder) MustBuild() IdentifyR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandGAVPhysicalAddressesBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

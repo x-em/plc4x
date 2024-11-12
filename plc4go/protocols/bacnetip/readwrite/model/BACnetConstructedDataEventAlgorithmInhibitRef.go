@@ -86,6 +86,8 @@ type BACnetConstructedDataEventAlgorithmInhibitRefBuilder interface {
 	WithEventAlgorithmInhibitRef(BACnetObjectPropertyReference) BACnetConstructedDataEventAlgorithmInhibitRefBuilder
 	// WithEventAlgorithmInhibitRefBuilder adds EventAlgorithmInhibitRef (property field) which is build by the builder
 	WithEventAlgorithmInhibitRefBuilder(func(BACnetObjectPropertyReferenceBuilder) BACnetObjectPropertyReferenceBuilder) BACnetConstructedDataEventAlgorithmInhibitRefBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataEventAlgorithmInhibitRef or returns an error if something is wrong
 	Build() (BACnetConstructedDataEventAlgorithmInhibitRef, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataEventAlgorithmInhibitRefBuilder) MustBuild() BACn
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataEventAlgorithmInhibitRefBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

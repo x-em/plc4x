@@ -106,6 +106,8 @@ type BACnetFaultParameterFaultStatusFlagsBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetFaultParameterFaultStatusFlagsBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetFaultParameterFaultStatusFlagsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetFaultParameterBuilder
 	// Build builds the BACnetFaultParameterFaultStatusFlags or returns an error if something is wrong
 	Build() (BACnetFaultParameterFaultStatusFlags, error)
 	// MustBuild does the same as Build but panics on error
@@ -222,8 +224,10 @@ func (b *_BACnetFaultParameterFaultStatusFlagsBuilder) MustBuild() BACnetFaultPa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetFaultParameterFaultStatusFlagsBuilder) Done() BACnetFaultParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetFaultParameterBuilder().(*_BACnetFaultParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -82,6 +82,8 @@ type S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder interface {
 	WithMandatoryFields(messageObjects []AlarmMessageObjectAckType) S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder
 	// WithMessageObjects adds MessageObjects (property field)
 	WithMessageObjects(...AlarmMessageObjectAckType) S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadUserDataItemBuilder
 	// Build builds the S7PayloadUserDataItemCpuFunctionAlarmAckRequest or returns an error if something is wrong
 	Build() (S7PayloadUserDataItemCpuFunctionAlarmAckRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -131,8 +133,10 @@ func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder) MustBuild() S7
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder) Done() S7PayloadUserDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadUserDataItemBuilder().(*_S7PayloadUserDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataDeviceMaxMasterBuilder interface {
 	WithMaxMaster(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataDeviceMaxMasterBuilder
 	// WithMaxMasterBuilder adds MaxMaster (property field) which is build by the builder
 	WithMaxMasterBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataDeviceMaxMasterBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataDeviceMaxMaster or returns an error if something is wrong
 	Build() (BACnetConstructedDataDeviceMaxMaster, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataDeviceMaxMasterBuilder) MustBuild() BACnetConstru
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataDeviceMaxMasterBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

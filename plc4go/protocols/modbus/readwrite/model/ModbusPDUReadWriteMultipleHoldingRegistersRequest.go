@@ -103,6 +103,8 @@ type ModbusPDUReadWriteMultipleHoldingRegistersRequestBuilder interface {
 	WithWriteQuantity(uint16) ModbusPDUReadWriteMultipleHoldingRegistersRequestBuilder
 	// WithValue adds Value (property field)
 	WithValue(...byte) ModbusPDUReadWriteMultipleHoldingRegistersRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUReadWriteMultipleHoldingRegistersRequest or returns an error if something is wrong
 	Build() (ModbusPDUReadWriteMultipleHoldingRegistersRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -172,8 +174,10 @@ func (b *_ModbusPDUReadWriteMultipleHoldingRegistersRequestBuilder) MustBuild() 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUReadWriteMultipleHoldingRegistersRequestBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

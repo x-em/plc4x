@@ -85,6 +85,8 @@ type ApduDataMemoryResponseBuilder interface {
 	WithAddress(uint16) ApduDataMemoryResponseBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) ApduDataMemoryResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataBuilder
 	// Build builds the ApduDataMemoryResponse or returns an error if something is wrong
 	Build() (ApduDataMemoryResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ApduDataMemoryResponseBuilder) MustBuild() ApduDataMemoryResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataMemoryResponseBuilder) Done() ApduDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataBuilder().(*_ApduDataBuilder)
+	}
 	return b.parentBuilder
 }
 

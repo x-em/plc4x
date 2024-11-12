@@ -71,6 +71,8 @@ type ApduDataExtIndividualAddressSerialNumberWriteBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ApduDataExtIndividualAddressSerialNumberWriteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataExtBuilder
 	// Build builds the ApduDataExtIndividualAddressSerialNumberWrite or returns an error if something is wrong
 	Build() (ApduDataExtIndividualAddressSerialNumberWrite, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_ApduDataExtIndividualAddressSerialNumberWriteBuilder) MustBuild() Apdu
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataExtIndividualAddressSerialNumberWriteBuilder) Done() ApduDataExtBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataExtBuilder().(*_ApduDataExtBuilder)
+	}
 	return b.parentBuilder
 }
 

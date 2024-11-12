@@ -112,6 +112,8 @@ type WriteValueBuilder interface {
 	WithValue(DataValue) WriteValueBuilder
 	// WithValueBuilder adds Value (property field) which is build by the builder
 	WithValueBuilder(func(DataValueBuilder) DataValueBuilder) WriteValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the WriteValue or returns an error if something is wrong
 	Build() (WriteValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -233,8 +235,10 @@ func (b *_WriteValueBuilder) MustBuild() WriteValue {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_WriteValueBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -82,6 +82,8 @@ type BACnetConfirmedServiceRequestRequestKeyBuilder interface {
 	WithMandatoryFields(bytesOfRemovedService []byte) BACnetConfirmedServiceRequestRequestKeyBuilder
 	// WithBytesOfRemovedService adds BytesOfRemovedService (property field)
 	WithBytesOfRemovedService(...byte) BACnetConfirmedServiceRequestRequestKeyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestRequestKey or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestRequestKey, error)
 	// MustBuild does the same as Build but panics on error
@@ -131,8 +133,10 @@ func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) MustBuild() BACnetConf
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

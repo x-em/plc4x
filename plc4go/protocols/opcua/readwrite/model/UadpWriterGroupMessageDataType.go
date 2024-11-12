@@ -103,6 +103,8 @@ type UadpWriterGroupMessageDataTypeBuilder interface {
 	WithSamplingOffset(float64) UadpWriterGroupMessageDataTypeBuilder
 	// WithPublishingOffset adds PublishingOffset (property field)
 	WithPublishingOffset(...float64) UadpWriterGroupMessageDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the UadpWriterGroupMessageDataType or returns an error if something is wrong
 	Build() (UadpWriterGroupMessageDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -172,8 +174,10 @@ func (b *_UadpWriterGroupMessageDataTypeBuilder) MustBuild() UadpWriterGroupMess
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_UadpWriterGroupMessageDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

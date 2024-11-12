@@ -86,6 +86,8 @@ type BACnetConstructedDataStopWhenFullBuilder interface {
 	WithStopWhenFull(BACnetApplicationTagBoolean) BACnetConstructedDataStopWhenFullBuilder
 	// WithStopWhenFullBuilder adds StopWhenFull (property field) which is build by the builder
 	WithStopWhenFullBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataStopWhenFullBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataStopWhenFull or returns an error if something is wrong
 	Build() (BACnetConstructedDataStopWhenFull, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataStopWhenFullBuilder) MustBuild() BACnetConstructe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataStopWhenFullBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

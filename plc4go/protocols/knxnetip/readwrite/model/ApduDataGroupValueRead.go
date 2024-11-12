@@ -75,6 +75,8 @@ type ApduDataGroupValueReadBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ApduDataGroupValueReadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataBuilder
 	// Build builds the ApduDataGroupValueRead or returns an error if something is wrong
 	Build() (ApduDataGroupValueRead, error)
 	// MustBuild does the same as Build but panics on error
@@ -119,8 +121,10 @@ func (b *_ApduDataGroupValueReadBuilder) MustBuild() ApduDataGroupValueRead {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataGroupValueReadBuilder) Done() ApduDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataBuilder().(*_ApduDataBuilder)
+	}
 	return b.parentBuilder
 }
 

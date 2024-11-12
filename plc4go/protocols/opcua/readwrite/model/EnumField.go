@@ -112,6 +112,8 @@ type EnumFieldBuilder interface {
 	WithName(PascalString) EnumFieldBuilder
 	// WithNameBuilder adds Name (property field) which is build by the builder
 	WithNameBuilder(func(PascalStringBuilder) PascalStringBuilder) EnumFieldBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the EnumField or returns an error if something is wrong
 	Build() (EnumField, error)
 	// MustBuild does the same as Build but panics on error
@@ -233,8 +235,10 @@ func (b *_EnumFieldBuilder) MustBuild() EnumField {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_EnumFieldBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

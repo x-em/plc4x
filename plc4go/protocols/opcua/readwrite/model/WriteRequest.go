@@ -90,6 +90,8 @@ type WriteRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) WriteRequestBuilder
 	// WithNodesToWrite adds NodesToWrite (property field)
 	WithNodesToWrite(...WriteValue) WriteRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the WriteRequest or returns an error if something is wrong
 	Build() (WriteRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_WriteRequestBuilder) MustBuild() WriteRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_WriteRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

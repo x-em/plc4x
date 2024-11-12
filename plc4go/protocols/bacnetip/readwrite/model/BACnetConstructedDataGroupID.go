@@ -86,6 +86,8 @@ type BACnetConstructedDataGroupIDBuilder interface {
 	WithGroupId(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataGroupIDBuilder
 	// WithGroupIdBuilder adds GroupId (property field) which is build by the builder
 	WithGroupIdBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataGroupIDBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataGroupID or returns an error if something is wrong
 	Build() (BACnetConstructedDataGroupID, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataGroupIDBuilder) MustBuild() BACnetConstructedData
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataGroupIDBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

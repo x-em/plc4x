@@ -118,6 +118,8 @@ type CipConnectionManagerResponseBuilder interface {
 	WithOtApi(uint32) CipConnectionManagerResponseBuilder
 	// WithToApi adds ToApi (property field)
 	WithToApi(uint32) CipConnectionManagerResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipConnectionManagerResponse or returns an error if something is wrong
 	Build() (CipConnectionManagerResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -197,8 +199,10 @@ func (b *_CipConnectionManagerResponseBuilder) MustBuild() CipConnectionManagerR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipConnectionManagerResponseBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

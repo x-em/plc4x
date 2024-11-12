@@ -105,6 +105,8 @@ type S7ParameterModeTransitionBuilder interface {
 	WithCurrentMode(uint8) S7ParameterModeTransitionBuilder
 	// WithSequenceNumber adds SequenceNumber (property field)
 	WithSequenceNumber(uint8) S7ParameterModeTransitionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7ParameterBuilder
 	// Build builds the S7ParameterModeTransition or returns an error if something is wrong
 	Build() (S7ParameterModeTransition, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_S7ParameterModeTransitionBuilder) MustBuild() S7ParameterModeTransitio
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7ParameterModeTransitionBuilder) Done() S7ParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7ParameterBuilder().(*_S7ParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

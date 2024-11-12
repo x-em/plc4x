@@ -124,6 +124,8 @@ type QueryFirstResponseBuilder interface {
 	WithFilterResult(ContentFilterResult) QueryFirstResponseBuilder
 	// WithFilterResultBuilder adds FilterResult (property field) which is build by the builder
 	WithFilterResultBuilder(func(ContentFilterResultBuilder) ContentFilterResultBuilder) QueryFirstResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the QueryFirstResponse or returns an error if something is wrong
 	Build() (QueryFirstResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -255,8 +257,10 @@ func (b *_QueryFirstResponseBuilder) MustBuild() QueryFirstResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_QueryFirstResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

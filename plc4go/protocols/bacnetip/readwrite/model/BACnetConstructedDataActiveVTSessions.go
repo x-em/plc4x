@@ -79,6 +79,8 @@ type BACnetConstructedDataActiveVTSessionsBuilder interface {
 	WithMandatoryFields(activeVTSession []BACnetVTSession) BACnetConstructedDataActiveVTSessionsBuilder
 	// WithActiveVTSession adds ActiveVTSession (property field)
 	WithActiveVTSession(...BACnetVTSession) BACnetConstructedDataActiveVTSessionsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataActiveVTSessions or returns an error if something is wrong
 	Build() (BACnetConstructedDataActiveVTSessions, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataActiveVTSessionsBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataActiveVTSessionsBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

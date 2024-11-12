@@ -96,6 +96,8 @@ type DeleteMonitoredItemsRequestBuilder interface {
 	WithSubscriptionId(uint32) DeleteMonitoredItemsRequestBuilder
 	// WithMonitoredItemIds adds MonitoredItemIds (property field)
 	WithMonitoredItemIds(...uint32) DeleteMonitoredItemsRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DeleteMonitoredItemsRequest or returns an error if something is wrong
 	Build() (DeleteMonitoredItemsRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_DeleteMonitoredItemsRequestBuilder) MustBuild() DeleteMonitoredItemsRe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DeleteMonitoredItemsRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type MediaTransportControlDataRepeatOnOffBuilder interface {
 	WithMandatoryFields(repeatType byte) MediaTransportControlDataRepeatOnOffBuilder
 	// WithRepeatType adds RepeatType (property field)
 	WithRepeatType(byte) MediaTransportControlDataRepeatOnOffBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataRepeatOnOff or returns an error if something is wrong
 	Build() (MediaTransportControlDataRepeatOnOff, error)
 	// MustBuild does the same as Build but panics on error
@@ -134,8 +136,10 @@ func (b *_MediaTransportControlDataRepeatOnOffBuilder) MustBuild() MediaTranspor
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataRepeatOnOffBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

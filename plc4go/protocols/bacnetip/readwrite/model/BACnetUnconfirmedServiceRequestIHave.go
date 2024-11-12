@@ -106,6 +106,8 @@ type BACnetUnconfirmedServiceRequestIHaveBuilder interface {
 	WithObjectName(BACnetApplicationTagCharacterString) BACnetUnconfirmedServiceRequestIHaveBuilder
 	// WithObjectNameBuilder adds ObjectName (property field) which is build by the builder
 	WithObjectNameBuilder(func(BACnetApplicationTagCharacterStringBuilder) BACnetApplicationTagCharacterStringBuilder) BACnetUnconfirmedServiceRequestIHaveBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetUnconfirmedServiceRequestBuilder
 	// Build builds the BACnetUnconfirmedServiceRequestIHave or returns an error if something is wrong
 	Build() (BACnetUnconfirmedServiceRequestIHave, error)
 	// MustBuild does the same as Build but panics on error
@@ -222,8 +224,10 @@ func (b *_BACnetUnconfirmedServiceRequestIHaveBuilder) MustBuild() BACnetUnconfi
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetUnconfirmedServiceRequestIHaveBuilder) Done() BACnetUnconfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetUnconfirmedServiceRequestBuilder().(*_BACnetUnconfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

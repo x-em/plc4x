@@ -87,6 +87,8 @@ type NLMNetworkNumberIsBuilder interface {
 	WithNetworkNumber(uint16) NLMNetworkNumberIsBuilder
 	// WithNetworkNumberConfigured adds NetworkNumberConfigured (property field)
 	WithNetworkNumberConfigured(bool) NLMNetworkNumberIsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMNetworkNumberIs or returns an error if something is wrong
 	Build() (NLMNetworkNumberIs, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_NLMNetworkNumberIsBuilder) MustBuild() NLMNetworkNumberIs {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMNetworkNumberIsBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

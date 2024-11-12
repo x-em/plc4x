@@ -85,6 +85,8 @@ type ModbusPDUWriteSingleCoilRequestBuilder interface {
 	WithAddress(uint16) ModbusPDUWriteSingleCoilRequestBuilder
 	// WithValue adds Value (property field)
 	WithValue(uint16) ModbusPDUWriteSingleCoilRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUWriteSingleCoilRequest or returns an error if something is wrong
 	Build() (ModbusPDUWriteSingleCoilRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ModbusPDUWriteSingleCoilRequestBuilder) MustBuild() ModbusPDUWriteSing
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUWriteSingleCoilRequestBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

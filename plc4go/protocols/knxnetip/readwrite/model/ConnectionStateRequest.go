@@ -94,6 +94,8 @@ type ConnectionStateRequestBuilder interface {
 	WithHpaiControlEndpoint(HPAIControlEndpoint) ConnectionStateRequestBuilder
 	// WithHpaiControlEndpointBuilder adds HpaiControlEndpoint (property field) which is build by the builder
 	WithHpaiControlEndpointBuilder(func(HPAIControlEndpointBuilder) HPAIControlEndpointBuilder) ConnectionStateRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the ConnectionStateRequest or returns an error if something is wrong
 	Build() (ConnectionStateRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -167,8 +169,10 @@ func (b *_ConnectionStateRequestBuilder) MustBuild() ConnectionStateRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ConnectionStateRequestBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

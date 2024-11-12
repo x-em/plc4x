@@ -86,6 +86,8 @@ type BACnetConstructedDataStateDescriptionBuilder interface {
 	WithStateDescription(BACnetApplicationTagCharacterString) BACnetConstructedDataStateDescriptionBuilder
 	// WithStateDescriptionBuilder adds StateDescription (property field) which is build by the builder
 	WithStateDescriptionBuilder(func(BACnetApplicationTagCharacterStringBuilder) BACnetApplicationTagCharacterStringBuilder) BACnetConstructedDataStateDescriptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataStateDescription or returns an error if something is wrong
 	Build() (BACnetConstructedDataStateDescription, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataStateDescriptionBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataStateDescriptionBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

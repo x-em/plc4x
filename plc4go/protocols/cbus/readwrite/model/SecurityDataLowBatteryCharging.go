@@ -83,6 +83,8 @@ type SecurityDataLowBatteryChargingBuilder interface {
 	WithMandatoryFields(startStop byte) SecurityDataLowBatteryChargingBuilder
 	// WithStartStop adds StartStop (property field)
 	WithStartStop(byte) SecurityDataLowBatteryChargingBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataLowBatteryCharging or returns an error if something is wrong
 	Build() (SecurityDataLowBatteryCharging, error)
 	// MustBuild does the same as Build but panics on error
@@ -132,8 +134,10 @@ func (b *_SecurityDataLowBatteryChargingBuilder) MustBuild() SecurityDataLowBatt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataLowBatteryChargingBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type SecurityDataSystemArmedDisarmedBuilder interface {
 	WithArmCodeType(SecurityArmCode) SecurityDataSystemArmedDisarmedBuilder
 	// WithArmCodeTypeBuilder adds ArmCodeType (property field) which is build by the builder
 	WithArmCodeTypeBuilder(func(SecurityArmCodeBuilder) SecurityArmCodeBuilder) SecurityDataSystemArmedDisarmedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataSystemArmedDisarmed or returns an error if something is wrong
 	Build() (SecurityDataSystemArmedDisarmed, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_SecurityDataSystemArmedDisarmedBuilder) MustBuild() SecurityDataSystem
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataSystemArmedDisarmedBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

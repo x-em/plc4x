@@ -79,6 +79,8 @@ type MeteringDataOilConsumptionBuilder interface {
 	WithMandatoryFields(L uint32) MeteringDataOilConsumptionBuilder
 	// WithL adds L (property field)
 	WithL(uint32) MeteringDataOilConsumptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MeteringDataBuilder
 	// Build builds the MeteringDataOilConsumption or returns an error if something is wrong
 	Build() (MeteringDataOilConsumption, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_MeteringDataOilConsumptionBuilder) MustBuild() MeteringDataOilConsumpt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MeteringDataOilConsumptionBuilder) Done() MeteringDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMeteringDataBuilder().(*_MeteringDataBuilder)
+	}
 	return b.parentBuilder
 }
 

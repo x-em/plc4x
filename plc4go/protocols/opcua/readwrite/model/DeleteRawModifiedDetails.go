@@ -104,6 +104,8 @@ type DeleteRawModifiedDetailsBuilder interface {
 	WithStartTime(int64) DeleteRawModifiedDetailsBuilder
 	// WithEndTime adds EndTime (property field)
 	WithEndTime(int64) DeleteRawModifiedDetailsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DeleteRawModifiedDetails or returns an error if something is wrong
 	Build() (DeleteRawModifiedDetails, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_DeleteRawModifiedDetailsBuilder) MustBuild() DeleteRawModifiedDetails 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DeleteRawModifiedDetailsBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

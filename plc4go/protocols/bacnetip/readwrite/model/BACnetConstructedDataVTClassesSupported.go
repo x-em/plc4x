@@ -79,6 +79,8 @@ type BACnetConstructedDataVTClassesSupportedBuilder interface {
 	WithMandatoryFields(vtClassesSupported []BACnetVTClassTagged) BACnetConstructedDataVTClassesSupportedBuilder
 	// WithVtClassesSupported adds VtClassesSupported (property field)
 	WithVtClassesSupported(...BACnetVTClassTagged) BACnetConstructedDataVTClassesSupportedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataVTClassesSupported or returns an error if something is wrong
 	Build() (BACnetConstructedDataVTClassesSupported, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataVTClassesSupportedBuilder) MustBuild() BACnetCons
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataVTClassesSupportedBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

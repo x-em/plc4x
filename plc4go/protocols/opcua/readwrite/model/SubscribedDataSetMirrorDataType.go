@@ -90,6 +90,8 @@ type SubscribedDataSetMirrorDataTypeBuilder interface {
 	WithParentNodeNameBuilder(func(PascalStringBuilder) PascalStringBuilder) SubscribedDataSetMirrorDataTypeBuilder
 	// WithRolePermissions adds RolePermissions (property field)
 	WithRolePermissions(...RolePermissionType) SubscribedDataSetMirrorDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SubscribedDataSetMirrorDataType or returns an error if something is wrong
 	Build() (SubscribedDataSetMirrorDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_SubscribedDataSetMirrorDataTypeBuilder) MustBuild() SubscribedDataSetM
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SubscribedDataSetMirrorDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BVLCReadForeignDeviceTableAckBuilder interface {
 	WithMandatoryFields(table []BVLCForeignDeviceTableEntry) BVLCReadForeignDeviceTableAckBuilder
 	// WithTable adds Table (property field)
 	WithTable(...BVLCForeignDeviceTableEntry) BVLCReadForeignDeviceTableAckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCReadForeignDeviceTableAck or returns an error if something is wrong
 	Build() (BVLCReadForeignDeviceTableAck, error)
 	// MustBuild does the same as Build but panics on error
@@ -133,8 +135,10 @@ func (b *_BVLCReadForeignDeviceTableAckBuilder) MustBuild() BVLCReadForeignDevic
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCReadForeignDeviceTableAckBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 

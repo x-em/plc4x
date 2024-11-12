@@ -81,6 +81,8 @@ type ConnectedAddressItemBuilder interface {
 	WithMandatoryFields(connectionId uint32) ConnectedAddressItemBuilder
 	// WithConnectionId adds ConnectionId (property field)
 	WithConnectionId(uint32) ConnectedAddressItemBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TypeIdBuilder
 	// Build builds the ConnectedAddressItem or returns an error if something is wrong
 	Build() (ConnectedAddressItem, error)
 	// MustBuild does the same as Build but panics on error
@@ -130,8 +132,10 @@ func (b *_ConnectedAddressItemBuilder) MustBuild() ConnectedAddressItem {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ConnectedAddressItemBuilder) Done() TypeIdBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTypeIdBuilder().(*_TypeIdBuilder)
+	}
 	return b.parentBuilder
 }
 

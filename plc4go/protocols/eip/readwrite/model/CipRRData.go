@@ -91,6 +91,8 @@ type CipRRDataBuilder interface {
 	WithTimeout(uint16) CipRRDataBuilder
 	// WithTypeIds adds TypeIds (property field)
 	WithTypeIds(...TypeId) CipRRDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() EipPacketBuilder
 	// Build builds the CipRRData or returns an error if something is wrong
 	Build() (CipRRData, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_CipRRDataBuilder) MustBuild() CipRRData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipRRDataBuilder) Done() EipPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewEipPacketBuilder().(*_EipPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

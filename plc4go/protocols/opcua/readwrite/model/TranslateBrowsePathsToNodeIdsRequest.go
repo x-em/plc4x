@@ -90,6 +90,8 @@ type TranslateBrowsePathsToNodeIdsRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) TranslateBrowsePathsToNodeIdsRequestBuilder
 	// WithBrowsePaths adds BrowsePaths (property field)
 	WithBrowsePaths(...BrowsePath) TranslateBrowsePathsToNodeIdsRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the TranslateBrowsePathsToNodeIdsRequest or returns an error if something is wrong
 	Build() (TranslateBrowsePathsToNodeIdsRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_TranslateBrowsePathsToNodeIdsRequestBuilder) MustBuild() TranslateBrow
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TranslateBrowsePathsToNodeIdsRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

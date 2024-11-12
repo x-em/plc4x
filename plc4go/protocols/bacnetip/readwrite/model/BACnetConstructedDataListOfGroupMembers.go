@@ -79,6 +79,8 @@ type BACnetConstructedDataListOfGroupMembersBuilder interface {
 	WithMandatoryFields(listOfGroupMembers []BACnetReadAccessSpecification) BACnetConstructedDataListOfGroupMembersBuilder
 	// WithListOfGroupMembers adds ListOfGroupMembers (property field)
 	WithListOfGroupMembers(...BACnetReadAccessSpecification) BACnetConstructedDataListOfGroupMembersBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataListOfGroupMembers or returns an error if something is wrong
 	Build() (BACnetConstructedDataListOfGroupMembers, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataListOfGroupMembersBuilder) MustBuild() BACnetCons
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataListOfGroupMembersBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

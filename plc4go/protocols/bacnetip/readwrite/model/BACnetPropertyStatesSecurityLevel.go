@@ -84,6 +84,8 @@ type BACnetPropertyStatesSecurityLevelBuilder interface {
 	WithSecurityLevel(BACnetSecurityLevelTagged) BACnetPropertyStatesSecurityLevelBuilder
 	// WithSecurityLevelBuilder adds SecurityLevel (property field) which is build by the builder
 	WithSecurityLevelBuilder(func(BACnetSecurityLevelTaggedBuilder) BACnetSecurityLevelTaggedBuilder) BACnetPropertyStatesSecurityLevelBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesSecurityLevel or returns an error if something is wrong
 	Build() (BACnetPropertyStatesSecurityLevel, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesSecurityLevelBuilder) MustBuild() BACnetPropertySt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesSecurityLevelBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

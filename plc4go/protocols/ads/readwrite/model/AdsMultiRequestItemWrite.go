@@ -91,6 +91,8 @@ type AdsMultiRequestItemWriteBuilder interface {
 	WithItemIndexOffset(uint32) AdsMultiRequestItemWriteBuilder
 	// WithItemWriteLength adds ItemWriteLength (property field)
 	WithItemWriteLength(uint32) AdsMultiRequestItemWriteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsMultiRequestItemBuilder
 	// Build builds the AdsMultiRequestItemWrite or returns an error if something is wrong
 	Build() (AdsMultiRequestItemWrite, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_AdsMultiRequestItemWriteBuilder) MustBuild() AdsMultiRequestItemWrite 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsMultiRequestItemWriteBuilder) Done() AdsMultiRequestItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsMultiRequestItemBuilder().(*_AdsMultiRequestItemBuilder)
+	}
 	return b.parentBuilder
 }
 

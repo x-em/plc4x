@@ -108,6 +108,8 @@ type CreateSubscriptionResponseBuilder interface {
 	WithRevisedLifetimeCount(uint32) CreateSubscriptionResponseBuilder
 	// WithRevisedMaxKeepAliveCount adds RevisedMaxKeepAliveCount (property field)
 	WithRevisedMaxKeepAliveCount(uint32) CreateSubscriptionResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CreateSubscriptionResponse or returns an error if something is wrong
 	Build() (CreateSubscriptionResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -196,8 +198,10 @@ func (b *_CreateSubscriptionResponseBuilder) MustBuild() CreateSubscriptionRespo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CreateSubscriptionResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

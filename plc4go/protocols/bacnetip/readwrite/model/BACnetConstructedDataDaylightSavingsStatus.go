@@ -86,6 +86,8 @@ type BACnetConstructedDataDaylightSavingsStatusBuilder interface {
 	WithDaylightSavingsStatus(BACnetApplicationTagBoolean) BACnetConstructedDataDaylightSavingsStatusBuilder
 	// WithDaylightSavingsStatusBuilder adds DaylightSavingsStatus (property field) which is build by the builder
 	WithDaylightSavingsStatusBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataDaylightSavingsStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataDaylightSavingsStatus or returns an error if something is wrong
 	Build() (BACnetConstructedDataDaylightSavingsStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataDaylightSavingsStatusBuilder) MustBuild() BACnetC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataDaylightSavingsStatusBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type COTPPacketDisconnectResponseBuilder interface {
 	WithDestinationReference(uint16) COTPPacketDisconnectResponseBuilder
 	// WithSourceReference adds SourceReference (property field)
 	WithSourceReference(uint16) COTPPacketDisconnectResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() COTPPacketBuilder
 	// Build builds the COTPPacketDisconnectResponse or returns an error if something is wrong
 	Build() (COTPPacketDisconnectResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_COTPPacketDisconnectResponseBuilder) MustBuild() COTPPacketDisconnectR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_COTPPacketDisconnectResponseBuilder) Done() COTPPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCOTPPacketBuilder().(*_COTPPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

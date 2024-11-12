@@ -86,6 +86,8 @@ type BACnetConstructedDataFaultTypeBuilder interface {
 	WithFaultType(BACnetFaultTypeTagged) BACnetConstructedDataFaultTypeBuilder
 	// WithFaultTypeBuilder adds FaultType (property field) which is build by the builder
 	WithFaultTypeBuilder(func(BACnetFaultTypeTaggedBuilder) BACnetFaultTypeTaggedBuilder) BACnetConstructedDataFaultTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataFaultType or returns an error if something is wrong
 	Build() (BACnetConstructedDataFaultType, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataFaultTypeBuilder) MustBuild() BACnetConstructedDa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataFaultTypeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

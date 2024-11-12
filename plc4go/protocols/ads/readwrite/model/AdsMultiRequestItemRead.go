@@ -91,6 +91,8 @@ type AdsMultiRequestItemReadBuilder interface {
 	WithItemIndexOffset(uint32) AdsMultiRequestItemReadBuilder
 	// WithItemReadLength adds ItemReadLength (property field)
 	WithItemReadLength(uint32) AdsMultiRequestItemReadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AdsMultiRequestItemBuilder
 	// Build builds the AdsMultiRequestItemRead or returns an error if something is wrong
 	Build() (AdsMultiRequestItemRead, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_AdsMultiRequestItemReadBuilder) MustBuild() AdsMultiRequestItemRead {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsMultiRequestItemReadBuilder) Done() AdsMultiRequestItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAdsMultiRequestItemBuilder().(*_AdsMultiRequestItemBuilder)
+	}
 	return b.parentBuilder
 }
 

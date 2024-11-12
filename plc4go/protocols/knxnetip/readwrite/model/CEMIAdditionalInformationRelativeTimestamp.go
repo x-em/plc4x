@@ -87,6 +87,8 @@ type CEMIAdditionalInformationRelativeTimestampBuilder interface {
 	WithRelativeTimestamp(RelativeTimestamp) CEMIAdditionalInformationRelativeTimestampBuilder
 	// WithRelativeTimestampBuilder adds RelativeTimestamp (property field) which is build by the builder
 	WithRelativeTimestampBuilder(func(RelativeTimestampBuilder) RelativeTimestampBuilder) CEMIAdditionalInformationRelativeTimestampBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CEMIAdditionalInformationBuilder
 	// Build builds the CEMIAdditionalInformationRelativeTimestamp or returns an error if something is wrong
 	Build() (CEMIAdditionalInformationRelativeTimestamp, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,8 +157,10 @@ func (b *_CEMIAdditionalInformationRelativeTimestampBuilder) MustBuild() CEMIAdd
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CEMIAdditionalInformationRelativeTimestampBuilder) Done() CEMIAdditionalInformationBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCEMIAdditionalInformationBuilder().(*_CEMIAdditionalInformationBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -130,6 +130,8 @@ type RequestHeaderBuilder interface {
 	WithAdditionalHeader(ExtensionObject) RequestHeaderBuilder
 	// WithAdditionalHeaderBuilder adds AdditionalHeader (property field) which is build by the builder
 	WithAdditionalHeaderBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) RequestHeaderBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RequestHeader or returns an error if something is wrong
 	Build() (RequestHeader, error)
 	// MustBuild does the same as Build but panics on error
@@ -266,8 +268,10 @@ func (b *_RequestHeaderBuilder) MustBuild() RequestHeader {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RequestHeaderBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

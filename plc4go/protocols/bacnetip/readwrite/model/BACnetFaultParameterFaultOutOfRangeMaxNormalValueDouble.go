@@ -84,6 +84,8 @@ type BACnetFaultParameterFaultOutOfRangeMaxNormalValueDoubleBuilder interface {
 	WithDoubleValue(BACnetApplicationTagDouble) BACnetFaultParameterFaultOutOfRangeMaxNormalValueDoubleBuilder
 	// WithDoubleValueBuilder adds DoubleValue (property field) which is build by the builder
 	WithDoubleValueBuilder(func(BACnetApplicationTagDoubleBuilder) BACnetApplicationTagDoubleBuilder) BACnetFaultParameterFaultOutOfRangeMaxNormalValueDoubleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder
 	// Build builds the BACnetFaultParameterFaultOutOfRangeMaxNormalValueDouble or returns an error if something is wrong
 	Build() (BACnetFaultParameterFaultOutOfRangeMaxNormalValueDouble, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetFaultParameterFaultOutOfRangeMaxNormalValueDoubleBuilder) MustBu
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetFaultParameterFaultOutOfRangeMaxNormalValueDoubleBuilder) Done() BACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder().(*_BACnetFaultParameterFaultOutOfRangeMaxNormalValueBuilder)
+	}
 	return b.parentBuilder
 }
 

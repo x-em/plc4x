@@ -88,6 +88,8 @@ type StatusRequestLevelBuilder interface {
 	WithApplication(ApplicationIdContainer) StatusRequestLevelBuilder
 	// WithStartingGroupAddressLabel adds StartingGroupAddressLabel (property field)
 	WithStartingGroupAddressLabel(byte) StatusRequestLevelBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() StatusRequestBuilder
 	// Build builds the StatusRequestLevel or returns an error if something is wrong
 	Build() (StatusRequestLevel, error)
 	// MustBuild does the same as Build but panics on error
@@ -142,8 +144,10 @@ func (b *_StatusRequestLevelBuilder) MustBuild() StatusRequestLevel {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_StatusRequestLevelBuilder) Done() StatusRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewStatusRequestBuilder().(*_StatusRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

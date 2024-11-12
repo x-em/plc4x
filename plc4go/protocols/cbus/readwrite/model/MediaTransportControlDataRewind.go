@@ -95,6 +95,8 @@ type MediaTransportControlDataRewindBuilder interface {
 	WithMandatoryFields(operation byte) MediaTransportControlDataRewindBuilder
 	// WithOperation adds Operation (property field)
 	WithOperation(byte) MediaTransportControlDataRewindBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MediaTransportControlDataBuilder
 	// Build builds the MediaTransportControlDataRewind or returns an error if something is wrong
 	Build() (MediaTransportControlDataRewind, error)
 	// MustBuild does the same as Build but panics on error
@@ -144,8 +146,10 @@ func (b *_MediaTransportControlDataRewindBuilder) MustBuild() MediaTransportCont
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MediaTransportControlDataRewindBuilder) Done() MediaTransportControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type LogicalSegmentBuilder interface {
 	WithSegmentType(LogicalSegmentType) LogicalSegmentBuilder
 	// WithSegmentTypeBuilder adds SegmentType (property field) which is build by the builder
 	WithSegmentTypeBuilder(func(LogicalSegmentTypeBuilder) LogicalSegmentTypeBuilder) LogicalSegmentBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() PathSegmentBuilder
 	// Build builds the LogicalSegment or returns an error if something is wrong
 	Build() (LogicalSegment, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_LogicalSegmentBuilder) MustBuild() LogicalSegment {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LogicalSegmentBuilder) Done() PathSegmentBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewPathSegmentBuilder().(*_PathSegmentBuilder)
+	}
 	return b.parentBuilder
 }
 

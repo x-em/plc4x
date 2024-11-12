@@ -114,6 +114,8 @@ type BACnetConfirmedServiceRequestConfirmedTextMessageBuilder interface {
 	WithMessage(BACnetContextTagCharacterString) BACnetConfirmedServiceRequestConfirmedTextMessageBuilder
 	// WithMessageBuilder adds Message (property field) which is build by the builder
 	WithMessageBuilder(func(BACnetContextTagCharacterStringBuilder) BACnetContextTagCharacterStringBuilder) BACnetConfirmedServiceRequestConfirmedTextMessageBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestConfirmedTextMessage or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestConfirmedTextMessage, error)
 	// MustBuild does the same as Build but panics on error
@@ -248,8 +250,10 @@ func (b *_BACnetConfirmedServiceRequestConfirmedTextMessageBuilder) MustBuild() 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestConfirmedTextMessageBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

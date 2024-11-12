@@ -90,6 +90,8 @@ type BrowsePathResultBuilder interface {
 	WithStatusCodeBuilder(func(StatusCodeBuilder) StatusCodeBuilder) BrowsePathResultBuilder
 	// WithTargets adds Targets (property field)
 	WithTargets(...BrowsePathTarget) BrowsePathResultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the BrowsePathResult or returns an error if something is wrong
 	Build() (BrowsePathResult, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_BrowsePathResultBuilder) MustBuild() BrowsePathResult {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BrowsePathResultBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

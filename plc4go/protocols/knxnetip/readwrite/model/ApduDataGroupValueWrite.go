@@ -85,6 +85,8 @@ type ApduDataGroupValueWriteBuilder interface {
 	WithDataFirstByte(int8) ApduDataGroupValueWriteBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) ApduDataGroupValueWriteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataBuilder
 	// Build builds the ApduDataGroupValueWrite or returns an error if something is wrong
 	Build() (ApduDataGroupValueWrite, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ApduDataGroupValueWriteBuilder) MustBuild() ApduDataGroupValueWrite {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataGroupValueWriteBuilder) Done() ApduDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataBuilder().(*_ApduDataBuilder)
+	}
 	return b.parentBuilder
 }
 

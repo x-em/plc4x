@@ -79,6 +79,8 @@ type BACnetConstructedDataTrendLogMultipleLogBufferBuilder interface {
 	WithMandatoryFields(floorText []BACnetLogMultipleRecord) BACnetConstructedDataTrendLogMultipleLogBufferBuilder
 	// WithFloorText adds FloorText (property field)
 	WithFloorText(...BACnetLogMultipleRecord) BACnetConstructedDataTrendLogMultipleLogBufferBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataTrendLogMultipleLogBuffer or returns an error if something is wrong
 	Build() (BACnetConstructedDataTrendLogMultipleLogBuffer, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataTrendLogMultipleLogBufferBuilder) MustBuild() BAC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataTrendLogMultipleLogBufferBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

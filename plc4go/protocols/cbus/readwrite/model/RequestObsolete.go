@@ -91,6 +91,8 @@ type RequestObsoleteBuilder interface {
 	WithOptionalAlpha(Alpha) RequestObsoleteBuilder
 	// WithOptionalAlphaBuilder adds Alpha (property field) which is build by the builder
 	WithOptionalAlphaBuilder(func(AlphaBuilder) AlphaBuilder) RequestObsoleteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() RequestBuilder
 	// Build builds the RequestObsolete or returns an error if something is wrong
 	Build() (RequestObsolete, error)
 	// MustBuild does the same as Build but panics on error
@@ -177,8 +179,10 @@ func (b *_RequestObsoleteBuilder) MustBuild() RequestObsolete {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RequestObsoleteBuilder) Done() RequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewRequestBuilder().(*_RequestBuilder)
+	}
 	return b.parentBuilder
 }
 

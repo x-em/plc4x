@@ -144,6 +144,8 @@ type NLMUpdateKeyUpdateBuilder interface {
 	WithOptionalSet2KeyCount(uint8) NLMUpdateKeyUpdateBuilder
 	// WithSet2Keys adds Set2Keys (property field)
 	WithSet2Keys(...NLMUpdateKeyUpdateKeyEntry) NLMUpdateKeyUpdateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMUpdateKeyUpdate or returns an error if something is wrong
 	Build() (NLMUpdateKeyUpdate, error)
 	// MustBuild does the same as Build but panics on error
@@ -262,8 +264,10 @@ func (b *_NLMUpdateKeyUpdateBuilder) MustBuild() NLMUpdateKeyUpdate {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMUpdateKeyUpdateBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

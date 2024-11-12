@@ -101,6 +101,8 @@ type RegisterServer2RequestBuilder interface {
 	WithServerBuilder(func(RegisteredServerBuilder) RegisteredServerBuilder) RegisterServer2RequestBuilder
 	// WithDiscoveryConfiguration adds DiscoveryConfiguration (property field)
 	WithDiscoveryConfiguration(...ExtensionObject) RegisterServer2RequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RegisterServer2Request or returns an error if something is wrong
 	Build() (RegisterServer2Request, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_RegisterServer2RequestBuilder) MustBuild() RegisterServer2Request {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RegisterServer2RequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

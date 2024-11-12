@@ -87,6 +87,8 @@ type FirmataMessageAnalogIOBuilder interface {
 	WithPin(uint8) FirmataMessageAnalogIOBuilder
 	// WithData adds Data (property field)
 	WithData(...int8) FirmataMessageAnalogIOBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() FirmataMessageBuilder
 	// Build builds the FirmataMessageAnalogIO or returns an error if something is wrong
 	Build() (FirmataMessageAnalogIO, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_FirmataMessageAnalogIOBuilder) MustBuild() FirmataMessageAnalogIO {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_FirmataMessageAnalogIOBuilder) Done() FirmataMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewFirmataMessageBuilder().(*_FirmataMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

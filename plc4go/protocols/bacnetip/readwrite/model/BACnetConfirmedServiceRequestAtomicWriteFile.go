@@ -122,6 +122,8 @@ type BACnetConfirmedServiceRequestAtomicWriteFileBuilder interface {
 	WithOptionalClosingTag(BACnetClosingTag) BACnetConfirmedServiceRequestAtomicWriteFileBuilder
 	// WithOptionalClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithOptionalClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetConfirmedServiceRequestAtomicWriteFileBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestAtomicWriteFile or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestAtomicWriteFile, error)
 	// MustBuild does the same as Build but panics on error
@@ -274,8 +276,10 @@ func (b *_BACnetConfirmedServiceRequestAtomicWriteFileBuilder) MustBuild() BACne
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestAtomicWriteFileBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

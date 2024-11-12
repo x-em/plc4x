@@ -103,6 +103,8 @@ type ClockAndTimekeepingDataUpdateDateBuilder interface {
 	WithDay(uint8) ClockAndTimekeepingDataUpdateDateBuilder
 	// WithDayOfWeek adds DayOfWeek (property field)
 	WithDayOfWeek(uint8) ClockAndTimekeepingDataUpdateDateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ClockAndTimekeepingDataBuilder
 	// Build builds the ClockAndTimekeepingDataUpdateDate or returns an error if something is wrong
 	Build() (ClockAndTimekeepingDataUpdateDate, error)
 	// MustBuild does the same as Build but panics on error
@@ -172,8 +174,10 @@ func (b *_ClockAndTimekeepingDataUpdateDateBuilder) MustBuild() ClockAndTimekeep
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ClockAndTimekeepingDataUpdateDateBuilder) Done() ClockAndTimekeepingDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewClockAndTimekeepingDataBuilder().(*_ClockAndTimekeepingDataBuilder)
+	}
 	return b.parentBuilder
 }
 

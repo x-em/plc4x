@@ -84,6 +84,8 @@ type BACnetPropertyStatesLifeSafetyModeBuilder interface {
 	WithLifeSafetyMode(BACnetLifeSafetyModeTagged) BACnetPropertyStatesLifeSafetyModeBuilder
 	// WithLifeSafetyModeBuilder adds LifeSafetyMode (property field) which is build by the builder
 	WithLifeSafetyModeBuilder(func(BACnetLifeSafetyModeTaggedBuilder) BACnetLifeSafetyModeTaggedBuilder) BACnetPropertyStatesLifeSafetyModeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesLifeSafetyMode or returns an error if something is wrong
 	Build() (BACnetPropertyStatesLifeSafetyMode, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesLifeSafetyModeBuilder) MustBuild() BACnetPropertyS
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesLifeSafetyModeBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

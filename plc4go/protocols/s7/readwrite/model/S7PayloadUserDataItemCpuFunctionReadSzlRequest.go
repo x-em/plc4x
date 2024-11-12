@@ -90,6 +90,8 @@ type S7PayloadUserDataItemCpuFunctionReadSzlRequestBuilder interface {
 	WithSzlIdBuilder(func(SzlIdBuilder) SzlIdBuilder) S7PayloadUserDataItemCpuFunctionReadSzlRequestBuilder
 	// WithSzlIndex adds SzlIndex (property field)
 	WithSzlIndex(uint16) S7PayloadUserDataItemCpuFunctionReadSzlRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadUserDataItemBuilder
 	// Build builds the S7PayloadUserDataItemCpuFunctionReadSzlRequest or returns an error if something is wrong
 	Build() (S7PayloadUserDataItemCpuFunctionReadSzlRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_S7PayloadUserDataItemCpuFunctionReadSzlRequestBuilder) MustBuild() S7P
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadUserDataItemCpuFunctionReadSzlRequestBuilder) Done() S7PayloadUserDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadUserDataItemBuilder().(*_S7PayloadUserDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

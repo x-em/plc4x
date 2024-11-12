@@ -89,6 +89,8 @@ type SecurityDataPasswordEntryStatusBuilder interface {
 	WithMandatoryFields(code byte) SecurityDataPasswordEntryStatusBuilder
 	// WithCode adds Code (property field)
 	WithCode(byte) SecurityDataPasswordEntryStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataPasswordEntryStatus or returns an error if something is wrong
 	Build() (SecurityDataPasswordEntryStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -138,8 +140,10 @@ func (b *_SecurityDataPasswordEntryStatusBuilder) MustBuild() SecurityDataPasswo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataPasswordEntryStatusBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

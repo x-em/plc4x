@@ -86,6 +86,8 @@ type BACnetConstructedDataRestorePreparationTimeBuilder interface {
 	WithRestorePreparationTime(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataRestorePreparationTimeBuilder
 	// WithRestorePreparationTimeBuilder adds RestorePreparationTime (property field) which is build by the builder
 	WithRestorePreparationTimeBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataRestorePreparationTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataRestorePreparationTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataRestorePreparationTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataRestorePreparationTimeBuilder) MustBuild() BACnet
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataRestorePreparationTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

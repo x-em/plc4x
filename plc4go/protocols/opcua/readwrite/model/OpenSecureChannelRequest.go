@@ -119,6 +119,8 @@ type OpenSecureChannelRequestBuilder interface {
 	WithClientNonceBuilder(func(PascalByteStringBuilder) PascalByteStringBuilder) OpenSecureChannelRequestBuilder
 	// WithRequestedLifetime adds RequestedLifetime (property field)
 	WithRequestedLifetime(uint32) OpenSecureChannelRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the OpenSecureChannelRequest or returns an error if something is wrong
 	Build() (OpenSecureChannelRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -231,8 +233,10 @@ func (b *_OpenSecureChannelRequestBuilder) MustBuild() OpenSecureChannelRequest 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_OpenSecureChannelRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

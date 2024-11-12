@@ -79,6 +79,8 @@ type TriggerControlDataTriggerEventBuilder interface {
 	WithMandatoryFields(actionSelector byte) TriggerControlDataTriggerEventBuilder
 	// WithActionSelector adds ActionSelector (property field)
 	WithActionSelector(byte) TriggerControlDataTriggerEventBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TriggerControlDataBuilder
 	// Build builds the TriggerControlDataTriggerEvent or returns an error if something is wrong
 	Build() (TriggerControlDataTriggerEvent, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_TriggerControlDataTriggerEventBuilder) MustBuild() TriggerControlDataT
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TriggerControlDataTriggerEventBuilder) Done() TriggerControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTriggerControlDataBuilder().(*_TriggerControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

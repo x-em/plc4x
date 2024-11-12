@@ -89,6 +89,8 @@ type NodeIdFourByteBuilder interface {
 	WithNamespaceIndex(uint8) NodeIdFourByteBuilder
 	// WithId adds Id (property field)
 	WithId(uint16) NodeIdFourByteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NodeIdTypeDefinitionBuilder
 	// Build builds the NodeIdFourByte or returns an error if something is wrong
 	Build() (NodeIdFourByte, error)
 	// MustBuild does the same as Build but panics on error
@@ -143,8 +145,10 @@ func (b *_NodeIdFourByteBuilder) MustBuild() NodeIdFourByte {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NodeIdFourByteBuilder) Done() NodeIdTypeDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNodeIdTypeDefinitionBuilder().(*_NodeIdTypeDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

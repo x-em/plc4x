@@ -84,6 +84,8 @@ type BACnetValueSourceObjectBuilder interface {
 	WithObject(BACnetDeviceObjectReferenceEnclosed) BACnetValueSourceObjectBuilder
 	// WithObjectBuilder adds Object (property field) which is build by the builder
 	WithObjectBuilder(func(BACnetDeviceObjectReferenceEnclosedBuilder) BACnetDeviceObjectReferenceEnclosedBuilder) BACnetValueSourceObjectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetValueSourceBuilder
 	// Build builds the BACnetValueSourceObject or returns an error if something is wrong
 	Build() (BACnetValueSourceObject, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetValueSourceObjectBuilder) MustBuild() BACnetValueSourceObject {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetValueSourceObjectBuilder) Done() BACnetValueSourceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetValueSourceBuilder().(*_BACnetValueSourceBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder interface 
 	WithReference(BACnetDeviceObjectPropertyReferenceEnclosed) BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder
 	// WithReferenceBuilder adds Reference (property field) which is build by the builder
 	WithReferenceBuilder(func(BACnetDeviceObjectPropertyReferenceEnclosedBuilder) BACnetDeviceObjectPropertyReferenceEnclosedBuilder) BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetFaultParameterFaultExtendedParametersEntryBuilder
 	// Build builds the BACnetFaultParameterFaultExtendedParametersEntryReference or returns an error if something is wrong
 	Build() (BACnetFaultParameterFaultExtendedParametersEntryReference, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder) Must
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder) Done() BACnetFaultParameterFaultExtendedParametersEntryBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetFaultParameterFaultExtendedParametersEntryBuilder().(*_BACnetFaultParameterFaultExtendedParametersEntryBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataTriggerBuilder interface {
 	WithTrigger(BACnetApplicationTagBoolean) BACnetConstructedDataTriggerBuilder
 	// WithTriggerBuilder adds Trigger (property field) which is build by the builder
 	WithTriggerBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataTriggerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataTrigger or returns an error if something is wrong
 	Build() (BACnetConstructedDataTrigger, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataTriggerBuilder) MustBuild() BACnetConstructedData
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataTriggerBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

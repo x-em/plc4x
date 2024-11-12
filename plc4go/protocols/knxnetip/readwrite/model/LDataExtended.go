@@ -119,6 +119,8 @@ type LDataExtendedBuilder interface {
 	WithApdu(Apdu) LDataExtendedBuilder
 	// WithApduBuilder adds Apdu (property field) which is build by the builder
 	WithApduBuilder(func(ApduBuilder) ApduBuilder) LDataExtendedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() LDataFrameBuilder
 	// Build builds the LDataExtended or returns an error if something is wrong
 	Build() (LDataExtended, error)
 	// MustBuild does the same as Build but panics on error
@@ -231,8 +233,10 @@ func (b *_LDataExtendedBuilder) MustBuild() LDataExtended {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LDataExtendedBuilder) Done() LDataFrameBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewLDataFrameBuilder().(*_LDataFrameBuilder)
+	}
 	return b.parentBuilder
 }
 

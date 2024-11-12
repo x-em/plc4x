@@ -101,6 +101,8 @@ type BACnetLogDataLogDataBuilder interface {
 	WithInnerClosingTag(BACnetClosingTag) BACnetLogDataLogDataBuilder
 	// WithInnerClosingTagBuilder adds InnerClosingTag (property field) which is build by the builder
 	WithInnerClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetLogDataLogDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLogDataBuilder
 	// Build builds the BACnetLogDataLogData or returns an error if something is wrong
 	Build() (BACnetLogDataLogData, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_BACnetLogDataLogDataBuilder) MustBuild() BACnetLogDataLogData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLogDataLogDataBuilder) Done() BACnetLogDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLogDataBuilder().(*_BACnetLogDataBuilder)
+	}
 	return b.parentBuilder
 }
 

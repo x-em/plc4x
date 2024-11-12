@@ -86,6 +86,8 @@ type BACnetConstructedDataIPv6AddressBuilder interface {
 	WithIpv6Address(BACnetApplicationTagOctetString) BACnetConstructedDataIPv6AddressBuilder
 	// WithIpv6AddressBuilder adds Ipv6Address (property field) which is build by the builder
 	WithIpv6AddressBuilder(func(BACnetApplicationTagOctetStringBuilder) BACnetApplicationTagOctetStringBuilder) BACnetConstructedDataIPv6AddressBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataIPv6Address or returns an error if something is wrong
 	Build() (BACnetConstructedDataIPv6Address, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataIPv6AddressBuilder) MustBuild() BACnetConstructed
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataIPv6AddressBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

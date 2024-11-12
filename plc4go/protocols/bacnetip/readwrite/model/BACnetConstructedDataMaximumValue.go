@@ -86,6 +86,8 @@ type BACnetConstructedDataMaximumValueBuilder interface {
 	WithMaximumValue(BACnetApplicationTagReal) BACnetConstructedDataMaximumValueBuilder
 	// WithMaximumValueBuilder adds MaximumValue (property field) which is build by the builder
 	WithMaximumValueBuilder(func(BACnetApplicationTagRealBuilder) BACnetApplicationTagRealBuilder) BACnetConstructedDataMaximumValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataMaximumValue or returns an error if something is wrong
 	Build() (BACnetConstructedDataMaximumValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataMaximumValueBuilder) MustBuild() BACnetConstructe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataMaximumValueBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

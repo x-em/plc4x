@@ -79,6 +79,8 @@ type IdentifyReplyCommandTypeBuilder interface {
 	WithMandatoryFields(unitType string) IdentifyReplyCommandTypeBuilder
 	// WithUnitType adds UnitType (property field)
 	WithUnitType(string) IdentifyReplyCommandTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandType or returns an error if something is wrong
 	Build() (IdentifyReplyCommandType, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_IdentifyReplyCommandTypeBuilder) MustBuild() IdentifyReplyCommandType 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandTypeBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

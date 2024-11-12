@@ -112,6 +112,8 @@ type StandaloneSubscribedDataSetDataTypeBuilder interface {
 	WithSubscribedDataSet(ExtensionObject) StandaloneSubscribedDataSetDataTypeBuilder
 	// WithSubscribedDataSetBuilder adds SubscribedDataSet (property field) which is build by the builder
 	WithSubscribedDataSetBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) StandaloneSubscribedDataSetDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the StandaloneSubscribedDataSetDataType or returns an error if something is wrong
 	Build() (StandaloneSubscribedDataSetDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -233,8 +235,10 @@ func (b *_StandaloneSubscribedDataSetDataTypeBuilder) MustBuild() StandaloneSubs
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_StandaloneSubscribedDataSetDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -89,6 +89,8 @@ type BACnetConstructedDataCarDoorCommandBuilder interface {
 	WithOptionalNumberOfDataElementsBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataCarDoorCommandBuilder
 	// WithCarDoorCommand adds CarDoorCommand (property field)
 	WithCarDoorCommand(...BACnetLiftCarDoorCommandTagged) BACnetConstructedDataCarDoorCommandBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataCarDoorCommand or returns an error if something is wrong
 	Build() (BACnetConstructedDataCarDoorCommand, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetConstructedDataCarDoorCommandBuilder) MustBuild() BACnetConstruc
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataCarDoorCommandBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

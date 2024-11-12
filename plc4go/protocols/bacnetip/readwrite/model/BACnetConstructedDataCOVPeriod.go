@@ -86,6 +86,8 @@ type BACnetConstructedDataCOVPeriodBuilder interface {
 	WithCovPeriod(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataCOVPeriodBuilder
 	// WithCovPeriodBuilder adds CovPeriod (property field) which is build by the builder
 	WithCovPeriodBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataCOVPeriodBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataCOVPeriod or returns an error if something is wrong
 	Build() (BACnetConstructedDataCOVPeriod, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataCOVPeriodBuilder) MustBuild() BACnetConstructedDa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataCOVPeriodBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

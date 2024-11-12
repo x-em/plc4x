@@ -76,6 +76,8 @@ type RequestNullBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() RequestNullBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() RequestBuilder
 	// Build builds the RequestNull or returns an error if something is wrong
 	Build() (RequestNull, error)
 	// MustBuild does the same as Build but panics on error
@@ -120,8 +122,10 @@ func (b *_RequestNullBuilder) MustBuild() RequestNull {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RequestNullBuilder) Done() RequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewRequestBuilder().(*_RequestBuilder)
+	}
 	return b.parentBuilder
 }
 

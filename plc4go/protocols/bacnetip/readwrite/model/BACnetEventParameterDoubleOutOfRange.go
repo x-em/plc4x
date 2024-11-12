@@ -139,6 +139,8 @@ type BACnetEventParameterDoubleOutOfRangeBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetEventParameterDoubleOutOfRangeBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetEventParameterDoubleOutOfRangeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetEventParameterBuilder
 	// Build builds the BACnetEventParameterDoubleOutOfRange or returns an error if something is wrong
 	Build() (BACnetEventParameterDoubleOutOfRange, error)
 	// MustBuild does the same as Build but panics on error
@@ -327,8 +329,10 @@ func (b *_BACnetEventParameterDoubleOutOfRangeBuilder) MustBuild() BACnetEventPa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetEventParameterDoubleOutOfRangeBuilder) Done() BACnetEventParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetEventParameterBuilder().(*_BACnetEventParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

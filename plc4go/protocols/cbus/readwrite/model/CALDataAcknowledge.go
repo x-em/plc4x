@@ -85,6 +85,8 @@ type CALDataAcknowledgeBuilder interface {
 	WithParamNo(Parameter) CALDataAcknowledgeBuilder
 	// WithCode adds Code (property field)
 	WithCode(uint8) CALDataAcknowledgeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataAcknowledge or returns an error if something is wrong
 	Build() (CALDataAcknowledge, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_CALDataAcknowledgeBuilder) MustBuild() CALDataAcknowledge {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataAcknowledgeBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type VariantQualifiedNameBuilder interface {
 	WithOptionalArrayLength(int32) VariantQualifiedNameBuilder
 	// WithValue adds Value (property field)
 	WithValue(...QualifiedName) VariantQualifiedNameBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantQualifiedName or returns an error if something is wrong
 	Build() (VariantQualifiedName, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantQualifiedNameBuilder) MustBuild() VariantQualifiedName {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantQualifiedNameBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

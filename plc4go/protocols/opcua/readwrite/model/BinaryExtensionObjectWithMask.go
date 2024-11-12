@@ -84,6 +84,8 @@ type BinaryExtensionObjectWithMaskBuilder interface {
 	WithBody(ExtensionObjectDefinition) BinaryExtensionObjectWithMaskBuilder
 	// WithBodyBuilder adds Body (property field) which is build by the builder
 	WithBodyBuilder(func(ExtensionObjectDefinitionBuilder) ExtensionObjectDefinitionBuilder) BinaryExtensionObjectWithMaskBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectWithMaskBuilder
 	// Build builds the BinaryExtensionObjectWithMask or returns an error if something is wrong
 	Build() (BinaryExtensionObjectWithMask, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BinaryExtensionObjectWithMaskBuilder) MustBuild() BinaryExtensionObjec
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BinaryExtensionObjectWithMaskBuilder) Done() ExtensionObjectWithMaskBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectWithMaskBuilder().(*_ExtensionObjectWithMaskBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -91,6 +91,8 @@ type NLMChallengeRequestBuilder interface {
 	WithOriginalMessageId(uint32) NLMChallengeRequestBuilder
 	// WithOriginalTimestamp adds OriginalTimestamp (property field)
 	WithOriginalTimestamp(uint32) NLMChallengeRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMChallengeRequest or returns an error if something is wrong
 	Build() (NLMChallengeRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_NLMChallengeRequestBuilder) MustBuild() NLMChallengeRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMChallengeRequestBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

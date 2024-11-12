@@ -85,6 +85,8 @@ type NLMVendorProprietaryMessageBuilder interface {
 	WithVendorId(BACnetVendorId) NLMVendorProprietaryMessageBuilder
 	// WithProprietaryMessage adds ProprietaryMessage (property field)
 	WithProprietaryMessage(...byte) NLMVendorProprietaryMessageBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMVendorProprietaryMessage or returns an error if something is wrong
 	Build() (NLMVendorProprietaryMessage, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_NLMVendorProprietaryMessageBuilder) MustBuild() NLMVendorProprietaryMe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMVendorProprietaryMessageBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

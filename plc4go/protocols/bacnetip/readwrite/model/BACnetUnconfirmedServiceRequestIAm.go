@@ -117,6 +117,8 @@ type BACnetUnconfirmedServiceRequestIAmBuilder interface {
 	WithVendorId(BACnetVendorIdTagged) BACnetUnconfirmedServiceRequestIAmBuilder
 	// WithVendorIdBuilder adds VendorId (property field) which is build by the builder
 	WithVendorIdBuilder(func(BACnetVendorIdTaggedBuilder) BACnetVendorIdTaggedBuilder) BACnetUnconfirmedServiceRequestIAmBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetUnconfirmedServiceRequestBuilder
 	// Build builds the BACnetUnconfirmedServiceRequestIAm or returns an error if something is wrong
 	Build() (BACnetUnconfirmedServiceRequestIAm, error)
 	// MustBuild does the same as Build but panics on error
@@ -257,8 +259,10 @@ func (b *_BACnetUnconfirmedServiceRequestIAmBuilder) MustBuild() BACnetUnconfirm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetUnconfirmedServiceRequestIAmBuilder) Done() BACnetUnconfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetUnconfirmedServiceRequestBuilder().(*_BACnetUnconfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

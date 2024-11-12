@@ -90,6 +90,8 @@ type IdentityMappingRuleTypeBuilder interface {
 	WithCriteria(PascalString) IdentityMappingRuleTypeBuilder
 	// WithCriteriaBuilder adds Criteria (property field) which is build by the builder
 	WithCriteriaBuilder(func(PascalStringBuilder) PascalStringBuilder) IdentityMappingRuleTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the IdentityMappingRuleType or returns an error if something is wrong
 	Build() (IdentityMappingRuleType, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_IdentityMappingRuleTypeBuilder) MustBuild() IdentityMappingRuleType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentityMappingRuleTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

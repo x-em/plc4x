@@ -79,6 +79,8 @@ type CipSecurityInformationBuilder interface {
 	WithMandatoryFields(todoImplement []uint8) CipSecurityInformationBuilder
 	// WithTodoImplement adds TodoImplement (property field)
 	WithTodoImplement(...uint8) CipSecurityInformationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CommandSpecificDataItemBuilder
 	// Build builds the CipSecurityInformation or returns an error if something is wrong
 	Build() (CipSecurityInformation, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_CipSecurityInformationBuilder) MustBuild() CipSecurityInformation {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipSecurityInformationBuilder) Done() CommandSpecificDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCommandSpecificDataItemBuilder().(*_CommandSpecificDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

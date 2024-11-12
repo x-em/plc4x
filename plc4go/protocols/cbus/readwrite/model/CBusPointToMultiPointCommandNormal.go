@@ -92,6 +92,8 @@ type CBusPointToMultiPointCommandNormalBuilder interface {
 	WithSalData(SALData) CBusPointToMultiPointCommandNormalBuilder
 	// WithSalDataBuilder adds SalData (property field) which is build by the builder
 	WithSalDataBuilder(func(SALDataBuilder) SALDataBuilder) CBusPointToMultiPointCommandNormalBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CBusPointToMultiPointCommandBuilder
 	// Build builds the CBusPointToMultiPointCommandNormal or returns an error if something is wrong
 	Build() (CBusPointToMultiPointCommandNormal, error)
 	// MustBuild does the same as Build but panics on error
@@ -165,8 +167,10 @@ func (b *_CBusPointToMultiPointCommandNormalBuilder) MustBuild() CBusPointToMult
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CBusPointToMultiPointCommandNormalBuilder) Done() CBusPointToMultiPointCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCBusPointToMultiPointCommandBuilder().(*_CBusPointToMultiPointCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type HistoryModifiedEventBuilder interface {
 	WithEvents(...HistoryEventFieldList) HistoryModifiedEventBuilder
 	// WithModificationInfos adds ModificationInfos (property field)
 	WithModificationInfos(...ModificationInfo) HistoryModifiedEventBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the HistoryModifiedEvent or returns an error if something is wrong
 	Build() (HistoryModifiedEvent, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_HistoryModifiedEventBuilder) MustBuild() HistoryModifiedEvent {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_HistoryModifiedEventBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

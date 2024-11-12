@@ -85,6 +85,8 @@ type VariantStatusCodeBuilder interface {
 	WithOptionalArrayLength(int32) VariantStatusCodeBuilder
 	// WithValue adds Value (property field)
 	WithValue(...StatusCode) VariantStatusCodeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantStatusCode or returns an error if something is wrong
 	Build() (VariantStatusCode, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantStatusCodeBuilder) MustBuild() VariantStatusCode {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantStatusCodeBuilder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type ModbusPDUWriteMultipleCoilsResponseBuilder interface {
 	WithStartingAddress(uint16) ModbusPDUWriteMultipleCoilsResponseBuilder
 	// WithQuantity adds Quantity (property field)
 	WithQuantity(uint16) ModbusPDUWriteMultipleCoilsResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUWriteMultipleCoilsResponse or returns an error if something is wrong
 	Build() (ModbusPDUWriteMultipleCoilsResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ModbusPDUWriteMultipleCoilsResponseBuilder) MustBuild() ModbusPDUWrite
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUWriteMultipleCoilsResponseBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

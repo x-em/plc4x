@@ -84,6 +84,8 @@ type BACnetUnconfirmedServiceRequestWhoHasObjectIdentifierBuilder interface {
 	WithObjectIdentifier(BACnetContextTagObjectIdentifier) BACnetUnconfirmedServiceRequestWhoHasObjectIdentifierBuilder
 	// WithObjectIdentifierBuilder adds ObjectIdentifier (property field) which is build by the builder
 	WithObjectIdentifierBuilder(func(BACnetContextTagObjectIdentifierBuilder) BACnetContextTagObjectIdentifierBuilder) BACnetUnconfirmedServiceRequestWhoHasObjectIdentifierBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetUnconfirmedServiceRequestWhoHasObjectBuilder
 	// Build builds the BACnetUnconfirmedServiceRequestWhoHasObjectIdentifier or returns an error if something is wrong
 	Build() (BACnetUnconfirmedServiceRequestWhoHasObjectIdentifier, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetUnconfirmedServiceRequestWhoHasObjectIdentifierBuilder) MustBuil
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetUnconfirmedServiceRequestWhoHasObjectIdentifierBuilder) Done() BACnetUnconfirmedServiceRequestWhoHasObjectBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetUnconfirmedServiceRequestWhoHasObjectBuilder().(*_BACnetUnconfirmedServiceRequestWhoHasObjectBuilder)
+	}
 	return b.parentBuilder
 }
 

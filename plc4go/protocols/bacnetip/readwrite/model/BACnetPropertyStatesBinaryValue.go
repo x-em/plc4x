@@ -84,6 +84,8 @@ type BACnetPropertyStatesBinaryValueBuilder interface {
 	WithBinaryValue(BACnetBinaryPVTagged) BACnetPropertyStatesBinaryValueBuilder
 	// WithBinaryValueBuilder adds BinaryValue (property field) which is build by the builder
 	WithBinaryValueBuilder(func(BACnetBinaryPVTaggedBuilder) BACnetBinaryPVTaggedBuilder) BACnetPropertyStatesBinaryValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesBinaryValue or returns an error if something is wrong
 	Build() (BACnetPropertyStatesBinaryValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesBinaryValueBuilder) MustBuild() BACnetPropertyStat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesBinaryValueBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

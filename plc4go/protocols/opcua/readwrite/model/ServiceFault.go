@@ -84,6 +84,8 @@ type ServiceFaultBuilder interface {
 	WithResponseHeader(ResponseHeader) ServiceFaultBuilder
 	// WithResponseHeaderBuilder adds ResponseHeader (property field) which is build by the builder
 	WithResponseHeaderBuilder(func(ResponseHeaderBuilder) ResponseHeaderBuilder) ServiceFaultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ServiceFault or returns an error if something is wrong
 	Build() (ServiceFault, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_ServiceFaultBuilder) MustBuild() ServiceFault {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ServiceFaultBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

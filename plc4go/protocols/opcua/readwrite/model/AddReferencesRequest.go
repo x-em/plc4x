@@ -90,6 +90,8 @@ type AddReferencesRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) AddReferencesRequestBuilder
 	// WithReferencesToAdd adds ReferencesToAdd (property field)
 	WithReferencesToAdd(...AddReferencesItem) AddReferencesRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the AddReferencesRequest or returns an error if something is wrong
 	Build() (AddReferencesRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_AddReferencesRequestBuilder) MustBuild() AddReferencesRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AddReferencesRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

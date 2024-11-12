@@ -85,6 +85,8 @@ type RationalNumberBuilder interface {
 	WithNumerator(int32) RationalNumberBuilder
 	// WithDenominator adds Denominator (property field)
 	WithDenominator(uint32) RationalNumberBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RationalNumber or returns an error if something is wrong
 	Build() (RationalNumber, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_RationalNumberBuilder) MustBuild() RationalNumber {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RationalNumberBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

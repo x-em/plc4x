@@ -162,6 +162,8 @@ type SessionSecurityDiagnosticsDataTypeBuilder interface {
 	WithClientCertificate(PascalByteString) SessionSecurityDiagnosticsDataTypeBuilder
 	// WithClientCertificateBuilder adds ClientCertificate (property field) which is build by the builder
 	WithClientCertificateBuilder(func(PascalByteStringBuilder) PascalByteStringBuilder) SessionSecurityDiagnosticsDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SessionSecurityDiagnosticsDataType or returns an error if something is wrong
 	Build() (SessionSecurityDiagnosticsDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -384,8 +386,10 @@ func (b *_SessionSecurityDiagnosticsDataTypeBuilder) MustBuild() SessionSecurity
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SessionSecurityDiagnosticsDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

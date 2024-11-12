@@ -84,6 +84,8 @@ type BACnetPropertyStatesLiftCarDriveStatusBuilder interface {
 	WithLiftCarDriveStatus(BACnetLiftCarDriveStatusTagged) BACnetPropertyStatesLiftCarDriveStatusBuilder
 	// WithLiftCarDriveStatusBuilder adds LiftCarDriveStatus (property field) which is build by the builder
 	WithLiftCarDriveStatusBuilder(func(BACnetLiftCarDriveStatusTaggedBuilder) BACnetLiftCarDriveStatusTaggedBuilder) BACnetPropertyStatesLiftCarDriveStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesLiftCarDriveStatus or returns an error if something is wrong
 	Build() (BACnetPropertyStatesLiftCarDriveStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesLiftCarDriveStatusBuilder) MustBuild() BACnetPrope
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesLiftCarDriveStatusBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

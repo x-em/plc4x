@@ -127,6 +127,8 @@ type PubSubGroupDataTypeBuilder interface {
 	WithMaxNetworkMessageSize(uint32) PubSubGroupDataTypeBuilder
 	// WithGroupProperties adds GroupProperties (property field)
 	WithGroupProperties(...KeyValuePair) PubSubGroupDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PubSubGroupDataType or returns an error if something is wrong
 	Build() (PubSubGroupDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -244,8 +246,10 @@ func (b *_PubSubGroupDataTypeBuilder) MustBuild() PubSubGroupDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PubSubGroupDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

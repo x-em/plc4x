@@ -157,6 +157,8 @@ type CipIdentityBuilder interface {
 	WithProductName(string) CipIdentityBuilder
 	// WithState adds State (property field)
 	WithState(uint8) CipIdentityBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CommandSpecificDataItemBuilder
 	// Build builds the CipIdentity or returns an error if something is wrong
 	Build() (CipIdentity, error)
 	// MustBuild does the same as Build but panics on error
@@ -266,8 +268,10 @@ func (b *_CipIdentityBuilder) MustBuild() CipIdentity {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipIdentityBuilder) Done() CommandSpecificDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCommandSpecificDataItemBuilder().(*_CommandSpecificDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

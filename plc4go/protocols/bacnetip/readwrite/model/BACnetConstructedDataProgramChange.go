@@ -86,6 +86,8 @@ type BACnetConstructedDataProgramChangeBuilder interface {
 	WithProgramChange(BACnetProgramRequestTagged) BACnetConstructedDataProgramChangeBuilder
 	// WithProgramChangeBuilder adds ProgramChange (property field) which is build by the builder
 	WithProgramChangeBuilder(func(BACnetProgramRequestTaggedBuilder) BACnetProgramRequestTaggedBuilder) BACnetConstructedDataProgramChangeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataProgramChange or returns an error if something is wrong
 	Build() (BACnetConstructedDataProgramChange, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataProgramChangeBuilder) MustBuild() BACnetConstruct
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataProgramChangeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

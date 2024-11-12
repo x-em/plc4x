@@ -82,6 +82,8 @@ type BACnetConfirmedServiceRequestVTCloseBuilder interface {
 	WithMandatoryFields(listOfRemoteVtSessionIdentifiers []BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTCloseBuilder
 	// WithListOfRemoteVtSessionIdentifiers adds ListOfRemoteVtSessionIdentifiers (property field)
 	WithListOfRemoteVtSessionIdentifiers(...BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTCloseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestVTClose or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestVTClose, error)
 	// MustBuild does the same as Build but panics on error
@@ -131,8 +133,10 @@ func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) MustBuild() BACnetConfirm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

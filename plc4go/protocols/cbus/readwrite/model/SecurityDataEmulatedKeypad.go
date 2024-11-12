@@ -101,6 +101,8 @@ type SecurityDataEmulatedKeypadBuilder interface {
 	WithMandatoryFields(key byte) SecurityDataEmulatedKeypadBuilder
 	// WithKey adds Key (property field)
 	WithKey(byte) SecurityDataEmulatedKeypadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataEmulatedKeypad or returns an error if something is wrong
 	Build() (SecurityDataEmulatedKeypad, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_SecurityDataEmulatedKeypadBuilder) MustBuild() SecurityDataEmulatedKey
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataEmulatedKeypadBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

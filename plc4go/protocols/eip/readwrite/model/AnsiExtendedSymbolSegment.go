@@ -85,6 +85,8 @@ type AnsiExtendedSymbolSegmentBuilder interface {
 	WithSymbol(string) AnsiExtendedSymbolSegmentBuilder
 	// WithPad adds Pad (property field)
 	WithOptionalPad(uint8) AnsiExtendedSymbolSegmentBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() DataSegmentTypeBuilder
 	// Build builds the AnsiExtendedSymbolSegment or returns an error if something is wrong
 	Build() (AnsiExtendedSymbolSegment, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_AnsiExtendedSymbolSegmentBuilder) MustBuild() AnsiExtendedSymbolSegmen
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AnsiExtendedSymbolSegmentBuilder) Done() DataSegmentTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewDataSegmentTypeBuilder().(*_DataSegmentTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

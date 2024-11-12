@@ -85,6 +85,8 @@ type AccessControlDataValidAccessRequestBuilder interface {
 	WithAccessControlDirection(AccessControlDirection) AccessControlDataValidAccessRequestBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) AccessControlDataValidAccessRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AccessControlDataBuilder
 	// Build builds the AccessControlDataValidAccessRequest or returns an error if something is wrong
 	Build() (AccessControlDataValidAccessRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_AccessControlDataValidAccessRequestBuilder) MustBuild() AccessControlD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AccessControlDataValidAccessRequestBuilder) Done() AccessControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAccessControlDataBuilder().(*_AccessControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

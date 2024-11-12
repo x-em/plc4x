@@ -84,6 +84,8 @@ type ApduDataOtherBuilder interface {
 	WithExtendedApdu(ApduDataExt) ApduDataOtherBuilder
 	// WithExtendedApduBuilder adds ExtendedApdu (property field) which is build by the builder
 	WithExtendedApduBuilder(func(ApduDataExtBuilder) ApduDataExtBuilder) ApduDataOtherBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataBuilder
 	// Build builds the ApduDataOther or returns an error if something is wrong
 	Build() (ApduDataOther, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_ApduDataOtherBuilder) MustBuild() ApduDataOther {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataOtherBuilder) Done() ApduDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataBuilder().(*_ApduDataBuilder)
+	}
 	return b.parentBuilder
 }
 

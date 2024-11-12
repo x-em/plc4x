@@ -84,6 +84,8 @@ type BACnetLogDataLogDataEntryFailureBuilder interface {
 	WithFailure(ErrorEnclosed) BACnetLogDataLogDataEntryFailureBuilder
 	// WithFailureBuilder adds Failure (property field) which is build by the builder
 	WithFailureBuilder(func(ErrorEnclosedBuilder) ErrorEnclosedBuilder) BACnetLogDataLogDataEntryFailureBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLogDataLogDataEntryBuilder
 	// Build builds the BACnetLogDataLogDataEntryFailure or returns an error if something is wrong
 	Build() (BACnetLogDataLogDataEntryFailure, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLogDataLogDataEntryFailureBuilder) MustBuild() BACnetLogDataLogD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLogDataLogDataEntryFailureBuilder) Done() BACnetLogDataLogDataEntryBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLogDataLogDataEntryBuilder().(*_BACnetLogDataLogDataEntryBuilder)
+	}
 	return b.parentBuilder
 }
 

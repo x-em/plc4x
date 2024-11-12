@@ -85,6 +85,8 @@ type KnxGroupAddress2LevelBuilder interface {
 	WithMainGroup(uint8) KnxGroupAddress2LevelBuilder
 	// WithSubGroup adds SubGroup (property field)
 	WithSubGroup(uint16) KnxGroupAddress2LevelBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxGroupAddressBuilder
 	// Build builds the KnxGroupAddress2Level or returns an error if something is wrong
 	Build() (KnxGroupAddress2Level, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_KnxGroupAddress2LevelBuilder) MustBuild() KnxGroupAddress2Level {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_KnxGroupAddress2LevelBuilder) Done() KnxGroupAddressBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxGroupAddressBuilder().(*_KnxGroupAddressBuilder)
+	}
 	return b.parentBuilder
 }
 

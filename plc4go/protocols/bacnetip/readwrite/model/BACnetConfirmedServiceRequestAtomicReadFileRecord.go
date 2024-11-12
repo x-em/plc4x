@@ -95,6 +95,8 @@ type BACnetConfirmedServiceRequestAtomicReadFileRecordBuilder interface {
 	WithRequestRecordCount(BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestAtomicReadFileRecordBuilder
 	// WithRequestRecordCountBuilder adds RequestRecordCount (property field) which is build by the builder
 	WithRequestRecordCountBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConfirmedServiceRequestAtomicReadFileRecordBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordBuilder
 	// Build builds the BACnetConfirmedServiceRequestAtomicReadFileRecord or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestAtomicReadFileRecord, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_BACnetConfirmedServiceRequestAtomicReadFileRecordBuilder) MustBuild() 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestAtomicReadFileRecordBuilder) Done() BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordBuilder().(*_BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordBuilder)
+	}
 	return b.parentBuilder
 }
 

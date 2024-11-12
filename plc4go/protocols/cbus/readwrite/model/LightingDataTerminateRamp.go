@@ -79,6 +79,8 @@ type LightingDataTerminateRampBuilder interface {
 	WithMandatoryFields(group byte) LightingDataTerminateRampBuilder
 	// WithGroup adds Group (property field)
 	WithGroup(byte) LightingDataTerminateRampBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() LightingDataBuilder
 	// Build builds the LightingDataTerminateRamp or returns an error if something is wrong
 	Build() (LightingDataTerminateRamp, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_LightingDataTerminateRampBuilder) MustBuild() LightingDataTerminateRam
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LightingDataTerminateRampBuilder) Done() LightingDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewLightingDataBuilder().(*_LightingDataBuilder)
+	}
 	return b.parentBuilder
 }
 

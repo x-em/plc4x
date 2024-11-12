@@ -82,6 +82,8 @@ type BACnetServiceAckAuthenticateBuilder interface {
 	WithMandatoryFields(bytesOfRemovedService []byte) BACnetServiceAckAuthenticateBuilder
 	// WithBytesOfRemovedService adds BytesOfRemovedService (property field)
 	WithBytesOfRemovedService(...byte) BACnetServiceAckAuthenticateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckAuthenticate or returns an error if something is wrong
 	Build() (BACnetServiceAckAuthenticate, error)
 	// MustBuild does the same as Build but panics on error
@@ -131,8 +133,10 @@ func (b *_BACnetServiceAckAuthenticateBuilder) MustBuild() BACnetServiceAckAuthe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckAuthenticateBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

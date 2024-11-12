@@ -84,6 +84,8 @@ type BACnetPropertyStatesNetworkTypeBuilder interface {
 	WithNetworkType(BACnetNetworkTypeTagged) BACnetPropertyStatesNetworkTypeBuilder
 	// WithNetworkTypeBuilder adds NetworkType (property field) which is build by the builder
 	WithNetworkTypeBuilder(func(BACnetNetworkTypeTaggedBuilder) BACnetNetworkTypeTaggedBuilder) BACnetPropertyStatesNetworkTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesNetworkType or returns an error if something is wrong
 	Build() (BACnetPropertyStatesNetworkType, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesNetworkTypeBuilder) MustBuild() BACnetPropertyStat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesNetworkTypeBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

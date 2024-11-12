@@ -107,6 +107,8 @@ type BrowseRequestBuilder interface {
 	WithRequestedMaxReferencesPerNode(uint32) BrowseRequestBuilder
 	// WithNodesToBrowse adds NodesToBrowse (property field)
 	WithNodesToBrowse(...BrowseDescription) BrowseRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the BrowseRequest or returns an error if something is wrong
 	Build() (BrowseRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -209,8 +211,10 @@ func (b *_BrowseRequestBuilder) MustBuild() BrowseRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BrowseRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -145,6 +145,8 @@ type AddNodesItemBuilder interface {
 	WithTypeDefinition(ExpandedNodeId) AddNodesItemBuilder
 	// WithTypeDefinitionBuilder adds TypeDefinition (property field) which is build by the builder
 	WithTypeDefinitionBuilder(func(ExpandedNodeIdBuilder) ExpandedNodeIdBuilder) AddNodesItemBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the AddNodesItem or returns an error if something is wrong
 	Build() (AddNodesItem, error)
 	// MustBuild does the same as Build but panics on error
@@ -338,8 +340,10 @@ func (b *_AddNodesItemBuilder) MustBuild() AddNodesItem {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AddNodesItemBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type ModbusPDUReadDiscreteInputsRequestBuilder interface {
 	WithStartingAddress(uint16) ModbusPDUReadDiscreteInputsRequestBuilder
 	// WithQuantity adds Quantity (property field)
 	WithQuantity(uint16) ModbusPDUReadDiscreteInputsRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUReadDiscreteInputsRequest or returns an error if something is wrong
 	Build() (ModbusPDUReadDiscreteInputsRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ModbusPDUReadDiscreteInputsRequestBuilder) MustBuild() ModbusPDUReadDi
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUReadDiscreteInputsRequestBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

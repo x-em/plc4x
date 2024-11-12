@@ -90,6 +90,8 @@ type CallRequestBuilder interface {
 	WithRequestHeaderBuilder(func(RequestHeaderBuilder) RequestHeaderBuilder) CallRequestBuilder
 	// WithMethodsToCall adds MethodsToCall (property field)
 	WithMethodsToCall(...CallMethodRequest) CallRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CallRequest or returns an error if something is wrong
 	Build() (CallRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_CallRequestBuilder) MustBuild() CallRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CallRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

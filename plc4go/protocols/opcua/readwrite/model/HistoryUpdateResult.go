@@ -96,6 +96,8 @@ type HistoryUpdateResultBuilder interface {
 	WithOperationResults(...StatusCode) HistoryUpdateResultBuilder
 	// WithDiagnosticInfos adds DiagnosticInfos (property field)
 	WithDiagnosticInfos(...DiagnosticInfo) HistoryUpdateResultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the HistoryUpdateResult or returns an error if something is wrong
 	Build() (HistoryUpdateResult, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_HistoryUpdateResultBuilder) MustBuild() HistoryUpdateResult {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_HistoryUpdateResultBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

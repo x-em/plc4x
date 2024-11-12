@@ -89,6 +89,8 @@ type BACnetConstructedDataAuthenticationPolicyNamesBuilder interface {
 	WithOptionalNumberOfDataElementsBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataAuthenticationPolicyNamesBuilder
 	// WithAuthenticationPolicyNames adds AuthenticationPolicyNames (property field)
 	WithAuthenticationPolicyNames(...BACnetApplicationTagCharacterString) BACnetConstructedDataAuthenticationPolicyNamesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAuthenticationPolicyNames or returns an error if something is wrong
 	Build() (BACnetConstructedDataAuthenticationPolicyNames, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetConstructedDataAuthenticationPolicyNamesBuilder) MustBuild() BAC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAuthenticationPolicyNamesBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

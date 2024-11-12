@@ -90,6 +90,8 @@ type CALDataReplyBuilder interface {
 	WithParameterValue(ParameterValue) CALDataReplyBuilder
 	// WithParameterValueBuilder adds ParameterValue (property field) which is build by the builder
 	WithParameterValueBuilder(func(ParameterValueBuilder) ParameterValueBuilder) CALDataReplyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataReply or returns an error if something is wrong
 	Build() (CALDataReply, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_CALDataReplyBuilder) MustBuild() CALDataReply {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataReplyBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

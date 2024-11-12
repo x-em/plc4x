@@ -107,6 +107,8 @@ type ServerOnNetworkBuilder interface {
 	WithDiscoveryUrlBuilder(func(PascalStringBuilder) PascalStringBuilder) ServerOnNetworkBuilder
 	// WithServerCapabilities adds ServerCapabilities (property field)
 	WithServerCapabilities(...PascalString) ServerOnNetworkBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ServerOnNetwork or returns an error if something is wrong
 	Build() (ServerOnNetwork, error)
 	// MustBuild does the same as Build but panics on error
@@ -209,8 +211,10 @@ func (b *_ServerOnNetworkBuilder) MustBuild() ServerOnNetwork {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ServerOnNetworkBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -102,6 +102,8 @@ type FindServersOnNetworkRequestBuilder interface {
 	WithMaxRecordsToReturn(uint32) FindServersOnNetworkRequestBuilder
 	// WithServerCapabilityFilter adds ServerCapabilityFilter (property field)
 	WithServerCapabilityFilter(...PascalString) FindServersOnNetworkRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the FindServersOnNetworkRequest or returns an error if something is wrong
 	Build() (FindServersOnNetworkRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -185,8 +187,10 @@ func (b *_FindServersOnNetworkRequestBuilder) MustBuild() FindServersOnNetworkRe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_FindServersOnNetworkRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

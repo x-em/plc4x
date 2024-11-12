@@ -90,6 +90,8 @@ type GenericAttributeValueBuilder interface {
 	WithValue(Variant) GenericAttributeValueBuilder
 	// WithValueBuilder adds Value (property field) which is build by the builder
 	WithValueBuilder(func(VariantBuilder) VariantBuilder) GenericAttributeValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the GenericAttributeValue or returns an error if something is wrong
 	Build() (GenericAttributeValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_GenericAttributeValueBuilder) MustBuild() GenericAttributeValue {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_GenericAttributeValueBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

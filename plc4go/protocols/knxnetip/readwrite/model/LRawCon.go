@@ -71,6 +71,8 @@ type LRawConBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() LRawConBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CEMIBuilder
 	// Build builds the LRawCon or returns an error if something is wrong
 	Build() (LRawCon, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_LRawConBuilder) MustBuild() LRawCon {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_LRawConBuilder) Done() CEMIBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCEMIBuilder().(*_CEMIBuilder)
+	}
 	return b.parentBuilder
 }
 

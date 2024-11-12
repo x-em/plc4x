@@ -110,6 +110,8 @@ type MonitoringParametersBuilder interface {
 	WithQueueSize(uint32) MonitoringParametersBuilder
 	// WithDiscardOldest adds DiscardOldest (property field)
 	WithDiscardOldest(bool) MonitoringParametersBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the MonitoringParameters or returns an error if something is wrong
 	Build() (MonitoringParameters, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_MonitoringParametersBuilder) MustBuild() MonitoringParameters {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MonitoringParametersBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

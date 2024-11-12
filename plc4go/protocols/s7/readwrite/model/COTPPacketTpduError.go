@@ -85,6 +85,8 @@ type COTPPacketTpduErrorBuilder interface {
 	WithDestinationReference(uint16) COTPPacketTpduErrorBuilder
 	// WithRejectCause adds RejectCause (property field)
 	WithRejectCause(uint8) COTPPacketTpduErrorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() COTPPacketBuilder
 	// Build builds the COTPPacketTpduError or returns an error if something is wrong
 	Build() (COTPPacketTpduError, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_COTPPacketTpduErrorBuilder) MustBuild() COTPPacketTpduError {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_COTPPacketTpduErrorBuilder) Done() COTPPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCOTPPacketBuilder().(*_COTPPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

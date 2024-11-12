@@ -79,6 +79,8 @@ type ModbusPDUErrorBuilder interface {
 	WithMandatoryFields(exceptionCode ModbusErrorCode) ModbusPDUErrorBuilder
 	// WithExceptionCode adds ExceptionCode (property field)
 	WithExceptionCode(ModbusErrorCode) ModbusPDUErrorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUError or returns an error if something is wrong
 	Build() (ModbusPDUError, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ModbusPDUErrorBuilder) MustBuild() ModbusPDUError {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUErrorBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -91,6 +91,8 @@ type AdsDeviceNotificationRequestBuilder interface {
 	WithStamps(uint32) AdsDeviceNotificationRequestBuilder
 	// WithAdsStampHeaders adds AdsStampHeaders (property field)
 	WithAdsStampHeaders(...AdsStampHeader) AdsDeviceNotificationRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AmsPacketBuilder
 	// Build builds the AdsDeviceNotificationRequest or returns an error if something is wrong
 	Build() (AdsDeviceNotificationRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_AdsDeviceNotificationRequestBuilder) MustBuild() AdsDeviceNotification
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsDeviceNotificationRequestBuilder) Done() AmsPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAmsPacketBuilder().(*_AmsPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

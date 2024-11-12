@@ -111,6 +111,8 @@ type MonitoredSALShortFormBasicModeBuilder interface {
 	WithOptionalSalData(SALData) MonitoredSALShortFormBasicModeBuilder
 	// WithOptionalSalDataBuilder adds SalData (property field) which is build by the builder
 	WithOptionalSalDataBuilder(func(SALDataBuilder) SALDataBuilder) MonitoredSALShortFormBasicModeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MonitoredSALBuilder
 	// Build builds the MonitoredSALShortFormBasicMode or returns an error if something is wrong
 	Build() (MonitoredSALShortFormBasicMode, error)
 	// MustBuild does the same as Build but panics on error
@@ -198,8 +200,10 @@ func (b *_MonitoredSALShortFormBasicModeBuilder) MustBuild() MonitoredSALShortFo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MonitoredSALShortFormBasicModeBuilder) Done() MonitoredSALBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMonitoredSALBuilder().(*_MonitoredSALBuilder)
+	}
 	return b.parentBuilder
 }
 

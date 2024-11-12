@@ -79,6 +79,8 @@ type KnxNetObjectServerBuilder interface {
 	WithMandatoryFields(version uint8) KnxNetObjectServerBuilder
 	// WithVersion adds Version (property field)
 	WithVersion(uint8) KnxNetObjectServerBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ServiceIdBuilder
 	// Build builds the KnxNetObjectServer or returns an error if something is wrong
 	Build() (KnxNetObjectServer, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_KnxNetObjectServerBuilder) MustBuild() KnxNetObjectServer {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_KnxNetObjectServerBuilder) Done() ServiceIdBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewServiceIdBuilder().(*_ServiceIdBuilder)
+	}
 	return b.parentBuilder
 }
 

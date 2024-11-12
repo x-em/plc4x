@@ -86,6 +86,8 @@ type BACnetConstructedDataSegmentationSupportedBuilder interface {
 	WithSegmentationSupported(BACnetSegmentationTagged) BACnetConstructedDataSegmentationSupportedBuilder
 	// WithSegmentationSupportedBuilder adds SegmentationSupported (property field) which is build by the builder
 	WithSegmentationSupportedBuilder(func(BACnetSegmentationTaggedBuilder) BACnetSegmentationTaggedBuilder) BACnetConstructedDataSegmentationSupportedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataSegmentationSupported or returns an error if something is wrong
 	Build() (BACnetConstructedDataSegmentationSupported, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataSegmentationSupportedBuilder) MustBuild() BACnetC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataSegmentationSupportedBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

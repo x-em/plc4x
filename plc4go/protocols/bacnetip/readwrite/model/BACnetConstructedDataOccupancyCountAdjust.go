@@ -86,6 +86,8 @@ type BACnetConstructedDataOccupancyCountAdjustBuilder interface {
 	WithOccupancyCountAdjust(BACnetApplicationTagBoolean) BACnetConstructedDataOccupancyCountAdjustBuilder
 	// WithOccupancyCountAdjustBuilder adds OccupancyCountAdjust (property field) which is build by the builder
 	WithOccupancyCountAdjustBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataOccupancyCountAdjustBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataOccupancyCountAdjust or returns an error if something is wrong
 	Build() (BACnetConstructedDataOccupancyCountAdjust, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataOccupancyCountAdjustBuilder) MustBuild() BACnetCo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataOccupancyCountAdjustBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

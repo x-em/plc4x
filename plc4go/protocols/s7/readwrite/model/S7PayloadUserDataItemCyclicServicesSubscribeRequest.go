@@ -97,6 +97,8 @@ type S7PayloadUserDataItemCyclicServicesSubscribeRequestBuilder interface {
 	WithTimeFactor(uint8) S7PayloadUserDataItemCyclicServicesSubscribeRequestBuilder
 	// WithItem adds Item (property field)
 	WithItem(...CycServiceItemType) S7PayloadUserDataItemCyclicServicesSubscribeRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadUserDataItemBuilder
 	// Build builds the S7PayloadUserDataItemCyclicServicesSubscribeRequest or returns an error if something is wrong
 	Build() (S7PayloadUserDataItemCyclicServicesSubscribeRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -161,8 +163,10 @@ func (b *_S7PayloadUserDataItemCyclicServicesSubscribeRequestBuilder) MustBuild(
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadUserDataItemCyclicServicesSubscribeRequestBuilder) Done() S7PayloadUserDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadUserDataItemBuilder().(*_S7PayloadUserDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

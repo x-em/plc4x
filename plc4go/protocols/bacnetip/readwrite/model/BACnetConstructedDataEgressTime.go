@@ -86,6 +86,8 @@ type BACnetConstructedDataEgressTimeBuilder interface {
 	WithEgressTime(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataEgressTimeBuilder
 	// WithEgressTimeBuilder adds EgressTime (property field) which is build by the builder
 	WithEgressTimeBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataEgressTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataEgressTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataEgressTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataEgressTimeBuilder) MustBuild() BACnetConstructedD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataEgressTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

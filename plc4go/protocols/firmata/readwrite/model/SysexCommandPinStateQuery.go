@@ -79,6 +79,8 @@ type SysexCommandPinStateQueryBuilder interface {
 	WithMandatoryFields(pin uint8) SysexCommandPinStateQueryBuilder
 	// WithPin adds Pin (property field)
 	WithPin(uint8) SysexCommandPinStateQueryBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SysexCommandBuilder
 	// Build builds the SysexCommandPinStateQuery or returns an error if something is wrong
 	Build() (SysexCommandPinStateQuery, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_SysexCommandPinStateQueryBuilder) MustBuild() SysexCommandPinStateQuer
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SysexCommandPinStateQueryBuilder) Done() SysexCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSysexCommandBuilder().(*_SysexCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

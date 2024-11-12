@@ -95,6 +95,8 @@ type BACnetServiceAckGetEventInformationBuilder interface {
 	WithMoreEvents(BACnetContextTagBoolean) BACnetServiceAckGetEventInformationBuilder
 	// WithMoreEventsBuilder adds MoreEvents (property field) which is build by the builder
 	WithMoreEventsBuilder(func(BACnetContextTagBooleanBuilder) BACnetContextTagBooleanBuilder) BACnetServiceAckGetEventInformationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckGetEventInformation or returns an error if something is wrong
 	Build() (BACnetServiceAckGetEventInformation, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_BACnetServiceAckGetEventInformationBuilder) MustBuild() BACnetServiceA
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckGetEventInformationBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -84,6 +84,8 @@ type BACnetPropertyStatesBackupStateBuilder interface {
 	WithBackupState(BACnetBackupStateTagged) BACnetPropertyStatesBackupStateBuilder
 	// WithBackupStateBuilder adds BackupState (property field) which is build by the builder
 	WithBackupStateBuilder(func(BACnetBackupStateTaggedBuilder) BACnetBackupStateTaggedBuilder) BACnetPropertyStatesBackupStateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesBackupState or returns an error if something is wrong
 	Build() (BACnetPropertyStatesBackupState, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesBackupStateBuilder) MustBuild() BACnetPropertyStat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesBackupStateBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -105,6 +105,8 @@ type MultipleServiceResponseBuilder interface {
 	WithOffsets(...uint16) MultipleServiceResponseBuilder
 	// WithServicesData adds ServicesData (property field)
 	WithServicesData(...byte) MultipleServiceResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the MultipleServiceResponse or returns an error if something is wrong
 	Build() (MultipleServiceResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_MultipleServiceResponseBuilder) MustBuild() MultipleServiceResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MultipleServiceResponseBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

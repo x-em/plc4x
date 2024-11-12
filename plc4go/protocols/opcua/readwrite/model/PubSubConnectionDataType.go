@@ -154,6 +154,8 @@ type PubSubConnectionDataTypeBuilder interface {
 	WithWriterGroups(...WriterGroupDataType) PubSubConnectionDataTypeBuilder
 	// WithReaderGroups adds ReaderGroups (property field)
 	WithReaderGroups(...ReaderGroupDataType) PubSubConnectionDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the PubSubConnectionDataType or returns an error if something is wrong
 	Build() (PubSubConnectionDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -338,8 +340,10 @@ func (b *_PubSubConnectionDataTypeBuilder) MustBuild() PubSubConnectionDataType 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PubSubConnectionDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

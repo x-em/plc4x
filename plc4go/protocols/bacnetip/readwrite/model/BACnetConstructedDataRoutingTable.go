@@ -79,6 +79,8 @@ type BACnetConstructedDataRoutingTableBuilder interface {
 	WithMandatoryFields(routingTable []BACnetRouterEntry) BACnetConstructedDataRoutingTableBuilder
 	// WithRoutingTable adds RoutingTable (property field)
 	WithRoutingTable(...BACnetRouterEntry) BACnetConstructedDataRoutingTableBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataRoutingTable or returns an error if something is wrong
 	Build() (BACnetConstructedDataRoutingTable, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataRoutingTableBuilder) MustBuild() BACnetConstructe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataRoutingTableBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

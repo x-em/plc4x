@@ -90,6 +90,8 @@ type RegisterNodesResponseBuilder interface {
 	WithResponseHeaderBuilder(func(ResponseHeaderBuilder) ResponseHeaderBuilder) RegisterNodesResponseBuilder
 	// WithRegisteredNodeIds adds RegisteredNodeIds (property field)
 	WithRegisteredNodeIds(...NodeId) RegisterNodesResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RegisterNodesResponse or returns an error if something is wrong
 	Build() (RegisterNodesResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_RegisterNodesResponseBuilder) MustBuild() RegisterNodesResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RegisterNodesResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

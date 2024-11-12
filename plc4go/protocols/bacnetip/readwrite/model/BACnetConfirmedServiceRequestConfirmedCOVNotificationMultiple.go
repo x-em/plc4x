@@ -125,6 +125,8 @@ type BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder interf
 	WithListOfCovNotifications(ListOfCovNotificationsList) BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder
 	// WithListOfCovNotificationsBuilder adds ListOfCovNotifications (property field) which is build by the builder
 	WithListOfCovNotificationsBuilder(func(ListOfCovNotificationsListBuilder) ListOfCovNotificationsListBuilder) BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestConfirmedCOVNotificationMultiple or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestConfirmedCOVNotificationMultiple, error)
 	// MustBuild does the same as Build but panics on error
@@ -283,8 +285,10 @@ func (b *_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder) 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

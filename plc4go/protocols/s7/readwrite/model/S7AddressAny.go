@@ -111,6 +111,8 @@ type S7AddressAnyBuilder interface {
 	WithByteAddress(uint16) S7AddressAnyBuilder
 	// WithBitAddress adds BitAddress (property field)
 	WithBitAddress(uint8) S7AddressAnyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7AddressBuilder
 	// Build builds the S7AddressAny or returns an error if something is wrong
 	Build() (S7AddressAny, error)
 	// MustBuild does the same as Build but panics on error
@@ -185,8 +187,10 @@ func (b *_S7AddressAnyBuilder) MustBuild() S7AddressAny {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7AddressAnyBuilder) Done() S7AddressBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7AddressBuilder().(*_S7AddressBuilder)
+	}
 	return b.parentBuilder
 }
 

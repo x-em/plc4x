@@ -84,6 +84,8 @@ type SALDataMeasurementBuilder interface {
 	WithMeasurementData(MeasurementData) SALDataMeasurementBuilder
 	// WithMeasurementDataBuilder adds MeasurementData (property field) which is build by the builder
 	WithMeasurementDataBuilder(func(MeasurementDataBuilder) MeasurementDataBuilder) SALDataMeasurementBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataMeasurement or returns an error if something is wrong
 	Build() (SALDataMeasurement, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_SALDataMeasurementBuilder) MustBuild() SALDataMeasurement {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataMeasurementBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

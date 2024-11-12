@@ -96,6 +96,8 @@ type RedundantServerDataTypeBuilder interface {
 	WithServiceLevel(uint8) RedundantServerDataTypeBuilder
 	// WithServerState adds ServerState (property field)
 	WithServerState(ServerState) RedundantServerDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the RedundantServerDataType or returns an error if something is wrong
 	Build() (RedundantServerDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_RedundantServerDataTypeBuilder) MustBuild() RedundantServerDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RedundantServerDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

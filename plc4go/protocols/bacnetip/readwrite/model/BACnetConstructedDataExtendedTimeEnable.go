@@ -86,6 +86,8 @@ type BACnetConstructedDataExtendedTimeEnableBuilder interface {
 	WithExtendedTimeEnable(BACnetApplicationTagBoolean) BACnetConstructedDataExtendedTimeEnableBuilder
 	// WithExtendedTimeEnableBuilder adds ExtendedTimeEnable (property field) which is build by the builder
 	WithExtendedTimeEnableBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataExtendedTimeEnableBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataExtendedTimeEnable or returns an error if something is wrong
 	Build() (BACnetConstructedDataExtendedTimeEnable, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataExtendedTimeEnableBuilder) MustBuild() BACnetCons
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataExtendedTimeEnableBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

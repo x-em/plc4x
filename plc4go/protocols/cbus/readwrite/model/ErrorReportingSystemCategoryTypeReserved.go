@@ -79,6 +79,8 @@ type ErrorReportingSystemCategoryTypeReservedBuilder interface {
 	WithMandatoryFields(reservedValue uint8) ErrorReportingSystemCategoryTypeReservedBuilder
 	// WithReservedValue adds ReservedValue (property field)
 	WithReservedValue(uint8) ErrorReportingSystemCategoryTypeReservedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ErrorReportingSystemCategoryTypeBuilder
 	// Build builds the ErrorReportingSystemCategoryTypeReserved or returns an error if something is wrong
 	Build() (ErrorReportingSystemCategoryTypeReserved, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ErrorReportingSystemCategoryTypeReservedBuilder) MustBuild() ErrorRepo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ErrorReportingSystemCategoryTypeReservedBuilder) Done() ErrorReportingSystemCategoryTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewErrorReportingSystemCategoryTypeBuilder().(*_ErrorReportingSystemCategoryTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -140,6 +140,8 @@ type AirConditioningDataHvacScheduleEntryBuilder interface {
 	WithOptionalRawLevel(HVACRawLevels) AirConditioningDataHvacScheduleEntryBuilder
 	// WithOptionalRawLevelBuilder adds RawLevel (property field) which is build by the builder
 	WithOptionalRawLevelBuilder(func(HVACRawLevelsBuilder) HVACRawLevelsBuilder) AirConditioningDataHvacScheduleEntryBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AirConditioningDataBuilder
 	// Build builds the AirConditioningDataHvacScheduleEntry or returns an error if something is wrong
 	Build() (AirConditioningDataHvacScheduleEntry, error)
 	// MustBuild does the same as Build but panics on error
@@ -307,8 +309,10 @@ func (b *_AirConditioningDataHvacScheduleEntryBuilder) MustBuild() AirConditioni
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AirConditioningDataHvacScheduleEntryBuilder) Done() AirConditioningDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAirConditioningDataBuilder().(*_AirConditioningDataBuilder)
+	}
 	return b.parentBuilder
 }
 

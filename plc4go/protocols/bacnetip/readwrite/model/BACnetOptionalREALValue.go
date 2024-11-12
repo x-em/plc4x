@@ -84,6 +84,8 @@ type BACnetOptionalREALValueBuilder interface {
 	WithRealValue(BACnetApplicationTagReal) BACnetOptionalREALValueBuilder
 	// WithRealValueBuilder adds RealValue (property field) which is build by the builder
 	WithRealValueBuilder(func(BACnetApplicationTagRealBuilder) BACnetApplicationTagRealBuilder) BACnetOptionalREALValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetOptionalREALBuilder
 	// Build builds the BACnetOptionalREALValue or returns an error if something is wrong
 	Build() (BACnetOptionalREALValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetOptionalREALValueBuilder) MustBuild() BACnetOptionalREALValue {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetOptionalREALValueBuilder) Done() BACnetOptionalREALBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetOptionalREALBuilder().(*_BACnetOptionalREALBuilder)
+	}
 	return b.parentBuilder
 }
 

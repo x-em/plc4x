@@ -86,6 +86,8 @@ type BACnetConstructedDataIPv6DefaultGatewayBuilder interface {
 	WithIpv6DefaultGateway(BACnetApplicationTagOctetString) BACnetConstructedDataIPv6DefaultGatewayBuilder
 	// WithIpv6DefaultGatewayBuilder adds Ipv6DefaultGateway (property field) which is build by the builder
 	WithIpv6DefaultGatewayBuilder(func(BACnetApplicationTagOctetStringBuilder) BACnetApplicationTagOctetStringBuilder) BACnetConstructedDataIPv6DefaultGatewayBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataIPv6DefaultGateway or returns an error if something is wrong
 	Build() (BACnetConstructedDataIPv6DefaultGateway, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataIPv6DefaultGatewayBuilder) MustBuild() BACnetCons
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataIPv6DefaultGatewayBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

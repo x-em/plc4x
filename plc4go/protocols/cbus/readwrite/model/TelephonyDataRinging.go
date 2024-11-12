@@ -81,6 +81,8 @@ type TelephonyDataRingingBuilder interface {
 	WithMandatoryFields(number string) TelephonyDataRingingBuilder
 	// WithNumber adds Number (property field)
 	WithNumber(string) TelephonyDataRingingBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TelephonyDataBuilder
 	// Build builds the TelephonyDataRinging or returns an error if something is wrong
 	Build() (TelephonyDataRinging, error)
 	// MustBuild does the same as Build but panics on error
@@ -130,8 +132,10 @@ func (b *_TelephonyDataRingingBuilder) MustBuild() TelephonyDataRinging {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TelephonyDataRingingBuilder) Done() TelephonyDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTelephonyDataBuilder().(*_TelephonyDataBuilder)
+	}
 	return b.parentBuilder
 }
 

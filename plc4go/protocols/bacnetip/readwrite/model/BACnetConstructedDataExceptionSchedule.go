@@ -89,6 +89,8 @@ type BACnetConstructedDataExceptionScheduleBuilder interface {
 	WithOptionalNumberOfDataElementsBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataExceptionScheduleBuilder
 	// WithExceptionSchedule adds ExceptionSchedule (property field)
 	WithExceptionSchedule(...BACnetSpecialEvent) BACnetConstructedDataExceptionScheduleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataExceptionSchedule or returns an error if something is wrong
 	Build() (BACnetConstructedDataExceptionSchedule, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,8 +158,10 @@ func (b *_BACnetConstructedDataExceptionScheduleBuilder) MustBuild() BACnetConst
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataExceptionScheduleBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

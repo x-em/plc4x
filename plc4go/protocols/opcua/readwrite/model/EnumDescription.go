@@ -112,6 +112,8 @@ type EnumDescriptionBuilder interface {
 	WithEnumDefinitionBuilder(func(EnumDefinitionBuilder) EnumDefinitionBuilder) EnumDescriptionBuilder
 	// WithBuiltInType adds BuiltInType (property field)
 	WithBuiltInType(uint8) EnumDescriptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the EnumDescription or returns an error if something is wrong
 	Build() (EnumDescription, error)
 	// MustBuild does the same as Build but panics on error
@@ -233,8 +235,10 @@ func (b *_EnumDescriptionBuilder) MustBuild() EnumDescription {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_EnumDescriptionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

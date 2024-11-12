@@ -71,6 +71,8 @@ type SALDataRoomControlSystemBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() SALDataRoomControlSystemBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataRoomControlSystem or returns an error if something is wrong
 	Build() (SALDataRoomControlSystem, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_SALDataRoomControlSystemBuilder) MustBuild() SALDataRoomControlSystem 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataRoomControlSystemBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

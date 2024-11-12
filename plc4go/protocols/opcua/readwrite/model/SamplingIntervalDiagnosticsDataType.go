@@ -97,6 +97,8 @@ type SamplingIntervalDiagnosticsDataTypeBuilder interface {
 	WithMaxMonitoredItemCount(uint32) SamplingIntervalDiagnosticsDataTypeBuilder
 	// WithDisabledMonitoredItemCount adds DisabledMonitoredItemCount (property field)
 	WithDisabledMonitoredItemCount(uint32) SamplingIntervalDiagnosticsDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SamplingIntervalDiagnosticsDataType or returns an error if something is wrong
 	Build() (SamplingIntervalDiagnosticsDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -161,8 +163,10 @@ func (b *_SamplingIntervalDiagnosticsDataTypeBuilder) MustBuild() SamplingInterv
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SamplingIntervalDiagnosticsDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

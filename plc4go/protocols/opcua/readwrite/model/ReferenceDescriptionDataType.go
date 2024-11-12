@@ -114,6 +114,8 @@ type ReferenceDescriptionDataTypeBuilder interface {
 	WithTargetNode(ExpandedNodeId) ReferenceDescriptionDataTypeBuilder
 	// WithTargetNodeBuilder adds TargetNode (property field) which is build by the builder
 	WithTargetNodeBuilder(func(ExpandedNodeIdBuilder) ExpandedNodeIdBuilder) ReferenceDescriptionDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ReferenceDescriptionDataType or returns an error if something is wrong
 	Build() (ReferenceDescriptionDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -235,8 +237,10 @@ func (b *_ReferenceDescriptionDataTypeBuilder) MustBuild() ReferenceDescriptionD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ReferenceDescriptionDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

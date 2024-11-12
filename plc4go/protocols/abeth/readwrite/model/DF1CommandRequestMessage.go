@@ -84,6 +84,8 @@ type DF1CommandRequestMessageBuilder interface {
 	WithCommand(DF1RequestCommand) DF1CommandRequestMessageBuilder
 	// WithCommandBuilder adds Command (property field) which is build by the builder
 	WithCommandBuilder(func(DF1RequestCommandBuilder) DF1RequestCommandBuilder) DF1CommandRequestMessageBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() DF1RequestMessageBuilder
 	// Build builds the DF1CommandRequestMessage or returns an error if something is wrong
 	Build() (DF1CommandRequestMessage, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_DF1CommandRequestMessageBuilder) MustBuild() DF1CommandRequestMessage 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DF1CommandRequestMessageBuilder) Done() DF1RequestMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewDF1RequestMessageBuilder().(*_DF1RequestMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

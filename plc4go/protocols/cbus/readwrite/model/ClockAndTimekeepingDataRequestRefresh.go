@@ -71,6 +71,8 @@ type ClockAndTimekeepingDataRequestRefreshBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ClockAndTimekeepingDataRequestRefreshBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ClockAndTimekeepingDataBuilder
 	// Build builds the ClockAndTimekeepingDataRequestRefresh or returns an error if something is wrong
 	Build() (ClockAndTimekeepingDataRequestRefresh, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) MustBuild() ClockAndTime
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) Done() ClockAndTimekeepingDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewClockAndTimekeepingDataBuilder().(*_ClockAndTimekeepingDataBuilder)
+	}
 	return b.parentBuilder
 }
 

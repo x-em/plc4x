@@ -86,6 +86,8 @@ type BACnetConstructedDataDoNotHideBuilder interface {
 	WithDoNotHide(BACnetApplicationTagBoolean) BACnetConstructedDataDoNotHideBuilder
 	// WithDoNotHideBuilder adds DoNotHide (property field) which is build by the builder
 	WithDoNotHideBuilder(func(BACnetApplicationTagBooleanBuilder) BACnetApplicationTagBooleanBuilder) BACnetConstructedDataDoNotHideBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataDoNotHide or returns an error if something is wrong
 	Build() (BACnetConstructedDataDoNotHide, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataDoNotHideBuilder) MustBuild() BACnetConstructedDa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataDoNotHideBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

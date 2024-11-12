@@ -102,6 +102,8 @@ type TriggerControlDataLabelBuilder interface {
 	WithOptionalLanguage(Language) TriggerControlDataLabelBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) TriggerControlDataLabelBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() TriggerControlDataBuilder
 	// Build builds the TriggerControlDataLabel or returns an error if something is wrong
 	Build() (TriggerControlDataLabel, error)
 	// MustBuild does the same as Build but panics on error
@@ -185,8 +187,10 @@ func (b *_TriggerControlDataLabelBuilder) MustBuild() TriggerControlDataLabel {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TriggerControlDataLabelBuilder) Done() TriggerControlDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewTriggerControlDataBuilder().(*_TriggerControlDataBuilder)
+	}
 	return b.parentBuilder
 }
 

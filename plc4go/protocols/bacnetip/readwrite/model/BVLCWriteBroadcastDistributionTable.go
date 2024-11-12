@@ -84,6 +84,8 @@ type BVLCWriteBroadcastDistributionTableBuilder interface {
 	WithMandatoryFields(table []BVLCBroadcastDistributionTableEntry) BVLCWriteBroadcastDistributionTableBuilder
 	// WithTable adds Table (property field)
 	WithTable(...BVLCBroadcastDistributionTableEntry) BVLCWriteBroadcastDistributionTableBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCWriteBroadcastDistributionTable or returns an error if something is wrong
 	Build() (BVLCWriteBroadcastDistributionTable, error)
 	// MustBuild does the same as Build but panics on error
@@ -133,8 +135,10 @@ func (b *_BVLCWriteBroadcastDistributionTableBuilder) MustBuild() BVLCWriteBroad
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCWriteBroadcastDistributionTableBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 

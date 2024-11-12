@@ -84,6 +84,8 @@ type SALDataErrorReportingBuilder interface {
 	WithErrorReportingData(ErrorReportingData) SALDataErrorReportingBuilder
 	// WithErrorReportingDataBuilder adds ErrorReportingData (property field) which is build by the builder
 	WithErrorReportingDataBuilder(func(ErrorReportingDataBuilder) ErrorReportingDataBuilder) SALDataErrorReportingBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataErrorReporting or returns an error if something is wrong
 	Build() (SALDataErrorReporting, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_SALDataErrorReportingBuilder) MustBuild() SALDataErrorReporting {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataErrorReportingBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

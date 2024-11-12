@@ -79,6 +79,8 @@ type MeteringDataGasConsumptionBuilder interface {
 	WithMandatoryFields(mJ uint32) MeteringDataGasConsumptionBuilder
 	// WithMJ adds MJ (property field)
 	WithMJ(uint32) MeteringDataGasConsumptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MeteringDataBuilder
 	// Build builds the MeteringDataGasConsumption or returns an error if something is wrong
 	Build() (MeteringDataGasConsumption, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_MeteringDataGasConsumptionBuilder) MustBuild() MeteringDataGasConsumpt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MeteringDataGasConsumptionBuilder) Done() MeteringDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMeteringDataBuilder().(*_MeteringDataBuilder)
+	}
 	return b.parentBuilder
 }
 

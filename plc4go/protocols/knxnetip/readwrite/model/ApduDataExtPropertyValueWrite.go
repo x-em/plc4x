@@ -103,6 +103,8 @@ type ApduDataExtPropertyValueWriteBuilder interface {
 	WithIndex(uint16) ApduDataExtPropertyValueWriteBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) ApduDataExtPropertyValueWriteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataExtBuilder
 	// Build builds the ApduDataExtPropertyValueWrite or returns an error if something is wrong
 	Build() (ApduDataExtPropertyValueWrite, error)
 	// MustBuild does the same as Build but panics on error
@@ -172,8 +174,10 @@ func (b *_ApduDataExtPropertyValueWriteBuilder) MustBuild() ApduDataExtPropertyV
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataExtPropertyValueWriteBuilder) Done() ApduDataExtBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataExtBuilder().(*_ApduDataExtBuilder)
+	}
 	return b.parentBuilder
 }
 

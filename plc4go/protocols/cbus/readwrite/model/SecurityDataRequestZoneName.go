@@ -79,6 +79,8 @@ type SecurityDataRequestZoneNameBuilder interface {
 	WithMandatoryFields(zoneNumber uint8) SecurityDataRequestZoneNameBuilder
 	// WithZoneNumber adds ZoneNumber (property field)
 	WithZoneNumber(uint8) SecurityDataRequestZoneNameBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SecurityDataBuilder
 	// Build builds the SecurityDataRequestZoneName or returns an error if something is wrong
 	Build() (SecurityDataRequestZoneName, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_SecurityDataRequestZoneNameBuilder) MustBuild() SecurityDataRequestZon
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SecurityDataRequestZoneNameBuilder) Done() SecurityDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSecurityDataBuilder().(*_SecurityDataBuilder)
+	}
 	return b.parentBuilder
 }
 

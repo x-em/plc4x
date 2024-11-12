@@ -86,6 +86,8 @@ type BACnetConstructedDataNetworkNumberBuilder interface {
 	WithNetworkNumber(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataNetworkNumberBuilder
 	// WithNetworkNumberBuilder adds NetworkNumber (property field) which is build by the builder
 	WithNetworkNumberBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataNetworkNumberBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataNetworkNumber or returns an error if something is wrong
 	Build() (BACnetConstructedDataNetworkNumber, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataNetworkNumberBuilder) MustBuild() BACnetConstruct
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataNetworkNumberBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

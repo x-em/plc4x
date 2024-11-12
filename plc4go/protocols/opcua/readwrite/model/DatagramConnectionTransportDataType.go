@@ -84,6 +84,8 @@ type DatagramConnectionTransportDataTypeBuilder interface {
 	WithDiscoveryAddress(ExtensionObject) DatagramConnectionTransportDataTypeBuilder
 	// WithDiscoveryAddressBuilder adds DiscoveryAddress (property field) which is build by the builder
 	WithDiscoveryAddressBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) DatagramConnectionTransportDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DatagramConnectionTransportDataType or returns an error if something is wrong
 	Build() (DatagramConnectionTransportDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_DatagramConnectionTransportDataTypeBuilder) MustBuild() DatagramConnec
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DatagramConnectionTransportDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

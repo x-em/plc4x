@@ -79,6 +79,8 @@ type ModbusPDUReadExceptionStatusResponseBuilder interface {
 	WithMandatoryFields(value uint8) ModbusPDUReadExceptionStatusResponseBuilder
 	// WithValue adds Value (property field)
 	WithValue(uint8) ModbusPDUReadExceptionStatusResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUReadExceptionStatusResponse or returns an error if something is wrong
 	Build() (ModbusPDUReadExceptionStatusResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ModbusPDUReadExceptionStatusResponseBuilder) MustBuild() ModbusPDURead
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUReadExceptionStatusResponseBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

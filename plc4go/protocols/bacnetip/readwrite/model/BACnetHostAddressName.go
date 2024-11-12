@@ -84,6 +84,8 @@ type BACnetHostAddressNameBuilder interface {
 	WithName(BACnetContextTagCharacterString) BACnetHostAddressNameBuilder
 	// WithNameBuilder adds Name (property field) which is build by the builder
 	WithNameBuilder(func(BACnetContextTagCharacterStringBuilder) BACnetContextTagCharacterStringBuilder) BACnetHostAddressNameBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetHostAddressBuilder
 	// Build builds the BACnetHostAddressName or returns an error if something is wrong
 	Build() (BACnetHostAddressName, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetHostAddressNameBuilder) MustBuild() BACnetHostAddressName {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetHostAddressNameBuilder) Done() BACnetHostAddressBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetHostAddressBuilder().(*_BACnetHostAddressBuilder)
+	}
 	return b.parentBuilder
 }
 

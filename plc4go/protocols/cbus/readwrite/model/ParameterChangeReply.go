@@ -84,6 +84,8 @@ type ParameterChangeReplyBuilder interface {
 	WithParameterChange(ParameterChange) ParameterChangeReplyBuilder
 	// WithParameterChangeBuilder adds ParameterChange (property field) which is build by the builder
 	WithParameterChangeBuilder(func(ParameterChangeBuilder) ParameterChangeBuilder) ParameterChangeReplyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ReplyBuilder
 	// Build builds the ParameterChangeReply or returns an error if something is wrong
 	Build() (ParameterChangeReply, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_ParameterChangeReplyBuilder) MustBuild() ParameterChangeReply {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ParameterChangeReplyBuilder) Done() ReplyBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewReplyBuilder().(*_ReplyBuilder)
+	}
 	return b.parentBuilder
 }
 

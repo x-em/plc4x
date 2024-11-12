@@ -85,6 +85,8 @@ type HistoryModifiedDataBuilder interface {
 	WithDataValues(...DataValue) HistoryModifiedDataBuilder
 	// WithModificationInfos adds ModificationInfos (property field)
 	WithModificationInfos(...ModificationInfo) HistoryModifiedDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the HistoryModifiedData or returns an error if something is wrong
 	Build() (HistoryModifiedData, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_HistoryModifiedDataBuilder) MustBuild() HistoryModifiedData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_HistoryModifiedDataBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

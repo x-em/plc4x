@@ -92,6 +92,8 @@ type APDURejectBuilder interface {
 	WithRejectReason(BACnetRejectReasonTagged) APDURejectBuilder
 	// WithRejectReasonBuilder adds RejectReason (property field) which is build by the builder
 	WithRejectReasonBuilder(func(BACnetRejectReasonTaggedBuilder) BACnetRejectReasonTaggedBuilder) APDURejectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() APDUBuilder
 	// Build builds the APDUReject or returns an error if something is wrong
 	Build() (APDUReject, error)
 	// MustBuild does the same as Build but panics on error
@@ -165,8 +167,10 @@ func (b *_APDURejectBuilder) MustBuild() APDUReject {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_APDURejectBuilder) Done() APDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAPDUBuilder().(*_APDUBuilder)
+	}
 	return b.parentBuilder
 }
 

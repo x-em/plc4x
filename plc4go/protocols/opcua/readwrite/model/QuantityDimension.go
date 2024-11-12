@@ -121,6 +121,8 @@ type QuantityDimensionBuilder interface {
 	WithAbsoluteTemperatureExponent(int8) QuantityDimensionBuilder
 	// WithDimensionlessExponent adds DimensionlessExponent (property field)
 	WithDimensionlessExponent(int8) QuantityDimensionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the QuantityDimension or returns an error if something is wrong
 	Build() (QuantityDimension, error)
 	// MustBuild does the same as Build but panics on error
@@ -205,8 +207,10 @@ func (b *_QuantityDimensionBuilder) MustBuild() QuantityDimension {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_QuantityDimensionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

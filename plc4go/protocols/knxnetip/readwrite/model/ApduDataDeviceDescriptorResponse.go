@@ -85,6 +85,8 @@ type ApduDataDeviceDescriptorResponseBuilder interface {
 	WithDescriptorType(uint8) ApduDataDeviceDescriptorResponseBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) ApduDataDeviceDescriptorResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduDataBuilder
 	// Build builds the ApduDataDeviceDescriptorResponse or returns an error if something is wrong
 	Build() (ApduDataDeviceDescriptorResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ApduDataDeviceDescriptorResponseBuilder) MustBuild() ApduDataDeviceDes
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduDataDeviceDescriptorResponseBuilder) Done() ApduDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduDataBuilder().(*_ApduDataBuilder)
+	}
 	return b.parentBuilder
 }
 

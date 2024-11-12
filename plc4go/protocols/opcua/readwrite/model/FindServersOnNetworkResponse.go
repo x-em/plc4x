@@ -96,6 +96,8 @@ type FindServersOnNetworkResponseBuilder interface {
 	WithLastCounterResetTime(int64) FindServersOnNetworkResponseBuilder
 	// WithServers adds Servers (property field)
 	WithServers(...ServerOnNetwork) FindServersOnNetworkResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the FindServersOnNetworkResponse or returns an error if something is wrong
 	Build() (FindServersOnNetworkResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_FindServersOnNetworkResponseBuilder) MustBuild() FindServersOnNetworkR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_FindServersOnNetworkResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

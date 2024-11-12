@@ -111,6 +111,8 @@ type BACnetConfirmedServiceRequestAddListElementBuilder interface {
 	WithOptionalListOfElements(BACnetConstructedData) BACnetConfirmedServiceRequestAddListElementBuilder
 	// WithOptionalListOfElementsBuilder adds ListOfElements (property field) which is build by the builder
 	WithOptionalListOfElementsBuilder(func(BACnetConstructedDataBuilder) BACnetConstructedDataBuilder) BACnetConfirmedServiceRequestAddListElementBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestAddListElement or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestAddListElement, error)
 	// MustBuild does the same as Build but panics on error
@@ -239,8 +241,10 @@ func (b *_BACnetConfirmedServiceRequestAddListElementBuilder) MustBuild() BACnet
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestAddListElementBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

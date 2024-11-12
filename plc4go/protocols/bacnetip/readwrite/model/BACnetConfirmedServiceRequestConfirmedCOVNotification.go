@@ -128,6 +128,8 @@ type BACnetConfirmedServiceRequestConfirmedCOVNotificationBuilder interface {
 	WithListOfValues(BACnetPropertyValues) BACnetConfirmedServiceRequestConfirmedCOVNotificationBuilder
 	// WithListOfValuesBuilder adds ListOfValues (property field) which is build by the builder
 	WithListOfValuesBuilder(func(BACnetPropertyValuesBuilder) BACnetPropertyValuesBuilder) BACnetConfirmedServiceRequestConfirmedCOVNotificationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestConfirmedCOVNotification or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestConfirmedCOVNotification, error)
 	// MustBuild does the same as Build but panics on error
@@ -292,8 +294,10 @@ func (b *_BACnetConfirmedServiceRequestConfirmedCOVNotificationBuilder) MustBuil
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestConfirmedCOVNotificationBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -90,6 +90,8 @@ type GetEndpointsResponseBuilder interface {
 	WithResponseHeaderBuilder(func(ResponseHeaderBuilder) ResponseHeaderBuilder) GetEndpointsResponseBuilder
 	// WithEndpoints adds Endpoints (property field)
 	WithEndpoints(...EndpointDescription) GetEndpointsResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the GetEndpointsResponse or returns an error if something is wrong
 	Build() (GetEndpointsResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_GetEndpointsResponseBuilder) MustBuild() GetEndpointsResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_GetEndpointsResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

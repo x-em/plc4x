@@ -86,6 +86,8 @@ type BACnetConstructedDataLastCredentialAddedTimeBuilder interface {
 	WithLastCredentialAddedTime(BACnetDateTime) BACnetConstructedDataLastCredentialAddedTimeBuilder
 	// WithLastCredentialAddedTimeBuilder adds LastCredentialAddedTime (property field) which is build by the builder
 	WithLastCredentialAddedTimeBuilder(func(BACnetDateTimeBuilder) BACnetDateTimeBuilder) BACnetConstructedDataLastCredentialAddedTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataLastCredentialAddedTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataLastCredentialAddedTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataLastCredentialAddedTimeBuilder) MustBuild() BACne
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataLastCredentialAddedTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

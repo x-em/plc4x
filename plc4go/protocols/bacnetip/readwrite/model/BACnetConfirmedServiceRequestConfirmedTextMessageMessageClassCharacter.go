@@ -84,6 +84,8 @@ type BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassCharacterBuild
 	WithCharacterValue(BACnetContextTagCharacterString) BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassCharacterBuilder
 	// WithCharacterValueBuilder adds CharacterValue (property field) which is build by the builder
 	WithCharacterValueBuilder(func(BACnetContextTagCharacterStringBuilder) BACnetContextTagCharacterStringBuilder) BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassCharacterBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder
 	// Build builds the BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassCharacter or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassCharacter, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassCharacter
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassCharacterBuilder) Done() BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder().(*_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassBuilder)
+	}
 	return b.parentBuilder
 }
 

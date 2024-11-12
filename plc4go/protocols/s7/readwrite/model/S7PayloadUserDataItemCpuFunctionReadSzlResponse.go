@@ -79,6 +79,8 @@ type S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder interface {
 	WithMandatoryFields(items []byte) S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder
 	// WithItems adds Items (property field)
 	WithItems(...byte) S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7PayloadUserDataItemBuilder
 	// Build builds the S7PayloadUserDataItemCpuFunctionReadSzlResponse or returns an error if something is wrong
 	Build() (S7PayloadUserDataItemCpuFunctionReadSzlResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) MustBuild() S7
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) Done() S7PayloadUserDataItemBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7PayloadUserDataItemBuilder().(*_S7PayloadUserDataItemBuilder)
+	}
 	return b.parentBuilder
 }
 

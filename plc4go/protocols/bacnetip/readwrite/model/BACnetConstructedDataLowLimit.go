@@ -86,6 +86,8 @@ type BACnetConstructedDataLowLimitBuilder interface {
 	WithLowLimit(BACnetApplicationTagReal) BACnetConstructedDataLowLimitBuilder
 	// WithLowLimitBuilder adds LowLimit (property field) which is build by the builder
 	WithLowLimitBuilder(func(BACnetApplicationTagRealBuilder) BACnetApplicationTagRealBuilder) BACnetConstructedDataLowLimitBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataLowLimit or returns an error if something is wrong
 	Build() (BACnetConstructedDataLowLimit, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataLowLimitBuilder) MustBuild() BACnetConstructedDat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataLowLimitBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

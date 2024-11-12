@@ -123,6 +123,8 @@ type CipUnconnectedRequestBuilder interface {
 	WithBackPlane(int8) CipUnconnectedRequestBuilder
 	// WithSlot adds Slot (property field)
 	WithSlot(int8) CipUnconnectedRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipUnconnectedRequest or returns an error if something is wrong
 	Build() (CipUnconnectedRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -249,8 +251,10 @@ func (b *_CipUnconnectedRequestBuilder) MustBuild() CipUnconnectedRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipUnconnectedRequestBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

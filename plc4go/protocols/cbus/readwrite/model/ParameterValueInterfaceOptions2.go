@@ -90,6 +90,8 @@ type ParameterValueInterfaceOptions2Builder interface {
 	WithValueBuilder(func(InterfaceOptions2Builder) InterfaceOptions2Builder) ParameterValueInterfaceOptions2Builder
 	// WithData adds Data (property field)
 	WithData(...byte) ParameterValueInterfaceOptions2Builder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ParameterValueBuilder
 	// Build builds the ParameterValueInterfaceOptions2 or returns an error if something is wrong
 	Build() (ParameterValueInterfaceOptions2, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_ParameterValueInterfaceOptions2Builder) MustBuild() ParameterValueInte
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ParameterValueInterfaceOptions2Builder) Done() ParameterValueBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewParameterValueBuilder().(*_ParameterValueBuilder)
+	}
 	return b.parentBuilder
 }
 

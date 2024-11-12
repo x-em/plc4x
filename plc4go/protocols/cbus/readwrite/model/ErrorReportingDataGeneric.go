@@ -132,6 +132,8 @@ type ErrorReportingDataGenericBuilder interface {
 	WithErrorData1(uint8) ErrorReportingDataGenericBuilder
 	// WithErrorData2 adds ErrorData2 (property field)
 	WithErrorData2(uint8) ErrorReportingDataGenericBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ErrorReportingDataBuilder
 	// Build builds the ErrorReportingDataGeneric or returns an error if something is wrong
 	Build() (ErrorReportingDataGeneric, error)
 	// MustBuild does the same as Build but panics on error
@@ -235,8 +237,10 @@ func (b *_ErrorReportingDataGenericBuilder) MustBuild() ErrorReportingDataGeneri
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ErrorReportingDataGenericBuilder) Done() ErrorReportingDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewErrorReportingDataBuilder().(*_ErrorReportingDataBuilder)
+	}
 	return b.parentBuilder
 }
 

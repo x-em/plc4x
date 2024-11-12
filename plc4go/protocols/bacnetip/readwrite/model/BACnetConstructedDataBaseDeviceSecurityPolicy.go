@@ -86,6 +86,8 @@ type BACnetConstructedDataBaseDeviceSecurityPolicyBuilder interface {
 	WithBaseDeviceSecurityPolicy(BACnetSecurityLevelTagged) BACnetConstructedDataBaseDeviceSecurityPolicyBuilder
 	// WithBaseDeviceSecurityPolicyBuilder adds BaseDeviceSecurityPolicy (property field) which is build by the builder
 	WithBaseDeviceSecurityPolicyBuilder(func(BACnetSecurityLevelTaggedBuilder) BACnetSecurityLevelTaggedBuilder) BACnetConstructedDataBaseDeviceSecurityPolicyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataBaseDeviceSecurityPolicy or returns an error if something is wrong
 	Build() (BACnetConstructedDataBaseDeviceSecurityPolicy, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataBaseDeviceSecurityPolicyBuilder) MustBuild() BACn
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataBaseDeviceSecurityPolicyBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

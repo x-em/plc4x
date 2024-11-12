@@ -84,6 +84,8 @@ type UserIdentityTokenBuilder interface {
 	WithPolicyId(PascalString) UserIdentityTokenBuilder
 	// WithPolicyIdBuilder adds PolicyId (property field) which is build by the builder
 	WithPolicyIdBuilder(func(PascalStringBuilder) PascalStringBuilder) UserIdentityTokenBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the UserIdentityToken or returns an error if something is wrong
 	Build() (UserIdentityToken, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_UserIdentityTokenBuilder) MustBuild() UserIdentityToken {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_UserIdentityTokenBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

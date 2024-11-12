@@ -163,6 +163,8 @@ type CreateSessionResponseBuilder interface {
 	WithServerSignatureBuilder(func(SignatureDataBuilder) SignatureDataBuilder) CreateSessionResponseBuilder
 	// WithMaxRequestMessageSize adds MaxRequestMessageSize (property field)
 	WithMaxRequestMessageSize(uint32) CreateSessionResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CreateSessionResponse or returns an error if something is wrong
 	Build() (CreateSessionResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -371,8 +373,10 @@ func (b *_CreateSessionResponseBuilder) MustBuild() CreateSessionResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CreateSessionResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataStartTimeBuilder interface {
 	WithStartTime(BACnetDateTime) BACnetConstructedDataStartTimeBuilder
 	// WithStartTimeBuilder adds StartTime (property field) which is build by the builder
 	WithStartTimeBuilder(func(BACnetDateTimeBuilder) BACnetDateTimeBuilder) BACnetConstructedDataStartTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataStartTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataStartTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataStartTimeBuilder) MustBuild() BACnetConstructedDa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataStartTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

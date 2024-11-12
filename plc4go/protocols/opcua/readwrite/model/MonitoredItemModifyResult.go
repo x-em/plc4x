@@ -107,6 +107,8 @@ type MonitoredItemModifyResultBuilder interface {
 	WithFilterResult(ExtensionObject) MonitoredItemModifyResultBuilder
 	// WithFilterResultBuilder adds FilterResult (property field) which is build by the builder
 	WithFilterResultBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) MonitoredItemModifyResultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the MonitoredItemModifyResult or returns an error if something is wrong
 	Build() (MonitoredItemModifyResult, error)
 	// MustBuild does the same as Build but panics on error
@@ -209,8 +211,10 @@ func (b *_MonitoredItemModifyResultBuilder) MustBuild() MonitoredItemModifyResul
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MonitoredItemModifyResultBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -125,6 +125,8 @@ type BACnetServiceAckGetEnrollmentSummaryBuilder interface {
 	WithOptionalNotificationClass(BACnetApplicationTagUnsignedInteger) BACnetServiceAckGetEnrollmentSummaryBuilder
 	// WithOptionalNotificationClassBuilder adds NotificationClass (property field) which is build by the builder
 	WithOptionalNotificationClassBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetServiceAckGetEnrollmentSummaryBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckGetEnrollmentSummary or returns an error if something is wrong
 	Build() (BACnetServiceAckGetEnrollmentSummary, error)
 	// MustBuild does the same as Build but panics on error
@@ -283,8 +285,10 @@ func (b *_BACnetServiceAckGetEnrollmentSummaryBuilder) MustBuild() BACnetService
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckGetEnrollmentSummaryBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 

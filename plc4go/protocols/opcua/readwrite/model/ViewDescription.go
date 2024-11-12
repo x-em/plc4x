@@ -96,6 +96,8 @@ type ViewDescriptionBuilder interface {
 	WithTimestamp(int64) ViewDescriptionBuilder
 	// WithViewVersion adds ViewVersion (property field)
 	WithViewVersion(uint32) ViewDescriptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ViewDescription or returns an error if something is wrong
 	Build() (ViewDescription, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_ViewDescriptionBuilder) MustBuild() ViewDescription {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ViewDescriptionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -107,6 +107,8 @@ type CurrencyUnitTypeBuilder interface {
 	WithCurrency(LocalizedText) CurrencyUnitTypeBuilder
 	// WithCurrencyBuilder adds Currency (property field) which is build by the builder
 	WithCurrencyBuilder(func(LocalizedTextBuilder) LocalizedTextBuilder) CurrencyUnitTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CurrencyUnitType or returns an error if something is wrong
 	Build() (CurrencyUnitType, error)
 	// MustBuild does the same as Build but panics on error
@@ -209,8 +211,10 @@ func (b *_CurrencyUnitTypeBuilder) MustBuild() CurrencyUnitType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CurrencyUnitTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

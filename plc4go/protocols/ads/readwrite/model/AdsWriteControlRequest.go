@@ -91,6 +91,8 @@ type AdsWriteControlRequestBuilder interface {
 	WithDeviceState(uint16) AdsWriteControlRequestBuilder
 	// WithData adds Data (property field)
 	WithData(...byte) AdsWriteControlRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AmsPacketBuilder
 	// Build builds the AdsWriteControlRequest or returns an error if something is wrong
 	Build() (AdsWriteControlRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_AdsWriteControlRequestBuilder) MustBuild() AdsWriteControlRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsWriteControlRequestBuilder) Done() AmsPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAmsPacketBuilder().(*_AmsPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

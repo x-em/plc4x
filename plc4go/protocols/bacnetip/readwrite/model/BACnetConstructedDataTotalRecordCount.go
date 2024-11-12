@@ -86,6 +86,8 @@ type BACnetConstructedDataTotalRecordCountBuilder interface {
 	WithTotalRecordCount(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataTotalRecordCountBuilder
 	// WithTotalRecordCountBuilder adds TotalRecordCount (property field) which is build by the builder
 	WithTotalRecordCountBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataTotalRecordCountBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataTotalRecordCount or returns an error if something is wrong
 	Build() (BACnetConstructedDataTotalRecordCount, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataTotalRecordCountBuilder) MustBuild() BACnetConstr
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataTotalRecordCountBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

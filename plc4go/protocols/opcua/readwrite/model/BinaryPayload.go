@@ -79,6 +79,8 @@ type BinaryPayloadBuilder interface {
 	WithMandatoryFields(payload []byte) BinaryPayloadBuilder
 	// WithPayload adds Payload (property field)
 	WithPayload(...byte) BinaryPayloadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() PayloadBuilder
 	// Build builds the BinaryPayload or returns an error if something is wrong
 	Build() (BinaryPayload, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BinaryPayloadBuilder) MustBuild() BinaryPayload {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BinaryPayloadBuilder) Done() PayloadBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewPayloadBuilder().(*_PayloadBuilder)
+	}
 	return b.parentBuilder
 }
 

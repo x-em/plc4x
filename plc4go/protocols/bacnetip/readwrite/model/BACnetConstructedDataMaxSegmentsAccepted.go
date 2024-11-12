@@ -86,6 +86,8 @@ type BACnetConstructedDataMaxSegmentsAcceptedBuilder interface {
 	WithMaxSegmentsAccepted(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMaxSegmentsAcceptedBuilder
 	// WithMaxSegmentsAcceptedBuilder adds MaxSegmentsAccepted (property field) which is build by the builder
 	WithMaxSegmentsAcceptedBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataMaxSegmentsAcceptedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataMaxSegmentsAccepted or returns an error if something is wrong
 	Build() (BACnetConstructedDataMaxSegmentsAccepted, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataMaxSegmentsAcceptedBuilder) MustBuild() BACnetCon
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataMaxSegmentsAcceptedBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

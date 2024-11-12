@@ -79,6 +79,8 @@ type BACnetConstructedDataDateListBuilder interface {
 	WithMandatoryFields(dateList []BACnetCalendarEntry) BACnetConstructedDataDateListBuilder
 	// WithDateList adds DateList (property field)
 	WithDateList(...BACnetCalendarEntry) BACnetConstructedDataDateListBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataDateList or returns an error if something is wrong
 	Build() (BACnetConstructedDataDateList, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataDateListBuilder) MustBuild() BACnetConstructedDat
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataDateListBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

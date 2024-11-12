@@ -122,6 +122,8 @@ type CreateSubscriptionRequestBuilder interface {
 	WithPublishingEnabled(bool) CreateSubscriptionRequestBuilder
 	// WithPriority adds Priority (property field)
 	WithPriority(uint8) CreateSubscriptionRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CreateSubscriptionRequest or returns an error if something is wrong
 	Build() (CreateSubscriptionRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -220,8 +222,10 @@ func (b *_CreateSubscriptionRequestBuilder) MustBuild() CreateSubscriptionReques
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CreateSubscriptionRequestBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

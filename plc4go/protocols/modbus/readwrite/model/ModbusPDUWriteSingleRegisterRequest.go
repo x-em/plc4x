@@ -85,6 +85,8 @@ type ModbusPDUWriteSingleRegisterRequestBuilder interface {
 	WithAddress(uint16) ModbusPDUWriteSingleRegisterRequestBuilder
 	// WithValue adds Value (property field)
 	WithValue(uint16) ModbusPDUWriteSingleRegisterRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUWriteSingleRegisterRequest or returns an error if something is wrong
 	Build() (ModbusPDUWriteSingleRegisterRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ModbusPDUWriteSingleRegisterRequestBuilder) MustBuild() ModbusPDUWrite
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUWriteSingleRegisterRequestBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -79,6 +79,8 @@ type IdentifyReplyCommandLogicalAssignmentBuilder interface {
 	WithMandatoryFields(logicAssigment []LogicAssignment) IdentifyReplyCommandLogicalAssignmentBuilder
 	// WithLogicAssigment adds LogicAssigment (property field)
 	WithLogicAssigment(...LogicAssignment) IdentifyReplyCommandLogicalAssignmentBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandLogicalAssignment or returns an error if something is wrong
 	Build() (IdentifyReplyCommandLogicalAssignment, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_IdentifyReplyCommandLogicalAssignmentBuilder) MustBuild() IdentifyRepl
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandLogicalAssignmentBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -71,6 +71,8 @@ type ApduControlDisconnectBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ApduControlDisconnectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ApduControlBuilder
 	// Build builds the ApduControlDisconnect or returns an error if something is wrong
 	Build() (ApduControlDisconnect, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_ApduControlDisconnectBuilder) MustBuild() ApduControlDisconnect {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ApduControlDisconnectBuilder) Done() ApduControlBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewApduControlBuilder().(*_ApduControlBuilder)
+	}
 	return b.parentBuilder
 }
 

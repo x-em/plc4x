@@ -95,6 +95,8 @@ type ChangeListRemoveErrorBuilder interface {
 	WithFirstFailedElementNumber(BACnetContextTagUnsignedInteger) ChangeListRemoveErrorBuilder
 	// WithFirstFailedElementNumberBuilder adds FirstFailedElementNumber (property field) which is build by the builder
 	WithFirstFailedElementNumberBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) ChangeListRemoveErrorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetErrorBuilder
 	// Build builds the ChangeListRemoveError or returns an error if something is wrong
 	Build() (ChangeListRemoveError, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_ChangeListRemoveErrorBuilder) MustBuild() ChangeListRemoveError {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ChangeListRemoveErrorBuilder) Done() BACnetErrorBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetErrorBuilder().(*_BACnetErrorBuilder)
+	}
 	return b.parentBuilder
 }
 

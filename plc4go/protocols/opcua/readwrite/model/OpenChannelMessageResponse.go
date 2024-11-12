@@ -112,6 +112,8 @@ type OpenChannelMessageResponseBuilder interface {
 	WithReceiverCertificateThumbprint(PascalByteString) OpenChannelMessageResponseBuilder
 	// WithReceiverCertificateThumbprintBuilder adds ReceiverCertificateThumbprint (property field) which is build by the builder
 	WithReceiverCertificateThumbprintBuilder(func(PascalByteStringBuilder) PascalByteStringBuilder) OpenChannelMessageResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() OpenChannelMessageBuilder
 	// Build builds the OpenChannelMessageResponse or returns an error if something is wrong
 	Build() (OpenChannelMessageResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -233,8 +235,10 @@ func (b *_OpenChannelMessageResponseBuilder) MustBuild() OpenChannelMessageRespo
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_OpenChannelMessageResponseBuilder) Done() OpenChannelMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewOpenChannelMessageBuilder().(*_OpenChannelMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

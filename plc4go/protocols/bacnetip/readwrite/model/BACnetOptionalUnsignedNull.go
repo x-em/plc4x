@@ -84,6 +84,8 @@ type BACnetOptionalUnsignedNullBuilder interface {
 	WithNullValue(BACnetApplicationTagNull) BACnetOptionalUnsignedNullBuilder
 	// WithNullValueBuilder adds NullValue (property field) which is build by the builder
 	WithNullValueBuilder(func(BACnetApplicationTagNullBuilder) BACnetApplicationTagNullBuilder) BACnetOptionalUnsignedNullBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetOptionalUnsignedBuilder
 	// Build builds the BACnetOptionalUnsignedNull or returns an error if something is wrong
 	Build() (BACnetOptionalUnsignedNull, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetOptionalUnsignedNullBuilder) MustBuild() BACnetOptionalUnsignedN
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetOptionalUnsignedNullBuilder) Done() BACnetOptionalUnsignedBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetOptionalUnsignedBuilder().(*_BACnetOptionalUnsignedBuilder)
+	}
 	return b.parentBuilder
 }
 

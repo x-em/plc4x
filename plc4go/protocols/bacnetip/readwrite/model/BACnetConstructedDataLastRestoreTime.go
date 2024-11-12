@@ -86,6 +86,8 @@ type BACnetConstructedDataLastRestoreTimeBuilder interface {
 	WithLastRestoreTime(BACnetTimeStamp) BACnetConstructedDataLastRestoreTimeBuilder
 	// WithLastRestoreTimeBuilder adds LastRestoreTime (property field) which is build by the builder
 	WithLastRestoreTimeBuilder(func(BACnetTimeStampBuilder) BACnetTimeStampBuilder) BACnetConstructedDataLastRestoreTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataLastRestoreTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataLastRestoreTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataLastRestoreTimeBuilder) MustBuild() BACnetConstru
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataLastRestoreTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -95,6 +95,8 @@ type SemanticChangeStructureDataTypeBuilder interface {
 	WithAffectedType(NodeId) SemanticChangeStructureDataTypeBuilder
 	// WithAffectedTypeBuilder adds AffectedType (property field) which is build by the builder
 	WithAffectedTypeBuilder(func(NodeIdBuilder) NodeIdBuilder) SemanticChangeStructureDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SemanticChangeStructureDataType or returns an error if something is wrong
 	Build() (SemanticChangeStructureDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_SemanticChangeStructureDataTypeBuilder) MustBuild() SemanticChangeStru
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SemanticChangeStructureDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

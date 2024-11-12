@@ -79,6 +79,8 @@ type BACnetConstructedDataLandingCallsBuilder interface {
 	WithMandatoryFields(landingCallStatus []BACnetLandingCallStatus) BACnetConstructedDataLandingCallsBuilder
 	// WithLandingCallStatus adds LandingCallStatus (property field)
 	WithLandingCallStatus(...BACnetLandingCallStatus) BACnetConstructedDataLandingCallsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataLandingCalls or returns an error if something is wrong
 	Build() (BACnetConstructedDataLandingCalls, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataLandingCallsBuilder) MustBuild() BACnetConstructe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataLandingCallsBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

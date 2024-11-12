@@ -79,6 +79,8 @@ type IdentifyReplyCommandMaximumLevelsBuilder interface {
 	WithMandatoryFields(maximumLevels []byte) IdentifyReplyCommandMaximumLevelsBuilder
 	// WithMaximumLevels adds MaximumLevels (property field)
 	WithMaximumLevels(...byte) IdentifyReplyCommandMaximumLevelsBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandMaximumLevels or returns an error if something is wrong
 	Build() (IdentifyReplyCommandMaximumLevels, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_IdentifyReplyCommandMaximumLevelsBuilder) MustBuild() IdentifyReplyCom
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandMaximumLevelsBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

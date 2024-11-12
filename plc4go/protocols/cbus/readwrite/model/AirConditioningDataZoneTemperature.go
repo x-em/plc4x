@@ -107,6 +107,8 @@ type AirConditioningDataZoneTemperatureBuilder interface {
 	WithTemperatureBuilder(func(HVACTemperatureBuilder) HVACTemperatureBuilder) AirConditioningDataZoneTemperatureBuilder
 	// WithSensorStatus adds SensorStatus (property field)
 	WithSensorStatus(HVACSensorStatus) AirConditioningDataZoneTemperatureBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AirConditioningDataBuilder
 	// Build builds the AirConditioningDataZoneTemperature or returns an error if something is wrong
 	Build() (AirConditioningDataZoneTemperature, error)
 	// MustBuild does the same as Build but panics on error
@@ -209,8 +211,10 @@ func (b *_AirConditioningDataZoneTemperatureBuilder) MustBuild() AirConditioning
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AirConditioningDataZoneTemperatureBuilder) Done() AirConditioningDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAirConditioningDataBuilder().(*_AirConditioningDataBuilder)
+	}
 	return b.parentBuilder
 }
 

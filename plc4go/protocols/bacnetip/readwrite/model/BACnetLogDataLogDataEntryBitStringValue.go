@@ -84,6 +84,8 @@ type BACnetLogDataLogDataEntryBitStringValueBuilder interface {
 	WithBitStringValue(BACnetContextTagBitString) BACnetLogDataLogDataEntryBitStringValueBuilder
 	// WithBitStringValueBuilder adds BitStringValue (property field) which is build by the builder
 	WithBitStringValueBuilder(func(BACnetContextTagBitStringBuilder) BACnetContextTagBitStringBuilder) BACnetLogDataLogDataEntryBitStringValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetLogDataLogDataEntryBuilder
 	// Build builds the BACnetLogDataLogDataEntryBitStringValue or returns an error if something is wrong
 	Build() (BACnetLogDataLogDataEntryBitStringValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetLogDataLogDataEntryBitStringValueBuilder) MustBuild() BACnetLogD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetLogDataLogDataEntryBitStringValueBuilder) Done() BACnetLogDataLogDataEntryBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetLogDataLogDataEntryBuilder().(*_BACnetLogDataLogDataEntryBuilder)
+	}
 	return b.parentBuilder
 }
 

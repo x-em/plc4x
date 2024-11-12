@@ -71,6 +71,8 @@ type ConnectionResponseDataBlockDeviceManagementBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ConnectionResponseDataBlockDeviceManagementBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ConnectionResponseDataBlockBuilder
 	// Build builds the ConnectionResponseDataBlockDeviceManagement or returns an error if something is wrong
 	Build() (ConnectionResponseDataBlockDeviceManagement, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_ConnectionResponseDataBlockDeviceManagementBuilder) MustBuild() Connec
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ConnectionResponseDataBlockDeviceManagementBuilder) Done() ConnectionResponseDataBlockBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewConnectionResponseDataBlockBuilder().(*_ConnectionResponseDataBlockBuilder)
+	}
 	return b.parentBuilder
 }
 

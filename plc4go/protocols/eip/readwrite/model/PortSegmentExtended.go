@@ -93,6 +93,8 @@ type PortSegmentExtendedBuilder interface {
 	WithLinkAddressSize(uint8) PortSegmentExtendedBuilder
 	// WithAddress adds Address (property field)
 	WithAddress(string) PortSegmentExtendedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() PortSegmentTypeBuilder
 	// Build builds the PortSegmentExtended or returns an error if something is wrong
 	Build() (PortSegmentExtended, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_PortSegmentExtendedBuilder) MustBuild() PortSegmentExtended {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_PortSegmentExtendedBuilder) Done() PortSegmentTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewPortSegmentTypeBuilder().(*_PortSegmentTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -71,6 +71,8 @@ type CALDataResetBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() CALDataResetBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataReset or returns an error if something is wrong
 	Build() (CALDataReset, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_CALDataResetBuilder) MustBuild() CALDataReset {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataResetBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

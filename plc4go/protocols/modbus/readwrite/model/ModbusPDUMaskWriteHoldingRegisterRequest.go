@@ -91,6 +91,8 @@ type ModbusPDUMaskWriteHoldingRegisterRequestBuilder interface {
 	WithAndMask(uint16) ModbusPDUMaskWriteHoldingRegisterRequestBuilder
 	// WithOrMask adds OrMask (property field)
 	WithOrMask(uint16) ModbusPDUMaskWriteHoldingRegisterRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUMaskWriteHoldingRegisterRequest or returns an error if something is wrong
 	Build() (ModbusPDUMaskWriteHoldingRegisterRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_ModbusPDUMaskWriteHoldingRegisterRequestBuilder) MustBuild() ModbusPDU
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUMaskWriteHoldingRegisterRequestBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

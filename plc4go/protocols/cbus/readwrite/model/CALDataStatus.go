@@ -91,6 +91,8 @@ type CALDataStatusBuilder interface {
 	WithBlockStart(uint8) CALDataStatusBuilder
 	// WithStatusBytes adds StatusBytes (property field)
 	WithStatusBytes(...StatusByte) CALDataStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataStatus or returns an error if something is wrong
 	Build() (CALDataStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -150,8 +152,10 @@ func (b *_CALDataStatusBuilder) MustBuild() CALDataStatus {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataStatusBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

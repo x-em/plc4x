@@ -86,6 +86,8 @@ type BACnetConstructedDataAlarmValueBuilder interface {
 	WithBinaryPv(BACnetBinaryPVTagged) BACnetConstructedDataAlarmValueBuilder
 	// WithBinaryPvBuilder adds BinaryPv (property field) which is build by the builder
 	WithBinaryPvBuilder(func(BACnetBinaryPVTaggedBuilder) BACnetBinaryPVTaggedBuilder) BACnetConstructedDataAlarmValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAlarmValue or returns an error if something is wrong
 	Build() (BACnetConstructedDataAlarmValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataAlarmValueBuilder) MustBuild() BACnetConstructedD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAlarmValueBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

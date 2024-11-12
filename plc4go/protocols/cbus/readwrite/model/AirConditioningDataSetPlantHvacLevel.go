@@ -131,6 +131,8 @@ type AirConditioningDataSetPlantHvacLevelBuilder interface {
 	WithOptionalAuxLevel(HVACAuxiliaryLevel) AirConditioningDataSetPlantHvacLevelBuilder
 	// WithOptionalAuxLevelBuilder adds AuxLevel (property field) which is build by the builder
 	WithOptionalAuxLevelBuilder(func(HVACAuxiliaryLevelBuilder) HVACAuxiliaryLevelBuilder) AirConditioningDataSetPlantHvacLevelBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AirConditioningDataBuilder
 	// Build builds the AirConditioningDataSetPlantHvacLevel or returns an error if something is wrong
 	Build() (AirConditioningDataSetPlantHvacLevel, error)
 	// MustBuild does the same as Build but panics on error
@@ -287,8 +289,10 @@ func (b *_AirConditioningDataSetPlantHvacLevelBuilder) MustBuild() AirConditioni
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AirConditioningDataSetPlantHvacLevelBuilder) Done() AirConditioningDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAirConditioningDataBuilder().(*_AirConditioningDataBuilder)
+	}
 	return b.parentBuilder
 }
 

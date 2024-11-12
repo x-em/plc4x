@@ -81,6 +81,8 @@ type ConnectionRequestInformationTunnelConnectionBuilder interface {
 	WithMandatoryFields(knxLayer KnxLayer) ConnectionRequestInformationTunnelConnectionBuilder
 	// WithKnxLayer adds KnxLayer (property field)
 	WithKnxLayer(KnxLayer) ConnectionRequestInformationTunnelConnectionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ConnectionRequestInformationBuilder
 	// Build builds the ConnectionRequestInformationTunnelConnection or returns an error if something is wrong
 	Build() (ConnectionRequestInformationTunnelConnection, error)
 	// MustBuild does the same as Build but panics on error
@@ -130,8 +132,10 @@ func (b *_ConnectionRequestInformationTunnelConnectionBuilder) MustBuild() Conne
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ConnectionRequestInformationTunnelConnectionBuilder) Done() ConnectionRequestInformationBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewConnectionRequestInformationBuilder().(*_ConnectionRequestInformationBuilder)
+	}
 	return b.parentBuilder
 }
 

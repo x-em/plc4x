@@ -84,6 +84,8 @@ type BACnetEventParameterNoneBuilder interface {
 	WithNone(BACnetContextTagNull) BACnetEventParameterNoneBuilder
 	// WithNoneBuilder adds None (property field) which is build by the builder
 	WithNoneBuilder(func(BACnetContextTagNullBuilder) BACnetContextTagNullBuilder) BACnetEventParameterNoneBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetEventParameterBuilder
 	// Build builds the BACnetEventParameterNone or returns an error if something is wrong
 	Build() (BACnetEventParameterNone, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetEventParameterNoneBuilder) MustBuild() BACnetEventParameterNone 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetEventParameterNoneBuilder) Done() BACnetEventParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetEventParameterBuilder().(*_BACnetEventParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

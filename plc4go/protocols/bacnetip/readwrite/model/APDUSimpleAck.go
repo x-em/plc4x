@@ -87,6 +87,8 @@ type APDUSimpleAckBuilder interface {
 	WithOriginalInvokeId(uint8) APDUSimpleAckBuilder
 	// WithServiceChoice adds ServiceChoice (property field)
 	WithServiceChoice(BACnetConfirmedServiceChoice) APDUSimpleAckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() APDUBuilder
 	// Build builds the APDUSimpleAck or returns an error if something is wrong
 	Build() (APDUSimpleAck, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_APDUSimpleAckBuilder) MustBuild() APDUSimpleAck {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_APDUSimpleAckBuilder) Done() APDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAPDUBuilder().(*_APDUBuilder)
+	}
 	return b.parentBuilder
 }
 

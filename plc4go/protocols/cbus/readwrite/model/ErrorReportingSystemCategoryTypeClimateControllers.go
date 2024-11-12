@@ -79,6 +79,8 @@ type ErrorReportingSystemCategoryTypeClimateControllersBuilder interface {
 	WithMandatoryFields(categoryForType ErrorReportingSystemCategoryTypeForClimateControllers) ErrorReportingSystemCategoryTypeClimateControllersBuilder
 	// WithCategoryForType adds CategoryForType (property field)
 	WithCategoryForType(ErrorReportingSystemCategoryTypeForClimateControllers) ErrorReportingSystemCategoryTypeClimateControllersBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ErrorReportingSystemCategoryTypeBuilder
 	// Build builds the ErrorReportingSystemCategoryTypeClimateControllers or returns an error if something is wrong
 	Build() (ErrorReportingSystemCategoryTypeClimateControllers, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ErrorReportingSystemCategoryTypeClimateControllersBuilder) MustBuild()
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ErrorReportingSystemCategoryTypeClimateControllersBuilder) Done() ErrorReportingSystemCategoryTypeBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewErrorReportingSystemCategoryTypeBuilder().(*_ErrorReportingSystemCategoryTypeBuilder)
+	}
 	return b.parentBuilder
 }
 

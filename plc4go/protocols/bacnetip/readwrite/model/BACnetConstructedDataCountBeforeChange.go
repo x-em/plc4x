@@ -86,6 +86,8 @@ type BACnetConstructedDataCountBeforeChangeBuilder interface {
 	WithCountBeforeChange(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataCountBeforeChangeBuilder
 	// WithCountBeforeChangeBuilder adds CountBeforeChange (property field) which is build by the builder
 	WithCountBeforeChangeBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataCountBeforeChangeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataCountBeforeChange or returns an error if something is wrong
 	Build() (BACnetConstructedDataCountBeforeChange, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataCountBeforeChangeBuilder) MustBuild() BACnetConst
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataCountBeforeChangeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataResolutionBuilder interface {
 	WithResolution(BACnetApplicationTagReal) BACnetConstructedDataResolutionBuilder
 	// WithResolutionBuilder adds Resolution (property field) which is build by the builder
 	WithResolutionBuilder(func(BACnetApplicationTagRealBuilder) BACnetApplicationTagRealBuilder) BACnetConstructedDataResolutionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataResolution or returns an error if something is wrong
 	Build() (BACnetConstructedDataResolution, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataResolutionBuilder) MustBuild() BACnetConstructedD
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataResolutionBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

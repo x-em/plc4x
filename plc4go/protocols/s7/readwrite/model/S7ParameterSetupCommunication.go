@@ -93,6 +93,8 @@ type S7ParameterSetupCommunicationBuilder interface {
 	WithMaxAmqCallee(uint16) S7ParameterSetupCommunicationBuilder
 	// WithPduLength adds PduLength (property field)
 	WithPduLength(uint16) S7ParameterSetupCommunicationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() S7ParameterBuilder
 	// Build builds the S7ParameterSetupCommunication or returns an error if something is wrong
 	Build() (S7ParameterSetupCommunication, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_S7ParameterSetupCommunicationBuilder) MustBuild() S7ParameterSetupComm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_S7ParameterSetupCommunicationBuilder) Done() S7ParameterBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewS7ParameterBuilder().(*_S7ParameterBuilder)
+	}
 	return b.parentBuilder
 }
 

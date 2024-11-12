@@ -107,6 +107,8 @@ type CALDataStatusExtendedBuilder interface {
 	WithStatusBytes(...StatusByte) CALDataStatusExtendedBuilder
 	// WithLevelInformation adds LevelInformation (property field)
 	WithLevelInformation(...LevelInformation) CALDataStatusExtendedBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CALDataBuilder
 	// Build builds the CALDataStatusExtended or returns an error if something is wrong
 	Build() (CALDataStatusExtended, error)
 	// MustBuild does the same as Build but panics on error
@@ -176,8 +178,10 @@ func (b *_CALDataStatusExtendedBuilder) MustBuild() CALDataStatusExtended {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CALDataStatusExtendedBuilder) Done() CALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCALDataBuilder().(*_CALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -90,6 +90,8 @@ type OpcuaAcknowledgeResponseBuilder interface {
 	WithLimits(OpcuaProtocolLimits) OpcuaAcknowledgeResponseBuilder
 	// WithLimitsBuilder adds Limits (property field) which is build by the builder
 	WithLimitsBuilder(func(OpcuaProtocolLimitsBuilder) OpcuaProtocolLimitsBuilder) OpcuaAcknowledgeResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MessagePDUBuilder
 	// Build builds the OpcuaAcknowledgeResponse or returns an error if something is wrong
 	Build() (OpcuaAcknowledgeResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_OpcuaAcknowledgeResponseBuilder) MustBuild() OpcuaAcknowledgeResponse 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_OpcuaAcknowledgeResponseBuilder) Done() MessagePDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMessagePDUBuilder().(*_MessagePDUBuilder)
+	}
 	return b.parentBuilder
 }
 

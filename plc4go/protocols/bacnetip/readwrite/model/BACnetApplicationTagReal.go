@@ -86,6 +86,8 @@ type BACnetApplicationTagRealBuilder interface {
 	WithPayload(BACnetTagPayloadReal) BACnetApplicationTagRealBuilder
 	// WithPayloadBuilder adds Payload (property field) which is build by the builder
 	WithPayloadBuilder(func(BACnetTagPayloadRealBuilder) BACnetTagPayloadRealBuilder) BACnetApplicationTagRealBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetApplicationTagBuilder
 	// Build builds the BACnetApplicationTagReal or returns an error if something is wrong
 	Build() (BACnetApplicationTagReal, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetApplicationTagRealBuilder) MustBuild() BACnetApplicationTagReal 
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetApplicationTagRealBuilder) Done() BACnetApplicationTagBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetApplicationTagBuilder().(*_BACnetApplicationTagBuilder)
+	}
 	return b.parentBuilder
 }
 

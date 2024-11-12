@@ -86,6 +86,8 @@ type BACnetConstructedDataIPv6DHCPLeaseTimeBuilder interface {
 	WithIpv6DhcpLeaseTime(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataIPv6DHCPLeaseTimeBuilder
 	// WithIpv6DhcpLeaseTimeBuilder adds Ipv6DhcpLeaseTime (property field) which is build by the builder
 	WithIpv6DhcpLeaseTimeBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataIPv6DHCPLeaseTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataIPv6DHCPLeaseTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataIPv6DHCPLeaseTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataIPv6DHCPLeaseTimeBuilder) MustBuild() BACnetConst
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataIPv6DHCPLeaseTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

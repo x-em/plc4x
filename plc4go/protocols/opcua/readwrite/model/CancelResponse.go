@@ -90,6 +90,8 @@ type CancelResponseBuilder interface {
 	WithResponseHeaderBuilder(func(ResponseHeaderBuilder) ResponseHeaderBuilder) CancelResponseBuilder
 	// WithCancelCount adds CancelCount (property field)
 	WithCancelCount(uint32) CancelResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the CancelResponse or returns an error if something is wrong
 	Build() (CancelResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_CancelResponseBuilder) MustBuild() CancelResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CancelResponseBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

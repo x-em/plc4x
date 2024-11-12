@@ -85,6 +85,8 @@ type NLMRejectMessageToNetworkBuilder interface {
 	WithRejectReason(NLMRejectMessageToNetworkRejectReason) NLMRejectMessageToNetworkBuilder
 	// WithDestinationNetworkAddress adds DestinationNetworkAddress (property field)
 	WithDestinationNetworkAddress(uint16) NLMRejectMessageToNetworkBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NLMBuilder
 	// Build builds the NLMRejectMessageToNetwork or returns an error if something is wrong
 	Build() (NLMRejectMessageToNetwork, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_NLMRejectMessageToNetworkBuilder) MustBuild() NLMRejectMessageToNetwor
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NLMRejectMessageToNetworkBuilder) Done() NLMBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNLMBuilder().(*_NLMBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type APDUUnknownBuilder interface {
 	WithUnknownTypeRest(uint8) APDUUnknownBuilder
 	// WithUnknownBytes adds UnknownBytes (property field)
 	WithUnknownBytes(...byte) APDUUnknownBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() APDUBuilder
 	// Build builds the APDUUnknown or returns an error if something is wrong
 	Build() (APDUUnknown, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_APDUUnknownBuilder) MustBuild() APDUUnknown {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_APDUUnknownBuilder) Done() APDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAPDUBuilder().(*_APDUBuilder)
+	}
 	return b.parentBuilder
 }
 

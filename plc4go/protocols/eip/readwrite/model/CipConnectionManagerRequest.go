@@ -208,6 +208,8 @@ type CipConnectionManagerRequestBuilder interface {
 	WithConnectionPathSize(uint8) CipConnectionManagerRequestBuilder
 	// WithConnectionPaths adds ConnectionPaths (property field)
 	WithConnectionPaths(...PathSegment) CipConnectionManagerRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipConnectionManagerRequest or returns an error if something is wrong
 	Build() (CipConnectionManagerRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -437,8 +439,10 @@ func (b *_CipConnectionManagerRequestBuilder) MustBuild() CipConnectionManagerRe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipConnectionManagerRequestBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

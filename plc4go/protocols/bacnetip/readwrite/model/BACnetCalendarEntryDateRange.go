@@ -84,6 +84,8 @@ type BACnetCalendarEntryDateRangeBuilder interface {
 	WithDateRange(BACnetDateRangeEnclosed) BACnetCalendarEntryDateRangeBuilder
 	// WithDateRangeBuilder adds DateRange (property field) which is build by the builder
 	WithDateRangeBuilder(func(BACnetDateRangeEnclosedBuilder) BACnetDateRangeEnclosedBuilder) BACnetCalendarEntryDateRangeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetCalendarEntryBuilder
 	// Build builds the BACnetCalendarEntryDateRange or returns an error if something is wrong
 	Build() (BACnetCalendarEntryDateRange, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetCalendarEntryDateRangeBuilder) MustBuild() BACnetCalendarEntryDa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetCalendarEntryDateRangeBuilder) Done() BACnetCalendarEntryBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetCalendarEntryBuilder().(*_BACnetCalendarEntryBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -123,6 +123,8 @@ type BrokerDataSetReaderTransportDataTypeBuilder interface {
 	WithMetaDataQueueName(PascalString) BrokerDataSetReaderTransportDataTypeBuilder
 	// WithMetaDataQueueNameBuilder adds MetaDataQueueName (property field) which is build by the builder
 	WithMetaDataQueueNameBuilder(func(PascalStringBuilder) PascalStringBuilder) BrokerDataSetReaderTransportDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the BrokerDataSetReaderTransportDataType or returns an error if something is wrong
 	Build() (BrokerDataSetReaderTransportDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -268,8 +270,10 @@ func (b *_BrokerDataSetReaderTransportDataTypeBuilder) MustBuild() BrokerDataSet
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BrokerDataSetReaderTransportDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

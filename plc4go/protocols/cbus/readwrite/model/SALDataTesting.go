@@ -71,6 +71,8 @@ type SALDataTestingBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() SALDataTestingBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataTesting or returns an error if something is wrong
 	Build() (SALDataTesting, error)
 	// MustBuild does the same as Build but panics on error
@@ -115,8 +117,10 @@ func (b *_SALDataTestingBuilder) MustBuild() SALDataTesting {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataTestingBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

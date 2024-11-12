@@ -84,6 +84,8 @@ type BACnetPropertyStatesShedStateBuilder interface {
 	WithShedState(BACnetShedStateTagged) BACnetPropertyStatesShedStateBuilder
 	// WithShedStateBuilder adds ShedState (property field) which is build by the builder
 	WithShedStateBuilder(func(BACnetShedStateTaggedBuilder) BACnetShedStateTaggedBuilder) BACnetPropertyStatesShedStateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesShedState or returns an error if something is wrong
 	Build() (BACnetPropertyStatesShedState, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesShedStateBuilder) MustBuild() BACnetPropertyStates
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesShedStateBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

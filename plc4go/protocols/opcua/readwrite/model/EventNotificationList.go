@@ -79,6 +79,8 @@ type EventNotificationListBuilder interface {
 	WithMandatoryFields(events []EventFieldList) EventNotificationListBuilder
 	// WithEvents adds Events (property field)
 	WithEvents(...EventFieldList) EventNotificationListBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the EventNotificationList or returns an error if something is wrong
 	Build() (EventNotificationList, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_EventNotificationListBuilder) MustBuild() EventNotificationList {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_EventNotificationListBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -85,6 +85,8 @@ type AdsAddDeviceNotificationResponseBuilder interface {
 	WithResult(ReturnCode) AdsAddDeviceNotificationResponseBuilder
 	// WithNotificationHandle adds NotificationHandle (property field)
 	WithNotificationHandle(uint32) AdsAddDeviceNotificationResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() AmsPacketBuilder
 	// Build builds the AdsAddDeviceNotificationResponse or returns an error if something is wrong
 	Build() (AdsAddDeviceNotificationResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_AdsAddDeviceNotificationResponseBuilder) MustBuild() AdsAddDeviceNotif
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_AdsAddDeviceNotificationResponseBuilder) Done() AmsPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewAmsPacketBuilder().(*_AmsPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

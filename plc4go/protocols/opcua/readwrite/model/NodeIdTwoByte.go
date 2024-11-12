@@ -83,6 +83,8 @@ type NodeIdTwoByteBuilder interface {
 	WithMandatoryFields(id uint8) NodeIdTwoByteBuilder
 	// WithId adds Id (property field)
 	WithId(uint8) NodeIdTwoByteBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() NodeIdTypeDefinitionBuilder
 	// Build builds the NodeIdTwoByte or returns an error if something is wrong
 	Build() (NodeIdTwoByte, error)
 	// MustBuild does the same as Build but panics on error
@@ -132,8 +134,10 @@ func (b *_NodeIdTwoByteBuilder) MustBuild() NodeIdTwoByte {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NodeIdTwoByteBuilder) Done() NodeIdTypeDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewNodeIdTypeDefinitionBuilder().(*_NodeIdTypeDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

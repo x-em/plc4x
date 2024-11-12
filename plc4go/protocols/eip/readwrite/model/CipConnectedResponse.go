@@ -95,6 +95,8 @@ type CipConnectedResponseBuilder interface {
 	WithOptionalData(CIPDataConnected) CipConnectedResponseBuilder
 	// WithOptionalDataBuilder adds Data (property field) which is build by the builder
 	WithOptionalDataBuilder(func(CIPDataConnectedBuilder) CIPDataConnectedBuilder) CipConnectedResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipConnectedResponse or returns an error if something is wrong
 	Build() (CipConnectedResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -167,8 +169,10 @@ func (b *_CipConnectedResponseBuilder) MustBuild() CipConnectedResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipConnectedResponseBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

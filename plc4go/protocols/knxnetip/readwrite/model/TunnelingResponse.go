@@ -86,6 +86,8 @@ type TunnelingResponseBuilder interface {
 	WithTunnelingResponseDataBlock(TunnelingResponseDataBlock) TunnelingResponseBuilder
 	// WithTunnelingResponseDataBlockBuilder adds TunnelingResponseDataBlock (property field) which is build by the builder
 	WithTunnelingResponseDataBlockBuilder(func(TunnelingResponseDataBlockBuilder) TunnelingResponseDataBlockBuilder) TunnelingResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the TunnelingResponse or returns an error if something is wrong
 	Build() (TunnelingResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_TunnelingResponseBuilder) MustBuild() TunnelingResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_TunnelingResponseBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 

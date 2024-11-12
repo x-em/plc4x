@@ -87,6 +87,8 @@ type FirmataCommandSetDigitalPinValueBuilder interface {
 	WithPin(uint8) FirmataCommandSetDigitalPinValueBuilder
 	// WithOn adds On (property field)
 	WithOn(bool) FirmataCommandSetDigitalPinValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() FirmataCommandBuilder
 	// Build builds the FirmataCommandSetDigitalPinValue or returns an error if something is wrong
 	Build() (FirmataCommandSetDigitalPinValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_FirmataCommandSetDigitalPinValueBuilder) MustBuild() FirmataCommandSet
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_FirmataCommandSetDigitalPinValueBuilder) Done() FirmataCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewFirmataCommandBuilder().(*_FirmataCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

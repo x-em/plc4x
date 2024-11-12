@@ -151,6 +151,8 @@ type CipConnectionManagerCloseRequestBuilder interface {
 	WithConnectionPathSize(uint8) CipConnectionManagerCloseRequestBuilder
 	// WithConnectionPaths adds ConnectionPaths (property field)
 	WithConnectionPaths(...PathSegment) CipConnectionManagerCloseRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipConnectionManagerCloseRequest or returns an error if something is wrong
 	Build() (CipConnectionManagerCloseRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -288,8 +290,10 @@ func (b *_CipConnectionManagerCloseRequestBuilder) MustBuild() CipConnectionMana
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipConnectionManagerCloseRequestBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

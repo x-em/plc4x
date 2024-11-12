@@ -79,6 +79,8 @@ type BACnetConstructedDataAccessDoorFaultValuesBuilder interface {
 	WithMandatoryFields(faultValues []BACnetDoorAlarmStateTagged) BACnetConstructedDataAccessDoorFaultValuesBuilder
 	// WithFaultValues adds FaultValues (property field)
 	WithFaultValues(...BACnetDoorAlarmStateTagged) BACnetConstructedDataAccessDoorFaultValuesBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataAccessDoorFaultValues or returns an error if something is wrong
 	Build() (BACnetConstructedDataAccessDoorFaultValues, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_BACnetConstructedDataAccessDoorFaultValuesBuilder) MustBuild() BACnetC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataAccessDoorFaultValuesBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

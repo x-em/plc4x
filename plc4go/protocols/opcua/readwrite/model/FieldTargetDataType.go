@@ -140,6 +140,8 @@ type FieldTargetDataTypeBuilder interface {
 	WithOverrideValue(Variant) FieldTargetDataTypeBuilder
 	// WithOverrideValueBuilder adds OverrideValue (property field) which is build by the builder
 	WithOverrideValueBuilder(func(VariantBuilder) VariantBuilder) FieldTargetDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the FieldTargetDataType or returns an error if something is wrong
 	Build() (FieldTargetDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -314,8 +316,10 @@ func (b *_FieldTargetDataTypeBuilder) MustBuild() FieldTargetDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_FieldTargetDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

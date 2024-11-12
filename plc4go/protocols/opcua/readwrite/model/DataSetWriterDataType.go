@@ -149,6 +149,8 @@ type DataSetWriterDataTypeBuilder interface {
 	WithMessageSettings(ExtensionObject) DataSetWriterDataTypeBuilder
 	// WithMessageSettingsBuilder adds MessageSettings (property field) which is build by the builder
 	WithMessageSettingsBuilder(func(ExtensionObjectBuilder) ExtensionObjectBuilder) DataSetWriterDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DataSetWriterDataType or returns an error if something is wrong
 	Build() (DataSetWriterDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -314,8 +316,10 @@ func (b *_DataSetWriterDataTypeBuilder) MustBuild() DataSetWriterDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DataSetWriterDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

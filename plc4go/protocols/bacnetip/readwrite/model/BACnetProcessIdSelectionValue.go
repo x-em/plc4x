@@ -84,6 +84,8 @@ type BACnetProcessIdSelectionValueBuilder interface {
 	WithProcessIdentifier(BACnetApplicationTagUnsignedInteger) BACnetProcessIdSelectionValueBuilder
 	// WithProcessIdentifierBuilder adds ProcessIdentifier (property field) which is build by the builder
 	WithProcessIdentifierBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetProcessIdSelectionValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetProcessIdSelectionBuilder
 	// Build builds the BACnetProcessIdSelectionValue or returns an error if something is wrong
 	Build() (BACnetProcessIdSelectionValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetProcessIdSelectionValueBuilder) MustBuild() BACnetProcessIdSelec
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetProcessIdSelectionValueBuilder) Done() BACnetProcessIdSelectionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetProcessIdSelectionBuilder().(*_BACnetProcessIdSelectionBuilder)
+	}
 	return b.parentBuilder
 }
 

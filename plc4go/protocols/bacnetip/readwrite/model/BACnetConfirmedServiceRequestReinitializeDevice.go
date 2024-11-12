@@ -92,6 +92,8 @@ type BACnetConfirmedServiceRequestReinitializeDeviceBuilder interface {
 	WithOptionalPassword(BACnetContextTagCharacterString) BACnetConfirmedServiceRequestReinitializeDeviceBuilder
 	// WithOptionalPasswordBuilder adds Password (property field) which is build by the builder
 	WithOptionalPasswordBuilder(func(BACnetContextTagCharacterStringBuilder) BACnetContextTagCharacterStringBuilder) BACnetConfirmedServiceRequestReinitializeDeviceBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestReinitializeDevice or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestReinitializeDevice, error)
 	// MustBuild does the same as Build but panics on error
@@ -178,8 +180,10 @@ func (b *_BACnetConfirmedServiceRequestReinitializeDeviceBuilder) MustBuild() BA
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestReinitializeDeviceBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 

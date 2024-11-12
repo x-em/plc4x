@@ -103,6 +103,8 @@ type DF1RequestProtectedTypedLogicalReadBuilder interface {
 	WithElementNumber(uint8) DF1RequestProtectedTypedLogicalReadBuilder
 	// WithSubElementNumber adds SubElementNumber (property field)
 	WithSubElementNumber(uint8) DF1RequestProtectedTypedLogicalReadBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() DF1RequestCommandBuilder
 	// Build builds the DF1RequestProtectedTypedLogicalRead or returns an error if something is wrong
 	Build() (DF1RequestProtectedTypedLogicalRead, error)
 	// MustBuild does the same as Build but panics on error
@@ -172,8 +174,10 @@ func (b *_DF1RequestProtectedTypedLogicalReadBuilder) MustBuild() DF1RequestProt
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DF1RequestProtectedTypedLogicalReadBuilder) Done() DF1RequestCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewDF1RequestCommandBuilder().(*_DF1RequestCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

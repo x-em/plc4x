@@ -84,6 +84,8 @@ type BACnetPropertyStatesAuthenticationStatusBuilder interface {
 	WithAuthenticationStatus(BACnetAuthenticationStatusTagged) BACnetPropertyStatesAuthenticationStatusBuilder
 	// WithAuthenticationStatusBuilder adds AuthenticationStatus (property field) which is build by the builder
 	WithAuthenticationStatusBuilder(func(BACnetAuthenticationStatusTaggedBuilder) BACnetAuthenticationStatusTaggedBuilder) BACnetPropertyStatesAuthenticationStatusBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesAuthenticationStatus or returns an error if something is wrong
 	Build() (BACnetPropertyStatesAuthenticationStatus, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesAuthenticationStatusBuilder) MustBuild() BACnetPro
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesAuthenticationStatusBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

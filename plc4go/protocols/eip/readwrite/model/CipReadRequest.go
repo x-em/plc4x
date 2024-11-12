@@ -85,6 +85,8 @@ type CipReadRequestBuilder interface {
 	WithTag(...byte) CipReadRequestBuilder
 	// WithElementNb adds ElementNb (property field)
 	WithElementNb(uint16) CipReadRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipReadRequest or returns an error if something is wrong
 	Build() (CipReadRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_CipReadRequestBuilder) MustBuild() CipReadRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipReadRequestBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

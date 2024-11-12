@@ -112,6 +112,8 @@ type SimpleTypeDescriptionBuilder interface {
 	WithBaseDataTypeBuilder(func(NodeIdBuilder) NodeIdBuilder) SimpleTypeDescriptionBuilder
 	// WithBuiltInType adds BuiltInType (property field)
 	WithBuiltInType(uint8) SimpleTypeDescriptionBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the SimpleTypeDescription or returns an error if something is wrong
 	Build() (SimpleTypeDescription, error)
 	// MustBuild does the same as Build but panics on error
@@ -233,8 +235,10 @@ func (b *_SimpleTypeDescriptionBuilder) MustBuild() SimpleTypeDescription {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SimpleTypeDescriptionBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

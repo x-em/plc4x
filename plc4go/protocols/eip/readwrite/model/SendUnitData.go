@@ -88,6 +88,8 @@ type SendUnitDataBuilder interface {
 	WithTimeout(uint16) SendUnitDataBuilder
 	// WithTypeIds adds TypeIds (property field)
 	WithTypeIds(...TypeId) SendUnitDataBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() EipPacketBuilder
 	// Build builds the SendUnitData or returns an error if something is wrong
 	Build() (SendUnitData, error)
 	// MustBuild does the same as Build but panics on error
@@ -142,8 +144,10 @@ func (b *_SendUnitDataBuilder) MustBuild() SendUnitData {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SendUnitDataBuilder) Done() EipPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewEipPacketBuilder().(*_EipPacketBuilder)
+	}
 	return b.parentBuilder
 }
 

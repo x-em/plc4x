@@ -79,6 +79,8 @@ type ModbusPDUWriteFileRecordResponseBuilder interface {
 	WithMandatoryFields(items []ModbusPDUWriteFileRecordResponseItem) ModbusPDUWriteFileRecordResponseBuilder
 	// WithItems adds Items (property field)
 	WithItems(...ModbusPDUWriteFileRecordResponseItem) ModbusPDUWriteFileRecordResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUWriteFileRecordResponse or returns an error if something is wrong
 	Build() (ModbusPDUWriteFileRecordResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,8 +130,10 @@ func (b *_ModbusPDUWriteFileRecordResponseBuilder) MustBuild() ModbusPDUWriteFil
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUWriteFileRecordResponseBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

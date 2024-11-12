@@ -84,6 +84,8 @@ type BACnetPropertyStatesDoorValueBuilder interface {
 	WithDoorValue(BACnetDoorValueTagged) BACnetPropertyStatesDoorValueBuilder
 	// WithDoorValueBuilder adds DoorValue (property field) which is build by the builder
 	WithDoorValueBuilder(func(BACnetDoorValueTaggedBuilder) BACnetDoorValueTaggedBuilder) BACnetPropertyStatesDoorValueBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetPropertyStatesBuilder
 	// Build builds the BACnetPropertyStatesDoorValue or returns an error if something is wrong
 	Build() (BACnetPropertyStatesDoorValue, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetPropertyStatesDoorValueBuilder) MustBuild() BACnetPropertyStates
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetPropertyStatesDoorValueBuilder) Done() BACnetPropertyStatesBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetPropertyStatesBuilder().(*_BACnetPropertyStatesBuilder)
+	}
 	return b.parentBuilder
 }
 

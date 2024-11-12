@@ -90,6 +90,8 @@ type MonitoredItemNotificationBuilder interface {
 	WithValue(DataValue) MonitoredItemNotificationBuilder
 	// WithValueBuilder adds Value (property field) which is build by the builder
 	WithValueBuilder(func(DataValueBuilder) DataValueBuilder) MonitoredItemNotificationBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the MonitoredItemNotification or returns an error if something is wrong
 	Build() (MonitoredItemNotification, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_MonitoredItemNotificationBuilder) MustBuild() MonitoredItemNotificatio
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_MonitoredItemNotificationBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

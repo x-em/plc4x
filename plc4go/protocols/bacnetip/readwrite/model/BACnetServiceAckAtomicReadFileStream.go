@@ -95,6 +95,8 @@ type BACnetServiceAckAtomicReadFileStreamBuilder interface {
 	WithFileData(BACnetApplicationTagOctetString) BACnetServiceAckAtomicReadFileStreamBuilder
 	// WithFileDataBuilder adds FileData (property field) which is build by the builder
 	WithFileDataBuilder(func(BACnetApplicationTagOctetStringBuilder) BACnetApplicationTagOctetStringBuilder) BACnetServiceAckAtomicReadFileStreamBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckAtomicReadFileStreamOrRecordBuilder
 	// Build builds the BACnetServiceAckAtomicReadFileStream or returns an error if something is wrong
 	Build() (BACnetServiceAckAtomicReadFileStream, error)
 	// MustBuild does the same as Build but panics on error
@@ -187,8 +189,10 @@ func (b *_BACnetServiceAckAtomicReadFileStreamBuilder) MustBuild() BACnetService
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckAtomicReadFileStreamBuilder) Done() BACnetServiceAckAtomicReadFileStreamOrRecordBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckAtomicReadFileStreamOrRecordBuilder().(*_BACnetServiceAckAtomicReadFileStreamOrRecordBuilder)
+	}
 	return b.parentBuilder
 }
 

@@ -86,6 +86,8 @@ type BACnetConstructedDataRestoreCompletionTimeBuilder interface {
 	WithCompletionTime(BACnetApplicationTagUnsignedInteger) BACnetConstructedDataRestoreCompletionTimeBuilder
 	// WithCompletionTimeBuilder adds CompletionTime (property field) which is build by the builder
 	WithCompletionTimeBuilder(func(BACnetApplicationTagUnsignedIntegerBuilder) BACnetApplicationTagUnsignedIntegerBuilder) BACnetConstructedDataRestoreCompletionTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConstructedDataBuilder
 	// Build builds the BACnetConstructedDataRestoreCompletionTime or returns an error if something is wrong
 	Build() (BACnetConstructedDataRestoreCompletionTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -154,8 +156,10 @@ func (b *_BACnetConstructedDataRestoreCompletionTimeBuilder) MustBuild() BACnetC
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConstructedDataRestoreCompletionTimeBuilder) Done() BACnetConstructedDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConstructedDataBuilder().(*_BACnetConstructedDataBuilder)
+	}
 	return b.parentBuilder
 }
 

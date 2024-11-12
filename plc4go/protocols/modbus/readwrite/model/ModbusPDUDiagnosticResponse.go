@@ -85,6 +85,8 @@ type ModbusPDUDiagnosticResponseBuilder interface {
 	WithSubFunction(uint16) ModbusPDUDiagnosticResponseBuilder
 	// WithData adds Data (property field)
 	WithData(uint16) ModbusPDUDiagnosticResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ModbusPDUBuilder
 	// Build builds the ModbusPDUDiagnosticResponse or returns an error if something is wrong
 	Build() (ModbusPDUDiagnosticResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_ModbusPDUDiagnosticResponseBuilder) MustBuild() ModbusPDUDiagnosticRes
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ModbusPDUDiagnosticResponseBuilder) Done() ModbusPDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewModbusPDUBuilder().(*_ModbusPDUBuilder)
+	}
 	return b.parentBuilder
 }
 

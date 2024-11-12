@@ -84,6 +84,8 @@ type SALDataTriggerControlBuilder interface {
 	WithTriggerControlData(TriggerControlData) SALDataTriggerControlBuilder
 	// WithTriggerControlDataBuilder adds TriggerControlData (property field) which is build by the builder
 	WithTriggerControlDataBuilder(func(TriggerControlDataBuilder) TriggerControlDataBuilder) SALDataTriggerControlBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() SALDataBuilder
 	// Build builds the SALDataTriggerControl or returns an error if something is wrong
 	Build() (SALDataTriggerControl, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_SALDataTriggerControlBuilder) MustBuild() SALDataTriggerControl {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_SALDataTriggerControlBuilder) Done() SALDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewSALDataBuilder().(*_SALDataBuilder)
+	}
 	return b.parentBuilder
 }
 

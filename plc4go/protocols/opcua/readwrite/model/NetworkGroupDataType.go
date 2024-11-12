@@ -90,6 +90,8 @@ type NetworkGroupDataTypeBuilder interface {
 	WithServerUriBuilder(func(PascalStringBuilder) PascalStringBuilder) NetworkGroupDataTypeBuilder
 	// WithNetworkPaths adds NetworkPaths (property field)
 	WithNetworkPaths(...EndpointUrlListDataType) NetworkGroupDataTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the NetworkGroupDataType or returns an error if something is wrong
 	Build() (NetworkGroupDataType, error)
 	// MustBuild does the same as Build but panics on error
@@ -163,8 +165,10 @@ func (b *_NetworkGroupDataTypeBuilder) MustBuild() NetworkGroupDataType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_NetworkGroupDataTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

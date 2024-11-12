@@ -85,6 +85,8 @@ type IdentifyReplyCommandDelaysBuilder interface {
 	WithTerminalLevels(...byte) IdentifyReplyCommandDelaysBuilder
 	// WithReStrikeDelay adds ReStrikeDelay (property field)
 	WithReStrikeDelay(byte) IdentifyReplyCommandDelaysBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() IdentifyReplyCommandBuilder
 	// Build builds the IdentifyReplyCommandDelays or returns an error if something is wrong
 	Build() (IdentifyReplyCommandDelays, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_IdentifyReplyCommandDelaysBuilder) MustBuild() IdentifyReplyCommandDel
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_IdentifyReplyCommandDelaysBuilder) Done() IdentifyReplyCommandBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewIdentifyReplyCommandBuilder().(*_IdentifyReplyCommandBuilder)
+	}
 	return b.parentBuilder
 }
 

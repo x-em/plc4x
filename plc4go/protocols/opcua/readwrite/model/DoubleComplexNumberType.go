@@ -85,6 +85,8 @@ type DoubleComplexNumberTypeBuilder interface {
 	WithReal(float64) DoubleComplexNumberTypeBuilder
 	// WithImaginary adds Imaginary (property field)
 	WithImaginary(float64) DoubleComplexNumberTypeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the DoubleComplexNumberType or returns an error if something is wrong
 	Build() (DoubleComplexNumberType, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_DoubleComplexNumberTypeBuilder) MustBuild() DoubleComplexNumberType {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_DoubleComplexNumberTypeBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

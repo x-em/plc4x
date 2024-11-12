@@ -84,6 +84,8 @@ type BACnetRecipientAddressBuilder interface {
 	WithAddressValue(BACnetAddressEnclosed) BACnetRecipientAddressBuilder
 	// WithAddressValueBuilder adds AddressValue (property field) which is build by the builder
 	WithAddressValueBuilder(func(BACnetAddressEnclosedBuilder) BACnetAddressEnclosedBuilder) BACnetRecipientAddressBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetRecipientBuilder
 	// Build builds the BACnetRecipientAddress or returns an error if something is wrong
 	Build() (BACnetRecipientAddress, error)
 	// MustBuild does the same as Build but panics on error
@@ -152,8 +154,10 @@ func (b *_BACnetRecipientAddressBuilder) MustBuild() BACnetRecipientAddress {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetRecipientAddressBuilder) Done() BACnetRecipientBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetRecipientBuilder().(*_BACnetRecipientBuilder)
+	}
 	return b.parentBuilder
 }
 

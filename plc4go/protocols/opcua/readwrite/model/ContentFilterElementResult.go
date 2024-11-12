@@ -96,6 +96,8 @@ type ContentFilterElementResultBuilder interface {
 	WithOperandStatusCodes(...StatusCode) ContentFilterElementResultBuilder
 	// WithOperandDiagnosticInfos adds OperandDiagnosticInfos (property field)
 	WithOperandDiagnosticInfos(...DiagnosticInfo) ContentFilterElementResultBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectDefinitionBuilder
 	// Build builds the ContentFilterElementResult or returns an error if something is wrong
 	Build() (ContentFilterElementResult, error)
 	// MustBuild does the same as Build but panics on error
@@ -174,8 +176,10 @@ func (b *_ContentFilterElementResultBuilder) MustBuild() ContentFilterElementRes
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ContentFilterElementResultBuilder) Done() ExtensionObjectDefinitionBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectDefinitionBuilder().(*_ExtensionObjectDefinitionBuilder)
+	}
 	return b.parentBuilder
 }
 

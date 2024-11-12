@@ -105,6 +105,8 @@ type ClockAndTimekeepingDataUpdateTimeBuilder interface {
 	WithSecond(uint8) ClockAndTimekeepingDataUpdateTimeBuilder
 	// WithDaylightSaving adds DaylightSaving (property field)
 	WithDaylightSaving(byte) ClockAndTimekeepingDataUpdateTimeBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ClockAndTimekeepingDataBuilder
 	// Build builds the ClockAndTimekeepingDataUpdateTime or returns an error if something is wrong
 	Build() (ClockAndTimekeepingDataUpdateTime, error)
 	// MustBuild does the same as Build but panics on error
@@ -169,8 +171,10 @@ func (b *_ClockAndTimekeepingDataUpdateTimeBuilder) MustBuild() ClockAndTimekeep
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ClockAndTimekeepingDataUpdateTimeBuilder) Done() ClockAndTimekeepingDataBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewClockAndTimekeepingDataBuilder().(*_ClockAndTimekeepingDataBuilder)
+	}
 	return b.parentBuilder
 }
 

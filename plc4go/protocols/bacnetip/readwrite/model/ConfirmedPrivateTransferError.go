@@ -114,6 +114,8 @@ type ConfirmedPrivateTransferErrorBuilder interface {
 	WithOptionalErrorParameters(BACnetConstructedData) ConfirmedPrivateTransferErrorBuilder
 	// WithOptionalErrorParametersBuilder adds ErrorParameters (property field) which is build by the builder
 	WithOptionalErrorParametersBuilder(func(BACnetConstructedDataBuilder) BACnetConstructedDataBuilder) ConfirmedPrivateTransferErrorBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetErrorBuilder
 	// Build builds the ConfirmedPrivateTransferError or returns an error if something is wrong
 	Build() (ConfirmedPrivateTransferError, error)
 	// MustBuild does the same as Build but panics on error
@@ -248,8 +250,10 @@ func (b *_ConfirmedPrivateTransferErrorBuilder) MustBuild() ConfirmedPrivateTran
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_ConfirmedPrivateTransferErrorBuilder) Done() BACnetErrorBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetErrorBuilder().(*_BACnetErrorBuilder)
+	}
 	return b.parentBuilder
 }
 

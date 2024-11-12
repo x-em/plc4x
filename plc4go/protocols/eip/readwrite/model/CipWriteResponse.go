@@ -87,6 +87,8 @@ type CipWriteResponseBuilder interface {
 	WithStatus(uint8) CipWriteResponseBuilder
 	// WithExtStatus adds ExtStatus (property field)
 	WithExtStatus(uint8) CipWriteResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CipServiceBuilder
 	// Build builds the CipWriteResponse or returns an error if something is wrong
 	Build() (CipWriteResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -141,8 +143,10 @@ func (b *_CipWriteResponseBuilder) MustBuild() CipWriteResponse {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CipWriteResponseBuilder) Done() CipServiceBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCipServiceBuilder().(*_CipServiceBuilder)
+	}
 	return b.parentBuilder
 }
 

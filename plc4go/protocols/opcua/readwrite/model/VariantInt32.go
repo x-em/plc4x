@@ -85,6 +85,8 @@ type VariantInt32Builder interface {
 	WithOptionalArrayLength(int32) VariantInt32Builder
 	// WithValue adds Value (property field)
 	WithValue(...int32) VariantInt32Builder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() VariantBuilder
 	// Build builds the VariantInt32 or returns an error if something is wrong
 	Build() (VariantInt32, error)
 	// MustBuild does the same as Build but panics on error
@@ -139,8 +141,10 @@ func (b *_VariantInt32Builder) MustBuild() VariantInt32 {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_VariantInt32Builder) Done() VariantBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewVariantBuilder().(*_VariantBuilder)
+	}
 	return b.parentBuilder
 }
 
