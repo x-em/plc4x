@@ -131,6 +131,7 @@ var _ (HistoryReadResultBuilder) = (*_HistoryReadResultBuilder)(nil)
 
 func (b *_HistoryReadResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._HistoryReadResult
 }
 
 func (b *_HistoryReadResultBuilder) WithMandatoryFields(statusCode StatusCode, continuationPoint PascalByteString, historyData ExtensionObject) HistoryReadResultBuilder {

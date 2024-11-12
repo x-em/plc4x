@@ -109,6 +109,7 @@ var _ (ReceiveQosPriorityDataTypeBuilder) = (*_ReceiveQosPriorityDataTypeBuilder
 
 func (b *_ReceiveQosPriorityDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReceiveQosPriorityDataType
 }
 
 func (b *_ReceiveQosPriorityDataTypeBuilder) WithMandatoryFields(priorityLabel PascalString) ReceiveQosPriorityDataTypeBuilder {

@@ -120,6 +120,7 @@ var _ (WritePropertyMultipleErrorBuilder) = (*_WritePropertyMultipleErrorBuilder
 
 func (b *_WritePropertyMultipleErrorBuilder) setParent(contract BACnetErrorContract) {
 	b.BACnetErrorContract = contract
+	contract.(*_BACnetError)._SubType = b._WritePropertyMultipleError
 }
 
 func (b *_WritePropertyMultipleErrorBuilder) WithMandatoryFields(errorType ErrorEnclosed, firstFailedWriteAttempt BACnetObjectPropertyReferenceEnclosed) WritePropertyMultipleErrorBuilder {

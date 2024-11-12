@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTimerMaxPresValueBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataTimerMaxPresValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimerMaxPresValue
 }
 
 func (b *_BACnetConstructedDataTimerMaxPresValueBuilder) WithMandatoryFields(maxPresValue BACnetApplicationTagUnsignedInteger) BACnetConstructedDataTimerMaxPresValueBuilder {

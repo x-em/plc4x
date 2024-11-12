@@ -115,6 +115,7 @@ var _ (DeleteReferencesRequestBuilder) = (*_DeleteReferencesRequestBuilder)(nil)
 
 func (b *_DeleteReferencesRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteReferencesRequest
 }
 
 func (b *_DeleteReferencesRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, referencesToDelete []DeleteReferencesItem) DeleteReferencesRequestBuilder {

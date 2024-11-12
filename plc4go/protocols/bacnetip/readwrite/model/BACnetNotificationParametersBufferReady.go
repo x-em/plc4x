@@ -153,6 +153,7 @@ var _ (BACnetNotificationParametersBufferReadyBuilder) = (*_BACnetNotificationPa
 
 func (b *_BACnetNotificationParametersBufferReadyBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersBufferReady
 }
 
 func (b *_BACnetNotificationParametersBufferReadyBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, bufferProperty BACnetDeviceObjectPropertyReferenceEnclosed, previousNotification BACnetContextTagUnsignedInteger, currentNotification BACnetContextTagUnsignedInteger, innerClosingTag BACnetClosingTag) BACnetNotificationParametersBufferReadyBuilder {

@@ -109,6 +109,7 @@ var _ (SALDataTriggerControlBuilder) = (*_SALDataTriggerControlBuilder)(nil)
 
 func (b *_SALDataTriggerControlBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataTriggerControl
 }
 
 func (b *_SALDataTriggerControlBuilder) WithMandatoryFields(triggerControlData TriggerControlData) SALDataTriggerControlBuilder {

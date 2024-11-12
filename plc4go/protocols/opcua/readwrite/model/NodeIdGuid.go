@@ -114,6 +114,7 @@ var _ (NodeIdGuidBuilder) = (*_NodeIdGuidBuilder)(nil)
 
 func (b *_NodeIdGuidBuilder) setParent(contract NodeIdTypeDefinitionContract) {
 	b.NodeIdTypeDefinitionContract = contract
+	contract.(*_NodeIdTypeDefinition)._SubType = b._NodeIdGuid
 }
 
 func (b *_NodeIdGuidBuilder) WithMandatoryFields(namespaceIndex uint16, id []byte) NodeIdGuidBuilder {

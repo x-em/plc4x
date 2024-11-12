@@ -142,6 +142,7 @@ var _ (BACnetFaultParameterFaultOutOfRangeBuilder) = (*_BACnetFaultParameterFaul
 
 func (b *_BACnetFaultParameterFaultOutOfRangeBuilder) setParent(contract BACnetFaultParameterContract) {
 	b.BACnetFaultParameterContract = contract
+	contract.(*_BACnetFaultParameter)._SubType = b._BACnetFaultParameterFaultOutOfRange
 }
 
 func (b *_BACnetFaultParameterFaultOutOfRangeBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, minNormalValue BACnetFaultParameterFaultOutOfRangeMinNormalValue, maxNormalValue BACnetFaultParameterFaultOutOfRangeMaxNormalValue, closingTag BACnetClosingTag) BACnetFaultParameterFaultOutOfRangeBuilder {

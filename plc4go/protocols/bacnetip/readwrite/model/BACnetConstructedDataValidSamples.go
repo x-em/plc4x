@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataValidSamplesBuilder) = (*_BACnetConstructedDataValid
 
 func (b *_BACnetConstructedDataValidSamplesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataValidSamples
 }
 
 func (b *_BACnetConstructedDataValidSamplesBuilder) WithMandatoryFields(validSamples BACnetApplicationTagUnsignedInteger) BACnetConstructedDataValidSamplesBuilder {

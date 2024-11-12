@@ -109,6 +109,7 @@ var _ (SALDataTemperatureBroadcastBuilder) = (*_SALDataTemperatureBroadcastBuild
 
 func (b *_SALDataTemperatureBroadcastBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataTemperatureBroadcast
 }
 
 func (b *_SALDataTemperatureBroadcastBuilder) WithMandatoryFields(temperatureBroadcastData TemperatureBroadcastData) SALDataTemperatureBroadcastBuilder {

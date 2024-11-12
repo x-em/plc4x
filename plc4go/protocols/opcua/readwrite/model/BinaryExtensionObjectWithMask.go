@@ -109,6 +109,7 @@ var _ (BinaryExtensionObjectWithMaskBuilder) = (*_BinaryExtensionObjectWithMaskB
 
 func (b *_BinaryExtensionObjectWithMaskBuilder) setParent(contract ExtensionObjectWithMaskContract) {
 	b.ExtensionObjectWithMaskContract = contract
+	contract.(*_ExtensionObjectWithMask)._SubType = b._BinaryExtensionObjectWithMask
 }
 
 func (b *_BinaryExtensionObjectWithMaskBuilder) WithMandatoryFields(body ExtensionObjectDefinition) BinaryExtensionObjectWithMaskBuilder {

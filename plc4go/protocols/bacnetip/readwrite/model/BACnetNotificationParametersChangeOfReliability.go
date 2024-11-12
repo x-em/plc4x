@@ -153,6 +153,7 @@ var _ (BACnetNotificationParametersChangeOfReliabilityBuilder) = (*_BACnetNotifi
 
 func (b *_BACnetNotificationParametersChangeOfReliabilityBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersChangeOfReliability
 }
 
 func (b *_BACnetNotificationParametersChangeOfReliabilityBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, reliability BACnetReliabilityTagged, statusFlags BACnetStatusFlagsTagged, propertyValues BACnetPropertyValues, innerClosingTag BACnetClosingTag) BACnetNotificationParametersChangeOfReliabilityBuilder {

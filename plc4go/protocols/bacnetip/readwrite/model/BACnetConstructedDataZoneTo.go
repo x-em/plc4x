@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataZoneToBuilder) = (*_BACnetConstructedDataZoneToBuild
 
 func (b *_BACnetConstructedDataZoneToBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataZoneTo
 }
 
 func (b *_BACnetConstructedDataZoneToBuilder) WithMandatoryFields(zoneTo BACnetDeviceObjectReference) BACnetConstructedDataZoneToBuilder {

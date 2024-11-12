@@ -175,6 +175,7 @@ var _ (BACnetEventParameterFloatingLimitBuilder) = (*_BACnetEventParameterFloati
 
 func (b *_BACnetEventParameterFloatingLimitBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterFloatingLimit
 }
 
 func (b *_BACnetEventParameterFloatingLimitBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, timeDelay BACnetContextTagUnsignedInteger, setpointReference BACnetDeviceObjectPropertyReferenceEnclosed, lowDiffLimit BACnetContextTagReal, highDiffLimit BACnetContextTagReal, deadband BACnetContextTagReal, closingTag BACnetClosingTag) BACnetEventParameterFloatingLimitBuilder {

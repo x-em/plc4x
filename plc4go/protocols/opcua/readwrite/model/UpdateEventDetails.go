@@ -132,6 +132,7 @@ var _ (UpdateEventDetailsBuilder) = (*_UpdateEventDetailsBuilder)(nil)
 
 func (b *_UpdateEventDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UpdateEventDetails
 }
 
 func (b *_UpdateEventDetailsBuilder) WithMandatoryFields(nodeId NodeId, performInsertReplace PerformUpdateType, filter EventFilter, eventData []HistoryEventFieldList) UpdateEventDetailsBuilder {

@@ -96,6 +96,7 @@ var _ (SecurityDataArmFailedRaisedBuilder) = (*_SecurityDataArmFailedRaisedBuild
 
 func (b *_SecurityDataArmFailedRaisedBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataArmFailedRaised
 }
 
 func (b *_SecurityDataArmFailedRaisedBuilder) WithMandatoryFields() SecurityDataArmFailedRaisedBuilder {

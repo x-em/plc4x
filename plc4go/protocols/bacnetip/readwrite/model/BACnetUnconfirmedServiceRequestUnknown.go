@@ -104,6 +104,7 @@ var _ (BACnetUnconfirmedServiceRequestUnknownBuilder) = (*_BACnetUnconfirmedServ
 
 func (b *_BACnetUnconfirmedServiceRequestUnknownBuilder) setParent(contract BACnetUnconfirmedServiceRequestContract) {
 	b.BACnetUnconfirmedServiceRequestContract = contract
+	contract.(*_BACnetUnconfirmedServiceRequest)._SubType = b._BACnetUnconfirmedServiceRequestUnknown
 }
 
 func (b *_BACnetUnconfirmedServiceRequestUnknownBuilder) WithMandatoryFields(unknownBytes []byte) BACnetUnconfirmedServiceRequestUnknownBuilder {

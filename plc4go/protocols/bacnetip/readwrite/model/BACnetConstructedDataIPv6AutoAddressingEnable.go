@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIPv6AutoAddressingEnableBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataIPv6AutoAddressingEnableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPv6AutoAddressingEnable
 }
 
 func (b *_BACnetConstructedDataIPv6AutoAddressingEnableBuilder) WithMandatoryFields(autoAddressingEnable BACnetApplicationTagBoolean) BACnetConstructedDataIPv6AutoAddressingEnableBuilder {

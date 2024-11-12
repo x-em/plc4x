@@ -170,6 +170,7 @@ var _ (AddNodesItemBuilder) = (*_AddNodesItemBuilder)(nil)
 
 func (b *_AddNodesItemBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AddNodesItem
 }
 
 func (b *_AddNodesItemBuilder) WithMandatoryFields(parentNodeId ExpandedNodeId, referenceTypeId NodeId, requestedNewNodeId ExpandedNodeId, browseName QualifiedName, nodeClass NodeClass, nodeAttributes ExtensionObject, typeDefinition ExpandedNodeId) AddNodesItemBuilder {

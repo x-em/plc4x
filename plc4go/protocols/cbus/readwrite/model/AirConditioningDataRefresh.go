@@ -104,6 +104,7 @@ var _ (AirConditioningDataRefreshBuilder) = (*_AirConditioningDataRefreshBuilder
 
 func (b *_AirConditioningDataRefreshBuilder) setParent(contract AirConditioningDataContract) {
 	b.AirConditioningDataContract = contract
+	contract.(*_AirConditioningData)._SubType = b._AirConditioningDataRefresh
 }
 
 func (b *_AirConditioningDataRefreshBuilder) WithMandatoryFields(zoneGroup byte) AirConditioningDataRefreshBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIntegerValueFaultLowLimitBuilder) = (*_BACnetConstru
 
 func (b *_BACnetConstructedDataIntegerValueFaultLowLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIntegerValueFaultLowLimit
 }
 
 func (b *_BACnetConstructedDataIntegerValueFaultLowLimitBuilder) WithMandatoryFields(faultLowLimit BACnetApplicationTagSignedInteger) BACnetConstructedDataIntegerValueFaultLowLimitBuilder {

@@ -115,6 +115,7 @@ var _ (BrowsePathTargetBuilder) = (*_BrowsePathTargetBuilder)(nil)
 
 func (b *_BrowsePathTargetBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrowsePathTarget
 }
 
 func (b *_BrowsePathTargetBuilder) WithMandatoryFields(targetId ExpandedNodeId, remainingPathIndex uint32) BrowsePathTargetBuilder {

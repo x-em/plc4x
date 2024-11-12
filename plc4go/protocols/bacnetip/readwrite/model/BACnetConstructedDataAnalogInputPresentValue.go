@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAnalogInputPresentValueBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataAnalogInputPresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAnalogInputPresentValue
 }
 
 func (b *_BACnetConstructedDataAnalogInputPresentValueBuilder) WithMandatoryFields(presentValue BACnetApplicationTagReal) BACnetConstructedDataAnalogInputPresentValueBuilder {

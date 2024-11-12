@@ -109,6 +109,7 @@ var _ (SALDataMediaTransportBuilder) = (*_SALDataMediaTransportBuilder)(nil)
 
 func (b *_SALDataMediaTransportBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataMediaTransport
 }
 
 func (b *_SALDataMediaTransportBuilder) WithMandatoryFields(mediaTransportControlData MediaTransportControlData) SALDataMediaTransportBuilder {

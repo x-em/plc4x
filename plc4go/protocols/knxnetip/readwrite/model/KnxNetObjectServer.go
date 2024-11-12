@@ -104,6 +104,7 @@ var _ (KnxNetObjectServerBuilder) = (*_KnxNetObjectServerBuilder)(nil)
 
 func (b *_KnxNetObjectServerBuilder) setParent(contract ServiceIdContract) {
 	b.ServiceIdContract = contract
+	contract.(*_ServiceId)._SubType = b._KnxNetObjectServer
 }
 
 func (b *_KnxNetObjectServerBuilder) WithMandatoryFields(version uint8) KnxNetObjectServerBuilder {

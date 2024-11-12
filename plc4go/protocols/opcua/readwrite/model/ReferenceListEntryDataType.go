@@ -128,6 +128,7 @@ var _ (ReferenceListEntryDataTypeBuilder) = (*_ReferenceListEntryDataTypeBuilder
 
 func (b *_ReferenceListEntryDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReferenceListEntryDataType
 }
 
 func (b *_ReferenceListEntryDataTypeBuilder) WithMandatoryFields(referenceType NodeId, isForward bool, targetNode ExpandedNodeId) ReferenceListEntryDataTypeBuilder {

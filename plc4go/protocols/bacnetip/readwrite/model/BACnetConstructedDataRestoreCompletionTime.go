@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataRestoreCompletionTimeBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataRestoreCompletionTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataRestoreCompletionTime
 }
 
 func (b *_BACnetConstructedDataRestoreCompletionTimeBuilder) WithMandatoryFields(completionTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataRestoreCompletionTimeBuilder {

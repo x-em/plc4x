@@ -109,6 +109,7 @@ var _ (BACnetHostAddressIpAddressBuilder) = (*_BACnetHostAddressIpAddressBuilder
 
 func (b *_BACnetHostAddressIpAddressBuilder) setParent(contract BACnetHostAddressContract) {
 	b.BACnetHostAddressContract = contract
+	contract.(*_BACnetHostAddress)._SubType = b._BACnetHostAddressIpAddress
 }
 
 func (b *_BACnetHostAddressIpAddressBuilder) WithMandatoryFields(ipAddress BACnetContextTagOctetString) BACnetHostAddressIpAddressBuilder {

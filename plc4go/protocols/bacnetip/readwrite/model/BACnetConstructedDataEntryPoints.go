@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataEntryPointsBuilder) = (*_BACnetConstructedDataEntryP
 
 func (b *_BACnetConstructedDataEntryPointsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEntryPoints
 }
 
 func (b *_BACnetConstructedDataEntryPointsBuilder) WithMandatoryFields(entryPoints []BACnetDeviceObjectReference) BACnetConstructedDataEntryPointsBuilder {

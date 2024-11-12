@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueEnumeratedBuilder) = (*_BACnetPriorityValueEnumeratedB
 
 func (b *_BACnetPriorityValueEnumeratedBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueEnumerated
 }
 
 func (b *_BACnetPriorityValueEnumeratedBuilder) WithMandatoryFields(enumeratedValue BACnetApplicationTagEnumerated) BACnetPriorityValueEnumeratedBuilder {

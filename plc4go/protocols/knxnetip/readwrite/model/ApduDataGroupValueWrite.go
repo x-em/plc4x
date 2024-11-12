@@ -110,6 +110,7 @@ var _ (ApduDataGroupValueWriteBuilder) = (*_ApduDataGroupValueWriteBuilder)(nil)
 
 func (b *_ApduDataGroupValueWriteBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataGroupValueWrite
 }
 
 func (b *_ApduDataGroupValueWriteBuilder) WithMandatoryFields(dataFirstByte int8, data []byte) ApduDataGroupValueWriteBuilder {

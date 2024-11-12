@@ -109,6 +109,7 @@ var _ (SALDataErrorReportingBuilder) = (*_SALDataErrorReportingBuilder)(nil)
 
 func (b *_SALDataErrorReportingBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataErrorReporting
 }
 
 func (b *_SALDataErrorReportingBuilder) WithMandatoryFields(errorReportingData ErrorReportingData) SALDataErrorReportingBuilder {

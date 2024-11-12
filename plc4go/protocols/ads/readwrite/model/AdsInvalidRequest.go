@@ -96,6 +96,7 @@ var _ (AdsInvalidRequestBuilder) = (*_AdsInvalidRequestBuilder)(nil)
 
 func (b *_AdsInvalidRequestBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsInvalidRequest
 }
 
 func (b *_AdsInvalidRequestBuilder) WithMandatoryFields() AdsInvalidRequestBuilder {

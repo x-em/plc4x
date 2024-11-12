@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMinimumOnTimeBuilder) = (*_BACnetConstructedDataMini
 
 func (b *_BACnetConstructedDataMinimumOnTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMinimumOnTime
 }
 
 func (b *_BACnetConstructedDataMinimumOnTimeBuilder) WithMandatoryFields(minimumOnTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMinimumOnTimeBuilder {

@@ -104,6 +104,7 @@ var _ (NLMRouterBusyToNetworkBuilder) = (*_NLMRouterBusyToNetworkBuilder)(nil)
 
 func (b *_NLMRouterBusyToNetworkBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMRouterBusyToNetwork
 }
 
 func (b *_NLMRouterBusyToNetworkBuilder) WithMandatoryFields(destinationNetworkAddresses []uint16) NLMRouterBusyToNetworkBuilder {

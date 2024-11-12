@@ -114,6 +114,7 @@ var _ (FirmataMessageSubscribeDigitalPinValueBuilder) = (*_FirmataMessageSubscri
 
 func (b *_FirmataMessageSubscribeDigitalPinValueBuilder) setParent(contract FirmataMessageContract) {
 	b.FirmataMessageContract = contract
+	contract.(*_FirmataMessage)._SubType = b._FirmataMessageSubscribeDigitalPinValue
 }
 
 func (b *_FirmataMessageSubscribeDigitalPinValueBuilder) WithMandatoryFields(pin uint8, enable bool) FirmataMessageSubscribeDigitalPinValueBuilder {

@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataLandingDoorStatusBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataLandingDoorStatusBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLandingDoorStatus
 }
 
 func (b *_BACnetConstructedDataLandingDoorStatusBuilder) WithMandatoryFields(landingDoorStatus []BACnetLandingDoorStatus) BACnetConstructedDataLandingDoorStatusBuilder {

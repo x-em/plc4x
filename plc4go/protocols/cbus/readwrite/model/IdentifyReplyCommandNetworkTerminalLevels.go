@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandNetworkTerminalLevelsBuilder) = (*_IdentifyReplyComma
 
 func (b *_IdentifyReplyCommandNetworkTerminalLevelsBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandNetworkTerminalLevels
 }
 
 func (b *_IdentifyReplyCommandNetworkTerminalLevelsBuilder) WithMandatoryFields(networkTerminalLevels []byte) IdentifyReplyCommandNetworkTerminalLevelsBuilder {

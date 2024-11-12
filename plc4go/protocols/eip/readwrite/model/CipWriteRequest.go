@@ -122,6 +122,7 @@ var _ (CipWriteRequestBuilder) = (*_CipWriteRequestBuilder)(nil)
 
 func (b *_CipWriteRequestBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipWriteRequest
 }
 
 func (b *_CipWriteRequestBuilder) WithMandatoryFields(tag []byte, dataType CIPDataTypeCode, elementNb uint16, data []byte) CipWriteRequestBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDeviceTypeBuilder) = (*_BACnetConstructedDataDeviceT
 
 func (b *_BACnetConstructedDataDeviceTypeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDeviceType
 }
 
 func (b *_BACnetConstructedDataDeviceTypeBuilder) WithMandatoryFields(deviceType BACnetApplicationTagCharacterString) BACnetConstructedDataDeviceTypeBuilder {

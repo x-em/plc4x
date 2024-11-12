@@ -110,6 +110,7 @@ var _ (AdsReadWriteResponseBuilder) = (*_AdsReadWriteResponseBuilder)(nil)
 
 func (b *_AdsReadWriteResponseBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsReadWriteResponse
 }
 
 func (b *_AdsReadWriteResponseBuilder) WithMandatoryFields(result ReturnCode, data []byte) AdsReadWriteResponseBuilder {

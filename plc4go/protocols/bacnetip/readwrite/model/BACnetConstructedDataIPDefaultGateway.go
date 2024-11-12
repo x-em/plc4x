@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIPDefaultGatewayBuilder) = (*_BACnetConstructedDataI
 
 func (b *_BACnetConstructedDataIPDefaultGatewayBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPDefaultGateway
 }
 
 func (b *_BACnetConstructedDataIPDefaultGatewayBuilder) WithMandatoryFields(ipDefaultGateway BACnetApplicationTagOctetString) BACnetConstructedDataIPDefaultGatewayBuilder {

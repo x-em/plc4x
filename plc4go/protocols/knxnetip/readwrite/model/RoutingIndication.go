@@ -97,6 +97,7 @@ var _ (RoutingIndicationBuilder) = (*_RoutingIndicationBuilder)(nil)
 
 func (b *_RoutingIndicationBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._RoutingIndication
 }
 
 func (b *_RoutingIndicationBuilder) WithMandatoryFields() RoutingIndicationBuilder {

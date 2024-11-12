@@ -97,6 +97,7 @@ var _ (CIPEncapsulationConnectionRequestBuilder) = (*_CIPEncapsulationConnection
 
 func (b *_CIPEncapsulationConnectionRequestBuilder) setParent(contract CIPEncapsulationPacketContract) {
 	b.CIPEncapsulationPacketContract = contract
+	contract.(*_CIPEncapsulationPacket)._SubType = b._CIPEncapsulationConnectionRequest
 }
 
 func (b *_CIPEncapsulationConnectionRequestBuilder) WithMandatoryFields() CIPEncapsulationConnectionRequestBuilder {

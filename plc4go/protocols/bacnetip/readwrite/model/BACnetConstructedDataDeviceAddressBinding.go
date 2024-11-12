@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataDeviceAddressBindingBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataDeviceAddressBindingBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDeviceAddressBinding
 }
 
 func (b *_BACnetConstructedDataDeviceAddressBindingBuilder) WithMandatoryFields(deviceAddressBinding []BACnetAddressBinding) BACnetConstructedDataDeviceAddressBindingBuilder {

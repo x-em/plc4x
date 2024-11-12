@@ -96,6 +96,7 @@ var _ (SysexCommandStringDataBuilder) = (*_SysexCommandStringDataBuilder)(nil)
 
 func (b *_SysexCommandStringDataBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandStringData
 }
 
 func (b *_SysexCommandStringDataBuilder) WithMandatoryFields() SysexCommandStringDataBuilder {

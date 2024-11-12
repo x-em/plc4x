@@ -122,6 +122,7 @@ var _ (SamplingIntervalDiagnosticsDataTypeBuilder) = (*_SamplingIntervalDiagnost
 
 func (b *_SamplingIntervalDiagnosticsDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SamplingIntervalDiagnosticsDataType
 }
 
 func (b *_SamplingIntervalDiagnosticsDataTypeBuilder) WithMandatoryFields(samplingInterval float64, monitoredItemCount uint32, maxMonitoredItemCount uint32, disabledMonitoredItemCount uint32) SamplingIntervalDiagnosticsDataTypeBuilder {

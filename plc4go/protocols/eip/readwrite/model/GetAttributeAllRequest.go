@@ -120,6 +120,7 @@ var _ (GetAttributeAllRequestBuilder) = (*_GetAttributeAllRequestBuilder)(nil)
 
 func (b *_GetAttributeAllRequestBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._GetAttributeAllRequest
 }
 
 func (b *_GetAttributeAllRequestBuilder) WithMandatoryFields(classSegment PathSegment, instanceSegment PathSegment) GetAttributeAllRequestBuilder {

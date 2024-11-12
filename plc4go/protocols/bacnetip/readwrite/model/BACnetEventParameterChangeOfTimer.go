@@ -153,6 +153,7 @@ var _ (BACnetEventParameterChangeOfTimerBuilder) = (*_BACnetEventParameterChange
 
 func (b *_BACnetEventParameterChangeOfTimerBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterChangeOfTimer
 }
 
 func (b *_BACnetEventParameterChangeOfTimerBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, timeDelay BACnetContextTagUnsignedInteger, alarmValues BACnetEventParameterChangeOfTimerAlarmValue, updateTimeReference BACnetDeviceObjectPropertyReferenceEnclosed, closingTag BACnetClosingTag) BACnetEventParameterChangeOfTimerBuilder {

@@ -115,6 +115,7 @@ var _ (CBusPointToPointToMultiPointCommandNormalBuilder) = (*_CBusPointToPointTo
 
 func (b *_CBusPointToPointToMultiPointCommandNormalBuilder) setParent(contract CBusPointToPointToMultiPointCommandContract) {
 	b.CBusPointToPointToMultiPointCommandContract = contract
+	contract.(*_CBusPointToPointToMultiPointCommand)._SubType = b._CBusPointToPointToMultiPointCommandNormal
 }
 
 func (b *_CBusPointToPointToMultiPointCommandNormalBuilder) WithMandatoryFields(application ApplicationIdContainer, salData SALData) CBusPointToPointToMultiPointCommandNormalBuilder {

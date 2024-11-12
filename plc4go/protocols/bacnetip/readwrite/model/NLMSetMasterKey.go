@@ -109,6 +109,7 @@ var _ (NLMSetMasterKeyBuilder) = (*_NLMSetMasterKeyBuilder)(nil)
 
 func (b *_NLMSetMasterKeyBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMSetMasterKey
 }
 
 func (b *_NLMSetMasterKeyBuilder) WithMandatoryFields(key NLMUpdateKeyUpdateKeyEntry) NLMSetMasterKeyBuilder {

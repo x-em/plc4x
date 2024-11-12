@@ -104,6 +104,7 @@ var _ (ModbusPDUReadExceptionStatusResponseBuilder) = (*_ModbusPDUReadExceptionS
 
 func (b *_ModbusPDUReadExceptionStatusResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUReadExceptionStatusResponse
 }
 
 func (b *_ModbusPDUReadExceptionStatusResponseBuilder) WithMandatoryFields(value uint8) ModbusPDUReadExceptionStatusResponseBuilder {

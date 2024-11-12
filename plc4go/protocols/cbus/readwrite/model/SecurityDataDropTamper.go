@@ -96,6 +96,7 @@ var _ (SecurityDataDropTamperBuilder) = (*_SecurityDataDropTamperBuilder)(nil)
 
 func (b *_SecurityDataDropTamperBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataDropTamper
 }
 
 func (b *_SecurityDataDropTamperBuilder) WithMandatoryFields() SecurityDataDropTamperBuilder {

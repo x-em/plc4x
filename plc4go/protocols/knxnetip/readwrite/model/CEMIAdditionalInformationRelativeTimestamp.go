@@ -112,6 +112,7 @@ var _ (CEMIAdditionalInformationRelativeTimestampBuilder) = (*_CEMIAdditionalInf
 
 func (b *_CEMIAdditionalInformationRelativeTimestampBuilder) setParent(contract CEMIAdditionalInformationContract) {
 	b.CEMIAdditionalInformationContract = contract
+	contract.(*_CEMIAdditionalInformation)._SubType = b._CEMIAdditionalInformationRelativeTimestamp
 }
 
 func (b *_CEMIAdditionalInformationRelativeTimestampBuilder) WithMandatoryFields(relativeTimestamp RelativeTimestamp) CEMIAdditionalInformationRelativeTimestampBuilder {

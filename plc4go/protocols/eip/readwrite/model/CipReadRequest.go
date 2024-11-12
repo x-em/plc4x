@@ -110,6 +110,7 @@ var _ (CipReadRequestBuilder) = (*_CipReadRequestBuilder)(nil)
 
 func (b *_CipReadRequestBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipReadRequest
 }
 
 func (b *_CipReadRequestBuilder) WithMandatoryFields(tag []byte, elementNb uint16) CipReadRequestBuilder {

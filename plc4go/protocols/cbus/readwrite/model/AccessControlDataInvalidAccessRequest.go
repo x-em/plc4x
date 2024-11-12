@@ -110,6 +110,7 @@ var _ (AccessControlDataInvalidAccessRequestBuilder) = (*_AccessControlDataInval
 
 func (b *_AccessControlDataInvalidAccessRequestBuilder) setParent(contract AccessControlDataContract) {
 	b.AccessControlDataContract = contract
+	contract.(*_AccessControlData)._SubType = b._AccessControlDataInvalidAccessRequest
 }
 
 func (b *_AccessControlDataInvalidAccessRequestBuilder) WithMandatoryFields(accessControlDirection AccessControlDirection, data []byte) AccessControlDataInvalidAccessRequestBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesAccessCredentialDisableBuilder) = (*_BACnetPropertySt
 
 func (b *_BACnetPropertyStatesAccessCredentialDisableBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesAccessCredentialDisable
 }
 
 func (b *_BACnetPropertyStatesAccessCredentialDisableBuilder) WithMandatoryFields(accessCredentialDisable BACnetAccessCredentialDisableTagged) BACnetPropertyStatesAccessCredentialDisableBuilder {

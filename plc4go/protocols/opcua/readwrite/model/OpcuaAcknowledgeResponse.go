@@ -115,6 +115,7 @@ var _ (OpcuaAcknowledgeResponseBuilder) = (*_OpcuaAcknowledgeResponseBuilder)(ni
 
 func (b *_OpcuaAcknowledgeResponseBuilder) setParent(contract MessagePDUContract) {
 	b.MessagePDUContract = contract
+	contract.(*_MessagePDU)._SubType = b._OpcuaAcknowledgeResponse
 }
 
 func (b *_OpcuaAcknowledgeResponseBuilder) WithMandatoryFields(version uint32, limits OpcuaProtocolLimits) OpcuaAcknowledgeResponseBuilder {

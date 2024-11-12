@@ -96,6 +96,7 @@ var _ (MPropWriteReqBuilder) = (*_MPropWriteReqBuilder)(nil)
 
 func (b *_MPropWriteReqBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MPropWriteReq
 }
 
 func (b *_MPropWriteReqBuilder) WithMandatoryFields() MPropWriteReqBuilder {

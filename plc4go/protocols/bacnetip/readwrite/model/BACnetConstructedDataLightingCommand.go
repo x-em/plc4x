@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLightingCommandBuilder) = (*_BACnetConstructedDataLi
 
 func (b *_BACnetConstructedDataLightingCommandBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLightingCommand
 }
 
 func (b *_BACnetConstructedDataLightingCommandBuilder) WithMandatoryFields(lightingCommand BACnetLightingCommand) BACnetConstructedDataLightingCommandBuilder {

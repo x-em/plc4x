@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLastAccessPointBuilder) = (*_BACnetConstructedDataLa
 
 func (b *_BACnetConstructedDataLastAccessPointBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLastAccessPoint
 }
 
 func (b *_BACnetConstructedDataLastAccessPointBuilder) WithMandatoryFields(lastAccessPoint BACnetDeviceObjectReference) BACnetConstructedDataLastAccessPointBuilder {

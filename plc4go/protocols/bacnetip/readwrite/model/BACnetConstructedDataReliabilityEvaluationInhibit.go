@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataReliabilityEvaluationInhibitBuilder) = (*_BACnetCons
 
 func (b *_BACnetConstructedDataReliabilityEvaluationInhibitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataReliabilityEvaluationInhibit
 }
 
 func (b *_BACnetConstructedDataReliabilityEvaluationInhibitBuilder) WithMandatoryFields(reliabilityEvaluationInhibit BACnetApplicationTagBoolean) BACnetConstructedDataReliabilityEvaluationInhibitBuilder {

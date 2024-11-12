@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandLogicalAssignmentBuilder) = (*_IdentifyReplyCommandLo
 
 func (b *_IdentifyReplyCommandLogicalAssignmentBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandLogicalAssignment
 }
 
 func (b *_IdentifyReplyCommandLogicalAssignmentBuilder) WithMandatoryFields(logicAssigment []LogicAssignment) IdentifyReplyCommandLogicalAssignmentBuilder {

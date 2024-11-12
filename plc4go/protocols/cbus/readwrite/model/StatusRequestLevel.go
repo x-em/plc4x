@@ -113,6 +113,7 @@ var _ (StatusRequestLevelBuilder) = (*_StatusRequestLevelBuilder)(nil)
 
 func (b *_StatusRequestLevelBuilder) setParent(contract StatusRequestContract) {
 	b.StatusRequestContract = contract
+	contract.(*_StatusRequest)._SubType = b._StatusRequestLevel
 }
 
 func (b *_StatusRequestLevelBuilder) WithMandatoryFields(application ApplicationIdContainer, startingGroupAddressLabel byte) StatusRequestLevelBuilder {

@@ -104,6 +104,7 @@ var _ (MediaTransportControlDataTrackNameBuilder) = (*_MediaTransportControlData
 
 func (b *_MediaTransportControlDataTrackNameBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataTrackName
 }
 
 func (b *_MediaTransportControlDataTrackNameBuilder) WithMandatoryFields(trackName string) MediaTransportControlDataTrackNameBuilder {

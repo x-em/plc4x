@@ -106,6 +106,7 @@ var _ (TelephonyDataRingingBuilder) = (*_TelephonyDataRingingBuilder)(nil)
 
 func (b *_TelephonyDataRingingBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataRinging
 }
 
 func (b *_TelephonyDataRingingBuilder) WithMandatoryFields(number string) TelephonyDataRingingBuilder {

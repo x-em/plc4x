@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDefaultRampRateBuilder) = (*_BACnetConstructedDataDe
 
 func (b *_BACnetConstructedDataDefaultRampRateBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDefaultRampRate
 }
 
 func (b *_BACnetConstructedDataDefaultRampRateBuilder) WithMandatoryFields(defaultRampRate BACnetApplicationTagReal) BACnetConstructedDataDefaultRampRateBuilder {

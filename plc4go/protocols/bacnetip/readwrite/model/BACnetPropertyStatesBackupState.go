@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesBackupStateBuilder) = (*_BACnetPropertyStatesBackupSt
 
 func (b *_BACnetPropertyStatesBackupStateBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesBackupState
 }
 
 func (b *_BACnetPropertyStatesBackupStateBuilder) WithMandatoryFields(backupState BACnetBackupStateTagged) BACnetPropertyStatesBackupStateBuilder {

@@ -108,6 +108,7 @@ var _ (NodeIdTwoByteBuilder) = (*_NodeIdTwoByteBuilder)(nil)
 
 func (b *_NodeIdTwoByteBuilder) setParent(contract NodeIdTypeDefinitionContract) {
 	b.NodeIdTypeDefinitionContract = contract
+	contract.(*_NodeIdTypeDefinition)._SubType = b._NodeIdTwoByte
 }
 
 func (b *_NodeIdTwoByteBuilder) WithMandatoryFields(id uint8) NodeIdTwoByteBuilder {

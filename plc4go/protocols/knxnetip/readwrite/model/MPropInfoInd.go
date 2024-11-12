@@ -96,6 +96,7 @@ var _ (MPropInfoIndBuilder) = (*_MPropInfoIndBuilder)(nil)
 
 func (b *_MPropInfoIndBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MPropInfoInd
 }
 
 func (b *_MPropInfoIndBuilder) WithMandatoryFields() MPropInfoIndBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataOccupancyUpperLimitBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataOccupancyUpperLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataOccupancyUpperLimit
 }
 
 func (b *_BACnetConstructedDataOccupancyUpperLimitBuilder) WithMandatoryFields(occupancyUpperLimit BACnetApplicationTagUnsignedInteger) BACnetConstructedDataOccupancyUpperLimitBuilder {

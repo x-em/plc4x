@@ -109,6 +109,7 @@ var _ (BACnetScaleFloatScaleBuilder) = (*_BACnetScaleFloatScaleBuilder)(nil)
 
 func (b *_BACnetScaleFloatScaleBuilder) setParent(contract BACnetScaleContract) {
 	b.BACnetScaleContract = contract
+	contract.(*_BACnetScale)._SubType = b._BACnetScaleFloatScale
 }
 
 func (b *_BACnetScaleFloatScaleBuilder) WithMandatoryFields(floatScale BACnetContextTagReal) BACnetScaleFloatScaleBuilder {

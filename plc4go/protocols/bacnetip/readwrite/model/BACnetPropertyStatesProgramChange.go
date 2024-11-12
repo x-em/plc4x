@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesProgramChangeBuilder) = (*_BACnetPropertyStatesProgra
 
 func (b *_BACnetPropertyStatesProgramChangeBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesProgramChange
 }
 
 func (b *_BACnetPropertyStatesProgramChangeBuilder) WithMandatoryFields(programChange BACnetProgramRequestTagged) BACnetPropertyStatesProgramChangeBuilder {

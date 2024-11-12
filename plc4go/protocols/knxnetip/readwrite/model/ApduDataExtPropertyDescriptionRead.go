@@ -116,6 +116,7 @@ var _ (ApduDataExtPropertyDescriptionReadBuilder) = (*_ApduDataExtPropertyDescri
 
 func (b *_ApduDataExtPropertyDescriptionReadBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtPropertyDescriptionRead
 }
 
 func (b *_ApduDataExtPropertyDescriptionReadBuilder) WithMandatoryFields(objectIndex uint8, propertyId uint8, index uint8) ApduDataExtPropertyDescriptionReadBuilder {

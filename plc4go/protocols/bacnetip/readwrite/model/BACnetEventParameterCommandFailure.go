@@ -142,6 +142,7 @@ var _ (BACnetEventParameterCommandFailureBuilder) = (*_BACnetEventParameterComma
 
 func (b *_BACnetEventParameterCommandFailureBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterCommandFailure
 }
 
 func (b *_BACnetEventParameterCommandFailureBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, timeDelay BACnetContextTagUnsignedInteger, feedbackPropertyReference BACnetDeviceObjectPropertyReferenceEnclosed, closingTag BACnetClosingTag) BACnetEventParameterCommandFailureBuilder {

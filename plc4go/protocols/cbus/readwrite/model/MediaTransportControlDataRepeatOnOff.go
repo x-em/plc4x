@@ -110,6 +110,7 @@ var _ (MediaTransportControlDataRepeatOnOffBuilder) = (*_MediaTransportControlDa
 
 func (b *_MediaTransportControlDataRepeatOnOffBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataRepeatOnOff
 }
 
 func (b *_MediaTransportControlDataRepeatOnOffBuilder) WithMandatoryFields(repeatType byte) MediaTransportControlDataRepeatOnOffBuilder {

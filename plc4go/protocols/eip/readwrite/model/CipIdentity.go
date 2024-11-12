@@ -182,6 +182,7 @@ var _ (CipIdentityBuilder) = (*_CipIdentityBuilder)(nil)
 
 func (b *_CipIdentityBuilder) setParent(contract CommandSpecificDataItemContract) {
 	b.CommandSpecificDataItemContract = contract
+	contract.(*_CommandSpecificDataItem)._SubType = b._CipIdentity
 }
 
 func (b *_CipIdentityBuilder) WithMandatoryFields(encapsulationProtocolVersion uint16, socketAddressFamily uint16, socketAddressPort uint16, socketAddressAddress []uint8, vendorId uint16, deviceType uint16, productCode uint16, revisionMajor uint8, revisionMinor uint8, status uint16, serialNumber uint32, productName string, state uint8) CipIdentityBuilder {

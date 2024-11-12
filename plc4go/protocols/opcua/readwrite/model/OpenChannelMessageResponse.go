@@ -137,6 +137,7 @@ var _ (OpenChannelMessageResponseBuilder) = (*_OpenChannelMessageResponseBuilder
 
 func (b *_OpenChannelMessageResponseBuilder) setParent(contract OpenChannelMessageContract) {
 	b.OpenChannelMessageContract = contract
+	contract.(*_OpenChannelMessage)._SubType = b._OpenChannelMessageResponse
 }
 
 func (b *_OpenChannelMessageResponseBuilder) WithMandatoryFields(secureChannelId int32, securityPolicyUri PascalString, senderCertificate PascalByteString, receiverCertificateThumbprint PascalByteString) OpenChannelMessageResponseBuilder {

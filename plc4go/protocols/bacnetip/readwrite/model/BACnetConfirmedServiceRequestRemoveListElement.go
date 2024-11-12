@@ -136,6 +136,7 @@ var _ (BACnetConfirmedServiceRequestRemoveListElementBuilder) = (*_BACnetConfirm
 
 func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestRemoveListElement
 }
 
 func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) WithMandatoryFields(objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged) BACnetConfirmedServiceRequestRemoveListElementBuilder {

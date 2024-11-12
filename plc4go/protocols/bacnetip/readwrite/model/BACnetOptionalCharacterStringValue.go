@@ -109,6 +109,7 @@ var _ (BACnetOptionalCharacterStringValueBuilder) = (*_BACnetOptionalCharacterSt
 
 func (b *_BACnetOptionalCharacterStringValueBuilder) setParent(contract BACnetOptionalCharacterStringContract) {
 	b.BACnetOptionalCharacterStringContract = contract
+	contract.(*_BACnetOptionalCharacterString)._SubType = b._BACnetOptionalCharacterStringValue
 }
 
 func (b *_BACnetOptionalCharacterStringValueBuilder) WithMandatoryFields(characterstring BACnetApplicationTagCharacterString) BACnetOptionalCharacterStringValueBuilder {

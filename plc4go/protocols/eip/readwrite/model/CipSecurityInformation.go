@@ -104,6 +104,7 @@ var _ (CipSecurityInformationBuilder) = (*_CipSecurityInformationBuilder)(nil)
 
 func (b *_CipSecurityInformationBuilder) setParent(contract CommandSpecificDataItemContract) {
 	b.CommandSpecificDataItemContract = contract
+	contract.(*_CommandSpecificDataItem)._SubType = b._CipSecurityInformation
 }
 
 func (b *_CipSecurityInformationBuilder) WithMandatoryFields(todoImplement []uint8) CipSecurityInformationBuilder {

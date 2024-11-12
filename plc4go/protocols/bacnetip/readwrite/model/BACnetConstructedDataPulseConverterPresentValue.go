@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPulseConverterPresentValueBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataPulseConverterPresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPulseConverterPresentValue
 }
 
 func (b *_BACnetConstructedDataPulseConverterPresentValueBuilder) WithMandatoryFields(presentValue BACnetApplicationTagReal) BACnetConstructedDataPulseConverterPresentValueBuilder {

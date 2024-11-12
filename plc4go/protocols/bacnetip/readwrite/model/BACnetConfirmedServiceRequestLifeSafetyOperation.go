@@ -139,6 +139,7 @@ var _ (BACnetConfirmedServiceRequestLifeSafetyOperationBuilder) = (*_BACnetConfi
 
 func (b *_BACnetConfirmedServiceRequestLifeSafetyOperationBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestLifeSafetyOperation
 }
 
 func (b *_BACnetConfirmedServiceRequestLifeSafetyOperationBuilder) WithMandatoryFields(requestingProcessIdentifier BACnetContextTagUnsignedInteger, requestingSource BACnetContextTagCharacterString, request BACnetLifeSafetyOperationTagged) BACnetConfirmedServiceRequestLifeSafetyOperationBuilder {

@@ -170,6 +170,7 @@ var _ (ServerDiagnosticsSummaryDataTypeBuilder) = (*_ServerDiagnosticsSummaryDat
 
 func (b *_ServerDiagnosticsSummaryDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ServerDiagnosticsSummaryDataType
 }
 
 func (b *_ServerDiagnosticsSummaryDataTypeBuilder) WithMandatoryFields(serverViewCount uint32, currentSessionCount uint32, cumulatedSessionCount uint32, securityRejectedSessionCount uint32, rejectedSessionCount uint32, sessionTimeoutCount uint32, sessionAbortCount uint32, currentSubscriptionCount uint32, cumulatedSubscriptionCount uint32, publishingIntervalCount uint32, securityRejectedRequestsCount uint32, rejectedRequestsCount uint32) ServerDiagnosticsSummaryDataTypeBuilder {

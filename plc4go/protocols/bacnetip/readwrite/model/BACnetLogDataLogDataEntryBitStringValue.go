@@ -109,6 +109,7 @@ var _ (BACnetLogDataLogDataEntryBitStringValueBuilder) = (*_BACnetLogDataLogData
 
 func (b *_BACnetLogDataLogDataEntryBitStringValueBuilder) setParent(contract BACnetLogDataLogDataEntryContract) {
 	b.BACnetLogDataLogDataEntryContract = contract
+	contract.(*_BACnetLogDataLogDataEntry)._SubType = b._BACnetLogDataLogDataEntryBitStringValue
 }
 
 func (b *_BACnetLogDataLogDataEntryBitStringValueBuilder) WithMandatoryFields(bitStringValue BACnetContextTagBitString) BACnetLogDataLogDataEntryBitStringValueBuilder {

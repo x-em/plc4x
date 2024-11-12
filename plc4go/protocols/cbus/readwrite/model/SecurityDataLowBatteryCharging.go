@@ -108,6 +108,7 @@ var _ (SecurityDataLowBatteryChargingBuilder) = (*_SecurityDataLowBatteryChargin
 
 func (b *_SecurityDataLowBatteryChargingBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataLowBatteryCharging
 }
 
 func (b *_SecurityDataLowBatteryChargingBuilder) WithMandatoryFields(startStop byte) SecurityDataLowBatteryChargingBuilder {

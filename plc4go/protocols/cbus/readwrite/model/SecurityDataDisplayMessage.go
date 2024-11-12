@@ -104,6 +104,7 @@ var _ (SecurityDataDisplayMessageBuilder) = (*_SecurityDataDisplayMessageBuilder
 
 func (b *_SecurityDataDisplayMessageBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataDisplayMessage
 }
 
 func (b *_SecurityDataDisplayMessageBuilder) WithMandatoryFields(message string) SecurityDataDisplayMessageBuilder {

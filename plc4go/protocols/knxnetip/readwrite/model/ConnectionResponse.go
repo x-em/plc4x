@@ -128,6 +128,7 @@ var _ (ConnectionResponseBuilder) = (*_ConnectionResponseBuilder)(nil)
 
 func (b *_ConnectionResponseBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._ConnectionResponse
 }
 
 func (b *_ConnectionResponseBuilder) WithMandatoryFields(communicationChannelId uint8, status Status) ConnectionResponseBuilder {

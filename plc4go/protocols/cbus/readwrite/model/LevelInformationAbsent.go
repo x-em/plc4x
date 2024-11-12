@@ -100,6 +100,7 @@ var _ (LevelInformationAbsentBuilder) = (*_LevelInformationAbsentBuilder)(nil)
 
 func (b *_LevelInformationAbsentBuilder) setParent(contract LevelInformationContract) {
 	b.LevelInformationContract = contract
+	contract.(*_LevelInformation)._SubType = b._LevelInformationAbsent
 }
 
 func (b *_LevelInformationAbsentBuilder) WithMandatoryFields() LevelInformationAbsentBuilder {

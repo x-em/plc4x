@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBiasBuilder) = (*_BACnetConstructedDataBiasBuilder)(
 
 func (b *_BACnetConstructedDataBiasBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBias
 }
 
 func (b *_BACnetConstructedDataBiasBuilder) WithMandatoryFields(bias BACnetApplicationTagReal) BACnetConstructedDataBiasBuilder {

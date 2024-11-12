@@ -116,6 +116,7 @@ var _ (KnxGroupAddress3LevelBuilder) = (*_KnxGroupAddress3LevelBuilder)(nil)
 
 func (b *_KnxGroupAddress3LevelBuilder) setParent(contract KnxGroupAddressContract) {
 	b.KnxGroupAddressContract = contract
+	contract.(*_KnxGroupAddress)._SubType = b._KnxGroupAddress3Level
 }
 
 func (b *_KnxGroupAddress3LevelBuilder) WithMandatoryFields(mainGroup uint8, middleGroup uint8, subGroup uint8) KnxGroupAddress3LevelBuilder {

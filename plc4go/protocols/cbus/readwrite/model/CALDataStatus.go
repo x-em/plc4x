@@ -116,6 +116,7 @@ var _ (CALDataStatusBuilder) = (*_CALDataStatusBuilder)(nil)
 
 func (b *_CALDataStatusBuilder) setParent(contract CALDataContract) {
 	b.CALDataContract = contract
+	contract.(*_CALData)._SubType = b._CALDataStatus
 }
 
 func (b *_CALDataStatusBuilder) WithMandatoryFields(application ApplicationIdContainer, blockStart uint8, statusBytes []StatusByte) CALDataStatusBuilder {

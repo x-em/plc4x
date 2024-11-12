@@ -115,6 +115,7 @@ var _ (CancelResponseBuilder) = (*_CancelResponseBuilder)(nil)
 
 func (b *_CancelResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CancelResponse
 }
 
 func (b *_CancelResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, cancelCount uint32) CancelResponseBuilder {

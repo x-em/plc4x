@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueRealBuilder) = (*_BACnetPriorityValueRealBuilder)(nil)
 
 func (b *_BACnetPriorityValueRealBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueReal
 }
 
 func (b *_BACnetPriorityValueRealBuilder) WithMandatoryFields(realValue BACnetApplicationTagReal) BACnetPriorityValueRealBuilder {

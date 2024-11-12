@@ -128,6 +128,7 @@ var _ (DF1RequestProtectedTypedLogicalReadBuilder) = (*_DF1RequestProtectedTyped
 
 func (b *_DF1RequestProtectedTypedLogicalReadBuilder) setParent(contract DF1RequestCommandContract) {
 	b.DF1RequestCommandContract = contract
+	contract.(*_DF1RequestCommand)._SubType = b._DF1RequestProtectedTypedLogicalRead
 }
 
 func (b *_DF1RequestProtectedTypedLogicalReadBuilder) WithMandatoryFields(byteSize uint8, fileNumber uint8, fileType uint8, elementNumber uint8, subElementNumber uint8) DF1RequestProtectedTypedLogicalReadBuilder {

@@ -115,6 +115,7 @@ var _ (TransferResultBuilder) = (*_TransferResultBuilder)(nil)
 
 func (b *_TransferResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TransferResult
 }
 
 func (b *_TransferResultBuilder) WithMandatoryFields(statusCode StatusCode, availableSequenceNumbers []uint32) TransferResultBuilder {

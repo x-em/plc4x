@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesRestartReasonBuilder) = (*_BACnetPropertyStatesRestar
 
 func (b *_BACnetPropertyStatesRestartReasonBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesRestartReason
 }
 
 func (b *_BACnetPropertyStatesRestartReasonBuilder) WithMandatoryFields(restartReason BACnetRestartReasonTagged) BACnetPropertyStatesRestartReasonBuilder {

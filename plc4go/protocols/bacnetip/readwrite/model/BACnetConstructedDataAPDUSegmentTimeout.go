@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAPDUSegmentTimeoutBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataAPDUSegmentTimeoutBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAPDUSegmentTimeout
 }
 
 func (b *_BACnetConstructedDataAPDUSegmentTimeoutBuilder) WithMandatoryFields(apduSegmentTimeout BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAPDUSegmentTimeoutBuilder {

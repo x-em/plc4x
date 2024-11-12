@@ -137,6 +137,7 @@ var _ (SecurityDataStatusReport1Builder) = (*_SecurityDataStatusReport1Builder)(
 
 func (b *_SecurityDataStatusReport1Builder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataStatusReport1
 }
 
 func (b *_SecurityDataStatusReport1Builder) WithMandatoryFields(armCodeType SecurityArmCode, tamperStatus TamperStatus, panicStatus PanicStatus, zoneStatus []ZoneStatus) SecurityDataStatusReport1Builder {

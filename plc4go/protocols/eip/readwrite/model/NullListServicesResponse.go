@@ -96,6 +96,7 @@ var _ (NullListServicesResponseBuilder) = (*_NullListServicesResponseBuilder)(ni
 
 func (b *_NullListServicesResponseBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._NullListServicesResponse
 }
 
 func (b *_NullListServicesResponseBuilder) WithMandatoryFields() NullListServicesResponseBuilder {

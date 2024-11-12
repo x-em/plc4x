@@ -137,6 +137,7 @@ var _ (SimpleTypeDescriptionBuilder) = (*_SimpleTypeDescriptionBuilder)(nil)
 
 func (b *_SimpleTypeDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SimpleTypeDescription
 }
 
 func (b *_SimpleTypeDescriptionBuilder) WithMandatoryFields(dataTypeId NodeId, name QualifiedName, baseDataType NodeId, builtInType uint8) SimpleTypeDescriptionBuilder {

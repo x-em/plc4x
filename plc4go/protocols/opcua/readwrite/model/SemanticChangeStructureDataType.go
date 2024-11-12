@@ -120,6 +120,7 @@ var _ (SemanticChangeStructureDataTypeBuilder) = (*_SemanticChangeStructureDataT
 
 func (b *_SemanticChangeStructureDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SemanticChangeStructureDataType
 }
 
 func (b *_SemanticChangeStructureDataTypeBuilder) WithMandatoryFields(affected NodeId, affectedType NodeId) SemanticChangeStructureDataTypeBuilder {

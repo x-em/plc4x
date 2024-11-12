@@ -128,6 +128,7 @@ var _ (SessionlessInvokeRequestTypeBuilder) = (*_SessionlessInvokeRequestTypeBui
 
 func (b *_SessionlessInvokeRequestTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SessionlessInvokeRequestType
 }
 
 func (b *_SessionlessInvokeRequestTypeBuilder) WithMandatoryFields(urisVersion uint32, namespaceUris []PascalString, serverUris []PascalString, localeIds []PascalString, serviceId uint32) SessionlessInvokeRequestTypeBuilder {

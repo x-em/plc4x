@@ -96,6 +96,7 @@ var _ (DataTypeDefinitionBuilder) = (*_DataTypeDefinitionBuilder)(nil)
 
 func (b *_DataTypeDefinitionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataTypeDefinition
 }
 
 func (b *_DataTypeDefinitionBuilder) WithMandatoryFields() DataTypeDefinitionBuilder {

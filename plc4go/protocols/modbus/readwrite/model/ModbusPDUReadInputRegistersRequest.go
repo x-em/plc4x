@@ -110,6 +110,7 @@ var _ (ModbusPDUReadInputRegistersRequestBuilder) = (*_ModbusPDUReadInputRegiste
 
 func (b *_ModbusPDUReadInputRegistersRequestBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUReadInputRegistersRequest
 }
 
 func (b *_ModbusPDUReadInputRegistersRequestBuilder) WithMandatoryFields(startingAddress uint16, quantity uint16) ModbusPDUReadInputRegistersRequestBuilder {

@@ -108,6 +108,7 @@ var _ (MediaTransportControlDataShuffleOnOffBuilder) = (*_MediaTransportControlD
 
 func (b *_MediaTransportControlDataShuffleOnOffBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataShuffleOnOff
 }
 
 func (b *_MediaTransportControlDataShuffleOnOffBuilder) WithMandatoryFields(state byte) MediaTransportControlDataShuffleOnOffBuilder {

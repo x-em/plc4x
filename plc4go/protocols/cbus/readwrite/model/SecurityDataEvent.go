@@ -104,6 +104,7 @@ var _ (SecurityDataEventBuilder) = (*_SecurityDataEventBuilder)(nil)
 
 func (b *_SecurityDataEventBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataEvent
 }
 
 func (b *_SecurityDataEventBuilder) WithMandatoryFields(data []byte) SecurityDataEventBuilder {

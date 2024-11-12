@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLogIntervalBuilder) = (*_BACnetConstructedDataLogInt
 
 func (b *_BACnetConstructedDataLogIntervalBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLogInterval
 }
 
 func (b *_BACnetConstructedDataLogIntervalBuilder) WithMandatoryFields(logInterval BACnetApplicationTagUnsignedInteger) BACnetConstructedDataLogIntervalBuilder {

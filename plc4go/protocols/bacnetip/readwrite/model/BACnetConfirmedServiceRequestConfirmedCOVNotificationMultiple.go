@@ -150,6 +150,7 @@ var _ (BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder) = (
 
 func (b *_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestConfirmedCOVNotificationMultiple
 }
 
 func (b *_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder) WithMandatoryFields(subscriberProcessIdentifier BACnetContextTagUnsignedInteger, initiatingDeviceIdentifier BACnetContextTagObjectIdentifier, timeRemaining BACnetContextTagUnsignedInteger, listOfCovNotifications ListOfCovNotificationsList) BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleBuilder {

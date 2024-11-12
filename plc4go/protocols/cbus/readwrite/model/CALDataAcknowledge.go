@@ -110,6 +110,7 @@ var _ (CALDataAcknowledgeBuilder) = (*_CALDataAcknowledgeBuilder)(nil)
 
 func (b *_CALDataAcknowledgeBuilder) setParent(contract CALDataContract) {
 	b.CALDataContract = contract
+	contract.(*_CALData)._SubType = b._CALDataAcknowledge
 }
 
 func (b *_CALDataAcknowledgeBuilder) WithMandatoryFields(paramNo Parameter, code uint8) CALDataAcknowledgeBuilder {

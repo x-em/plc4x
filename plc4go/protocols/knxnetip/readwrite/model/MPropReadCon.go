@@ -134,6 +134,7 @@ var _ (MPropReadConBuilder) = (*_MPropReadConBuilder)(nil)
 
 func (b *_MPropReadConBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MPropReadCon
 }
 
 func (b *_MPropReadConBuilder) WithMandatoryFields(interfaceObjectType uint16, objectInstance uint8, propertyId uint8, numberOfElements uint8, startIndex uint16, data uint16) MPropReadConBuilder {

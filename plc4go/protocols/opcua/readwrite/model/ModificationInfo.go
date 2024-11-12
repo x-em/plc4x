@@ -121,6 +121,7 @@ var _ (ModificationInfoBuilder) = (*_ModificationInfoBuilder)(nil)
 
 func (b *_ModificationInfoBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ModificationInfo
 }
 
 func (b *_ModificationInfoBuilder) WithMandatoryFields(modificationTime int64, updateType HistoryUpdateType, userName PascalString) ModificationInfoBuilder {

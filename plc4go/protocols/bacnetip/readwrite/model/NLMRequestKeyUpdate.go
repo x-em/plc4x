@@ -140,6 +140,7 @@ var _ (NLMRequestKeyUpdateBuilder) = (*_NLMRequestKeyUpdateBuilder)(nil)
 
 func (b *_NLMRequestKeyUpdateBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMRequestKeyUpdate
 }
 
 func (b *_NLMRequestKeyUpdateBuilder) WithMandatoryFields(set1KeyRevision byte, set1ActivationTime uint32, set1ExpirationTime uint32, set2KeyRevision byte, set2ActivationTime uint32, set2ExpirationTime uint32, distributionKeyRevision byte) NLMRequestKeyUpdateBuilder {

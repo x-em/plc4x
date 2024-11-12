@@ -97,6 +97,7 @@ var _ (DF1SymbolMessageFrameACKBuilder) = (*_DF1SymbolMessageFrameACKBuilder)(ni
 
 func (b *_DF1SymbolMessageFrameACKBuilder) setParent(contract DF1SymbolContract) {
 	b.DF1SymbolContract = contract
+	contract.(*_DF1Symbol)._SubType = b._DF1SymbolMessageFrameACK
 }
 
 func (b *_DF1SymbolMessageFrameACKBuilder) WithMandatoryFields() DF1SymbolMessageFrameACKBuilder {

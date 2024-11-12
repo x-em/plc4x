@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataScaleFactorBuilder) = (*_BACnetConstructedDataScaleF
 
 func (b *_BACnetConstructedDataScaleFactorBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataScaleFactor
 }
 
 func (b *_BACnetConstructedDataScaleFactorBuilder) WithMandatoryFields(scaleFactor BACnetApplicationTagReal) BACnetConstructedDataScaleFactorBuilder {

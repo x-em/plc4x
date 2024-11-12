@@ -172,6 +172,7 @@ var _ (DataSetMetaDataTypeBuilder) = (*_DataSetMetaDataTypeBuilder)(nil)
 
 func (b *_DataSetMetaDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataSetMetaDataType
 }
 
 func (b *_DataSetMetaDataTypeBuilder) WithMandatoryFields(namespaces []PascalString, structureDataTypes []StructureDescription, enumDataTypes []EnumDescription, simpleDataTypes []SimpleTypeDescription, name PascalString, description LocalizedText, fields []FieldMetaData, dataSetClassId GuidValue, configurationVersion ConfigurationVersionDataType) DataSetMetaDataTypeBuilder {

@@ -122,6 +122,7 @@ var _ (DataTypeSchemaHeaderBuilder) = (*_DataTypeSchemaHeaderBuilder)(nil)
 
 func (b *_DataTypeSchemaHeaderBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataTypeSchemaHeader
 }
 
 func (b *_DataTypeSchemaHeaderBuilder) WithMandatoryFields(namespaces []PascalString, structureDataTypes []StructureDescription, enumDataTypes []EnumDescription, simpleDataTypes []SimpleTypeDescription) DataTypeSchemaHeaderBuilder {

@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataReasonForDisableBuilder) = (*_BACnetConstructedDataR
 
 func (b *_BACnetConstructedDataReasonForDisableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataReasonForDisable
 }
 
 func (b *_BACnetConstructedDataReasonForDisableBuilder) WithMandatoryFields(reasonForDisable []BACnetAccessCredentialDisableReasonTagged) BACnetConstructedDataReasonForDisableBuilder {

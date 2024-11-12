@@ -109,6 +109,7 @@ var _ (BACnetNotificationParametersComplexEventTypeBuilder) = (*_BACnetNotificat
 
 func (b *_BACnetNotificationParametersComplexEventTypeBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersComplexEventType
 }
 
 func (b *_BACnetNotificationParametersComplexEventTypeBuilder) WithMandatoryFields(listOfValues BACnetPropertyValues) BACnetNotificationParametersComplexEventTypeBuilder {

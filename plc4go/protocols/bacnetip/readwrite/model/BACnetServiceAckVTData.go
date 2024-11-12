@@ -131,6 +131,7 @@ var _ (BACnetServiceAckVTDataBuilder) = (*_BACnetServiceAckVTDataBuilder)(nil)
 
 func (b *_BACnetServiceAckVTDataBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckVTData
 }
 
 func (b *_BACnetServiceAckVTDataBuilder) WithMandatoryFields(vtSessionIdentifier BACnetApplicationTagUnsignedInteger, vtNewData BACnetApplicationTagOctetString, vtDataFlag BACnetApplicationTagUnsignedInteger) BACnetServiceAckVTDataBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesZoneOccupanyStateBuilder) = (*_BACnetPropertyStatesZo
 
 func (b *_BACnetPropertyStatesZoneOccupanyStateBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesZoneOccupanyState
 }
 
 func (b *_BACnetPropertyStatesZoneOccupanyStateBuilder) WithMandatoryFields(zoneOccupanyState BACnetAccessZoneOccupancyStateTagged) BACnetPropertyStatesZoneOccupanyStateBuilder {

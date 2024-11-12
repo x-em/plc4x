@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCarPositionBuilder) = (*_BACnetConstructedDataCarPos
 
 func (b *_BACnetConstructedDataCarPositionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCarPosition
 }
 
 func (b *_BACnetConstructedDataCarPositionBuilder) WithMandatoryFields(carPosition BACnetApplicationTagUnsignedInteger) BACnetConstructedDataCarPositionBuilder {

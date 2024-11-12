@@ -96,6 +96,7 @@ var _ (ApduDataExtReadRouterStatusResponseBuilder) = (*_ApduDataExtReadRouterSta
 
 func (b *_ApduDataExtReadRouterStatusResponseBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtReadRouterStatusResponse
 }
 
 func (b *_ApduDataExtReadRouterStatusResponseBuilder) WithMandatoryFields() ApduDataExtReadRouterStatusResponseBuilder {

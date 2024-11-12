@@ -113,6 +113,7 @@ var _ (SendUnitDataBuilder) = (*_SendUnitDataBuilder)(nil)
 
 func (b *_SendUnitDataBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._SendUnitData
 }
 
 func (b *_SendUnitDataBuilder) WithMandatoryFields(timeout uint16, typeIds []TypeId) SendUnitDataBuilder {

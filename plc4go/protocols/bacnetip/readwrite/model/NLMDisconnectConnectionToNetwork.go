@@ -104,6 +104,7 @@ var _ (NLMDisconnectConnectionToNetworkBuilder) = (*_NLMDisconnectConnectionToNe
 
 func (b *_NLMDisconnectConnectionToNetworkBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMDisconnectConnectionToNetwork
 }
 
 func (b *_NLMDisconnectConnectionToNetworkBuilder) WithMandatoryFields(destinationNetworkAddress uint16) NLMDisconnectConnectionToNetworkBuilder {

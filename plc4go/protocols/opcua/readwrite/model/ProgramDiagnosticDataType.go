@@ -183,6 +183,7 @@ var _ (ProgramDiagnosticDataTypeBuilder) = (*_ProgramDiagnosticDataTypeBuilder)(
 
 func (b *_ProgramDiagnosticDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ProgramDiagnosticDataType
 }
 
 func (b *_ProgramDiagnosticDataTypeBuilder) WithMandatoryFields(createSessionId NodeId, createClientName PascalString, invocationCreationTime int64, lastTransitionTime int64, lastMethodCall PascalString, lastMethodSessionId NodeId, lastMethodInputArguments []Argument, lastMethodOutputArguments []Argument, lastMethodCallTime int64, lastMethodReturnStatus StatusResult) ProgramDiagnosticDataTypeBuilder {

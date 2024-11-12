@@ -96,6 +96,7 @@ var _ (MediaTransportControlDataStatusRequestBuilder) = (*_MediaTransportControl
 
 func (b *_MediaTransportControlDataStatusRequestBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataStatusRequest
 }
 
 func (b *_MediaTransportControlDataStatusRequestBuilder) WithMandatoryFields() MediaTransportControlDataStatusRequestBuilder {

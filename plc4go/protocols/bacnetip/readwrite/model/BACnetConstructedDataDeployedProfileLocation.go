@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDeployedProfileLocationBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataDeployedProfileLocationBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDeployedProfileLocation
 }
 
 func (b *_BACnetConstructedDataDeployedProfileLocationBuilder) WithMandatoryFields(deployedProfileLocation BACnetApplicationTagCharacterString) BACnetConstructedDataDeployedProfileLocationBuilder {

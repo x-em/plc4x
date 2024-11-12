@@ -154,6 +154,7 @@ var _ (ActivateSessionRequestBuilder) = (*_ActivateSessionRequestBuilder)(nil)
 
 func (b *_ActivateSessionRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ActivateSessionRequest
 }
 
 func (b *_ActivateSessionRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, clientSignature SignatureData, clientSoftwareCertificates []SignedSoftwareCertificate, localeIds []PascalString, userIdentityToken ExtensionObject, userTokenSignature SignatureData) ActivateSessionRequestBuilder {

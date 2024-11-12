@@ -116,6 +116,7 @@ var _ (COTPPacketConnectionRequestBuilder) = (*_COTPPacketConnectionRequestBuild
 
 func (b *_COTPPacketConnectionRequestBuilder) setParent(contract COTPPacketContract) {
 	b.COTPPacketContract = contract
+	contract.(*_COTPPacket)._SubType = b._COTPPacketConnectionRequest
 }
 
 func (b *_COTPPacketConnectionRequestBuilder) WithMandatoryFields(destinationReference uint16, sourceReference uint16, protocolClass COTPProtocolClass) COTPPacketConnectionRequestBuilder {

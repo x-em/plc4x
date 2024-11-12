@@ -104,6 +104,7 @@ var _ (KnxNetIpTunnelingBuilder) = (*_KnxNetIpTunnelingBuilder)(nil)
 
 func (b *_KnxNetIpTunnelingBuilder) setParent(contract ServiceIdContract) {
 	b.ServiceIdContract = contract
+	contract.(*_ServiceId)._SubType = b._KnxNetIpTunneling
 }
 
 func (b *_KnxNetIpTunnelingBuilder) WithMandatoryFields(version uint8) KnxNetIpTunnelingBuilder {

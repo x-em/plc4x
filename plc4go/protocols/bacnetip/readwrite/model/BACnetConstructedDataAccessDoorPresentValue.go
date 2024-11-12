@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAccessDoorPresentValueBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataAccessDoorPresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAccessDoorPresentValue
 }
 
 func (b *_BACnetConstructedDataAccessDoorPresentValueBuilder) WithMandatoryFields(presentValue BACnetDoorValueTagged) BACnetConstructedDataAccessDoorPresentValueBuilder {

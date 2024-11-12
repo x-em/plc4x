@@ -152,6 +152,7 @@ var _ (ViewAttributesBuilder) = (*_ViewAttributesBuilder)(nil)
 
 func (b *_ViewAttributesBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ViewAttributes
 }
 
 func (b *_ViewAttributesBuilder) WithMandatoryFields(specifiedAttributes uint32, displayName LocalizedText, description LocalizedText, writeMask uint32, userWriteMask uint32, containsNoLoops bool, eventNotifier uint8) ViewAttributesBuilder {

@@ -136,6 +136,7 @@ var _ (MonitoredSALShortFormBasicModeBuilder) = (*_MonitoredSALShortFormBasicMod
 
 func (b *_MonitoredSALShortFormBasicModeBuilder) setParent(contract MonitoredSALContract) {
 	b.MonitoredSALContract = contract
+	contract.(*_MonitoredSAL)._SubType = b._MonitoredSALShortFormBasicMode
 }
 
 func (b *_MonitoredSALShortFormBasicModeBuilder) WithMandatoryFields(counts byte, application ApplicationIdContainer) MonitoredSALShortFormBasicModeBuilder {

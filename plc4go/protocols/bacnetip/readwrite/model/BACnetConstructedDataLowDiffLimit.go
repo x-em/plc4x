@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLowDiffLimitBuilder) = (*_BACnetConstructedDataLowDi
 
 func (b *_BACnetConstructedDataLowDiffLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLowDiffLimit
 }
 
 func (b *_BACnetConstructedDataLowDiffLimitBuilder) WithMandatoryFields(lowDiffLimit BACnetOptionalREAL) BACnetConstructedDataLowDiffLimitBuilder {

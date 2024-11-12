@@ -115,6 +115,7 @@ var _ (AddReferencesRequestBuilder) = (*_AddReferencesRequestBuilder)(nil)
 
 func (b *_AddReferencesRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AddReferencesRequest
 }
 
 func (b *_AddReferencesRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, referencesToAdd []AddReferencesItem) AddReferencesRequestBuilder {

@@ -111,6 +111,7 @@ var _ (TunnelingResponseBuilder) = (*_TunnelingResponseBuilder)(nil)
 
 func (b *_TunnelingResponseBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._TunnelingResponse
 }
 
 func (b *_TunnelingResponseBuilder) WithMandatoryFields(tunnelingResponseDataBlock TunnelingResponseDataBlock) TunnelingResponseBuilder {

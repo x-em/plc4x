@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataGlobalGroupPresentValueBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataGlobalGroupPresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataGlobalGroupPresentValue
 }
 
 func (b *_BACnetConstructedDataGlobalGroupPresentValueBuilder) WithMandatoryFields(presentValue []BACnetPropertyAccessResult) BACnetConstructedDataGlobalGroupPresentValueBuilder {

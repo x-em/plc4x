@@ -117,6 +117,7 @@ var _ (ReplyEncodedReplyBuilder) = (*_ReplyEncodedReplyBuilder)(nil)
 
 func (b *_ReplyEncodedReplyBuilder) setParent(contract ReplyContract) {
 	b.ReplyContract = contract
+	contract.(*_Reply)._SubType = b._ReplyEncodedReply
 }
 
 func (b *_ReplyEncodedReplyBuilder) WithMandatoryFields(encodedReply EncodedReply, chksum Checksum) ReplyEncodedReplyBuilder {

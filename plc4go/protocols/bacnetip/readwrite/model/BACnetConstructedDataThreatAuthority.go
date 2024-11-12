@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataThreatAuthorityBuilder) = (*_BACnetConstructedDataTh
 
 func (b *_BACnetConstructedDataThreatAuthorityBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataThreatAuthority
 }
 
 func (b *_BACnetConstructedDataThreatAuthorityBuilder) WithMandatoryFields(threatAuthority BACnetAccessThreatLevel) BACnetConstructedDataThreatAuthorityBuilder {

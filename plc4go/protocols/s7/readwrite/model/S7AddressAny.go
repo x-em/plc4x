@@ -136,6 +136,7 @@ var _ (S7AddressAnyBuilder) = (*_S7AddressAnyBuilder)(nil)
 
 func (b *_S7AddressAnyBuilder) setParent(contract S7AddressContract) {
 	b.S7AddressContract = contract
+	contract.(*_S7Address)._SubType = b._S7AddressAny
 }
 
 func (b *_S7AddressAnyBuilder) WithMandatoryFields(transportSize TransportSize, numberOfElements uint16, dbNumber uint16, area MemoryArea, byteAddress uint16, bitAddress uint8) S7AddressAnyBuilder {

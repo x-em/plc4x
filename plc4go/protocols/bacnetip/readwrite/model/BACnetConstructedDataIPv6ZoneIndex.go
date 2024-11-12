@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIPv6ZoneIndexBuilder) = (*_BACnetConstructedDataIPv6
 
 func (b *_BACnetConstructedDataIPv6ZoneIndexBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPv6ZoneIndex
 }
 
 func (b *_BACnetConstructedDataIPv6ZoneIndexBuilder) WithMandatoryFields(ipv6ZoneIndex BACnetApplicationTagCharacterString) BACnetConstructedDataIPv6ZoneIndexBuilder {

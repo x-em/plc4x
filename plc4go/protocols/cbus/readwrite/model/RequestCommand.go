@@ -129,6 +129,7 @@ var _ (RequestCommandBuilder) = (*_RequestCommandBuilder)(nil)
 
 func (b *_RequestCommandBuilder) setParent(contract RequestContract) {
 	b.RequestContract = contract
+	contract.(*_Request)._SubType = b._RequestCommand
 }
 
 func (b *_RequestCommandBuilder) WithMandatoryFields(cbusCommand CBusCommand, chksum Checksum) RequestCommandBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBACnetIPv6ModeBuilder) = (*_BACnetConstructedDataBAC
 
 func (b *_BACnetConstructedDataBACnetIPv6ModeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBACnetIPv6Mode
 }
 
 func (b *_BACnetConstructedDataBACnetIPv6ModeBuilder) WithMandatoryFields(bacnetIpv6Mode BACnetIPModeTagged) BACnetConstructedDataBACnetIPv6ModeBuilder {

@@ -115,6 +115,7 @@ var _ (EventFilterBuilder) = (*_EventFilterBuilder)(nil)
 
 func (b *_EventFilterBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EventFilter
 }
 
 func (b *_EventFilterBuilder) WithMandatoryFields(selectClauses []SimpleAttributeOperand, whereClause ContentFilter) EventFilterBuilder {

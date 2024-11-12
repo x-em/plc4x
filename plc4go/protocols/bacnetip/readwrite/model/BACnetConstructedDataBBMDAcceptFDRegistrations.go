@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) = (*_BACnetConstru
 
 func (b *_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBBMDAcceptFDRegistrations
 }
 
 func (b *_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) WithMandatoryFields(bbmdAcceptFDRegistrations BACnetApplicationTagBoolean) BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder {

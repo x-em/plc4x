@@ -138,6 +138,7 @@ var _ (DatagramConnectionTransport2DataTypeBuilder) = (*_DatagramConnectionTrans
 
 func (b *_DatagramConnectionTransport2DataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DatagramConnectionTransport2DataType
 }
 
 func (b *_DatagramConnectionTransport2DataTypeBuilder) WithMandatoryFields(discoveryAddress ExtensionObject, discoveryAnnounceRate uint32, discoveryMaxMessageSize uint32, qosCategory PascalString, datagramQos []ExtensionObject) DatagramConnectionTransport2DataTypeBuilder {

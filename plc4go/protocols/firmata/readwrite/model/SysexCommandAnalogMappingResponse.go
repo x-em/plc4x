@@ -96,6 +96,7 @@ var _ (SysexCommandAnalogMappingResponseBuilder) = (*_SysexCommandAnalogMappingR
 
 func (b *_SysexCommandAnalogMappingResponseBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandAnalogMappingResponse
 }
 
 func (b *_SysexCommandAnalogMappingResponseBuilder) WithMandatoryFields() SysexCommandAnalogMappingResponseBuilder {

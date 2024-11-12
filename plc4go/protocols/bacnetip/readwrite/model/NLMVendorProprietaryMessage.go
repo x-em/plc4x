@@ -110,6 +110,7 @@ var _ (NLMVendorProprietaryMessageBuilder) = (*_NLMVendorProprietaryMessageBuild
 
 func (b *_NLMVendorProprietaryMessageBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMVendorProprietaryMessage
 }
 
 func (b *_NLMVendorProprietaryMessageBuilder) WithMandatoryFields(vendorId BACnetVendorId, proprietaryMessage []byte) NLMVendorProprietaryMessageBuilder {

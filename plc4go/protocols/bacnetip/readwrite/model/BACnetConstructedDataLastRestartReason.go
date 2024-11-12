@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLastRestartReasonBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataLastRestartReasonBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLastRestartReason
 }
 
 func (b *_BACnetConstructedDataLastRestartReasonBuilder) WithMandatoryFields(lastRestartReason BACnetRestartReasonTagged) BACnetConstructedDataLastRestartReasonBuilder {

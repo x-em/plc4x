@@ -125,6 +125,7 @@ var _ (ServicesResponseBuilder) = (*_ServicesResponseBuilder)(nil)
 
 func (b *_ServicesResponseBuilder) setParent(contract TypeIdContract) {
 	b.TypeIdContract = contract
+	contract.(*_TypeId)._SubType = b._ServicesResponse
 }
 
 func (b *_ServicesResponseBuilder) WithMandatoryFields(encapsulationProtocol uint16, supportsCIPEncapsulation bool, supportsUDP bool, data []byte) ServicesResponseBuilder {

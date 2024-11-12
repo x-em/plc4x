@@ -116,6 +116,7 @@ var _ (DataChangeFilterBuilder) = (*_DataChangeFilterBuilder)(nil)
 
 func (b *_DataChangeFilterBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataChangeFilter
 }
 
 func (b *_DataChangeFilterBuilder) WithMandatoryFields(trigger DataChangeTrigger, deadbandType uint32, deadbandValue float64) DataChangeFilterBuilder {

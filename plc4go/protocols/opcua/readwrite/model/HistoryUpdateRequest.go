@@ -115,6 +115,7 @@ var _ (HistoryUpdateRequestBuilder) = (*_HistoryUpdateRequestBuilder)(nil)
 
 func (b *_HistoryUpdateRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._HistoryUpdateRequest
 }
 
 func (b *_HistoryUpdateRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, historyUpdateDetails []ExtensionObject) HistoryUpdateRequestBuilder {

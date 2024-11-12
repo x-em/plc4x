@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueUnsignedBuilder) = (*_BACnetPriorityValueUnsignedBuild
 
 func (b *_BACnetPriorityValueUnsignedBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueUnsigned
 }
 
 func (b *_BACnetPriorityValueUnsignedBuilder) WithMandatoryFields(unsignedValue BACnetApplicationTagUnsignedInteger) BACnetPriorityValueUnsignedBuilder {

@@ -108,6 +108,7 @@ var _ (MediaTransportControlDataNextPreviousSelectionBuilder) = (*_MediaTranspor
 
 func (b *_MediaTransportControlDataNextPreviousSelectionBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataNextPreviousSelection
 }
 
 func (b *_MediaTransportControlDataNextPreviousSelectionBuilder) WithMandatoryFields(operation byte) MediaTransportControlDataNextPreviousSelectionBuilder {

@@ -152,6 +152,7 @@ var _ (MonitoredSALLongFormSmartModeBuilder) = (*_MonitoredSALLongFormSmartModeB
 
 func (b *_MonitoredSALLongFormSmartModeBuilder) setParent(contract MonitoredSALContract) {
 	b.MonitoredSALContract = contract
+	contract.(*_MonitoredSAL)._SubType = b._MonitoredSALLongFormSmartMode
 }
 
 func (b *_MonitoredSALLongFormSmartModeBuilder) WithMandatoryFields(terminatingByte uint32, application ApplicationIdContainer) MonitoredSALLongFormSmartModeBuilder {

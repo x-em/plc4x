@@ -126,6 +126,7 @@ var _ (PublishedEventsDataTypeBuilder) = (*_PublishedEventsDataTypeBuilder)(nil)
 
 func (b *_PublishedEventsDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishedEventsDataType
 }
 
 func (b *_PublishedEventsDataTypeBuilder) WithMandatoryFields(eventNotifier NodeId, selectedFields []SimpleAttributeOperand, filter ContentFilter) PublishedEventsDataTypeBuilder {

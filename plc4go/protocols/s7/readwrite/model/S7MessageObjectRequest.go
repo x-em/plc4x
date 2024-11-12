@@ -123,6 +123,7 @@ var _ (S7MessageObjectRequestBuilder) = (*_S7MessageObjectRequestBuilder)(nil)
 
 func (b *_S7MessageObjectRequestBuilder) setParent(contract S7DataAlarmMessageContract) {
 	b.S7DataAlarmMessageContract = contract
+	contract.(*_S7DataAlarmMessage)._SubType = b._S7MessageObjectRequest
 }
 
 func (b *_S7MessageObjectRequestBuilder) WithMandatoryFields(syntaxId SyntaxIdType, queryType QueryType, alarmType AlarmType) S7MessageObjectRequestBuilder {

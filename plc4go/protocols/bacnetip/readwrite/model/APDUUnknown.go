@@ -110,6 +110,7 @@ var _ (APDUUnknownBuilder) = (*_APDUUnknownBuilder)(nil)
 
 func (b *_APDUUnknownBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUUnknown
 }
 
 func (b *_APDUUnknownBuilder) WithMandatoryFields(unknownTypeRest uint8, unknownBytes []byte) APDUUnknownBuilder {

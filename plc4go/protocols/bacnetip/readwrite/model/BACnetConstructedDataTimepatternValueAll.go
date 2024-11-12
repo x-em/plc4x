@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataTimepatternValueAllBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataTimepatternValueAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimepatternValueAll
 }
 
 func (b *_BACnetConstructedDataTimepatternValueAllBuilder) WithMandatoryFields() BACnetConstructedDataTimepatternValueAllBuilder {

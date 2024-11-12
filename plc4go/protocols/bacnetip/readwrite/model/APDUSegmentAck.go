@@ -130,6 +130,7 @@ var _ (APDUSegmentAckBuilder) = (*_APDUSegmentAckBuilder)(nil)
 
 func (b *_APDUSegmentAckBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUSegmentAck
 }
 
 func (b *_APDUSegmentAckBuilder) WithMandatoryFields(negativeAck bool, server bool, originalInvokeId uint8, sequenceNumber uint8, actualWindowSize uint8) APDUSegmentAckBuilder {

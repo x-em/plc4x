@@ -109,6 +109,7 @@ var _ (BACnetProcessIdSelectionValueBuilder) = (*_BACnetProcessIdSelectionValueB
 
 func (b *_BACnetProcessIdSelectionValueBuilder) setParent(contract BACnetProcessIdSelectionContract) {
 	b.BACnetProcessIdSelectionContract = contract
+	contract.(*_BACnetProcessIdSelection)._SubType = b._BACnetProcessIdSelectionValue
 }
 
 func (b *_BACnetProcessIdSelectionValueBuilder) WithMandatoryFields(processIdentifier BACnetApplicationTagUnsignedInteger) BACnetProcessIdSelectionValueBuilder {

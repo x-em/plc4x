@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAuthorizationModeBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataAuthorizationModeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAuthorizationMode
 }
 
 func (b *_BACnetConstructedDataAuthorizationModeBuilder) WithMandatoryFields(authorizationMode BACnetAuthorizationModeTagged) BACnetConstructedDataAuthorizationModeBuilder {

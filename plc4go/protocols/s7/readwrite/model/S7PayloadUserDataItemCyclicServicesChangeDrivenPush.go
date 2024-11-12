@@ -110,6 +110,7 @@ var _ (S7PayloadUserDataItemCyclicServicesChangeDrivenPushBuilder) = (*_S7Payloa
 
 func (b *_S7PayloadUserDataItemCyclicServicesChangeDrivenPushBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemCyclicServicesChangeDrivenPush
 }
 
 func (b *_S7PayloadUserDataItemCyclicServicesChangeDrivenPushBuilder) WithMandatoryFields(itemsCount uint16, items []AssociatedQueryValueType) S7PayloadUserDataItemCyclicServicesChangeDrivenPushBuilder {

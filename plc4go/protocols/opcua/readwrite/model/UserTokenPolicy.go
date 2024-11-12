@@ -148,6 +148,7 @@ var _ (UserTokenPolicyBuilder) = (*_UserTokenPolicyBuilder)(nil)
 
 func (b *_UserTokenPolicyBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UserTokenPolicy
 }
 
 func (b *_UserTokenPolicyBuilder) WithMandatoryFields(policyId PascalString, tokenType UserTokenType, issuedTokenType PascalString, issuerEndpointUrl PascalString, securityPolicyUri PascalString) UserTokenPolicyBuilder {

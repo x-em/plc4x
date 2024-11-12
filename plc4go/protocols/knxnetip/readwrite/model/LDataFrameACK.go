@@ -96,6 +96,7 @@ var _ (LDataFrameACKBuilder) = (*_LDataFrameACKBuilder)(nil)
 
 func (b *_LDataFrameACKBuilder) setParent(contract LDataFrameContract) {
 	b.LDataFrameContract = contract
+	contract.(*_LDataFrame)._SubType = b._LDataFrameACK
 }
 
 func (b *_LDataFrameACKBuilder) WithMandatoryFields() LDataFrameACKBuilder {

@@ -96,6 +96,7 @@ var _ (ErrorResponseBuilder) = (*_ErrorResponseBuilder)(nil)
 
 func (b *_ErrorResponseBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._ErrorResponse
 }
 
 func (b *_ErrorResponseBuilder) WithMandatoryFields() ErrorResponseBuilder {

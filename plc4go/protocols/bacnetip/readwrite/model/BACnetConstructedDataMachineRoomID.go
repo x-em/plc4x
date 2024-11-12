@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMachineRoomIDBuilder) = (*_BACnetConstructedDataMach
 
 func (b *_BACnetConstructedDataMachineRoomIDBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMachineRoomID
 }
 
 func (b *_BACnetConstructedDataMachineRoomIDBuilder) WithMandatoryFields(machineRoomId BACnetApplicationTagObjectIdentifier) BACnetConstructedDataMachineRoomIDBuilder {

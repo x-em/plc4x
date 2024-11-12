@@ -135,6 +135,7 @@ var _ (MonitoringParametersBuilder) = (*_MonitoringParametersBuilder)(nil)
 
 func (b *_MonitoringParametersBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._MonitoringParameters
 }
 
 func (b *_MonitoringParametersBuilder) WithMandatoryFields(clientHandle uint32, samplingInterval float64, filter ExtensionObject, queueSize uint32, discardOldest bool) MonitoringParametersBuilder {

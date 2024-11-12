@@ -104,6 +104,7 @@ var _ (BinaryPayloadBuilder) = (*_BinaryPayloadBuilder)(nil)
 
 func (b *_BinaryPayloadBuilder) setParent(contract PayloadContract) {
 	b.PayloadContract = contract
+	contract.(*_Payload)._SubType = b._BinaryPayload
 }
 
 func (b *_BinaryPayloadBuilder) WithMandatoryFields(payload []byte) BinaryPayloadBuilder {

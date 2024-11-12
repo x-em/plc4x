@@ -104,6 +104,7 @@ var _ (KnxNetRemoteConfigurationAndDiagnosisBuilder) = (*_KnxNetRemoteConfigurat
 
 func (b *_KnxNetRemoteConfigurationAndDiagnosisBuilder) setParent(contract ServiceIdContract) {
 	b.ServiceIdContract = contract
+	contract.(*_ServiceId)._SubType = b._KnxNetRemoteConfigurationAndDiagnosis
 }
 
 func (b *_KnxNetRemoteConfigurationAndDiagnosisBuilder) WithMandatoryFields(version uint8) KnxNetRemoteConfigurationAndDiagnosisBuilder {

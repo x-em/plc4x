@@ -128,6 +128,7 @@ var _ (TrustListDataTypeBuilder) = (*_TrustListDataTypeBuilder)(nil)
 
 func (b *_TrustListDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TrustListDataType
 }
 
 func (b *_TrustListDataTypeBuilder) WithMandatoryFields(specifiedLists uint32, trustedCertificates []PascalByteString, trustedCrls []PascalByteString, issuerCertificates []PascalByteString, issuerCrls []PascalByteString) TrustListDataTypeBuilder {

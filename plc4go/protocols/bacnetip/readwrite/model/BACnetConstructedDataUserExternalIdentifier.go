@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataUserExternalIdentifierBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataUserExternalIdentifierBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataUserExternalIdentifier
 }
 
 func (b *_BACnetConstructedDataUserExternalIdentifierBuilder) WithMandatoryFields(userExternalIdentifier BACnetApplicationTagCharacterString) BACnetConstructedDataUserExternalIdentifierBuilder {

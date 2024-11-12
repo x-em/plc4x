@@ -110,6 +110,7 @@ var _ (VariantDataValueBuilder) = (*_VariantDataValueBuilder)(nil)
 
 func (b *_VariantDataValueBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantDataValue
 }
 
 func (b *_VariantDataValueBuilder) WithMandatoryFields(value []DataValue) VariantDataValueBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesLiftGroupModeBuilder) = (*_BACnetPropertyStatesLiftGr
 
 func (b *_BACnetPropertyStatesLiftGroupModeBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesLiftGroupMode
 }
 
 func (b *_BACnetPropertyStatesLiftGroupModeBuilder) WithMandatoryFields(liftGroupMode BACnetLiftGroupModeTagged) BACnetPropertyStatesLiftGroupModeBuilder {

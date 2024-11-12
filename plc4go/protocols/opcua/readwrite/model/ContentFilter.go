@@ -104,6 +104,7 @@ var _ (ContentFilterBuilder) = (*_ContentFilterBuilder)(nil)
 
 func (b *_ContentFilterBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ContentFilter
 }
 
 func (b *_ContentFilterBuilder) WithMandatoryFields(elements []ContentFilterElement) ContentFilterBuilder {

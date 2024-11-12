@@ -109,6 +109,7 @@ var _ (BACnetSpecialEventPeriodCalendarEntryBuilder) = (*_BACnetSpecialEventPeri
 
 func (b *_BACnetSpecialEventPeriodCalendarEntryBuilder) setParent(contract BACnetSpecialEventPeriodContract) {
 	b.BACnetSpecialEventPeriodContract = contract
+	contract.(*_BACnetSpecialEventPeriod)._SubType = b._BACnetSpecialEventPeriodCalendarEntry
 }
 
 func (b *_BACnetSpecialEventPeriodCalendarEntryBuilder) WithMandatoryFields(calendarEntry BACnetCalendarEntryEnclosed) BACnetSpecialEventPeriodCalendarEntryBuilder {

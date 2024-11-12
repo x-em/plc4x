@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataErrorLimitBuilder) = (*_BACnetConstructedDataErrorLi
 
 func (b *_BACnetConstructedDataErrorLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataErrorLimit
 }
 
 func (b *_BACnetConstructedDataErrorLimitBuilder) WithMandatoryFields(errorLimit BACnetApplicationTagReal) BACnetConstructedDataErrorLimitBuilder {

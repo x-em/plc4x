@@ -115,6 +115,7 @@ var _ (GetEndpointsResponseBuilder) = (*_GetEndpointsResponseBuilder)(nil)
 
 func (b *_GetEndpointsResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._GetEndpointsResponse
 }
 
 func (b *_GetEndpointsResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, endpoints []EndpointDescription) GetEndpointsResponseBuilder {

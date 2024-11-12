@@ -120,6 +120,7 @@ var _ (StatusResultBuilder) = (*_StatusResultBuilder)(nil)
 
 func (b *_StatusResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._StatusResult
 }
 
 func (b *_StatusResultBuilder) WithMandatoryFields(statusCode StatusCode, diagnosticInfo DiagnosticInfo) StatusResultBuilder {

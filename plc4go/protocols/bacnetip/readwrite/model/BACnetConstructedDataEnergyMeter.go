@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataEnergyMeterBuilder) = (*_BACnetConstructedDataEnergy
 
 func (b *_BACnetConstructedDataEnergyMeterBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEnergyMeter
 }
 
 func (b *_BACnetConstructedDataEnergyMeterBuilder) WithMandatoryFields(energyMeter BACnetApplicationTagReal) BACnetConstructedDataEnergyMeterBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataWindowIntervalBuilder) = (*_BACnetConstructedDataWin
 
 func (b *_BACnetConstructedDataWindowIntervalBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataWindowInterval
 }
 
 func (b *_BACnetConstructedDataWindowIntervalBuilder) WithMandatoryFields(windowInterval BACnetApplicationTagUnsignedInteger) BACnetConstructedDataWindowIntervalBuilder {

@@ -104,6 +104,7 @@ var _ (ApduDataDeviceDescriptorReadBuilder) = (*_ApduDataDeviceDescriptorReadBui
 
 func (b *_ApduDataDeviceDescriptorReadBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataDeviceDescriptorRead
 }
 
 func (b *_ApduDataDeviceDescriptorReadBuilder) WithMandatoryFields(descriptorType uint8) ApduDataDeviceDescriptorReadBuilder {

@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataAlertEnrollmentAllBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataAlertEnrollmentAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAlertEnrollmentAll
 }
 
 func (b *_BACnetConstructedDataAlertEnrollmentAllBuilder) WithMandatoryFields() BACnetConstructedDataAlertEnrollmentAllBuilder {

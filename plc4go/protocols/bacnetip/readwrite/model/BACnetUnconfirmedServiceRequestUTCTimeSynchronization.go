@@ -120,6 +120,7 @@ var _ (BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder) = (*_BACnet
 
 func (b *_BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder) setParent(contract BACnetUnconfirmedServiceRequestContract) {
 	b.BACnetUnconfirmedServiceRequestContract = contract
+	contract.(*_BACnetUnconfirmedServiceRequest)._SubType = b._BACnetUnconfirmedServiceRequestUTCTimeSynchronization
 }
 
 func (b *_BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder) WithMandatoryFields(synchronizedDate BACnetApplicationTagDate, synchronizedTime BACnetApplicationTagTime) BACnetUnconfirmedServiceRequestUTCTimeSynchronizationBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDoorUnlockDelayTimeBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataDoorUnlockDelayTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDoorUnlockDelayTime
 }
 
 func (b *_BACnetConstructedDataDoorUnlockDelayTimeBuilder) WithMandatoryFields(doorUnlockDelayTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataDoorUnlockDelayTimeBuilder {

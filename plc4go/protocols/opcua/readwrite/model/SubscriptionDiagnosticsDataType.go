@@ -291,6 +291,7 @@ var _ (SubscriptionDiagnosticsDataTypeBuilder) = (*_SubscriptionDiagnosticsDataT
 
 func (b *_SubscriptionDiagnosticsDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SubscriptionDiagnosticsDataType
 }
 
 func (b *_SubscriptionDiagnosticsDataTypeBuilder) WithMandatoryFields(sessionId NodeId, subscriptionId uint32, priority uint8, publishingInterval float64, maxKeepAliveCount uint32, maxLifetimeCount uint32, maxNotificationsPerPublish uint32, publishingEnabled bool, modifyCount uint32, enableCount uint32, disableCount uint32, republishRequestCount uint32, republishMessageRequestCount uint32, republishMessageCount uint32, transferRequestCount uint32, transferredToAltClientCount uint32, transferredToSameClientCount uint32, publishRequestCount uint32, dataChangeNotificationsCount uint32, eventNotificationsCount uint32, notificationsCount uint32, latePublishRequestCount uint32, currentKeepAliveCount uint32, currentLifetimeCount uint32, unacknowledgedMessageCount uint32, discardedMessageCount uint32, monitoredItemCount uint32, disabledMonitoredItemCount uint32, monitoringQueueOverflowCount uint32, nextSequenceNumber uint32, eventQueueOverFlowCount uint32) SubscriptionDiagnosticsDataTypeBuilder {

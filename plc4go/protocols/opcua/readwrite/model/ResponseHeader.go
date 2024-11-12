@@ -149,6 +149,7 @@ var _ (ResponseHeaderBuilder) = (*_ResponseHeaderBuilder)(nil)
 
 func (b *_ResponseHeaderBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ResponseHeader
 }
 
 func (b *_ResponseHeaderBuilder) WithMandatoryFields(timestamp int64, requestHandle uint32, serviceResult StatusCode, serviceDiagnostics DiagnosticInfo, stringTable []PascalString, additionalHeader ExtensionObject) ResponseHeaderBuilder {

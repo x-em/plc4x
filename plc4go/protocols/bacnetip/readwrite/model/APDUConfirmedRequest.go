@@ -172,6 +172,7 @@ var _ (APDUConfirmedRequestBuilder) = (*_APDUConfirmedRequestBuilder)(nil)
 
 func (b *_APDUConfirmedRequestBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUConfirmedRequest
 }
 
 func (b *_APDUConfirmedRequestBuilder) WithMandatoryFields(segmentedMessage bool, moreFollows bool, segmentedResponseAccepted bool, maxSegmentsAccepted MaxSegmentsAccepted, maxApduLengthAccepted MaxApduLengthAccepted, invokeId uint8, segment []byte) APDUConfirmedRequestBuilder {

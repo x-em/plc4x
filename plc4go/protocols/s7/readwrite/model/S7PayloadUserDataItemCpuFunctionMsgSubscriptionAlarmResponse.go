@@ -128,6 +128,7 @@ var _ (S7PayloadUserDataItemCpuFunctionMsgSubscriptionAlarmResponseBuilder) = (*
 
 func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionAlarmResponseBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemCpuFunctionMsgSubscriptionAlarmResponse
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionAlarmResponseBuilder) WithMandatoryFields(result uint8, reserved01 uint8, alarmType AlarmType, reserved02 uint8, reserved03 uint8) S7PayloadUserDataItemCpuFunctionMsgSubscriptionAlarmResponseBuilder {

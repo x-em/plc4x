@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMaxFailedAttemptsBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataMaxFailedAttemptsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMaxFailedAttempts
 }
 
 func (b *_BACnetConstructedDataMaxFailedAttemptsBuilder) WithMandatoryFields(maxFailedAttempts BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMaxFailedAttemptsBuilder {

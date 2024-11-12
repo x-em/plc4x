@@ -106,6 +106,7 @@ var _ (ConnectionRequestInformationTunnelConnectionBuilder) = (*_ConnectionReque
 
 func (b *_ConnectionRequestInformationTunnelConnectionBuilder) setParent(contract ConnectionRequestInformationContract) {
 	b.ConnectionRequestInformationContract = contract
+	contract.(*_ConnectionRequestInformation)._SubType = b._ConnectionRequestInformationTunnelConnection
 }
 
 func (b *_ConnectionRequestInformationTunnelConnectionBuilder) WithMandatoryFields(knxLayer KnxLayer) ConnectionRequestInformationTunnelConnectionBuilder {

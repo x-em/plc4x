@@ -109,6 +109,7 @@ var _ (BACnetChannelValueDateBuilder) = (*_BACnetChannelValueDateBuilder)(nil)
 
 func (b *_BACnetChannelValueDateBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueDate
 }
 
 func (b *_BACnetChannelValueDateBuilder) WithMandatoryFields(dateValue BACnetApplicationTagDate) BACnetChannelValueDateBuilder {

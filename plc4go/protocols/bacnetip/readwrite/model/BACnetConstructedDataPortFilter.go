@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataPortFilterBuilder) = (*_BACnetConstructedDataPortFil
 
 func (b *_BACnetConstructedDataPortFilterBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPortFilter
 }
 
 func (b *_BACnetConstructedDataPortFilterBuilder) WithMandatoryFields(portFilter []BACnetPortPermission) BACnetConstructedDataPortFilterBuilder {

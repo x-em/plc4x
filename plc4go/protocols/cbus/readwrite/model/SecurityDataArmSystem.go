@@ -116,6 +116,7 @@ var _ (SecurityDataArmSystemBuilder) = (*_SecurityDataArmSystemBuilder)(nil)
 
 func (b *_SecurityDataArmSystemBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataArmSystem
 }
 
 func (b *_SecurityDataArmSystemBuilder) WithMandatoryFields(armMode byte) SecurityDataArmSystemBuilder {

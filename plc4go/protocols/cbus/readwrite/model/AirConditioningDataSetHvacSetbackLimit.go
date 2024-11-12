@@ -137,6 +137,7 @@ var _ (AirConditioningDataSetHvacSetbackLimitBuilder) = (*_AirConditioningDataSe
 
 func (b *_AirConditioningDataSetHvacSetbackLimitBuilder) setParent(contract AirConditioningDataContract) {
 	b.AirConditioningDataContract = contract
+	contract.(*_AirConditioningData)._SubType = b._AirConditioningDataSetHvacSetbackLimit
 }
 
 func (b *_AirConditioningDataSetHvacSetbackLimitBuilder) WithMandatoryFields(zoneGroup byte, zoneList HVACZoneList, limit HVACTemperature, hvacModeAndFlags HVACModeAndFlags) AirConditioningDataSetHvacSetbackLimitBuilder {

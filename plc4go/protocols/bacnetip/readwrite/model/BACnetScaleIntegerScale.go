@@ -109,6 +109,7 @@ var _ (BACnetScaleIntegerScaleBuilder) = (*_BACnetScaleIntegerScaleBuilder)(nil)
 
 func (b *_BACnetScaleIntegerScaleBuilder) setParent(contract BACnetScaleContract) {
 	b.BACnetScaleContract = contract
+	contract.(*_BACnetScale)._SubType = b._BACnetScaleIntegerScale
 }
 
 func (b *_BACnetScaleIntegerScaleBuilder) WithMandatoryFields(integerScale BACnetContextTagSignedInteger) BACnetScaleIntegerScaleBuilder {

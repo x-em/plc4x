@@ -116,6 +116,7 @@ var _ (AdsReadStateResponseBuilder) = (*_AdsReadStateResponseBuilder)(nil)
 
 func (b *_AdsReadStateResponseBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsReadStateResponse
 }
 
 func (b *_AdsReadStateResponseBuilder) WithMandatoryFields(result ReturnCode, adsState uint16, deviceState uint16) AdsReadStateResponseBuilder {

@@ -104,6 +104,7 @@ var _ (ApduDataExtAuthorizeResponseBuilder) = (*_ApduDataExtAuthorizeResponseBui
 
 func (b *_ApduDataExtAuthorizeResponseBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtAuthorizeResponse
 }
 
 func (b *_ApduDataExtAuthorizeResponseBuilder) WithMandatoryFields(level uint8) ApduDataExtAuthorizeResponseBuilder {

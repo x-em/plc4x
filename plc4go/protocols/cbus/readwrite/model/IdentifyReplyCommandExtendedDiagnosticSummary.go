@@ -218,6 +218,7 @@ var _ (IdentifyReplyCommandExtendedDiagnosticSummaryBuilder) = (*_IdentifyReplyC
 
 func (b *_IdentifyReplyCommandExtendedDiagnosticSummaryBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandExtendedDiagnosticSummary
 }
 
 func (b *_IdentifyReplyCommandExtendedDiagnosticSummaryBuilder) WithMandatoryFields(lowApplication ApplicationIdContainer, highApplication ApplicationIdContainer, area byte, crc uint16, serialNumber uint32, networkVoltage byte, unitInLearnMode bool, networkVoltageLow bool, networkVoltageMarginal bool, enableChecksumAlarm bool, outputUnit bool, installationMMIError bool, EEWriteError bool, EEChecksumError bool, EEDataError bool, microReset bool, commsTxError bool, internalStackOverflow bool, microPowerReset bool) IdentifyReplyCommandExtendedDiagnosticSummaryBuilder {

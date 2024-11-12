@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAccessEventBuilder) = (*_BACnetConstructedDataAccess
 
 func (b *_BACnetConstructedDataAccessEventBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAccessEvent
 }
 
 func (b *_BACnetConstructedDataAccessEventBuilder) WithMandatoryFields(accessEvent BACnetAccessEventTagged) BACnetConstructedDataAccessEventBuilder {

@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataShedLevelDescriptionsBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataShedLevelDescriptionsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataShedLevelDescriptions
 }
 
 func (b *_BACnetConstructedDataShedLevelDescriptionsBuilder) WithMandatoryFields(shedLevelDescriptions []BACnetApplicationTagCharacterString) BACnetConstructedDataShedLevelDescriptionsBuilder {

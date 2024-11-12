@@ -96,6 +96,7 @@ var _ (MeteringDataMeasureOtherWaterBuilder) = (*_MeteringDataMeasureOtherWaterB
 
 func (b *_MeteringDataMeasureOtherWaterBuilder) setParent(contract MeteringDataContract) {
 	b.MeteringDataContract = contract
+	contract.(*_MeteringData)._SubType = b._MeteringDataMeasureOtherWater
 }
 
 func (b *_MeteringDataMeasureOtherWaterBuilder) WithMandatoryFields() MeteringDataMeasureOtherWaterBuilder {

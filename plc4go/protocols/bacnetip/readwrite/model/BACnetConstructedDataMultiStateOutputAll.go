@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataMultiStateOutputAllBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataMultiStateOutputAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateOutputAll
 }
 
 func (b *_BACnetConstructedDataMultiStateOutputAllBuilder) WithMandatoryFields() BACnetConstructedDataMultiStateOutputAllBuilder {

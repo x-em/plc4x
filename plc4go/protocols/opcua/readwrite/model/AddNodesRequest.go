@@ -115,6 +115,7 @@ var _ (AddNodesRequestBuilder) = (*_AddNodesRequestBuilder)(nil)
 
 func (b *_AddNodesRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AddNodesRequest
 }
 
 func (b *_AddNodesRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, nodesToAdd []AddNodesItem) AddNodesRequestBuilder {

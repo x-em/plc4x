@@ -104,6 +104,7 @@ var _ (S7PayloadUserDataBuilder) = (*_S7PayloadUserDataBuilder)(nil)
 
 func (b *_S7PayloadUserDataBuilder) setParent(contract S7PayloadContract) {
 	b.S7PayloadContract = contract
+	contract.(*_S7Payload)._SubType = b._S7PayloadUserData
 }
 
 func (b *_S7PayloadUserDataBuilder) WithMandatoryFields(items []S7PayloadUserDataItem) S7PayloadUserDataBuilder {

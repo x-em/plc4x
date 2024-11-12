@@ -109,6 +109,7 @@ var _ (BACnetPropertyStateActionUnknownBuilder) = (*_BACnetPropertyStateActionUn
 
 func (b *_BACnetPropertyStateActionUnknownBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStateActionUnknown
 }
 
 func (b *_BACnetPropertyStateActionUnknownBuilder) WithMandatoryFields(unknownValue BACnetContextTagUnknown) BACnetPropertyStateActionUnknownBuilder {

@@ -142,6 +142,7 @@ var _ (BACnetEventParameterChangeOfStateBuilder) = (*_BACnetEventParameterChange
 
 func (b *_BACnetEventParameterChangeOfStateBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterChangeOfState
 }
 
 func (b *_BACnetEventParameterChangeOfStateBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, timeDelay BACnetContextTagUnsignedInteger, listOfValues BACnetEventParameterChangeOfStateListOfValues, closingTag BACnetClosingTag) BACnetEventParameterChangeOfStateBuilder {

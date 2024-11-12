@@ -96,6 +96,7 @@ var _ (SetAttributeSingleResponseBuilder) = (*_SetAttributeSingleResponseBuilder
 
 func (b *_SetAttributeSingleResponseBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._SetAttributeSingleResponse
 }
 
 func (b *_SetAttributeSingleResponseBuilder) WithMandatoryFields() SetAttributeSingleResponseBuilder {

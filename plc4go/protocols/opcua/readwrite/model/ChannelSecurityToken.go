@@ -122,6 +122,7 @@ var _ (ChannelSecurityTokenBuilder) = (*_ChannelSecurityTokenBuilder)(nil)
 
 func (b *_ChannelSecurityTokenBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ChannelSecurityToken
 }
 
 func (b *_ChannelSecurityTokenBuilder) WithMandatoryFields(channelId uint32, tokenId uint32, createdAt int64, revisedLifetime uint32) ChannelSecurityTokenBuilder {

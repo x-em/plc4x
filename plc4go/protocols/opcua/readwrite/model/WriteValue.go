@@ -137,6 +137,7 @@ var _ (WriteValueBuilder) = (*_WriteValueBuilder)(nil)
 
 func (b *_WriteValueBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._WriteValue
 }
 
 func (b *_WriteValueBuilder) WithMandatoryFields(nodeId NodeId, attributeId uint32, indexRange PascalString, value DataValue) WriteValueBuilder {

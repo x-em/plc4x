@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesEscalatorOperationDirectionBuilder) = (*_BACnetProper
 
 func (b *_BACnetPropertyStatesEscalatorOperationDirectionBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesEscalatorOperationDirection
 }
 
 func (b *_BACnetPropertyStatesEscalatorOperationDirectionBuilder) WithMandatoryFields(escalatorOperationDirection BACnetEscalatorOperationDirectionTagged) BACnetPropertyStatesEscalatorOperationDirectionBuilder {

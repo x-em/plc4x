@@ -110,6 +110,7 @@ var _ (ServiceCounterDataTypeBuilder) = (*_ServiceCounterDataTypeBuilder)(nil)
 
 func (b *_ServiceCounterDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ServiceCounterDataType
 }
 
 func (b *_ServiceCounterDataTypeBuilder) WithMandatoryFields(totalCount uint32, errorCount uint32) ServiceCounterDataTypeBuilder {

@@ -131,6 +131,7 @@ var _ (BACnetServiceAckGetAlarmSummaryBuilder) = (*_BACnetServiceAckGetAlarmSumm
 
 func (b *_BACnetServiceAckGetAlarmSummaryBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckGetAlarmSummary
 }
 
 func (b *_BACnetServiceAckGetAlarmSummaryBuilder) WithMandatoryFields(objectIdentifier BACnetApplicationTagObjectIdentifier, eventState BACnetEventStateTagged, acknowledgedTransitions BACnetEventTransitionBitsTagged) BACnetServiceAckGetAlarmSummaryBuilder {

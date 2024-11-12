@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesIntegerValueBuilder) = (*_BACnetPropertyStatesInteger
 
 func (b *_BACnetPropertyStatesIntegerValueBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesIntegerValue
 }
 
 func (b *_BACnetPropertyStatesIntegerValueBuilder) WithMandatoryFields(integerValue BACnetContextTagSignedInteger) BACnetPropertyStatesIntegerValueBuilder {

@@ -107,6 +107,7 @@ var _ (BACnetConfirmedServiceRequestReadPropertyConditionalBuilder) = (*_BACnetC
 
 func (b *_BACnetConfirmedServiceRequestReadPropertyConditionalBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestReadPropertyConditional
 }
 
 func (b *_BACnetConfirmedServiceRequestReadPropertyConditionalBuilder) WithMandatoryFields(bytesOfRemovedService []byte) BACnetConfirmedServiceRequestReadPropertyConditionalBuilder {

@@ -104,6 +104,7 @@ var _ (MediaTransportControlDataSetCategoryBuilder) = (*_MediaTransportControlDa
 
 func (b *_MediaTransportControlDataSetCategoryBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataSetCategory
 }
 
 func (b *_MediaTransportControlDataSetCategoryBuilder) WithMandatoryFields(categoryNumber uint8) MediaTransportControlDataSetCategoryBuilder {

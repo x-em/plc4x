@@ -96,6 +96,7 @@ var _ (AccessControlDataRequestToExitBuilder) = (*_AccessControlDataRequestToExi
 
 func (b *_AccessControlDataRequestToExitBuilder) setParent(contract AccessControlDataContract) {
 	b.AccessControlDataContract = contract
+	contract.(*_AccessControlData)._SubType = b._AccessControlDataRequestToExit
 }
 
 func (b *_AccessControlDataRequestToExitBuilder) WithMandatoryFields() AccessControlDataRequestToExitBuilder {

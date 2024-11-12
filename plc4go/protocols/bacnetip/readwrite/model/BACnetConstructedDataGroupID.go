@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataGroupIDBuilder) = (*_BACnetConstructedDataGroupIDBui
 
 func (b *_BACnetConstructedDataGroupIDBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataGroupID
 }
 
 func (b *_BACnetConstructedDataGroupIDBuilder) WithMandatoryFields(groupId BACnetApplicationTagUnsignedInteger) BACnetConstructedDataGroupIDBuilder {

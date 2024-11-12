@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesLiftCarModeBuilder) = (*_BACnetPropertyStatesLiftCarM
 
 func (b *_BACnetPropertyStatesLiftCarModeBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesLiftCarMode
 }
 
 func (b *_BACnetPropertyStatesLiftCarModeBuilder) WithMandatoryFields(liftCarMode BACnetLiftCarModeTagged) BACnetPropertyStatesLiftCarModeBuilder {

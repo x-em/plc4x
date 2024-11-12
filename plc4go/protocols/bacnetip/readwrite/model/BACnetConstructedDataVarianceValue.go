@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataVarianceValueBuilder) = (*_BACnetConstructedDataVari
 
 func (b *_BACnetConstructedDataVarianceValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataVarianceValue
 }
 
 func (b *_BACnetConstructedDataVarianceValueBuilder) WithMandatoryFields(varianceValue BACnetApplicationTagReal) BACnetConstructedDataVarianceValueBuilder {

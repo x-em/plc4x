@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAnalogOutputInterfaceValueBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataAnalogOutputInterfaceValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAnalogOutputInterfaceValue
 }
 
 func (b *_BACnetConstructedDataAnalogOutputInterfaceValueBuilder) WithMandatoryFields(interfaceValue BACnetOptionalREAL) BACnetConstructedDataAnalogOutputInterfaceValueBuilder {

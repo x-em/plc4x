@@ -127,6 +127,7 @@ var _ (FindServersOnNetworkRequestBuilder) = (*_FindServersOnNetworkRequestBuild
 
 func (b *_FindServersOnNetworkRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._FindServersOnNetworkRequest
 }
 
 func (b *_FindServersOnNetworkRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, startingRecordId uint32, maxRecordsToReturn uint32, serverCapabilityFilter []PascalString) FindServersOnNetworkRequestBuilder {

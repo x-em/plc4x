@@ -104,6 +104,7 @@ var _ (HistoryEventBuilder) = (*_HistoryEventBuilder)(nil)
 
 func (b *_HistoryEventBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._HistoryEvent
 }
 
 func (b *_HistoryEventBuilder) WithMandatoryFields(events []HistoryEventFieldList) HistoryEventBuilder {

@@ -110,6 +110,7 @@ var _ (SubscriptionAcknowledgementBuilder) = (*_SubscriptionAcknowledgementBuild
 
 func (b *_SubscriptionAcknowledgementBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SubscriptionAcknowledgement
 }
 
 func (b *_SubscriptionAcknowledgementBuilder) WithMandatoryFields(subscriptionId uint32, sequenceNumber uint32) SubscriptionAcknowledgementBuilder {

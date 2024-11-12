@@ -111,6 +111,7 @@ var _ (BACnetApplicationTagEnumeratedBuilder) = (*_BACnetApplicationTagEnumerate
 
 func (b *_BACnetApplicationTagEnumeratedBuilder) setParent(contract BACnetApplicationTagContract) {
 	b.BACnetApplicationTagContract = contract
+	contract.(*_BACnetApplicationTag)._SubType = b._BACnetApplicationTagEnumerated
 }
 
 func (b *_BACnetApplicationTagEnumeratedBuilder) WithMandatoryFields(payload BACnetTagPayloadEnumerated) BACnetApplicationTagEnumeratedBuilder {

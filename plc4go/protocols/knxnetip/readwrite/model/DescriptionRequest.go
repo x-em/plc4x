@@ -111,6 +111,7 @@ var _ (DescriptionRequestBuilder) = (*_DescriptionRequestBuilder)(nil)
 
 func (b *_DescriptionRequestBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._DescriptionRequest
 }
 
 func (b *_DescriptionRequestBuilder) WithMandatoryFields(hpaiControlEndpoint HPAIControlEndpoint) DescriptionRequestBuilder {

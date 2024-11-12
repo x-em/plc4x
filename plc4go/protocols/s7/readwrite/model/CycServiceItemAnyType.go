@@ -128,6 +128,7 @@ var _ (CycServiceItemAnyTypeBuilder) = (*_CycServiceItemAnyTypeBuilder)(nil)
 
 func (b *_CycServiceItemAnyTypeBuilder) setParent(contract CycServiceItemTypeContract) {
 	b.CycServiceItemTypeContract = contract
+	contract.(*_CycServiceItemType)._SubType = b._CycServiceItemAnyType
 }
 
 func (b *_CycServiceItemAnyTypeBuilder) WithMandatoryFields(transportSize TransportSize, length uint16, dbNumber uint16, memoryArea MemoryArea, address uint32) CycServiceItemAnyTypeBuilder {

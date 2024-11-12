@@ -132,6 +132,7 @@ var _ (BrowseRequestBuilder) = (*_BrowseRequestBuilder)(nil)
 
 func (b *_BrowseRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrowseRequest
 }
 
 func (b *_BrowseRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, view ViewDescription, requestedMaxReferencesPerNode uint32, nodesToBrowse []BrowseDescription) BrowseRequestBuilder {

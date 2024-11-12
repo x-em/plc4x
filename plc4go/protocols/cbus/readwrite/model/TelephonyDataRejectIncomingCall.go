@@ -96,6 +96,7 @@ var _ (TelephonyDataRejectIncomingCallBuilder) = (*_TelephonyDataRejectIncomingC
 
 func (b *_TelephonyDataRejectIncomingCallBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataRejectIncomingCall
 }
 
 func (b *_TelephonyDataRejectIncomingCallBuilder) WithMandatoryFields() TelephonyDataRejectIncomingCallBuilder {

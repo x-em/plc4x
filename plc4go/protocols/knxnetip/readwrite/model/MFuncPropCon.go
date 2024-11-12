@@ -96,6 +96,7 @@ var _ (MFuncPropConBuilder) = (*_MFuncPropConBuilder)(nil)
 
 func (b *_MFuncPropConBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MFuncPropCon
 }
 
 func (b *_MFuncPropConBuilder) WithMandatoryFields() MFuncPropConBuilder {

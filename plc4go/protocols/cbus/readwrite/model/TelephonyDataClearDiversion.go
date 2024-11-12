@@ -96,6 +96,7 @@ var _ (TelephonyDataClearDiversionBuilder) = (*_TelephonyDataClearDiversionBuild
 
 func (b *_TelephonyDataClearDiversionBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataClearDiversion
 }
 
 func (b *_TelephonyDataClearDiversionBuilder) WithMandatoryFields() TelephonyDataClearDiversionBuilder {

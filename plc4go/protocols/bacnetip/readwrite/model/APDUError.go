@@ -123,6 +123,7 @@ var _ (APDUErrorBuilder) = (*_APDUErrorBuilder)(nil)
 
 func (b *_APDUErrorBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUError
 }
 
 func (b *_APDUErrorBuilder) WithMandatoryFields(originalInvokeId uint8, errorChoice BACnetConfirmedServiceChoice, error BACnetError) APDUErrorBuilder {

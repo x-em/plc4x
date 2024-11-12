@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandFirmwareVersionBuilder) = (*_IdentifyReplyCommandFirm
 
 func (b *_IdentifyReplyCommandFirmwareVersionBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandFirmwareVersion
 }
 
 func (b *_IdentifyReplyCommandFirmwareVersionBuilder) WithMandatoryFields(firmwareVersion string) IdentifyReplyCommandFirmwareVersionBuilder {

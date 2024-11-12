@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPrescaleBuilder) = (*_BACnetConstructedDataPrescaleB
 
 func (b *_BACnetConstructedDataPrescaleBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPrescale
 }
 
 func (b *_BACnetConstructedDataPrescaleBuilder) WithMandatoryFields(prescale BACnetPrescale) BACnetConstructedDataPrescaleBuilder {

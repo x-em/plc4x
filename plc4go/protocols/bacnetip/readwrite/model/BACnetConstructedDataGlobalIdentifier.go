@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataGlobalIdentifierBuilder) = (*_BACnetConstructedDataG
 
 func (b *_BACnetConstructedDataGlobalIdentifierBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataGlobalIdentifier
 }
 
 func (b *_BACnetConstructedDataGlobalIdentifierBuilder) WithMandatoryFields(globalIdentifier BACnetApplicationTagUnsignedInteger) BACnetConstructedDataGlobalIdentifierBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataFileTypeBuilder) = (*_BACnetConstructedDataFileTypeB
 
 func (b *_BACnetConstructedDataFileTypeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataFileType
 }
 
 func (b *_BACnetConstructedDataFileTypeBuilder) WithMandatoryFields(fileType BACnetApplicationTagCharacterString) BACnetConstructedDataFileTypeBuilder {

@@ -96,6 +96,7 @@ var _ (ModbusPDUReportServerIdRequestBuilder) = (*_ModbusPDUReportServerIdReques
 
 func (b *_ModbusPDUReportServerIdRequestBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUReportServerIdRequest
 }
 
 func (b *_ModbusPDUReportServerIdRequestBuilder) WithMandatoryFields() ModbusPDUReportServerIdRequestBuilder {

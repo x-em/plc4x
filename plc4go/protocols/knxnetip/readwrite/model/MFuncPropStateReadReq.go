@@ -96,6 +96,7 @@ var _ (MFuncPropStateReadReqBuilder) = (*_MFuncPropStateReadReqBuilder)(nil)
 
 func (b *_MFuncPropStateReadReqBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MFuncPropStateReadReq
 }
 
 func (b *_MFuncPropStateReadReqBuilder) WithMandatoryFields() MFuncPropStateReadReqBuilder {

@@ -131,6 +131,7 @@ var _ (IssuedIdentityTokenBuilder) = (*_IssuedIdentityTokenBuilder)(nil)
 
 func (b *_IssuedIdentityTokenBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._IssuedIdentityToken
 }
 
 func (b *_IssuedIdentityTokenBuilder) WithMandatoryFields(policyId PascalString, tokenData PascalByteString, encryptionAlgorithm PascalString) IssuedIdentityTokenBuilder {

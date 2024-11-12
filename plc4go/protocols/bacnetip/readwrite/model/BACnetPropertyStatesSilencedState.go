@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesSilencedStateBuilder) = (*_BACnetPropertyStatesSilenc
 
 func (b *_BACnetPropertyStatesSilencedStateBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesSilencedState
 }
 
 func (b *_BACnetPropertyStatesSilencedStateBuilder) WithMandatoryFields(silencedState BACnetSilencedStateTagged) BACnetPropertyStatesSilencedStateBuilder {

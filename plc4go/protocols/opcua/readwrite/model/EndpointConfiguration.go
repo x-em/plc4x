@@ -154,6 +154,7 @@ var _ (EndpointConfigurationBuilder) = (*_EndpointConfigurationBuilder)(nil)
 
 func (b *_EndpointConfigurationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EndpointConfiguration
 }
 
 func (b *_EndpointConfigurationBuilder) WithMandatoryFields(operationTimeout int32, useBinaryEncoding bool, maxStringLength int32, maxByteStringLength int32, maxArrayLength int32, maxMessageSize int32, maxBufferSize int32, channelLifetime int32, securityTokenLifetime int32) EndpointConfigurationBuilder {

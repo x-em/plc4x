@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataUserTypeBuilder) = (*_BACnetConstructedDataUserTypeB
 
 func (b *_BACnetConstructedDataUserTypeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataUserType
 }
 
 func (b *_BACnetConstructedDataUserTypeBuilder) WithMandatoryFields(userType BACnetAccessUserTypeTagged) BACnetConstructedDataUserTypeBuilder {

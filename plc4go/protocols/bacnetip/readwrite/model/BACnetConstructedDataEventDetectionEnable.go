@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataEventDetectionEnableBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataEventDetectionEnableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEventDetectionEnable
 }
 
 func (b *_BACnetConstructedDataEventDetectionEnableBuilder) WithMandatoryFields(eventDetectionEnable BACnetApplicationTagBoolean) BACnetConstructedDataEventDetectionEnableBuilder {

@@ -96,6 +96,7 @@ var _ (RequestEmptyBuilder) = (*_RequestEmptyBuilder)(nil)
 
 func (b *_RequestEmptyBuilder) setParent(contract RequestContract) {
 	b.RequestContract = contract
+	contract.(*_Request)._SubType = b._RequestEmpty
 }
 
 func (b *_RequestEmptyBuilder) WithMandatoryFields() RequestEmptyBuilder {

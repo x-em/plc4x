@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCarDoorZoneBuilder) = (*_BACnetConstructedDataCarDoo
 
 func (b *_BACnetConstructedDataCarDoorZoneBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCarDoorZone
 }
 
 func (b *_BACnetConstructedDataCarDoorZoneBuilder) WithMandatoryFields(carDoorZone BACnetApplicationTagBoolean) BACnetConstructedDataCarDoorZoneBuilder {

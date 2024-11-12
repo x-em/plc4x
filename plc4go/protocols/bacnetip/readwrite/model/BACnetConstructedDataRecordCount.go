@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataRecordCountBuilder) = (*_BACnetConstructedDataRecord
 
 func (b *_BACnetConstructedDataRecordCountBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataRecordCount
 }
 
 func (b *_BACnetConstructedDataRecordCountBuilder) WithMandatoryFields(recordCount BACnetApplicationTagUnsignedInteger) BACnetConstructedDataRecordCountBuilder {

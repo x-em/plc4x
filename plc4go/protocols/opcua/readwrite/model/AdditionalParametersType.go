@@ -104,6 +104,7 @@ var _ (AdditionalParametersTypeBuilder) = (*_AdditionalParametersTypeBuilder)(ni
 
 func (b *_AdditionalParametersTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AdditionalParametersType
 }
 
 func (b *_AdditionalParametersTypeBuilder) WithMandatoryFields(parameters []KeyValuePair) AdditionalParametersTypeBuilder {

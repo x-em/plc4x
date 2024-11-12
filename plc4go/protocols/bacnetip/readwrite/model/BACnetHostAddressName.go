@@ -109,6 +109,7 @@ var _ (BACnetHostAddressNameBuilder) = (*_BACnetHostAddressNameBuilder)(nil)
 
 func (b *_BACnetHostAddressNameBuilder) setParent(contract BACnetHostAddressContract) {
 	b.BACnetHostAddressContract = contract
+	contract.(*_BACnetHostAddress)._SubType = b._BACnetHostAddressName
 }
 
 func (b *_BACnetHostAddressNameBuilder) WithMandatoryFields(name BACnetContextTagCharacterString) BACnetHostAddressNameBuilder {

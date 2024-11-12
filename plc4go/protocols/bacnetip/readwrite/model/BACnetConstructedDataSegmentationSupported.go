@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataSegmentationSupportedBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataSegmentationSupportedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSegmentationSupported
 }
 
 func (b *_BACnetConstructedDataSegmentationSupportedBuilder) WithMandatoryFields(segmentationSupported BACnetSegmentationTagged) BACnetConstructedDataSegmentationSupportedBuilder {

@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataBBMDBroadcastDistributionTableBuilder) = (*_BACnetCo
 
 func (b *_BACnetConstructedDataBBMDBroadcastDistributionTableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBBMDBroadcastDistributionTable
 }
 
 func (b *_BACnetConstructedDataBBMDBroadcastDistributionTableBuilder) WithMandatoryFields(bbmdBroadcastDistributionTable []BACnetBDTEntry) BACnetConstructedDataBBMDBroadcastDistributionTableBuilder {

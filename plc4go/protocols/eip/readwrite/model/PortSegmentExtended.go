@@ -118,6 +118,7 @@ var _ (PortSegmentExtendedBuilder) = (*_PortSegmentExtendedBuilder)(nil)
 
 func (b *_PortSegmentExtendedBuilder) setParent(contract PortSegmentTypeContract) {
 	b.PortSegmentTypeContract = contract
+	contract.(*_PortSegmentType)._SubType = b._PortSegmentExtended
 }
 
 func (b *_PortSegmentExtendedBuilder) WithMandatoryFields(port uint8, linkAddressSize uint8, address string) PortSegmentExtendedBuilder {

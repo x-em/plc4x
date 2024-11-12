@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAllowGroupDelayInhibitBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataAllowGroupDelayInhibitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAllowGroupDelayInhibit
 }
 
 func (b *_BACnetConstructedDataAllowGroupDelayInhibitBuilder) WithMandatoryFields(allowGroupDelayInhibit BACnetApplicationTagBoolean) BACnetConstructedDataAllowGroupDelayInhibitBuilder {

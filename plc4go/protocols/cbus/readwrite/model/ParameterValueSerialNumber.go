@@ -115,6 +115,7 @@ var _ (ParameterValueSerialNumberBuilder) = (*_ParameterValueSerialNumberBuilder
 
 func (b *_ParameterValueSerialNumberBuilder) setParent(contract ParameterValueContract) {
 	b.ParameterValueContract = contract
+	contract.(*_ParameterValue)._SubType = b._ParameterValueSerialNumber
 }
 
 func (b *_ParameterValueSerialNumberBuilder) WithMandatoryFields(value SerialNumber, data []byte) ParameterValueSerialNumberBuilder {

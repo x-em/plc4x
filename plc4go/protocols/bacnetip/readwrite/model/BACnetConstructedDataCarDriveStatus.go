@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCarDriveStatusBuilder) = (*_BACnetConstructedDataCar
 
 func (b *_BACnetConstructedDataCarDriveStatusBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCarDriveStatus
 }
 
 func (b *_BACnetConstructedDataCarDriveStatusBuilder) WithMandatoryFields(carDriveStatus BACnetLiftCarDriveStatusTagged) BACnetConstructedDataCarDriveStatusBuilder {

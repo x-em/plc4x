@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataExitPointsBuilder) = (*_BACnetConstructedDataExitPoi
 
 func (b *_BACnetConstructedDataExitPointsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataExitPoints
 }
 
 func (b *_BACnetConstructedDataExitPointsBuilder) WithMandatoryFields(exitPoints []BACnetDeviceObjectReference) BACnetConstructedDataExitPointsBuilder {

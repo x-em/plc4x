@@ -106,6 +106,7 @@ var _ (BVLCRegisterForeignDeviceBuilder) = (*_BVLCRegisterForeignDeviceBuilder)(
 
 func (b *_BVLCRegisterForeignDeviceBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCRegisterForeignDevice
 }
 
 func (b *_BVLCRegisterForeignDeviceBuilder) WithMandatoryFields(ttl uint16) BVLCRegisterForeignDeviceBuilder {

@@ -110,6 +110,7 @@ var _ (XVTypeBuilder) = (*_XVTypeBuilder)(nil)
 
 func (b *_XVTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._XVType
 }
 
 func (b *_XVTypeBuilder) WithMandatoryFields(x float64, value float32) XVTypeBuilder {

@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataAuthenticationFactorsBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataAuthenticationFactorsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAuthenticationFactors
 }
 
 func (b *_BACnetConstructedDataAuthenticationFactorsBuilder) WithMandatoryFields(authenticationFactors []BACnetCredentialAuthenticationFactor) BACnetConstructedDataAuthenticationFactorsBuilder {

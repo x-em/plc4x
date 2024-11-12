@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataCarDoorCommandBuilder) = (*_BACnetConstructedDataCar
 
 func (b *_BACnetConstructedDataCarDoorCommandBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCarDoorCommand
 }
 
 func (b *_BACnetConstructedDataCarDoorCommandBuilder) WithMandatoryFields(carDoorCommand []BACnetLiftCarDoorCommandTagged) BACnetConstructedDataCarDoorCommandBuilder {

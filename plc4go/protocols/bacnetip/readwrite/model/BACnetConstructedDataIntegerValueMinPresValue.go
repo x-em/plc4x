@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIntegerValueMinPresValueBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataIntegerValueMinPresValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIntegerValueMinPresValue
 }
 
 func (b *_BACnetConstructedDataIntegerValueMinPresValueBuilder) WithMandatoryFields(minPresValue BACnetApplicationTagSignedInteger) BACnetConstructedDataIntegerValueMinPresValueBuilder {

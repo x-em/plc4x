@@ -133,6 +133,7 @@ var _ (SetTriggeringResponseBuilder) = (*_SetTriggeringResponseBuilder)(nil)
 
 func (b *_SetTriggeringResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SetTriggeringResponse
 }
 
 func (b *_SetTriggeringResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, addResults []StatusCode, addDiagnosticInfos []DiagnosticInfo, removeResults []StatusCode, removeDiagnosticInfos []DiagnosticInfo) SetTriggeringResponseBuilder {

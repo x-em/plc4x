@@ -136,6 +136,7 @@ var _ (BACnetServiceAckReadPropertyBuilder) = (*_BACnetServiceAckReadPropertyBui
 
 func (b *_BACnetServiceAckReadPropertyBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckReadProperty
 }
 
 func (b *_BACnetServiceAckReadPropertyBuilder) WithMandatoryFields(objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged) BACnetServiceAckReadPropertyBuilder {

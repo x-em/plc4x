@@ -111,6 +111,7 @@ var _ (FirmataCommandSysexBuilder) = (*_FirmataCommandSysexBuilder)(nil)
 
 func (b *_FirmataCommandSysexBuilder) setParent(contract FirmataCommandContract) {
 	b.FirmataCommandContract = contract
+	contract.(*_FirmataCommand)._SubType = b._FirmataCommandSysex
 }
 
 func (b *_FirmataCommandSysexBuilder) WithMandatoryFields(command SysexCommand) FirmataCommandSysexBuilder {

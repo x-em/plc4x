@@ -109,6 +109,7 @@ var _ (BACnetHostAddressNullBuilder) = (*_BACnetHostAddressNullBuilder)(nil)
 
 func (b *_BACnetHostAddressNullBuilder) setParent(contract BACnetHostAddressContract) {
 	b.BACnetHostAddressContract = contract
+	contract.(*_BACnetHostAddress)._SubType = b._BACnetHostAddressNull
 }
 
 func (b *_BACnetHostAddressNullBuilder) WithMandatoryFields(none BACnetContextTagNull) BACnetHostAddressNullBuilder {

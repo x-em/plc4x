@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataCommandActionBuilder) = (*_BACnetConstructedDataComm
 
 func (b *_BACnetConstructedDataCommandActionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCommandAction
 }
 
 func (b *_BACnetConstructedDataCommandActionBuilder) WithMandatoryFields(actionLists []BACnetActionList) BACnetConstructedDataCommandActionBuilder {

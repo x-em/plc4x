@@ -122,6 +122,7 @@ var _ (LevelInformationCorruptedBuilder) = (*_LevelInformationCorruptedBuilder)(
 
 func (b *_LevelInformationCorruptedBuilder) setParent(contract LevelInformationContract) {
 	b.LevelInformationContract = contract
+	contract.(*_LevelInformation)._SubType = b._LevelInformationCorrupted
 }
 
 func (b *_LevelInformationCorruptedBuilder) WithMandatoryFields(corruptedNibble1 uint8, corruptedNibble2 uint8, corruptedNibble3 uint8, corruptedNibble4 uint8) LevelInformationCorruptedBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetServiceAckAtomicWriteFileBuilder) = (*_BACnetServiceAckAtomicWriteF
 
 func (b *_BACnetServiceAckAtomicWriteFileBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckAtomicWriteFile
 }
 
 func (b *_BACnetServiceAckAtomicWriteFileBuilder) WithMandatoryFields(fileStartPosition BACnetContextTagSignedInteger) BACnetServiceAckAtomicWriteFileBuilder {

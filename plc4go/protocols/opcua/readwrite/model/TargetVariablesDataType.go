@@ -104,6 +104,7 @@ var _ (TargetVariablesDataTypeBuilder) = (*_TargetVariablesDataTypeBuilder)(nil)
 
 func (b *_TargetVariablesDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TargetVariablesDataType
 }
 
 func (b *_TargetVariablesDataTypeBuilder) WithMandatoryFields(targetVariables []FieldTargetDataType) TargetVariablesDataTypeBuilder {

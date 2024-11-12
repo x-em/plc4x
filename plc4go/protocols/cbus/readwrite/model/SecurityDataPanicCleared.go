@@ -96,6 +96,7 @@ var _ (SecurityDataPanicClearedBuilder) = (*_SecurityDataPanicClearedBuilder)(ni
 
 func (b *_SecurityDataPanicClearedBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataPanicCleared
 }
 
 func (b *_SecurityDataPanicClearedBuilder) WithMandatoryFields() SecurityDataPanicClearedBuilder {

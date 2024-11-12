@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesUnsignedValueBuilder) = (*_BACnetPropertyStatesUnsign
 
 func (b *_BACnetPropertyStatesUnsignedValueBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesUnsignedValue
 }
 
 func (b *_BACnetPropertyStatesUnsignedValueBuilder) WithMandatoryFields(unsignedValue BACnetContextTagUnsignedInteger) BACnetPropertyStatesUnsignedValueBuilder {

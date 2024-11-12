@@ -96,6 +96,7 @@ var _ (AdsReadDeviceInfoRequestBuilder) = (*_AdsReadDeviceInfoRequestBuilder)(ni
 
 func (b *_AdsReadDeviceInfoRequestBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsReadDeviceInfoRequest
 }
 
 func (b *_AdsReadDeviceInfoRequestBuilder) WithMandatoryFields() AdsReadDeviceInfoRequestBuilder {

@@ -117,6 +117,7 @@ var _ (BACnetConfirmedServiceRequestReinitializeDeviceBuilder) = (*_BACnetConfir
 
 func (b *_BACnetConfirmedServiceRequestReinitializeDeviceBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestReinitializeDevice
 }
 
 func (b *_BACnetConfirmedServiceRequestReinitializeDeviceBuilder) WithMandatoryFields(reinitializedStateOfDevice BACnetConfirmedServiceRequestReinitializeDeviceReinitializedStateOfDeviceTagged) BACnetConfirmedServiceRequestReinitializeDeviceBuilder {

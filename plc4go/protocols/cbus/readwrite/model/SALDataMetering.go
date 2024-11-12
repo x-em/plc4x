@@ -109,6 +109,7 @@ var _ (SALDataMeteringBuilder) = (*_SALDataMeteringBuilder)(nil)
 
 func (b *_SALDataMeteringBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataMetering
 }
 
 func (b *_SALDataMeteringBuilder) WithMandatoryFields(meteringData MeteringData) SALDataMeteringBuilder {

@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataAccessRightsAllBuilder) = (*_BACnetConstructedDataAc
 
 func (b *_BACnetConstructedDataAccessRightsAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAccessRightsAll
 }
 
 func (b *_BACnetConstructedDataAccessRightsAllBuilder) WithMandatoryFields() BACnetConstructedDataAccessRightsAllBuilder {

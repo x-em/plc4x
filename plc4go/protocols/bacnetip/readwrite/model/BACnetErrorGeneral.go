@@ -109,6 +109,7 @@ var _ (BACnetErrorGeneralBuilder) = (*_BACnetErrorGeneralBuilder)(nil)
 
 func (b *_BACnetErrorGeneralBuilder) setParent(contract BACnetErrorContract) {
 	b.BACnetErrorContract = contract
+	contract.(*_BACnetError)._SubType = b._BACnetErrorGeneral
 }
 
 func (b *_BACnetErrorGeneralBuilder) WithMandatoryFields(error Error) BACnetErrorGeneralBuilder {

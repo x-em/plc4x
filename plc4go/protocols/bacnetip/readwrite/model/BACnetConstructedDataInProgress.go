@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataInProgressBuilder) = (*_BACnetConstructedDataInProgr
 
 func (b *_BACnetConstructedDataInProgressBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataInProgress
 }
 
 func (b *_BACnetConstructedDataInProgressBuilder) WithMandatoryFields(inProgress BACnetLightingInProgressTagged) BACnetConstructedDataInProgressBuilder {

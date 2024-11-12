@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAnalogInputMaxPresValueBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataAnalogInputMaxPresValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAnalogInputMaxPresValue
 }
 
 func (b *_BACnetConstructedDataAnalogInputMaxPresValueBuilder) WithMandatoryFields(maxPresValue BACnetApplicationTagReal) BACnetConstructedDataAnalogInputMaxPresValueBuilder {

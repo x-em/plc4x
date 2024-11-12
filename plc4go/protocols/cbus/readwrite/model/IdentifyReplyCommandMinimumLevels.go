@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandMinimumLevelsBuilder) = (*_IdentifyReplyCommandMinimu
 
 func (b *_IdentifyReplyCommandMinimumLevelsBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandMinimumLevels
 }
 
 func (b *_IdentifyReplyCommandMinimumLevelsBuilder) WithMandatoryFields(minimumLevels []byte) IdentifyReplyCommandMinimumLevelsBuilder {

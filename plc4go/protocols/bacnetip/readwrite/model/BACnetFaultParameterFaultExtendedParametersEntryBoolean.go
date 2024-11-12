@@ -109,6 +109,7 @@ var _ (BACnetFaultParameterFaultExtendedParametersEntryBooleanBuilder) = (*_BACn
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryBooleanBuilder) setParent(contract BACnetFaultParameterFaultExtendedParametersEntryContract) {
 	b.BACnetFaultParameterFaultExtendedParametersEntryContract = contract
+	contract.(*_BACnetFaultParameterFaultExtendedParametersEntry)._SubType = b._BACnetFaultParameterFaultExtendedParametersEntryBoolean
 }
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryBooleanBuilder) WithMandatoryFields(booleanValue BACnetApplicationTagBoolean) BACnetFaultParameterFaultExtendedParametersEntryBooleanBuilder {

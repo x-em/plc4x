@@ -96,6 +96,7 @@ var _ (ApduDataExtWriteRouterStatusRequestBuilder) = (*_ApduDataExtWriteRouterSt
 
 func (b *_ApduDataExtWriteRouterStatusRequestBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtWriteRouterStatusRequest
 }
 
 func (b *_ApduDataExtWriteRouterStatusRequestBuilder) WithMandatoryFields() ApduDataExtWriteRouterStatusRequestBuilder {

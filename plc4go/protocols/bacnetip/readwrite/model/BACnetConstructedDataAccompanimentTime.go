@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAccompanimentTimeBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataAccompanimentTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAccompanimentTime
 }
 
 func (b *_BACnetConstructedDataAccompanimentTimeBuilder) WithMandatoryFields(accompanimentTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAccompanimentTimeBuilder {

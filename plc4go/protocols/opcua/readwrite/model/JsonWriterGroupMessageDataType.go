@@ -104,6 +104,7 @@ var _ (JsonWriterGroupMessageDataTypeBuilder) = (*_JsonWriterGroupMessageDataTyp
 
 func (b *_JsonWriterGroupMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._JsonWriterGroupMessageDataType
 }
 
 func (b *_JsonWriterGroupMessageDataTypeBuilder) WithMandatoryFields(networkMessageContentMask JsonNetworkMessageContentMask) JsonWriterGroupMessageDataTypeBuilder {

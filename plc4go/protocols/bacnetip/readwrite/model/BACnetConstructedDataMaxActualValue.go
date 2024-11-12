@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMaxActualValueBuilder) = (*_BACnetConstructedDataMax
 
 func (b *_BACnetConstructedDataMaxActualValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMaxActualValue
 }
 
 func (b *_BACnetConstructedDataMaxActualValueBuilder) WithMandatoryFields(maxActualValue BACnetApplicationTagReal) BACnetConstructedDataMaxActualValueBuilder {

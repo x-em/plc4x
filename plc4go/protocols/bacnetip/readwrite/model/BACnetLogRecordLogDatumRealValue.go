@@ -109,6 +109,7 @@ var _ (BACnetLogRecordLogDatumRealValueBuilder) = (*_BACnetLogRecordLogDatumReal
 
 func (b *_BACnetLogRecordLogDatumRealValueBuilder) setParent(contract BACnetLogRecordLogDatumContract) {
 	b.BACnetLogRecordLogDatumContract = contract
+	contract.(*_BACnetLogRecordLogDatum)._SubType = b._BACnetLogRecordLogDatumRealValue
 }
 
 func (b *_BACnetLogRecordLogDatumRealValueBuilder) WithMandatoryFields(realValue BACnetContextTagReal) BACnetLogRecordLogDatumRealValueBuilder {

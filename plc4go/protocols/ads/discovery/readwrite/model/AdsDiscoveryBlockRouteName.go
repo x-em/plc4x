@@ -109,6 +109,7 @@ var _ (AdsDiscoveryBlockRouteNameBuilder) = (*_AdsDiscoveryBlockRouteNameBuilder
 
 func (b *_AdsDiscoveryBlockRouteNameBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockRouteName
 }
 
 func (b *_AdsDiscoveryBlockRouteNameBuilder) WithMandatoryFields(routeName AmsString) AdsDiscoveryBlockRouteNameBuilder {

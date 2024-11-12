@@ -110,6 +110,7 @@ var _ (ApduDataGroupValueResponseBuilder) = (*_ApduDataGroupValueResponseBuilder
 
 func (b *_ApduDataGroupValueResponseBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataGroupValueResponse
 }
 
 func (b *_ApduDataGroupValueResponseBuilder) WithMandatoryFields(dataFirstByte int8, data []byte) ApduDataGroupValueResponseBuilder {

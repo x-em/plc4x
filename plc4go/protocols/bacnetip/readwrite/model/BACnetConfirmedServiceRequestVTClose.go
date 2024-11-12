@@ -107,6 +107,7 @@ var _ (BACnetConfirmedServiceRequestVTCloseBuilder) = (*_BACnetConfirmedServiceR
 
 func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestVTClose
 }
 
 func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) WithMandatoryFields(listOfRemoteVtSessionIdentifiers []BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTCloseBuilder {

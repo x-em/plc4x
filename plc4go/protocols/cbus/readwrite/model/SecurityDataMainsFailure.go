@@ -96,6 +96,7 @@ var _ (SecurityDataMainsFailureBuilder) = (*_SecurityDataMainsFailureBuilder)(ni
 
 func (b *_SecurityDataMainsFailureBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataMainsFailure
 }
 
 func (b *_SecurityDataMainsFailureBuilder) WithMandatoryFields() SecurityDataMainsFailureBuilder {

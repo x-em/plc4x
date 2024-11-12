@@ -122,6 +122,7 @@ var _ (MediaTransportControlDataTotalTracksBuilder) = (*_MediaTransportControlDa
 
 func (b *_MediaTransportControlDataTotalTracksBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataTotalTracks
 }
 
 func (b *_MediaTransportControlDataTotalTracksBuilder) WithMandatoryFields(totalTracksMSB byte, totalTracksMMSB byte, totalTracksMLSB byte, totalTracksLSB byte) MediaTransportControlDataTotalTracksBuilder {

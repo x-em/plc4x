@@ -123,6 +123,7 @@ var _ (APDUAbortBuilder) = (*_APDUAbortBuilder)(nil)
 
 func (b *_APDUAbortBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUAbort
 }
 
 func (b *_APDUAbortBuilder) WithMandatoryFields(server bool, originalInvokeId uint8, abortReason BACnetAbortReasonTagged) APDUAbortBuilder {

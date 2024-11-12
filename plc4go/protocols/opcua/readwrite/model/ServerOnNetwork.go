@@ -132,6 +132,7 @@ var _ (ServerOnNetworkBuilder) = (*_ServerOnNetworkBuilder)(nil)
 
 func (b *_ServerOnNetworkBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ServerOnNetwork
 }
 
 func (b *_ServerOnNetworkBuilder) WithMandatoryFields(recordId uint32, serverName PascalString, discoveryUrl PascalString, serverCapabilities []PascalString) ServerOnNetworkBuilder {

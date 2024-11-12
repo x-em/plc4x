@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDoorPulseTimeBuilder) = (*_BACnetConstructedDataDoor
 
 func (b *_BACnetConstructedDataDoorPulseTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDoorPulseTime
 }
 
 func (b *_BACnetConstructedDataDoorPulseTimeBuilder) WithMandatoryFields(doorPulseTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataDoorPulseTimeBuilder {

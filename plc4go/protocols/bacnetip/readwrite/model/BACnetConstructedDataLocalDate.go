@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLocalDateBuilder) = (*_BACnetConstructedDataLocalDat
 
 func (b *_BACnetConstructedDataLocalDateBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLocalDate
 }
 
 func (b *_BACnetConstructedDataLocalDateBuilder) WithMandatoryFields(localDate BACnetApplicationTagDate) BACnetConstructedDataLocalDateBuilder {

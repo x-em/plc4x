@@ -110,6 +110,7 @@ var _ (NLMInitializeRoutingTableBuilder) = (*_NLMInitializeRoutingTableBuilder)(
 
 func (b *_NLMInitializeRoutingTableBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMInitializeRoutingTable
 }
 
 func (b *_NLMInitializeRoutingTableBuilder) WithMandatoryFields(numberOfPorts uint8, portMappings []NLMInitializeRoutingTablePortMapping) NLMInitializeRoutingTableBuilder {

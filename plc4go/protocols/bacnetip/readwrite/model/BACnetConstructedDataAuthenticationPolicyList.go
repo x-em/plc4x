@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataAuthenticationPolicyListBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataAuthenticationPolicyListBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAuthenticationPolicyList
 }
 
 func (b *_BACnetConstructedDataAuthenticationPolicyListBuilder) WithMandatoryFields(authenticationPolicyList []BACnetAuthenticationPolicy) BACnetConstructedDataAuthenticationPolicyListBuilder {

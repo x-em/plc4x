@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataBitTextBuilder) = (*_BACnetConstructedDataBitTextBui
 
 func (b *_BACnetConstructedDataBitTextBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBitText
 }
 
 func (b *_BACnetConstructedDataBitTextBuilder) WithMandatoryFields(bitText []BACnetApplicationTagCharacterString) BACnetConstructedDataBitTextBuilder {

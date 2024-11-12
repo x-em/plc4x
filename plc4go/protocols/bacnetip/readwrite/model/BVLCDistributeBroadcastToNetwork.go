@@ -114,6 +114,7 @@ var _ (BVLCDistributeBroadcastToNetworkBuilder) = (*_BVLCDistributeBroadcastToNe
 
 func (b *_BVLCDistributeBroadcastToNetworkBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCDistributeBroadcastToNetwork
 }
 
 func (b *_BVLCDistributeBroadcastToNetworkBuilder) WithMandatoryFields(npdu NPDU) BVLCDistributeBroadcastToNetworkBuilder {

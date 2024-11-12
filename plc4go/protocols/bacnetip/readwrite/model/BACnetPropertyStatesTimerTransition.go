@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesTimerTransitionBuilder) = (*_BACnetPropertyStatesTime
 
 func (b *_BACnetPropertyStatesTimerTransitionBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesTimerTransition
 }
 
 func (b *_BACnetPropertyStatesTimerTransitionBuilder) WithMandatoryFields(timerTransition BACnetTimerTransitionTagged) BACnetPropertyStatesTimerTransitionBuilder {

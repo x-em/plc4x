@@ -110,6 +110,7 @@ var _ (COTPPacketDisconnectResponseBuilder) = (*_COTPPacketDisconnectResponseBui
 
 func (b *_COTPPacketDisconnectResponseBuilder) setParent(contract COTPPacketContract) {
 	b.COTPPacketContract = contract
+	contract.(*_COTPPacket)._SubType = b._COTPPacketDisconnectResponse
 }
 
 func (b *_COTPPacketDisconnectResponseBuilder) WithMandatoryFields(destinationReference uint16, sourceReference uint16) COTPPacketDisconnectResponseBuilder {

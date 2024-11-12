@@ -109,6 +109,7 @@ var _ (BACnetLogDataLogDataEntryEnumeratedValueBuilder) = (*_BACnetLogDataLogDat
 
 func (b *_BACnetLogDataLogDataEntryEnumeratedValueBuilder) setParent(contract BACnetLogDataLogDataEntryContract) {
 	b.BACnetLogDataLogDataEntryContract = contract
+	contract.(*_BACnetLogDataLogDataEntry)._SubType = b._BACnetLogDataLogDataEntryEnumeratedValue
 }
 
 func (b *_BACnetLogDataLogDataEntryEnumeratedValueBuilder) WithMandatoryFields(enumeratedValue BACnetContextTagEnumerated) BACnetLogDataLogDataEntryEnumeratedValueBuilder {

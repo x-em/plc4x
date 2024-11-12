@@ -110,6 +110,7 @@ var _ (AnsiExtendedSymbolSegmentBuilder) = (*_AnsiExtendedSymbolSegmentBuilder)(
 
 func (b *_AnsiExtendedSymbolSegmentBuilder) setParent(contract DataSegmentTypeContract) {
 	b.DataSegmentTypeContract = contract
+	contract.(*_DataSegmentType)._SubType = b._AnsiExtendedSymbolSegment
 }
 
 func (b *_AnsiExtendedSymbolSegmentBuilder) WithMandatoryFields(symbol string) AnsiExtendedSymbolSegmentBuilder {

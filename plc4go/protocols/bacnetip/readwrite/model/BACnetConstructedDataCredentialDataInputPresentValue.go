@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCredentialDataInputPresentValueBuilder) = (*_BACnetC
 
 func (b *_BACnetConstructedDataCredentialDataInputPresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCredentialDataInputPresentValue
 }
 
 func (b *_BACnetConstructedDataCredentialDataInputPresentValueBuilder) WithMandatoryFields(presentValue BACnetAuthenticationFactor) BACnetConstructedDataCredentialDataInputPresentValueBuilder {

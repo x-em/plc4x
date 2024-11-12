@@ -109,6 +109,7 @@ var _ (BACnetOptionalREALValueBuilder) = (*_BACnetOptionalREALValueBuilder)(nil)
 
 func (b *_BACnetOptionalREALValueBuilder) setParent(contract BACnetOptionalREALContract) {
 	b.BACnetOptionalREALContract = contract
+	contract.(*_BACnetOptionalREAL)._SubType = b._BACnetOptionalREALValue
 }
 
 func (b *_BACnetOptionalREALValueBuilder) WithMandatoryFields(realValue BACnetApplicationTagReal) BACnetOptionalREALValueBuilder {

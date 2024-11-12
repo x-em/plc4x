@@ -121,6 +121,7 @@ var _ (TranslateBrowsePathsToNodeIdsResponseBuilder) = (*_TranslateBrowsePathsTo
 
 func (b *_TranslateBrowsePathsToNodeIdsResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TranslateBrowsePathsToNodeIdsResponse
 }
 
 func (b *_TranslateBrowsePathsToNodeIdsResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []BrowsePathResult, diagnosticInfos []DiagnosticInfo) TranslateBrowsePathsToNodeIdsResponseBuilder {

@@ -127,6 +127,7 @@ var _ (IdentifyReplyCommandOutputUnitSummaryBuilder) = (*_IdentifyReplyCommandOu
 
 func (b *_IdentifyReplyCommandOutputUnitSummaryBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandOutputUnitSummary
 }
 
 func (b *_IdentifyReplyCommandOutputUnitSummaryBuilder) WithMandatoryFields(unitFlags IdentifyReplyCommandUnitSummary, timeFromLastRecoverOfMainsInSeconds uint8) IdentifyReplyCommandOutputUnitSummaryBuilder {

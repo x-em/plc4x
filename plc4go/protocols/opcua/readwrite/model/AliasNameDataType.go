@@ -115,6 +115,7 @@ var _ (AliasNameDataTypeBuilder) = (*_AliasNameDataTypeBuilder)(nil)
 
 func (b *_AliasNameDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AliasNameDataType
 }
 
 func (b *_AliasNameDataTypeBuilder) WithMandatoryFields(aliasName QualifiedName, referencedNodes []ExpandedNodeId) AliasNameDataTypeBuilder {

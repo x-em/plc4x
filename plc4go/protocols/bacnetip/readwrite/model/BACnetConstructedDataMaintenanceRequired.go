@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMaintenanceRequiredBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataMaintenanceRequiredBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMaintenanceRequired
 }
 
 func (b *_BACnetConstructedDataMaintenanceRequiredBuilder) WithMandatoryFields(maintenanceRequired BACnetMaintenanceTagged) BACnetConstructedDataMaintenanceRequiredBuilder {

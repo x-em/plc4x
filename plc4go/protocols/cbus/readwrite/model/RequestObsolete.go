@@ -116,6 +116,7 @@ var _ (RequestObsoleteBuilder) = (*_RequestObsoleteBuilder)(nil)
 
 func (b *_RequestObsoleteBuilder) setParent(contract RequestContract) {
 	b.RequestContract = contract
+	contract.(*_Request)._SubType = b._RequestObsolete
 }
 
 func (b *_RequestObsoleteBuilder) WithMandatoryFields(calData CALData) RequestObsoleteBuilder {

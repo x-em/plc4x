@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCOVUPeriodBuilder) = (*_BACnetConstructedDataCOVUPer
 
 func (b *_BACnetConstructedDataCOVUPeriodBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCOVUPeriod
 }
 
 func (b *_BACnetConstructedDataCOVUPeriodBuilder) WithMandatoryFields(covuPeriod BACnetApplicationTagUnsignedInteger) BACnetConstructedDataCOVUPeriodBuilder {

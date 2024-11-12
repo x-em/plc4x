@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAutoSlaveDiscoveryBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataAutoSlaveDiscoveryBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAutoSlaveDiscovery
 }
 
 func (b *_BACnetConstructedDataAutoSlaveDiscoveryBuilder) WithMandatoryFields(autoSlaveDiscovery BACnetApplicationTagBoolean) BACnetConstructedDataAutoSlaveDiscoveryBuilder {

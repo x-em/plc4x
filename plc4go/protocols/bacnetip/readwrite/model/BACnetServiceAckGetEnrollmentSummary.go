@@ -150,6 +150,7 @@ var _ (BACnetServiceAckGetEnrollmentSummaryBuilder) = (*_BACnetServiceAckGetEnro
 
 func (b *_BACnetServiceAckGetEnrollmentSummaryBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckGetEnrollmentSummary
 }
 
 func (b *_BACnetServiceAckGetEnrollmentSummaryBuilder) WithMandatoryFields(objectIdentifier BACnetApplicationTagObjectIdentifier, eventType BACnetEventTypeTagged, eventState BACnetEventStateTagged, priority BACnetApplicationTagUnsignedInteger) BACnetServiceAckGetEnrollmentSummaryBuilder {

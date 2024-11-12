@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesAuthenticationStatusBuilder) = (*_BACnetPropertyState
 
 func (b *_BACnetPropertyStatesAuthenticationStatusBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesAuthenticationStatus
 }
 
 func (b *_BACnetPropertyStatesAuthenticationStatusBuilder) WithMandatoryFields(authenticationStatus BACnetAuthenticationStatusTagged) BACnetPropertyStatesAuthenticationStatusBuilder {

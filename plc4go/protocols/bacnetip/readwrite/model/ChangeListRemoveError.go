@@ -120,6 +120,7 @@ var _ (ChangeListRemoveErrorBuilder) = (*_ChangeListRemoveErrorBuilder)(nil)
 
 func (b *_ChangeListRemoveErrorBuilder) setParent(contract BACnetErrorContract) {
 	b.BACnetErrorContract = contract
+	contract.(*_BACnetError)._SubType = b._ChangeListRemoveError
 }
 
 func (b *_ChangeListRemoveErrorBuilder) WithMandatoryFields(errorType ErrorEnclosed, firstFailedElementNumber BACnetContextTagUnsignedInteger) ChangeListRemoveErrorBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDeadbandBuilder) = (*_BACnetConstructedDataDeadbandB
 
 func (b *_BACnetConstructedDataDeadbandBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDeadband
 }
 
 func (b *_BACnetConstructedDataDeadbandBuilder) WithMandatoryFields(deadband BACnetApplicationTagReal) BACnetConstructedDataDeadbandBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTimeOfDeviceRestartBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataTimeOfDeviceRestartBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimeOfDeviceRestart
 }
 
 func (b *_BACnetConstructedDataTimeOfDeviceRestartBuilder) WithMandatoryFields(timeOfDeviceRestart BACnetTimeStamp) BACnetConstructedDataTimeOfDeviceRestartBuilder {

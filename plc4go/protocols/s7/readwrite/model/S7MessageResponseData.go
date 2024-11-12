@@ -110,6 +110,7 @@ var _ (S7MessageResponseDataBuilder) = (*_S7MessageResponseDataBuilder)(nil)
 
 func (b *_S7MessageResponseDataBuilder) setParent(contract S7MessageContract) {
 	b.S7MessageContract = contract
+	contract.(*_S7Message)._SubType = b._S7MessageResponseData
 }
 
 func (b *_S7MessageResponseDataBuilder) WithMandatoryFields(errorClass uint8, errorCode uint8) S7MessageResponseDataBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLifeSafetyZoneMaintenanceRequiredBuilder) = (*_BACne
 
 func (b *_BACnetConstructedDataLifeSafetyZoneMaintenanceRequiredBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLifeSafetyZoneMaintenanceRequired
 }
 
 func (b *_BACnetConstructedDataLifeSafetyZoneMaintenanceRequiredBuilder) WithMandatoryFields(maintenanceRequired BACnetApplicationTagBoolean) BACnetConstructedDataLifeSafetyZoneMaintenanceRequiredBuilder {

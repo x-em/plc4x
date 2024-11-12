@@ -166,6 +166,7 @@ var _ (BACnetServiceAckReadRangeBuilder) = (*_BACnetServiceAckReadRangeBuilder)(
 
 func (b *_BACnetServiceAckReadRangeBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckReadRange
 }
 
 func (b *_BACnetServiceAckReadRangeBuilder) WithMandatoryFields(objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged, resultFlags BACnetResultFlagsTagged, itemCount BACnetContextTagUnsignedInteger) BACnetServiceAckReadRangeBuilder {

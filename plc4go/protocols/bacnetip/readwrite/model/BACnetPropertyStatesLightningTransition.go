@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesLightningTransitionBuilder) = (*_BACnetPropertyStates
 
 func (b *_BACnetPropertyStatesLightningTransitionBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesLightningTransition
 }
 
 func (b *_BACnetPropertyStatesLightningTransitionBuilder) WithMandatoryFields(lightningTransition BACnetLightingTransitionTagged) BACnetPropertyStatesLightningTransitionBuilder {

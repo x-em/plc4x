@@ -104,6 +104,7 @@ var _ (AdsDiscoveryBlockVersionBuilder) = (*_AdsDiscoveryBlockVersionBuilder)(ni
 
 func (b *_AdsDiscoveryBlockVersionBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockVersion
 }
 
 func (b *_AdsDiscoveryBlockVersionBuilder) WithMandatoryFields(versionData []byte) AdsDiscoveryBlockVersionBuilder {

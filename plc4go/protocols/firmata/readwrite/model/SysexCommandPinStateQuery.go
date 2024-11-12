@@ -104,6 +104,7 @@ var _ (SysexCommandPinStateQueryBuilder) = (*_SysexCommandPinStateQueryBuilder)(
 
 func (b *_SysexCommandPinStateQueryBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandPinStateQuery
 }
 
 func (b *_SysexCommandPinStateQueryBuilder) WithMandatoryFields(pin uint8) SysexCommandPinStateQueryBuilder {

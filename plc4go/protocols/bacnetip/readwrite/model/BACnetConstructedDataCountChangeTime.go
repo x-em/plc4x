@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCountChangeTimeBuilder) = (*_BACnetConstructedDataCo
 
 func (b *_BACnetConstructedDataCountChangeTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCountChangeTime
 }
 
 func (b *_BACnetConstructedDataCountChangeTimeBuilder) WithMandatoryFields(countChangeTime BACnetDateTime) BACnetConstructedDataCountChangeTimeBuilder {

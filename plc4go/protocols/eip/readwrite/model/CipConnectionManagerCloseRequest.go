@@ -176,6 +176,7 @@ var _ (CipConnectionManagerCloseRequestBuilder) = (*_CipConnectionManagerCloseRe
 
 func (b *_CipConnectionManagerCloseRequestBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipConnectionManagerCloseRequest
 }
 
 func (b *_CipConnectionManagerCloseRequestBuilder) WithMandatoryFields(requestPathSize uint8, classSegment PathSegment, instanceSegment PathSegment, priority uint8, tickTime uint8, timeoutTicks uint8, connectionSerialNumber uint16, originatorVendorId uint16, originatorSerialNumber uint32, connectionPathSize uint8, connectionPaths []PathSegment) CipConnectionManagerCloseRequestBuilder {

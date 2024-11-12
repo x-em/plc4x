@@ -121,6 +121,7 @@ var _ (AddNodesResponseBuilder) = (*_AddNodesResponseBuilder)(nil)
 
 func (b *_AddNodesResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AddNodesResponse
 }
 
 func (b *_AddNodesResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []AddNodesResult, diagnosticInfos []DiagnosticInfo) AddNodesResponseBuilder {

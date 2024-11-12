@@ -104,6 +104,7 @@ var _ (ElementOperandBuilder) = (*_ElementOperandBuilder)(nil)
 
 func (b *_ElementOperandBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ElementOperand
 }
 
 func (b *_ElementOperandBuilder) WithMandatoryFields(index uint32) ElementOperandBuilder {

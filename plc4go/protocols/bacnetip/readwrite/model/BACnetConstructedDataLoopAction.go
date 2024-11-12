@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLoopActionBuilder) = (*_BACnetConstructedDataLoopAct
 
 func (b *_BACnetConstructedDataLoopActionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLoopAction
 }
 
 func (b *_BACnetConstructedDataLoopActionBuilder) WithMandatoryFields(action BACnetActionTagged) BACnetConstructedDataLoopActionBuilder {

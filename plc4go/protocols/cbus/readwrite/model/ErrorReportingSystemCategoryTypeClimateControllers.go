@@ -104,6 +104,7 @@ var _ (ErrorReportingSystemCategoryTypeClimateControllersBuilder) = (*_ErrorRepo
 
 func (b *_ErrorReportingSystemCategoryTypeClimateControllersBuilder) setParent(contract ErrorReportingSystemCategoryTypeContract) {
 	b.ErrorReportingSystemCategoryTypeContract = contract
+	contract.(*_ErrorReportingSystemCategoryType)._SubType = b._ErrorReportingSystemCategoryTypeClimateControllers
 }
 
 func (b *_ErrorReportingSystemCategoryTypeClimateControllersBuilder) WithMandatoryFields(categoryForType ErrorReportingSystemCategoryTypeForClimateControllers) ErrorReportingSystemCategoryTypeClimateControllersBuilder {

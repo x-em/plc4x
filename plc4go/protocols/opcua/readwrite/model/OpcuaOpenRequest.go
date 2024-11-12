@@ -123,6 +123,7 @@ var _ (OpcuaOpenRequestBuilder) = (*_OpcuaOpenRequestBuilder)(nil)
 
 func (b *_OpcuaOpenRequestBuilder) setParent(contract MessagePDUContract) {
 	b.MessagePDUContract = contract
+	contract.(*_MessagePDU)._SubType = b._OpcuaOpenRequest
 }
 
 func (b *_OpcuaOpenRequestBuilder) WithMandatoryFields(openRequest OpenChannelMessage, message Payload) OpcuaOpenRequestBuilder {

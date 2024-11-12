@@ -121,6 +121,7 @@ var _ (TransferSubscriptionsResponseBuilder) = (*_TransferSubscriptionsResponseB
 
 func (b *_TransferSubscriptionsResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TransferSubscriptionsResponse
 }
 
 func (b *_TransferSubscriptionsResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []TransferResult, diagnosticInfos []DiagnosticInfo) TransferSubscriptionsResponseBuilder {

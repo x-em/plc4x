@@ -233,6 +233,7 @@ var _ (CipConnectionManagerRequestBuilder) = (*_CipConnectionManagerRequestBuild
 
 func (b *_CipConnectionManagerRequestBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipConnectionManagerRequest
 }
 
 func (b *_CipConnectionManagerRequestBuilder) WithMandatoryFields(classSegment PathSegment, instanceSegment PathSegment, priority uint8, tickTime uint8, timeoutTicks uint8, otConnectionId uint32, toConnectionId uint32, connectionSerialNumber uint16, originatorVendorId uint16, originatorSerialNumber uint32, timeoutMultiplier uint8, otRpi uint32, otConnectionParameters NetworkConnectionParameters, toRpi uint32, toConnectionParameters NetworkConnectionParameters, transportType TransportType, connectionPathSize uint8, connectionPaths []PathSegment) CipConnectionManagerRequestBuilder {

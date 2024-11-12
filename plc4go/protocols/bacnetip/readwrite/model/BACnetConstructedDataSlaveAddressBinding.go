@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataSlaveAddressBindingBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataSlaveAddressBindingBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSlaveAddressBinding
 }
 
 func (b *_BACnetConstructedDataSlaveAddressBindingBuilder) WithMandatoryFields(slaveAddressBinding []BACnetAddressBinding) BACnetConstructedDataSlaveAddressBindingBuilder {

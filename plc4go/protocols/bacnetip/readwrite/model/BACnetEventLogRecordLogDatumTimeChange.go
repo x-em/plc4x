@@ -109,6 +109,7 @@ var _ (BACnetEventLogRecordLogDatumTimeChangeBuilder) = (*_BACnetEventLogRecordL
 
 func (b *_BACnetEventLogRecordLogDatumTimeChangeBuilder) setParent(contract BACnetEventLogRecordLogDatumContract) {
 	b.BACnetEventLogRecordLogDatumContract = contract
+	contract.(*_BACnetEventLogRecordLogDatum)._SubType = b._BACnetEventLogRecordLogDatumTimeChange
 }
 
 func (b *_BACnetEventLogRecordLogDatumTimeChangeBuilder) WithMandatoryFields(timeChange BACnetContextTagReal) BACnetEventLogRecordLogDatumTimeChangeBuilder {

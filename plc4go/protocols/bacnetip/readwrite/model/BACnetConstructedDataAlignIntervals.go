@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAlignIntervalsBuilder) = (*_BACnetConstructedDataAli
 
 func (b *_BACnetConstructedDataAlignIntervalsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAlignIntervals
 }
 
 func (b *_BACnetConstructedDataAlignIntervalsBuilder) WithMandatoryFields(alignIntervals BACnetApplicationTagBoolean) BACnetConstructedDataAlignIntervalsBuilder {

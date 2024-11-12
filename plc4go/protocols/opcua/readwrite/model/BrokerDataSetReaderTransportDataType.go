@@ -148,6 +148,7 @@ var _ (BrokerDataSetReaderTransportDataTypeBuilder) = (*_BrokerDataSetReaderTran
 
 func (b *_BrokerDataSetReaderTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrokerDataSetReaderTransportDataType
 }
 
 func (b *_BrokerDataSetReaderTransportDataTypeBuilder) WithMandatoryFields(queueName PascalString, resourceUri PascalString, authenticationProfileUri PascalString, requestedDeliveryGuarantee BrokerTransportQualityOfService, metaDataQueueName PascalString) BrokerDataSetReaderTransportDataTypeBuilder {

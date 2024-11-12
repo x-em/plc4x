@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataSystemStatusBuilder) = (*_BACnetConstructedDataSyste
 
 func (b *_BACnetConstructedDataSystemStatusBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSystemStatus
 }
 
 func (b *_BACnetConstructedDataSystemStatusBuilder) WithMandatoryFields(systemStatus BACnetDeviceStatusTagged) BACnetConstructedDataSystemStatusBuilder {

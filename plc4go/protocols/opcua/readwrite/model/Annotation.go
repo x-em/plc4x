@@ -126,6 +126,7 @@ var _ (AnnotationBuilder) = (*_AnnotationBuilder)(nil)
 
 func (b *_AnnotationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._Annotation
 }
 
 func (b *_AnnotationBuilder) WithMandatoryFields(message PascalString, userName PascalString, annotationTime int64) AnnotationBuilder {

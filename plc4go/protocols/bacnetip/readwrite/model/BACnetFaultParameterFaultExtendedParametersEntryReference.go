@@ -109,6 +109,7 @@ var _ (BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder) = (*_BA
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder) setParent(contract BACnetFaultParameterFaultExtendedParametersEntryContract) {
 	b.BACnetFaultParameterFaultExtendedParametersEntryContract = contract
+	contract.(*_BACnetFaultParameterFaultExtendedParametersEntry)._SubType = b._BACnetFaultParameterFaultExtendedParametersEntryReference
 }
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder) WithMandatoryFields(reference BACnetDeviceObjectPropertyReferenceEnclosed) BACnetFaultParameterFaultExtendedParametersEntryReferenceBuilder {

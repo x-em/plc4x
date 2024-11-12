@@ -143,6 +143,7 @@ var _ (AxisInformationBuilder) = (*_AxisInformationBuilder)(nil)
 
 func (b *_AxisInformationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AxisInformation
 }
 
 func (b *_AxisInformationBuilder) WithMandatoryFields(engineeringUnits EUInformation, eURange Range, title LocalizedText, axisScaleType AxisScaleEnumeration, axisSteps []float64) AxisInformationBuilder {

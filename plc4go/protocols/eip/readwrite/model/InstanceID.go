@@ -110,6 +110,7 @@ var _ (InstanceIDBuilder) = (*_InstanceIDBuilder)(nil)
 
 func (b *_InstanceIDBuilder) setParent(contract LogicalSegmentTypeContract) {
 	b.LogicalSegmentTypeContract = contract
+	contract.(*_LogicalSegmentType)._SubType = b._InstanceID
 }
 
 func (b *_InstanceIDBuilder) WithMandatoryFields(format uint8, instance uint8) InstanceIDBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataOperationDirectionBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataOperationDirectionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataOperationDirection
 }
 
 func (b *_BACnetConstructedDataOperationDirectionBuilder) WithMandatoryFields(operationDirection BACnetEscalatorOperationDirectionTagged) BACnetConstructedDataOperationDirectionBuilder {

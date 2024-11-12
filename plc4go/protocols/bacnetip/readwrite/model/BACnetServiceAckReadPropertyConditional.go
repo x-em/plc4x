@@ -107,6 +107,7 @@ var _ (BACnetServiceAckReadPropertyConditionalBuilder) = (*_BACnetServiceAckRead
 
 func (b *_BACnetServiceAckReadPropertyConditionalBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckReadPropertyConditional
 }
 
 func (b *_BACnetServiceAckReadPropertyConditionalBuilder) WithMandatoryFields(bytesOfRemovedService []byte) BACnetServiceAckReadPropertyConditionalBuilder {

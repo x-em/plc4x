@@ -152,6 +152,7 @@ var _ (PublishResponseBuilder) = (*_PublishResponseBuilder)(nil)
 
 func (b *_PublishResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishResponse
 }
 
 func (b *_PublishResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, subscriptionId uint32, availableSequenceNumbers []uint32, moreNotifications bool, notificationMessage NotificationMessage, results []StatusCode, diagnosticInfos []DiagnosticInfo) PublishResponseBuilder {

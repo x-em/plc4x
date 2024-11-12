@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataSubscribedRecipientsBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataSubscribedRecipientsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSubscribedRecipients
 }
 
 func (b *_BACnetConstructedDataSubscribedRecipientsBuilder) WithMandatoryFields(subscribedRecipients []BACnetEventNotificationSubscription) BACnetConstructedDataSubscribedRecipientsBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLinkSpeedAutonegotiateBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataLinkSpeedAutonegotiateBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLinkSpeedAutonegotiate
 }
 
 func (b *_BACnetConstructedDataLinkSpeedAutonegotiateBuilder) WithMandatoryFields(linkSpeedAutonegotiate BACnetApplicationTagBoolean) BACnetConstructedDataLinkSpeedAutonegotiateBuilder {

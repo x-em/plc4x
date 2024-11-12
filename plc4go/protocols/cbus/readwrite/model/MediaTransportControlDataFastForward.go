@@ -120,6 +120,7 @@ var _ (MediaTransportControlDataFastForwardBuilder) = (*_MediaTransportControlDa
 
 func (b *_MediaTransportControlDataFastForwardBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataFastForward
 }
 
 func (b *_MediaTransportControlDataFastForwardBuilder) WithMandatoryFields(operation byte) MediaTransportControlDataFastForwardBuilder {

@@ -149,6 +149,7 @@ var _ (QueryFirstRequestBuilder) = (*_QueryFirstRequestBuilder)(nil)
 
 func (b *_QueryFirstRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._QueryFirstRequest
 }
 
 func (b *_QueryFirstRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, view ViewDescription, nodeTypes []NodeTypeDescription, filter ContentFilter, maxDataSetsToReturn uint32, maxReferencesToReturn uint32) QueryFirstRequestBuilder {

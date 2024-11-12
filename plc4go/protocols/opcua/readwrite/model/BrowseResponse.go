@@ -121,6 +121,7 @@ var _ (BrowseResponseBuilder) = (*_BrowseResponseBuilder)(nil)
 
 func (b *_BrowseResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrowseResponse
 }
 
 func (b *_BrowseResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []BrowseResult, diagnosticInfos []DiagnosticInfo) BrowseResponseBuilder {

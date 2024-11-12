@@ -115,6 +115,7 @@ var _ (GenericAttributeValueBuilder) = (*_GenericAttributeValueBuilder)(nil)
 
 func (b *_GenericAttributeValueBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._GenericAttributeValue
 }
 
 func (b *_GenericAttributeValueBuilder) WithMandatoryFields(attributeId uint32, value Variant) GenericAttributeValueBuilder {

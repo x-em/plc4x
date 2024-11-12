@@ -115,6 +115,7 @@ var _ (CALDataReplyBuilder) = (*_CALDataReplyBuilder)(nil)
 
 func (b *_CALDataReplyBuilder) setParent(contract CALDataContract) {
 	b.CALDataContract = contract
+	contract.(*_CALData)._SubType = b._CALDataReply
 }
 
 func (b *_CALDataReplyBuilder) WithMandatoryFields(paramNo Parameter, parameterValue ParameterValue) CALDataReplyBuilder {

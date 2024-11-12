@@ -96,6 +96,7 @@ var _ (OrientationBuilder) = (*_OrientationBuilder)(nil)
 
 func (b *_OrientationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._Orientation
 }
 
 func (b *_OrientationBuilder) WithMandatoryFields() OrientationBuilder {

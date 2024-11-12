@@ -142,6 +142,7 @@ var _ (BACnetEventParameterAccessEventBuilder) = (*_BACnetEventParameterAccessEv
 
 func (b *_BACnetEventParameterAccessEventBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterAccessEvent
 }
 
 func (b *_BACnetEventParameterAccessEventBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, listOfAccessEvents BACnetEventParameterAccessEventListOfAccessEvents, accessEventTimeReference BACnetDeviceObjectPropertyReferenceEnclosed, closingTag BACnetClosingTag) BACnetEventParameterAccessEventBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesDoorValueBuilder) = (*_BACnetPropertyStatesDoorValueB
 
 func (b *_BACnetPropertyStatesDoorValueBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesDoorValue
 }
 
 func (b *_BACnetPropertyStatesDoorValueBuilder) WithMandatoryFields(doorValue BACnetDoorValueTagged) BACnetPropertyStatesDoorValueBuilder {

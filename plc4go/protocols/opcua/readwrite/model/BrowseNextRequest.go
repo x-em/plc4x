@@ -123,6 +123,7 @@ var _ (BrowseNextRequestBuilder) = (*_BrowseNextRequestBuilder)(nil)
 
 func (b *_BrowseNextRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrowseNextRequest
 }
 
 func (b *_BrowseNextRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, releaseContinuationPoints bool, continuationPoints []PascalByteString) BrowseNextRequestBuilder {

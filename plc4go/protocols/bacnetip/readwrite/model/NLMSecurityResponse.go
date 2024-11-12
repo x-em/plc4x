@@ -122,6 +122,7 @@ var _ (NLMSecurityResponseBuilder) = (*_NLMSecurityResponseBuilder)(nil)
 
 func (b *_NLMSecurityResponseBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMSecurityResponse
 }
 
 func (b *_NLMSecurityResponseBuilder) WithMandatoryFields(responseCode SecurityResponseCode, originalMessageId uint32, originalTimestamp uint32, variableParameters []byte) NLMSecurityResponseBuilder {

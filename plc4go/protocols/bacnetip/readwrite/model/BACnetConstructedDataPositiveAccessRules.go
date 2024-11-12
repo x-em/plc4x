@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataPositiveAccessRulesBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataPositiveAccessRulesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPositiveAccessRules
 }
 
 func (b *_BACnetConstructedDataPositiveAccessRulesBuilder) WithMandatoryFields(positiveAccessRules []BACnetAccessRule) BACnetConstructedDataPositiveAccessRulesBuilder {

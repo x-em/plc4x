@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataGlobalGroupGroupMembersBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataGlobalGroupGroupMembersBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataGlobalGroupGroupMembers
 }
 
 func (b *_BACnetConstructedDataGlobalGroupGroupMembersBuilder) WithMandatoryFields(groupMembers []BACnetDeviceObjectPropertyReference) BACnetConstructedDataGlobalGroupGroupMembersBuilder {

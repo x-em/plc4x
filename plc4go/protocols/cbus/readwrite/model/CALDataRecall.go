@@ -110,6 +110,7 @@ var _ (CALDataRecallBuilder) = (*_CALDataRecallBuilder)(nil)
 
 func (b *_CALDataRecallBuilder) setParent(contract CALDataContract) {
 	b.CALDataContract = contract
+	contract.(*_CALData)._SubType = b._CALDataRecall
 }
 
 func (b *_CALDataRecallBuilder) WithMandatoryFields(paramNo Parameter, count uint8) CALDataRecallBuilder {

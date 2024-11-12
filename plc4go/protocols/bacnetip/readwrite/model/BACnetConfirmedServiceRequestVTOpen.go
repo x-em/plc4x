@@ -120,6 +120,7 @@ var _ (BACnetConfirmedServiceRequestVTOpenBuilder) = (*_BACnetConfirmedServiceRe
 
 func (b *_BACnetConfirmedServiceRequestVTOpenBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestVTOpen
 }
 
 func (b *_BACnetConfirmedServiceRequestVTOpenBuilder) WithMandatoryFields(vtClass BACnetVTClassTagged, localVtSessionIdentifier BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTOpenBuilder {

@@ -96,6 +96,7 @@ var _ (ConnectionTransportDataTypeBuilder) = (*_ConnectionTransportDataTypeBuild
 
 func (b *_ConnectionTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ConnectionTransportDataType
 }
 
 func (b *_ConnectionTransportDataTypeBuilder) WithMandatoryFields() ConnectionTransportDataTypeBuilder {

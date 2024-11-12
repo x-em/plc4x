@@ -145,6 +145,7 @@ var _ (S7PayloadDiagnosticMessageBuilder) = (*_S7PayloadDiagnosticMessageBuilder
 
 func (b *_S7PayloadDiagnosticMessageBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadDiagnosticMessage
 }
 
 func (b *_S7PayloadDiagnosticMessageBuilder) WithMandatoryFields(eventId uint16, priorityClass uint8, obNumber uint8, datId uint16, info1 uint16, info2 uint32, timeStamp DateAndTime) S7PayloadDiagnosticMessageBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetServiceAckCreateObjectBuilder) = (*_BACnetServiceAckCreateObjectBui
 
 func (b *_BACnetServiceAckCreateObjectBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckCreateObject
 }
 
 func (b *_BACnetServiceAckCreateObjectBuilder) WithMandatoryFields(objectIdentifier BACnetApplicationTagObjectIdentifier) BACnetServiceAckCreateObjectBuilder {

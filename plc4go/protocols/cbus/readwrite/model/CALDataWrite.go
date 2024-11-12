@@ -121,6 +121,7 @@ var _ (CALDataWriteBuilder) = (*_CALDataWriteBuilder)(nil)
 
 func (b *_CALDataWriteBuilder) setParent(contract CALDataContract) {
 	b.CALDataContract = contract
+	contract.(*_CALData)._SubType = b._CALDataWrite
 }
 
 func (b *_CALDataWriteBuilder) WithMandatoryFields(paramNo Parameter, code byte, parameterValue ParameterValue) CALDataWriteBuilder {

@@ -124,6 +124,7 @@ var _ (S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequestBuilder) = (*_S7Pay
 
 func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequestBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequest
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequestBuilder) WithMandatoryFields(subscription uint8, magicKey string) S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequestBuilder {

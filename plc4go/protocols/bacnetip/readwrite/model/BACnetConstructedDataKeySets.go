@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataKeySetsBuilder) = (*_BACnetConstructedDataKeySetsBui
 
 func (b *_BACnetConstructedDataKeySetsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataKeySets
 }
 
 func (b *_BACnetConstructedDataKeySetsBuilder) WithMandatoryFields(keySets []BACnetSecurityKeySet) BACnetConstructedDataKeySetsBuilder {

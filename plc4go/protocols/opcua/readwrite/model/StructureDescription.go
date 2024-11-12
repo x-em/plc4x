@@ -131,6 +131,7 @@ var _ (StructureDescriptionBuilder) = (*_StructureDescriptionBuilder)(nil)
 
 func (b *_StructureDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._StructureDescription
 }
 
 func (b *_StructureDescriptionBuilder) WithMandatoryFields(dataTypeId NodeId, name QualifiedName, structureDefinition StructureDefinition) StructureDescriptionBuilder {

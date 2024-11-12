@@ -110,6 +110,7 @@ var _ (VariantDiagnosticInfoBuilder) = (*_VariantDiagnosticInfoBuilder)(nil)
 
 func (b *_VariantDiagnosticInfoBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantDiagnosticInfo
 }
 
 func (b *_VariantDiagnosticInfoBuilder) WithMandatoryFields(value []DiagnosticInfo) VariantDiagnosticInfoBuilder {

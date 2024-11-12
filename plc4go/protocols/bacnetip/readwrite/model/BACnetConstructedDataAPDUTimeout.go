@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAPDUTimeoutBuilder) = (*_BACnetConstructedDataAPDUTi
 
 func (b *_BACnetConstructedDataAPDUTimeoutBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAPDUTimeout
 }
 
 func (b *_BACnetConstructedDataAPDUTimeoutBuilder) WithMandatoryFields(apduTimeout BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAPDUTimeoutBuilder {

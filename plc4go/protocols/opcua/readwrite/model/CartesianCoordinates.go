@@ -96,6 +96,7 @@ var _ (CartesianCoordinatesBuilder) = (*_CartesianCoordinatesBuilder)(nil)
 
 func (b *_CartesianCoordinatesBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CartesianCoordinates
 }
 
 func (b *_CartesianCoordinatesBuilder) WithMandatoryFields() CartesianCoordinatesBuilder {

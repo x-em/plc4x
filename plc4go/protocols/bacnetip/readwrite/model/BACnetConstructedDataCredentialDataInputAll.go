@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataCredentialDataInputAllBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataCredentialDataInputAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCredentialDataInputAll
 }
 
 func (b *_BACnetConstructedDataCredentialDataInputAllBuilder) WithMandatoryFields() BACnetConstructedDataCredentialDataInputAllBuilder {

@@ -120,6 +120,7 @@ var _ (GetAttributeAllResponseBuilder) = (*_GetAttributeAllResponseBuilder)(nil)
 
 func (b *_GetAttributeAllResponseBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._GetAttributeAllResponse
 }
 
 func (b *_GetAttributeAllResponseBuilder) WithMandatoryFields(status uint8, extStatus uint8) GetAttributeAllResponseBuilder {

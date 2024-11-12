@@ -120,6 +120,7 @@ var _ (BrokerConnectionTransportDataTypeBuilder) = (*_BrokerConnectionTransportD
 
 func (b *_BrokerConnectionTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrokerConnectionTransportDataType
 }
 
 func (b *_BrokerConnectionTransportDataTypeBuilder) WithMandatoryFields(resourceUri PascalString, authenticationProfileUri PascalString) BrokerConnectionTransportDataTypeBuilder {

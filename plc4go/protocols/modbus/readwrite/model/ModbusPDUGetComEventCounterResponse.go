@@ -110,6 +110,7 @@ var _ (ModbusPDUGetComEventCounterResponseBuilder) = (*_ModbusPDUGetComEventCoun
 
 func (b *_ModbusPDUGetComEventCounterResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUGetComEventCounterResponse
 }
 
 func (b *_ModbusPDUGetComEventCounterResponseBuilder) WithMandatoryFields(status uint16, eventCount uint16) ModbusPDUGetComEventCounterResponseBuilder {

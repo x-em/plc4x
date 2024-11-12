@@ -120,6 +120,7 @@ var _ (StatusChangeNotificationBuilder) = (*_StatusChangeNotificationBuilder)(ni
 
 func (b *_StatusChangeNotificationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._StatusChangeNotification
 }
 
 func (b *_StatusChangeNotificationBuilder) WithMandatoryFields(status StatusCode, diagnosticInfo DiagnosticInfo) StatusChangeNotificationBuilder {

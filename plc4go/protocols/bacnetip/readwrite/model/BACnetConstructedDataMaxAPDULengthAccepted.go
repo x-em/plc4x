@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMaxAPDULengthAcceptedBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataMaxAPDULengthAcceptedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMaxAPDULengthAccepted
 }
 
 func (b *_BACnetConstructedDataMaxAPDULengthAcceptedBuilder) WithMandatoryFields(maxApduLengthAccepted BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMaxAPDULengthAcceptedBuilder {

@@ -148,6 +148,7 @@ var _ (AttributeOperandBuilder) = (*_AttributeOperandBuilder)(nil)
 
 func (b *_AttributeOperandBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AttributeOperand
 }
 
 func (b *_AttributeOperandBuilder) WithMandatoryFields(nodeId NodeId, alias PascalString, browsePath RelativePath, attributeId uint32, indexRange PascalString) AttributeOperandBuilder {

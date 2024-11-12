@@ -119,6 +119,7 @@ var _ (DisconnectRequestBuilder) = (*_DisconnectRequestBuilder)(nil)
 
 func (b *_DisconnectRequestBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._DisconnectRequest
 }
 
 func (b *_DisconnectRequestBuilder) WithMandatoryFields(communicationChannelId uint8, hpaiControlEndpoint HPAIControlEndpoint) DisconnectRequestBuilder {

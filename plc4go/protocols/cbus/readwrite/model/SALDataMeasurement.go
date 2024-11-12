@@ -109,6 +109,7 @@ var _ (SALDataMeasurementBuilder) = (*_SALDataMeasurementBuilder)(nil)
 
 func (b *_SALDataMeasurementBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataMeasurement
 }
 
 func (b *_SALDataMeasurementBuilder) WithMandatoryFields(measurementData MeasurementData) SALDataMeasurementBuilder {

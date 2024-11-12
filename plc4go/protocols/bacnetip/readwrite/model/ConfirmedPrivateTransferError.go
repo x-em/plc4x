@@ -139,6 +139,7 @@ var _ (ConfirmedPrivateTransferErrorBuilder) = (*_ConfirmedPrivateTransferErrorB
 
 func (b *_ConfirmedPrivateTransferErrorBuilder) setParent(contract BACnetErrorContract) {
 	b.BACnetErrorContract = contract
+	contract.(*_BACnetError)._SubType = b._ConfirmedPrivateTransferError
 }
 
 func (b *_ConfirmedPrivateTransferErrorBuilder) WithMandatoryFields(errorType ErrorEnclosed, vendorId BACnetVendorIdTagged, serviceNumber BACnetContextTagUnsignedInteger) ConfirmedPrivateTransferErrorBuilder {

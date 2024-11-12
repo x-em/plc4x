@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIPv6DHCPServerBuilder) = (*_BACnetConstructedDataIPv
 
 func (b *_BACnetConstructedDataIPv6DHCPServerBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPv6DHCPServer
 }
 
 func (b *_BACnetConstructedDataIPv6DHCPServerBuilder) WithMandatoryFields(dhcpServer BACnetApplicationTagOctetString) BACnetConstructedDataIPv6DHCPServerBuilder {

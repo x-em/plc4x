@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataWeeklyScheduleBuilder) = (*_BACnetConstructedDataWee
 
 func (b *_BACnetConstructedDataWeeklyScheduleBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataWeeklySchedule
 }
 
 func (b *_BACnetConstructedDataWeeklyScheduleBuilder) WithMandatoryFields(weeklySchedule []BACnetDailySchedule) BACnetConstructedDataWeeklyScheduleBuilder {

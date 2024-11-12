@@ -121,6 +121,7 @@ var _ (S7PayloadUserDataItemClkResponseBuilder) = (*_S7PayloadUserDataItemClkRes
 
 func (b *_S7PayloadUserDataItemClkResponseBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemClkResponse
 }
 
 func (b *_S7PayloadUserDataItemClkResponseBuilder) WithMandatoryFields(res uint8, year1 uint8, timeStamp DateAndTime) S7PayloadUserDataItemClkResponseBuilder {

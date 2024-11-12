@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataVendorIdentifierBuilder) = (*_BACnetConstructedDataV
 
 func (b *_BACnetConstructedDataVendorIdentifierBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataVendorIdentifier
 }
 
 func (b *_BACnetConstructedDataVendorIdentifierBuilder) WithMandatoryFields(vendorIdentifier BACnetVendorIdTagged) BACnetConstructedDataVendorIdentifierBuilder {

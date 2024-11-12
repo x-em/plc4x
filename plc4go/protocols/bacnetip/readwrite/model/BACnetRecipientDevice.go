@@ -109,6 +109,7 @@ var _ (BACnetRecipientDeviceBuilder) = (*_BACnetRecipientDeviceBuilder)(nil)
 
 func (b *_BACnetRecipientDeviceBuilder) setParent(contract BACnetRecipientContract) {
 	b.BACnetRecipientContract = contract
+	contract.(*_BACnetRecipient)._SubType = b._BACnetRecipientDevice
 }
 
 func (b *_BACnetRecipientDeviceBuilder) WithMandatoryFields(deviceValue BACnetContextTagObjectIdentifier) BACnetRecipientDeviceBuilder {

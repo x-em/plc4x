@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDirectReadingBuilder) = (*_BACnetConstructedDataDire
 
 func (b *_BACnetConstructedDataDirectReadingBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDirectReading
 }
 
 func (b *_BACnetConstructedDataDirectReadingBuilder) WithMandatoryFields(directReading BACnetApplicationTagReal) BACnetConstructedDataDirectReadingBuilder {

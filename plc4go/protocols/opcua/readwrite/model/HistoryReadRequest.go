@@ -140,6 +140,7 @@ var _ (HistoryReadRequestBuilder) = (*_HistoryReadRequestBuilder)(nil)
 
 func (b *_HistoryReadRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._HistoryReadRequest
 }
 
 func (b *_HistoryReadRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, historyReadDetails ExtensionObject, timestampsToReturn TimestampsToReturn, releaseContinuationPoints bool, nodesToRead []HistoryReadValueId) HistoryReadRequestBuilder {

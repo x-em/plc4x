@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataUsesRemainingBuilder) = (*_BACnetConstructedDataUses
 
 func (b *_BACnetConstructedDataUsesRemainingBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataUsesRemaining
 }
 
 func (b *_BACnetConstructedDataUsesRemainingBuilder) WithMandatoryFields(usesRemaining BACnetApplicationTagSignedInteger) BACnetConstructedDataUsesRemainingBuilder {

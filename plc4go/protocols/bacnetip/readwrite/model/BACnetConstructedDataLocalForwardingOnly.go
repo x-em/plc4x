@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLocalForwardingOnlyBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataLocalForwardingOnlyBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLocalForwardingOnly
 }
 
 func (b *_BACnetConstructedDataLocalForwardingOnlyBuilder) WithMandatoryFields(localForwardingOnly BACnetApplicationTagBoolean) BACnetConstructedDataLocalForwardingOnlyBuilder {

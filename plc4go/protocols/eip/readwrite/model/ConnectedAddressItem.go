@@ -106,6 +106,7 @@ var _ (ConnectedAddressItemBuilder) = (*_ConnectedAddressItemBuilder)(nil)
 
 func (b *_ConnectedAddressItemBuilder) setParent(contract TypeIdContract) {
 	b.TypeIdContract = contract
+	contract.(*_TypeId)._SubType = b._ConnectedAddressItem
 }
 
 func (b *_ConnectedAddressItemBuilder) WithMandatoryFields(connectionId uint32) ConnectedAddressItemBuilder {

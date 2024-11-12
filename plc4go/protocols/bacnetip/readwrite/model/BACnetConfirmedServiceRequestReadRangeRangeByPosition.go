@@ -120,6 +120,7 @@ var _ (BACnetConfirmedServiceRequestReadRangeRangeByPositionBuilder) = (*_BACnet
 
 func (b *_BACnetConfirmedServiceRequestReadRangeRangeByPositionBuilder) setParent(contract BACnetConfirmedServiceRequestReadRangeRangeContract) {
 	b.BACnetConfirmedServiceRequestReadRangeRangeContract = contract
+	contract.(*_BACnetConfirmedServiceRequestReadRangeRange)._SubType = b._BACnetConfirmedServiceRequestReadRangeRangeByPosition
 }
 
 func (b *_BACnetConfirmedServiceRequestReadRangeRangeByPositionBuilder) WithMandatoryFields(referenceIndex BACnetApplicationTagUnsignedInteger, count BACnetApplicationTagSignedInteger) BACnetConfirmedServiceRequestReadRangeRangeByPositionBuilder {

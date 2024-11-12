@@ -110,6 +110,7 @@ var _ (NLMRequestMasterKeyBuilder) = (*_NLMRequestMasterKeyBuilder)(nil)
 
 func (b *_NLMRequestMasterKeyBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMRequestMasterKey
 }
 
 func (b *_NLMRequestMasterKeyBuilder) WithMandatoryFields(numberOfSupportedKeyAlgorithms uint8, encryptionAndSignatureAlgorithms []byte) NLMRequestMasterKeyBuilder {

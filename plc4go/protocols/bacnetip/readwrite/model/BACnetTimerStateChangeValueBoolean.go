@@ -109,6 +109,7 @@ var _ (BACnetTimerStateChangeValueBooleanBuilder) = (*_BACnetTimerStateChangeVal
 
 func (b *_BACnetTimerStateChangeValueBooleanBuilder) setParent(contract BACnetTimerStateChangeValueContract) {
 	b.BACnetTimerStateChangeValueContract = contract
+	contract.(*_BACnetTimerStateChangeValue)._SubType = b._BACnetTimerStateChangeValueBoolean
 }
 
 func (b *_BACnetTimerStateChangeValueBooleanBuilder) WithMandatoryFields(booleanValue BACnetApplicationTagBoolean) BACnetTimerStateChangeValueBooleanBuilder {

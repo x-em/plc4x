@@ -109,6 +109,7 @@ var _ (PowerUpReplyBuilder) = (*_PowerUpReplyBuilder)(nil)
 
 func (b *_PowerUpReplyBuilder) setParent(contract ReplyContract) {
 	b.ReplyContract = contract
+	contract.(*_Reply)._SubType = b._PowerUpReply
 }
 
 func (b *_PowerUpReplyBuilder) WithMandatoryFields(powerUpIndicator PowerUp) PowerUpReplyBuilder {

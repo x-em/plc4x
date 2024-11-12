@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataShedDurationBuilder) = (*_BACnetConstructedDataShedD
 
 func (b *_BACnetConstructedDataShedDurationBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataShedDuration
 }
 
 func (b *_BACnetConstructedDataShedDurationBuilder) WithMandatoryFields(shedDuration BACnetApplicationTagUnsignedInteger) BACnetConstructedDataShedDurationBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesLockStatusBuilder) = (*_BACnetPropertyStatesLockStatu
 
 func (b *_BACnetPropertyStatesLockStatusBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesLockStatus
 }
 
 func (b *_BACnetPropertyStatesLockStatusBuilder) WithMandatoryFields(lockStatus BACnetLockStatusTagged) BACnetPropertyStatesLockStatusBuilder {

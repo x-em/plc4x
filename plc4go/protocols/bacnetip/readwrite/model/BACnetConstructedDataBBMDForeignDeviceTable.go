@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataBBMDForeignDeviceTableBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataBBMDForeignDeviceTableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBBMDForeignDeviceTable
 }
 
 func (b *_BACnetConstructedDataBBMDForeignDeviceTableBuilder) WithMandatoryFields(bbmdForeignDeviceTable []BACnetBDTEntry) BACnetConstructedDataBBMDForeignDeviceTableBuilder {

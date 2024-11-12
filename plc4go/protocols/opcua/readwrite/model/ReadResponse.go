@@ -121,6 +121,7 @@ var _ (ReadResponseBuilder) = (*_ReadResponseBuilder)(nil)
 
 func (b *_ReadResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadResponse
 }
 
 func (b *_ReadResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []DataValue, diagnosticInfos []DiagnosticInfo) ReadResponseBuilder {

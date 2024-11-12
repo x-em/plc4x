@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesShedStateBuilder) = (*_BACnetPropertyStatesShedStateB
 
 func (b *_BACnetPropertyStatesShedStateBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesShedState
 }
 
 func (b *_BACnetPropertyStatesShedStateBuilder) WithMandatoryFields(shedState BACnetShedStateTagged) BACnetPropertyStatesShedStateBuilder {

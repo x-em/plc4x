@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataLandingCallsBuilder) = (*_BACnetConstructedDataLandi
 
 func (b *_BACnetConstructedDataLandingCallsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLandingCalls
 }
 
 func (b *_BACnetConstructedDataLandingCallsBuilder) WithMandatoryFields(landingCallStatus []BACnetLandingCallStatus) BACnetConstructedDataLandingCallsBuilder {

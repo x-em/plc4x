@@ -109,6 +109,7 @@ var _ (ConnectionResponseDataBlockTunnelConnectionBuilder) = (*_ConnectionRespon
 
 func (b *_ConnectionResponseDataBlockTunnelConnectionBuilder) setParent(contract ConnectionResponseDataBlockContract) {
 	b.ConnectionResponseDataBlockContract = contract
+	contract.(*_ConnectionResponseDataBlock)._SubType = b._ConnectionResponseDataBlockTunnelConnection
 }
 
 func (b *_ConnectionResponseDataBlockTunnelConnectionBuilder) WithMandatoryFields(knxAddress KnxAddress) ConnectionResponseDataBlockTunnelConnectionBuilder {

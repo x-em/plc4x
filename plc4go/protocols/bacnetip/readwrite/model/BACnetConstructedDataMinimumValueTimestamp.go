@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMinimumValueTimestampBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataMinimumValueTimestampBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMinimumValueTimestamp
 }
 
 func (b *_BACnetConstructedDataMinimumValueTimestampBuilder) WithMandatoryFields(minimumValueTimestamp BACnetDateTime) BACnetConstructedDataMinimumValueTimestampBuilder {

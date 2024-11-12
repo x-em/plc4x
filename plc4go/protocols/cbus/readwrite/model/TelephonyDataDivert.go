@@ -104,6 +104,7 @@ var _ (TelephonyDataDivertBuilder) = (*_TelephonyDataDivertBuilder)(nil)
 
 func (b *_TelephonyDataDivertBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataDivert
 }
 
 func (b *_TelephonyDataDivertBuilder) WithMandatoryFields(number string) TelephonyDataDivertBuilder {

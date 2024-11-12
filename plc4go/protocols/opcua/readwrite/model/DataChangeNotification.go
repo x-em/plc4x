@@ -110,6 +110,7 @@ var _ (DataChangeNotificationBuilder) = (*_DataChangeNotificationBuilder)(nil)
 
 func (b *_DataChangeNotificationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataChangeNotification
 }
 
 func (b *_DataChangeNotificationBuilder) WithMandatoryFields(monitoredItems []MonitoredItemNotification, diagnosticInfos []DiagnosticInfo) DataChangeNotificationBuilder {

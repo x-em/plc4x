@@ -112,6 +112,7 @@ var _ (TimeZoneDataTypeBuilder) = (*_TimeZoneDataTypeBuilder)(nil)
 
 func (b *_TimeZoneDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TimeZoneDataType
 }
 
 func (b *_TimeZoneDataTypeBuilder) WithMandatoryFields(offset int16, daylightSavingInOffset bool) TimeZoneDataTypeBuilder {

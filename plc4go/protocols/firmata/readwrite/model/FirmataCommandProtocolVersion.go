@@ -110,6 +110,7 @@ var _ (FirmataCommandProtocolVersionBuilder) = (*_FirmataCommandProtocolVersionB
 
 func (b *_FirmataCommandProtocolVersionBuilder) setParent(contract FirmataCommandContract) {
 	b.FirmataCommandContract = contract
+	contract.(*_FirmataCommand)._SubType = b._FirmataCommandProtocolVersion
 }
 
 func (b *_FirmataCommandProtocolVersionBuilder) WithMandatoryFields(majorVersion uint8, minorVersion uint8) FirmataCommandProtocolVersionBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPassengerAlarmBuilder) = (*_BACnetConstructedDataPas
 
 func (b *_BACnetConstructedDataPassengerAlarmBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPassengerAlarm
 }
 
 func (b *_BACnetConstructedDataPassengerAlarmBuilder) WithMandatoryFields(passengerAlarm BACnetApplicationTagBoolean) BACnetConstructedDataPassengerAlarmBuilder {

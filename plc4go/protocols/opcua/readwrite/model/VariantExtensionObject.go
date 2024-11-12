@@ -110,6 +110,7 @@ var _ (VariantExtensionObjectBuilder) = (*_VariantExtensionObjectBuilder)(nil)
 
 func (b *_VariantExtensionObjectBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantExtensionObject
 }
 
 func (b *_VariantExtensionObjectBuilder) WithMandatoryFields(value []ExtensionObject) VariantExtensionObjectBuilder {

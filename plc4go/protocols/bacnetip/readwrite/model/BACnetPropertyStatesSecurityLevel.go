@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesSecurityLevelBuilder) = (*_BACnetPropertyStatesSecuri
 
 func (b *_BACnetPropertyStatesSecurityLevelBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesSecurityLevel
 }
 
 func (b *_BACnetPropertyStatesSecurityLevelBuilder) WithMandatoryFields(securityLevel BACnetSecurityLevelTagged) BACnetPropertyStatesSecurityLevelBuilder {

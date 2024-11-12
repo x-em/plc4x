@@ -110,6 +110,7 @@ var _ (NLMRejectMessageToNetworkBuilder) = (*_NLMRejectMessageToNetworkBuilder)(
 
 func (b *_NLMRejectMessageToNetworkBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMRejectMessageToNetwork
 }
 
 func (b *_NLMRejectMessageToNetworkBuilder) WithMandatoryFields(rejectReason NLMRejectMessageToNetworkRejectReason, destinationNetworkAddress uint16) NLMRejectMessageToNetworkBuilder {

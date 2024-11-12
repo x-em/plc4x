@@ -96,6 +96,7 @@ var _ (SecurityDataEntryDelayStartedBuilder) = (*_SecurityDataEntryDelayStartedB
 
 func (b *_SecurityDataEntryDelayStartedBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataEntryDelayStarted
 }
 
 func (b *_SecurityDataEntryDelayStartedBuilder) WithMandatoryFields() SecurityDataEntryDelayStartedBuilder {

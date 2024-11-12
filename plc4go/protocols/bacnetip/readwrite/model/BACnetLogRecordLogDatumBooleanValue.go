@@ -109,6 +109,7 @@ var _ (BACnetLogRecordLogDatumBooleanValueBuilder) = (*_BACnetLogRecordLogDatumB
 
 func (b *_BACnetLogRecordLogDatumBooleanValueBuilder) setParent(contract BACnetLogRecordLogDatumContract) {
 	b.BACnetLogRecordLogDatumContract = contract
+	contract.(*_BACnetLogRecordLogDatum)._SubType = b._BACnetLogRecordLogDatumBooleanValue
 }
 
 func (b *_BACnetLogRecordLogDatumBooleanValueBuilder) WithMandatoryFields(booleanValue BACnetContextTagBoolean) BACnetLogRecordLogDatumBooleanValueBuilder {

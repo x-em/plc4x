@@ -122,6 +122,7 @@ var _ (LinearConversionDataTypeBuilder) = (*_LinearConversionDataTypeBuilder)(ni
 
 func (b *_LinearConversionDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._LinearConversionDataType
 }
 
 func (b *_LinearConversionDataTypeBuilder) WithMandatoryFields(initialAddend float32, multiplicand float32, divisor float32, finalAddend float32) LinearConversionDataTypeBuilder {

@@ -167,6 +167,7 @@ var _ (SecurityGroupDataTypeBuilder) = (*_SecurityGroupDataTypeBuilder)(nil)
 
 func (b *_SecurityGroupDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SecurityGroupDataType
 }
 
 func (b *_SecurityGroupDataTypeBuilder) WithMandatoryFields(name PascalString, securityGroupFolder []PascalString, keyLifetime float64, securityPolicyUri PascalString, maxFutureKeyCount uint32, maxPastKeyCount uint32, securityGroupId PascalString, rolePermissions []RolePermissionType, groupProperties []KeyValuePair) SecurityGroupDataTypeBuilder {

@@ -110,6 +110,7 @@ var _ (VariantInt64Builder) = (*_VariantInt64Builder)(nil)
 
 func (b *_VariantInt64Builder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantInt64
 }
 
 func (b *_VariantInt64Builder) WithMandatoryFields(value []int64) VariantInt64Builder {

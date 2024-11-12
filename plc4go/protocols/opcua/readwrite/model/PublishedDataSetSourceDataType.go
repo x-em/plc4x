@@ -96,6 +96,7 @@ var _ (PublishedDataSetSourceDataTypeBuilder) = (*_PublishedDataSetSourceDataTyp
 
 func (b *_PublishedDataSetSourceDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishedDataSetSourceDataType
 }
 
 func (b *_PublishedDataSetSourceDataTypeBuilder) WithMandatoryFields() PublishedDataSetSourceDataTypeBuilder {

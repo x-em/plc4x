@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDutyWindowBuilder) = (*_BACnetConstructedDataDutyWin
 
 func (b *_BACnetConstructedDataDutyWindowBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDutyWindow
 }
 
 func (b *_BACnetConstructedDataDutyWindowBuilder) WithMandatoryFields(dutyWindow BACnetApplicationTagUnsignedInteger) BACnetConstructedDataDutyWindowBuilder {

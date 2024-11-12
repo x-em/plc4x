@@ -96,6 +96,7 @@ var _ (UnionBuilder) = (*_UnionBuilder)(nil)
 
 func (b *_UnionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._Union
 }
 
 func (b *_UnionBuilder) WithMandatoryFields() UnionBuilder {

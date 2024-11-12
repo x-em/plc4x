@@ -139,6 +139,7 @@ var _ (ReferenceDescriptionDataTypeBuilder) = (*_ReferenceDescriptionDataTypeBui
 
 func (b *_ReferenceDescriptionDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReferenceDescriptionDataType
 }
 
 func (b *_ReferenceDescriptionDataTypeBuilder) WithMandatoryFields(sourceNode NodeId, referenceType NodeId, isForward bool, targetNode ExpandedNodeId) ReferenceDescriptionDataTypeBuilder {

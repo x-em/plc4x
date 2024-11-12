@@ -96,6 +96,7 @@ var _ (FilterOperandBuilder) = (*_FilterOperandBuilder)(nil)
 
 func (b *_FilterOperandBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._FilterOperand
 }
 
 func (b *_FilterOperandBuilder) WithMandatoryFields() FilterOperandBuilder {

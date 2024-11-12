@@ -123,6 +123,7 @@ var _ (OpcuaMessageResponseBuilder) = (*_OpcuaMessageResponseBuilder)(nil)
 
 func (b *_OpcuaMessageResponseBuilder) setParent(contract MessagePDUContract) {
 	b.MessagePDUContract = contract
+	contract.(*_MessagePDU)._SubType = b._OpcuaMessageResponse
 }
 
 func (b *_OpcuaMessageResponseBuilder) WithMandatoryFields(securityHeader SecurityHeader, message Payload) OpcuaMessageResponseBuilder {

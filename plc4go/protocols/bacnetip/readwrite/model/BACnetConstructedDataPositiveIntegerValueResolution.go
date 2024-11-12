@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPositiveIntegerValueResolutionBuilder) = (*_BACnetCo
 
 func (b *_BACnetConstructedDataPositiveIntegerValueResolutionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPositiveIntegerValueResolution
 }
 
 func (b *_BACnetConstructedDataPositiveIntegerValueResolutionBuilder) WithMandatoryFields(resolution BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPositiveIntegerValueResolutionBuilder {

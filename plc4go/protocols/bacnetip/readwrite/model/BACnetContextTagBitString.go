@@ -109,6 +109,7 @@ var _ (BACnetContextTagBitStringBuilder) = (*_BACnetContextTagBitStringBuilder)(
 
 func (b *_BACnetContextTagBitStringBuilder) setParent(contract BACnetContextTagContract) {
 	b.BACnetContextTagContract = contract
+	contract.(*_BACnetContextTag)._SubType = b._BACnetContextTagBitString
 }
 
 func (b *_BACnetContextTagBitStringBuilder) WithMandatoryFields(payload BACnetTagPayloadBitString) BACnetContextTagBitStringBuilder {

@@ -110,6 +110,7 @@ var _ (MediaTransportControlDataSetSelectionBuilder) = (*_MediaTransportControlD
 
 func (b *_MediaTransportControlDataSetSelectionBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataSetSelection
 }
 
 func (b *_MediaTransportControlDataSetSelectionBuilder) WithMandatoryFields(selectionHi byte, selectionLo byte) MediaTransportControlDataSetSelectionBuilder {

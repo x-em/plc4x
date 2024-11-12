@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataEscalatorModeBuilder) = (*_BACnetConstructedDataEsca
 
 func (b *_BACnetConstructedDataEscalatorModeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEscalatorMode
 }
 
 func (b *_BACnetConstructedDataEscalatorModeBuilder) WithMandatoryFields(escalatorMode BACnetEscalatorModeTagged) BACnetConstructedDataEscalatorModeBuilder {

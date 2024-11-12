@@ -127,6 +127,7 @@ var _ (LightingDataLabelBuilder) = (*_LightingDataLabelBuilder)(nil)
 
 func (b *_LightingDataLabelBuilder) setParent(contract LightingDataContract) {
 	b.LightingDataContract = contract
+	contract.(*_LightingData)._SubType = b._LightingDataLabel
 }
 
 func (b *_LightingDataLabelBuilder) WithMandatoryFields(group byte, labelOptions LightingLabelOptions, data []byte) LightingDataLabelBuilder {

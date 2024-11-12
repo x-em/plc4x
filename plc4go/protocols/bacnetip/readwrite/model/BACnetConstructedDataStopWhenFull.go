@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataStopWhenFullBuilder) = (*_BACnetConstructedDataStopW
 
 func (b *_BACnetConstructedDataStopWhenFullBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataStopWhenFull
 }
 
 func (b *_BACnetConstructedDataStopWhenFullBuilder) WithMandatoryFields(stopWhenFull BACnetApplicationTagBoolean) BACnetConstructedDataStopWhenFullBuilder {

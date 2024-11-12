@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataSilencedBuilder) = (*_BACnetConstructedDataSilencedB
 
 func (b *_BACnetConstructedDataSilencedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSilenced
 }
 
 func (b *_BACnetConstructedDataSilencedBuilder) WithMandatoryFields(silenced BACnetSilencedStateTagged) BACnetConstructedDataSilencedBuilder {

@@ -109,6 +109,7 @@ var _ (AdsDiscoveryBlockUserNameBuilder) = (*_AdsDiscoveryBlockUserNameBuilder)(
 
 func (b *_AdsDiscoveryBlockUserNameBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockUserName
 }
 
 func (b *_AdsDiscoveryBlockUserNameBuilder) WithMandatoryFields(userName AmsString) AdsDiscoveryBlockUserNameBuilder {

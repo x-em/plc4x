@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataEscalatorFaultSignalsBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataEscalatorFaultSignalsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEscalatorFaultSignals
 }
 
 func (b *_BACnetConstructedDataEscalatorFaultSignalsBuilder) WithMandatoryFields(faultSignals []BACnetEscalatorFaultTagged) BACnetConstructedDataEscalatorFaultSignalsBuilder {

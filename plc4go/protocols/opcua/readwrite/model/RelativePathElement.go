@@ -134,6 +134,7 @@ var _ (RelativePathElementBuilder) = (*_RelativePathElementBuilder)(nil)
 
 func (b *_RelativePathElementBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RelativePathElement
 }
 
 func (b *_RelativePathElementBuilder) WithMandatoryFields(referenceTypeId NodeId, includeSubtypes bool, isInverse bool, targetName QualifiedName) RelativePathElementBuilder {

@@ -110,6 +110,7 @@ var _ (ApduDataDeviceDescriptorResponseBuilder) = (*_ApduDataDeviceDescriptorRes
 
 func (b *_ApduDataDeviceDescriptorResponseBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataDeviceDescriptorResponse
 }
 
 func (b *_ApduDataDeviceDescriptorResponseBuilder) WithMandatoryFields(descriptorType uint8, data []byte) ApduDataDeviceDescriptorResponseBuilder {

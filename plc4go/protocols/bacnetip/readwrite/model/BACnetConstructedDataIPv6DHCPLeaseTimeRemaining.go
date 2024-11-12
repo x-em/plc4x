@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIPv6DHCPLeaseTimeRemainingBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataIPv6DHCPLeaseTimeRemainingBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPv6DHCPLeaseTimeRemaining
 }
 
 func (b *_BACnetConstructedDataIPv6DHCPLeaseTimeRemainingBuilder) WithMandatoryFields(ipv6DhcpLeaseTimeRemaining BACnetApplicationTagUnsignedInteger) BACnetConstructedDataIPv6DHCPLeaseTimeRemainingBuilder {

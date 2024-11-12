@@ -107,6 +107,7 @@ var _ (BACnetContextTagUnknownBuilder) = (*_BACnetContextTagUnknownBuilder)(nil)
 
 func (b *_BACnetContextTagUnknownBuilder) setParent(contract BACnetContextTagContract) {
 	b.BACnetContextTagContract = contract
+	contract.(*_BACnetContextTag)._SubType = b._BACnetContextTagUnknown
 }
 
 func (b *_BACnetContextTagUnknownBuilder) WithMandatoryFields(unknownData []byte) BACnetContextTagUnknownBuilder {

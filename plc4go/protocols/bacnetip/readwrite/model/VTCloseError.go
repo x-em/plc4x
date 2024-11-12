@@ -117,6 +117,7 @@ var _ (VTCloseErrorBuilder) = (*_VTCloseErrorBuilder)(nil)
 
 func (b *_VTCloseErrorBuilder) setParent(contract BACnetErrorContract) {
 	b.BACnetErrorContract = contract
+	contract.(*_BACnetError)._SubType = b._VTCloseError
 }
 
 func (b *_VTCloseErrorBuilder) WithMandatoryFields(errorType ErrorEnclosed) VTCloseErrorBuilder {

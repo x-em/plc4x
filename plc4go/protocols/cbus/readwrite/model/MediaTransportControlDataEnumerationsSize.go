@@ -124,6 +124,7 @@ var _ (MediaTransportControlDataEnumerationsSizeBuilder) = (*_MediaTransportCont
 
 func (b *_MediaTransportControlDataEnumerationsSizeBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataEnumerationsSize
 }
 
 func (b *_MediaTransportControlDataEnumerationsSizeBuilder) WithMandatoryFields(sizeType byte, start uint8, size uint8) MediaTransportControlDataEnumerationsSizeBuilder {

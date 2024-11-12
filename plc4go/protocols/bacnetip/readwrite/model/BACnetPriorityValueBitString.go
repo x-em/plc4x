@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueBitStringBuilder) = (*_BACnetPriorityValueBitStringBui
 
 func (b *_BACnetPriorityValueBitStringBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueBitString
 }
 
 func (b *_BACnetPriorityValueBitStringBuilder) WithMandatoryFields(bitStringValue BACnetApplicationTagBitString) BACnetPriorityValueBitStringBuilder {

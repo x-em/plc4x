@@ -96,6 +96,7 @@ var _ (ApduDataExtDomainAddressReadBuilder) = (*_ApduDataExtDomainAddressReadBui
 
 func (b *_ApduDataExtDomainAddressReadBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtDomainAddressRead
 }
 
 func (b *_ApduDataExtDomainAddressReadBuilder) WithMandatoryFields() ApduDataExtDomainAddressReadBuilder {

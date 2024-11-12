@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesLiftFaultBuilder) = (*_BACnetPropertyStatesLiftFaultB
 
 func (b *_BACnetPropertyStatesLiftFaultBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesLiftFault
 }
 
 func (b *_BACnetPropertyStatesLiftFaultBuilder) WithMandatoryFields(liftFault BACnetLiftFaultTagged) BACnetPropertyStatesLiftFaultBuilder {

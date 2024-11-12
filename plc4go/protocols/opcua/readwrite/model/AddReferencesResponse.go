@@ -121,6 +121,7 @@ var _ (AddReferencesResponseBuilder) = (*_AddReferencesResponseBuilder)(nil)
 
 func (b *_AddReferencesResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AddReferencesResponse
 }
 
 func (b *_AddReferencesResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) AddReferencesResponseBuilder {

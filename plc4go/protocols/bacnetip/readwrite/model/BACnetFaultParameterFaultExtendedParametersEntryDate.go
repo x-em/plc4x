@@ -109,6 +109,7 @@ var _ (BACnetFaultParameterFaultExtendedParametersEntryDateBuilder) = (*_BACnetF
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryDateBuilder) setParent(contract BACnetFaultParameterFaultExtendedParametersEntryContract) {
 	b.BACnetFaultParameterFaultExtendedParametersEntryContract = contract
+	contract.(*_BACnetFaultParameterFaultExtendedParametersEntry)._SubType = b._BACnetFaultParameterFaultExtendedParametersEntryDate
 }
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryDateBuilder) WithMandatoryFields(dateValue BACnetApplicationTagDate) BACnetFaultParameterFaultExtendedParametersEntryDateBuilder {

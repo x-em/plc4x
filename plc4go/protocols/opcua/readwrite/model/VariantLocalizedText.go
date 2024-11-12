@@ -110,6 +110,7 @@ var _ (VariantLocalizedTextBuilder) = (*_VariantLocalizedTextBuilder)(nil)
 
 func (b *_VariantLocalizedTextBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantLocalizedText
 }
 
 func (b *_VariantLocalizedTextBuilder) WithMandatoryFields(value []LocalizedText) VariantLocalizedTextBuilder {

@@ -156,6 +156,7 @@ var _ (AddReferencesItemBuilder) = (*_AddReferencesItemBuilder)(nil)
 
 func (b *_AddReferencesItemBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AddReferencesItem
 }
 
 func (b *_AddReferencesItemBuilder) WithMandatoryFields(sourceNodeId NodeId, referenceTypeId NodeId, isForward bool, targetServerUri PascalString, targetNodeId ExpandedNodeId, targetNodeClass NodeClass) AddReferencesItemBuilder {

@@ -116,6 +116,7 @@ var _ (AdsMultiRequestItemReadBuilder) = (*_AdsMultiRequestItemReadBuilder)(nil)
 
 func (b *_AdsMultiRequestItemReadBuilder) setParent(contract AdsMultiRequestItemContract) {
 	b.AdsMultiRequestItemContract = contract
+	contract.(*_AdsMultiRequestItem)._SubType = b._AdsMultiRequestItemRead
 }
 
 func (b *_AdsMultiRequestItemReadBuilder) WithMandatoryFields(itemIndexGroup uint32, itemIndexOffset uint32, itemReadLength uint32) AdsMultiRequestItemReadBuilder {

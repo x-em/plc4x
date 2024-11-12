@@ -115,6 +115,7 @@ var _ (OpcuaMessageErrorBuilder) = (*_OpcuaMessageErrorBuilder)(nil)
 
 func (b *_OpcuaMessageErrorBuilder) setParent(contract MessagePDUContract) {
 	b.MessagePDUContract = contract
+	contract.(*_MessagePDU)._SubType = b._OpcuaMessageError
 }
 
 func (b *_OpcuaMessageErrorBuilder) WithMandatoryFields(error OpcuaStatusCode, reason PascalString) OpcuaMessageErrorBuilder {

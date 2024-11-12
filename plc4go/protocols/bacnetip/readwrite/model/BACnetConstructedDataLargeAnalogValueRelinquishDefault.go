@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLargeAnalogValueRelinquishDefaultBuilder) = (*_BACne
 
 func (b *_BACnetConstructedDataLargeAnalogValueRelinquishDefaultBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLargeAnalogValueRelinquishDefault
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueRelinquishDefaultBuilder) WithMandatoryFields(relinquishDefault BACnetApplicationTagDouble) BACnetConstructedDataLargeAnalogValueRelinquishDefaultBuilder {

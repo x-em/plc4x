@@ -109,6 +109,7 @@ var _ (BACnetCalendarEntryWeekNDayBuilder) = (*_BACnetCalendarEntryWeekNDayBuild
 
 func (b *_BACnetCalendarEntryWeekNDayBuilder) setParent(contract BACnetCalendarEntryContract) {
 	b.BACnetCalendarEntryContract = contract
+	contract.(*_BACnetCalendarEntry)._SubType = b._BACnetCalendarEntryWeekNDay
 }
 
 func (b *_BACnetCalendarEntryWeekNDayBuilder) WithMandatoryFields(weekNDay BACnetWeekNDayTagged) BACnetCalendarEntryWeekNDayBuilder {

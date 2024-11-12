@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataLoopAllBuilder) = (*_BACnetConstructedDataLoopAllBui
 
 func (b *_BACnetConstructedDataLoopAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLoopAll
 }
 
 func (b *_BACnetConstructedDataLoopAllBuilder) WithMandatoryFields() BACnetConstructedDataLoopAllBuilder {

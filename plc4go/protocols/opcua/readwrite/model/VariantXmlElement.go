@@ -110,6 +110,7 @@ var _ (VariantXmlElementBuilder) = (*_VariantXmlElementBuilder)(nil)
 
 func (b *_VariantXmlElementBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantXmlElement
 }
 
 func (b *_VariantXmlElementBuilder) WithMandatoryFields(value []PascalString) VariantXmlElementBuilder {

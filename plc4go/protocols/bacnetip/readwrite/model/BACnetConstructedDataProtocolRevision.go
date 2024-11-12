@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataProtocolRevisionBuilder) = (*_BACnetConstructedDataP
 
 func (b *_BACnetConstructedDataProtocolRevisionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataProtocolRevision
 }
 
 func (b *_BACnetConstructedDataProtocolRevisionBuilder) WithMandatoryFields(protocolRevision BACnetApplicationTagUnsignedInteger) BACnetConstructedDataProtocolRevisionBuilder {

@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataNegativeAccessRulesBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataNegativeAccessRulesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataNegativeAccessRules
 }
 
 func (b *_BACnetConstructedDataNegativeAccessRulesBuilder) WithMandatoryFields(negativeAccessRules []BACnetAccessRule) BACnetConstructedDataNegativeAccessRulesBuilder {

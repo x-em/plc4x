@@ -104,6 +104,7 @@ var _ (ModbusPDUReadDiscreteInputsResponseBuilder) = (*_ModbusPDUReadDiscreteInp
 
 func (b *_ModbusPDUReadDiscreteInputsResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUReadDiscreteInputsResponse
 }
 
 func (b *_ModbusPDUReadDiscreteInputsResponseBuilder) WithMandatoryFields(value []byte) ModbusPDUReadDiscreteInputsResponseBuilder {

@@ -156,6 +156,7 @@ var _ (AirConditioningDataSetPlantHumidityLevelBuilder) = (*_AirConditioningData
 
 func (b *_AirConditioningDataSetPlantHumidityLevelBuilder) setParent(contract AirConditioningDataContract) {
 	b.AirConditioningDataContract = contract
+	contract.(*_AirConditioningData)._SubType = b._AirConditioningDataSetPlantHumidityLevel
 }
 
 func (b *_AirConditioningDataSetPlantHumidityLevelBuilder) WithMandatoryFields(zoneGroup byte, zoneList HVACZoneList, humidityModeAndFlags HVACHumidityModeAndFlags, humidityType HVACHumidityType) AirConditioningDataSetPlantHumidityLevelBuilder {

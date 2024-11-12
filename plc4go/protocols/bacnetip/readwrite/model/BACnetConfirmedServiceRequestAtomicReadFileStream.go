@@ -120,6 +120,7 @@ var _ (BACnetConfirmedServiceRequestAtomicReadFileStreamBuilder) = (*_BACnetConf
 
 func (b *_BACnetConfirmedServiceRequestAtomicReadFileStreamBuilder) setParent(contract BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordContract) {
 	b.BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordContract = contract
+	contract.(*_BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecord)._SubType = b._BACnetConfirmedServiceRequestAtomicReadFileStream
 }
 
 func (b *_BACnetConfirmedServiceRequestAtomicReadFileStreamBuilder) WithMandatoryFields(fileStartPosition BACnetApplicationTagSignedInteger, requestOctetCount BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestAtomicReadFileStreamBuilder {

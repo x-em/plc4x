@@ -96,6 +96,7 @@ var _ (SecurityDataGasAlarmClearedBuilder) = (*_SecurityDataGasAlarmClearedBuild
 
 func (b *_SecurityDataGasAlarmClearedBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataGasAlarmCleared
 }
 
 func (b *_SecurityDataGasAlarmClearedBuilder) WithMandatoryFields() SecurityDataGasAlarmClearedBuilder {

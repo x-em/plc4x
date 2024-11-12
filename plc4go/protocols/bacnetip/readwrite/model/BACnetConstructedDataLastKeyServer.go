@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLastKeyServerBuilder) = (*_BACnetConstructedDataLast
 
 func (b *_BACnetConstructedDataLastKeyServerBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLastKeyServer
 }
 
 func (b *_BACnetConstructedDataLastKeyServerBuilder) WithMandatoryFields(lastKeyServer BACnetAddressBinding) BACnetConstructedDataLastKeyServerBuilder {

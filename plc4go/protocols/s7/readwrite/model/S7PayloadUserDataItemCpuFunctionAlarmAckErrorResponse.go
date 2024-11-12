@@ -96,6 +96,7 @@ var _ (S7PayloadUserDataItemCpuFunctionAlarmAckErrorResponseBuilder) = (*_S7Payl
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckErrorResponseBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemCpuFunctionAlarmAckErrorResponse
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckErrorResponseBuilder) WithMandatoryFields() S7PayloadUserDataItemCpuFunctionAlarmAckErrorResponseBuilder {

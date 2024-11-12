@@ -110,6 +110,7 @@ var _ (COTPPacketDataBuilder) = (*_COTPPacketDataBuilder)(nil)
 
 func (b *_COTPPacketDataBuilder) setParent(contract COTPPacketContract) {
 	b.COTPPacketContract = contract
+	contract.(*_COTPPacket)._SubType = b._COTPPacketData
 }
 
 func (b *_COTPPacketDataBuilder) WithMandatoryFields(eot bool, tpduRef uint8) COTPPacketDataBuilder {

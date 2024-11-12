@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandTypeBuilder) = (*_IdentifyReplyCommandTypeBuilder)(ni
 
 func (b *_IdentifyReplyCommandTypeBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandType
 }
 
 func (b *_IdentifyReplyCommandTypeBuilder) WithMandatoryFields(unitType string) IdentifyReplyCommandTypeBuilder {

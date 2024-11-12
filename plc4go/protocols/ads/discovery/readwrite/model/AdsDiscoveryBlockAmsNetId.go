@@ -112,6 +112,7 @@ var _ (AdsDiscoveryBlockAmsNetIdBuilder) = (*_AdsDiscoveryBlockAmsNetIdBuilder)(
 
 func (b *_AdsDiscoveryBlockAmsNetIdBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockAmsNetId
 }
 
 func (b *_AdsDiscoveryBlockAmsNetIdBuilder) WithMandatoryFields(amsNetId AmsNetId) AdsDiscoveryBlockAmsNetIdBuilder {

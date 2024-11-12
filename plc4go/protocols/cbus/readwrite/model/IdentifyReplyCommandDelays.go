@@ -110,6 +110,7 @@ var _ (IdentifyReplyCommandDelaysBuilder) = (*_IdentifyReplyCommandDelaysBuilder
 
 func (b *_IdentifyReplyCommandDelaysBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandDelays
 }
 
 func (b *_IdentifyReplyCommandDelaysBuilder) WithMandatoryFields(terminalLevels []byte, reStrikeDelay byte) IdentifyReplyCommandDelaysBuilder {

@@ -131,6 +131,7 @@ var _ (PubSubConfigurationValueDataTypeBuilder) = (*_PubSubConfigurationValueDat
 
 func (b *_PubSubConfigurationValueDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PubSubConfigurationValueDataType
 }
 
 func (b *_PubSubConfigurationValueDataTypeBuilder) WithMandatoryFields(configurationElement PubSubConfigurationRefDataType, name PascalString, identifier Variant) PubSubConfigurationValueDataTypeBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataUTCOffsetBuilder) = (*_BACnetConstructedDataUTCOffse
 
 func (b *_BACnetConstructedDataUTCOffsetBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataUTCOffset
 }
 
 func (b *_BACnetConstructedDataUTCOffsetBuilder) WithMandatoryFields(utcOffset BACnetApplicationTagSignedInteger) BACnetConstructedDataUTCOffsetBuilder {

@@ -104,6 +104,7 @@ var _ (ReadAnnotationDataDetailsBuilder) = (*_ReadAnnotationDataDetailsBuilder)(
 
 func (b *_ReadAnnotationDataDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadAnnotationDataDetails
 }
 
 func (b *_ReadAnnotationDataDetailsBuilder) WithMandatoryFields(reqTimes []int64) ReadAnnotationDataDetailsBuilder {

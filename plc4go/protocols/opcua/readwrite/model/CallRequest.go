@@ -115,6 +115,7 @@ var _ (CallRequestBuilder) = (*_CallRequestBuilder)(nil)
 
 func (b *_CallRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CallRequest
 }
 
 func (b *_CallRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, methodsToCall []CallMethodRequest) CallRequestBuilder {

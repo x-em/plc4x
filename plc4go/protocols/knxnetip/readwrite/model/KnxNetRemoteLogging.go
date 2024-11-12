@@ -104,6 +104,7 @@ var _ (KnxNetRemoteLoggingBuilder) = (*_KnxNetRemoteLoggingBuilder)(nil)
 
 func (b *_KnxNetRemoteLoggingBuilder) setParent(contract ServiceIdContract) {
 	b.ServiceIdContract = contract
+	contract.(*_ServiceId)._SubType = b._KnxNetRemoteLogging
 }
 
 func (b *_KnxNetRemoteLoggingBuilder) WithMandatoryFields(version uint8) KnxNetRemoteLoggingBuilder {

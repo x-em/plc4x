@@ -163,6 +163,7 @@ var _ (ReferenceTypeAttributesBuilder) = (*_ReferenceTypeAttributesBuilder)(nil)
 
 func (b *_ReferenceTypeAttributesBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReferenceTypeAttributes
 }
 
 func (b *_ReferenceTypeAttributesBuilder) WithMandatoryFields(specifiedAttributes uint32, displayName LocalizedText, description LocalizedText, writeMask uint32, userWriteMask uint32, symmetric bool, isAbstract bool, inverseName LocalizedText) ReferenceTypeAttributesBuilder {

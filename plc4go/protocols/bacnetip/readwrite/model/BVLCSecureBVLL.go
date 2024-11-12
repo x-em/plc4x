@@ -109,6 +109,7 @@ var _ (BVLCSecureBVLLBuilder) = (*_BVLCSecureBVLLBuilder)(nil)
 
 func (b *_BVLCSecureBVLLBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCSecureBVLL
 }
 
 func (b *_BVLCSecureBVLLBuilder) WithMandatoryFields(securityWrapper []byte) BVLCSecureBVLLBuilder {

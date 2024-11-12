@@ -120,6 +120,7 @@ var _ (BACnetConstructedDataEventTimeStampsBuilder) = (*_BACnetConstructedDataEv
 
 func (b *_BACnetConstructedDataEventTimeStampsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEventTimeStamps
 }
 
 func (b *_BACnetConstructedDataEventTimeStampsBuilder) WithMandatoryFields(eventTimeStamps []BACnetTimeStamp) BACnetConstructedDataEventTimeStampsBuilder {

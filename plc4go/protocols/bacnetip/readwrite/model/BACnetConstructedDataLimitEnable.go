@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLimitEnableBuilder) = (*_BACnetConstructedDataLimitE
 
 func (b *_BACnetConstructedDataLimitEnableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLimitEnable
 }
 
 func (b *_BACnetConstructedDataLimitEnableBuilder) WithMandatoryFields(limitEnable BACnetLimitEnableTagged) BACnetConstructedDataLimitEnableBuilder {

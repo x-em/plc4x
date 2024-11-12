@@ -132,6 +132,7 @@ var _ (CurrencyUnitTypeBuilder) = (*_CurrencyUnitTypeBuilder)(nil)
 
 func (b *_CurrencyUnitTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CurrencyUnitType
 }
 
 func (b *_CurrencyUnitTypeBuilder) WithMandatoryFields(numericCode int16, exponent int8, alphabeticCode PascalString, currency LocalizedText) CurrencyUnitTypeBuilder {

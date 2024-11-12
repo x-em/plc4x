@@ -121,6 +121,7 @@ var _ (RegisterServer2ResponseBuilder) = (*_RegisterServer2ResponseBuilder)(nil)
 
 func (b *_RegisterServer2ResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RegisterServer2Response
 }
 
 func (b *_RegisterServer2ResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, configurationResults []StatusCode, diagnosticInfos []DiagnosticInfo) RegisterServer2ResponseBuilder {

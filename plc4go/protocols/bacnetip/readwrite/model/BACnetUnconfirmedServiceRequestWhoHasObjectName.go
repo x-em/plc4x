@@ -109,6 +109,7 @@ var _ (BACnetUnconfirmedServiceRequestWhoHasObjectNameBuilder) = (*_BACnetUnconf
 
 func (b *_BACnetUnconfirmedServiceRequestWhoHasObjectNameBuilder) setParent(contract BACnetUnconfirmedServiceRequestWhoHasObjectContract) {
 	b.BACnetUnconfirmedServiceRequestWhoHasObjectContract = contract
+	contract.(*_BACnetUnconfirmedServiceRequestWhoHasObject)._SubType = b._BACnetUnconfirmedServiceRequestWhoHasObjectName
 }
 
 func (b *_BACnetUnconfirmedServiceRequestWhoHasObjectNameBuilder) WithMandatoryFields(objectName BACnetContextTagCharacterString) BACnetUnconfirmedServiceRequestWhoHasObjectNameBuilder {

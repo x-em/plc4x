@@ -104,6 +104,7 @@ var _ (AdsDeleteDeviceNotificationRequestBuilder) = (*_AdsDeleteDeviceNotificati
 
 func (b *_AdsDeleteDeviceNotificationRequestBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsDeleteDeviceNotificationRequest
 }
 
 func (b *_AdsDeleteDeviceNotificationRequestBuilder) WithMandatoryFields(notificationHandle uint32) AdsDeleteDeviceNotificationRequestBuilder {

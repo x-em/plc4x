@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataSupportedFormatsBuilder) = (*_BACnetConstructedDataS
 
 func (b *_BACnetConstructedDataSupportedFormatsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSupportedFormats
 }
 
 func (b *_BACnetConstructedDataSupportedFormatsBuilder) WithMandatoryFields(supportedFormats []BACnetAuthenticationFactorFormat) BACnetConstructedDataSupportedFormatsBuilder {

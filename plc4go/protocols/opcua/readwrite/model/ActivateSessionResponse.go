@@ -132,6 +132,7 @@ var _ (ActivateSessionResponseBuilder) = (*_ActivateSessionResponseBuilder)(nil)
 
 func (b *_ActivateSessionResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ActivateSessionResponse
 }
 
 func (b *_ActivateSessionResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, serverNonce PascalByteString, results []StatusCode, diagnosticInfos []DiagnosticInfo) ActivateSessionResponseBuilder {

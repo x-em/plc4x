@@ -117,6 +117,7 @@ var _ (BACnetContextTagBooleanBuilder) = (*_BACnetContextTagBooleanBuilder)(nil)
 
 func (b *_BACnetContextTagBooleanBuilder) setParent(contract BACnetContextTagContract) {
 	b.BACnetContextTagContract = contract
+	contract.(*_BACnetContextTag)._SubType = b._BACnetContextTagBoolean
 }
 
 func (b *_BACnetContextTagBooleanBuilder) WithMandatoryFields(value uint8, payload BACnetTagPayloadBoolean) BACnetContextTagBooleanBuilder {

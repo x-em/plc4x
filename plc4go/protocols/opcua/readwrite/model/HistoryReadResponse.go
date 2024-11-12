@@ -121,6 +121,7 @@ var _ (HistoryReadResponseBuilder) = (*_HistoryReadResponseBuilder)(nil)
 
 func (b *_HistoryReadResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._HistoryReadResponse
 }
 
 func (b *_HistoryReadResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []HistoryReadResult, diagnosticInfos []DiagnosticInfo) HistoryReadResponseBuilder {

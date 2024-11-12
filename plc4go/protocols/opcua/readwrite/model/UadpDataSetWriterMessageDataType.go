@@ -122,6 +122,7 @@ var _ (UadpDataSetWriterMessageDataTypeBuilder) = (*_UadpDataSetWriterMessageDat
 
 func (b *_UadpDataSetWriterMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UadpDataSetWriterMessageDataType
 }
 
 func (b *_UadpDataSetWriterMessageDataTypeBuilder) WithMandatoryFields(dataSetMessageContentMask UadpDataSetMessageContentMask, configuredSize uint16, networkMessageNumber uint16, dataSetOffset uint16) UadpDataSetWriterMessageDataTypeBuilder {

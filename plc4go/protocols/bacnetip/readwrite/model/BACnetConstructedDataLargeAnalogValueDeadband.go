@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLargeAnalogValueDeadbandBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataLargeAnalogValueDeadbandBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLargeAnalogValueDeadband
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueDeadbandBuilder) WithMandatoryFields(deadband BACnetApplicationTagDouble) BACnetConstructedDataLargeAnalogValueDeadbandBuilder {

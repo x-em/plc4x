@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataAuthorizationExemptionsBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataAuthorizationExemptionsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAuthorizationExemptions
 }
 
 func (b *_BACnetConstructedDataAuthorizationExemptionsBuilder) WithMandatoryFields(authorizationExemption []BACnetAuthorizationExemptionTagged) BACnetConstructedDataAuthorizationExemptionsBuilder {

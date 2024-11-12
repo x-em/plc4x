@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesBooleanBuilder) = (*_BACnetPropertyStatesBooleanBuild
 
 func (b *_BACnetPropertyStatesBooleanBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesBoolean
 }
 
 func (b *_BACnetPropertyStatesBooleanBuilder) WithMandatoryFields(booleanValue BACnetContextTagBoolean) BACnetPropertyStatesBooleanBuilder {

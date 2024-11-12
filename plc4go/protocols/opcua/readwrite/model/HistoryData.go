@@ -104,6 +104,7 @@ var _ (HistoryDataBuilder) = (*_HistoryDataBuilder)(nil)
 
 func (b *_HistoryDataBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._HistoryData
 }
 
 func (b *_HistoryDataBuilder) WithMandatoryFields(dataValues []DataValue) HistoryDataBuilder {

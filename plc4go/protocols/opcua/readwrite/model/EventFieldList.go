@@ -110,6 +110,7 @@ var _ (EventFieldListBuilder) = (*_EventFieldListBuilder)(nil)
 
 func (b *_EventFieldListBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EventFieldList
 }
 
 func (b *_EventFieldListBuilder) WithMandatoryFields(clientHandle uint32, eventFields []Variant) EventFieldListBuilder {

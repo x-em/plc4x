@@ -109,6 +109,7 @@ var _ (BACnetTimeStampSequenceBuilder) = (*_BACnetTimeStampSequenceBuilder)(nil)
 
 func (b *_BACnetTimeStampSequenceBuilder) setParent(contract BACnetTimeStampContract) {
 	b.BACnetTimeStampContract = contract
+	contract.(*_BACnetTimeStamp)._SubType = b._BACnetTimeStampSequence
 }
 
 func (b *_BACnetTimeStampSequenceBuilder) WithMandatoryFields(sequenceNumber BACnetContextTagUnsignedInteger) BACnetTimeStampSequenceBuilder {

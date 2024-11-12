@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueObjectidentifierBuilder) = (*_BACnetPriorityValueObjec
 
 func (b *_BACnetPriorityValueObjectidentifierBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueObjectidentifier
 }
 
 func (b *_BACnetPriorityValueObjectidentifierBuilder) WithMandatoryFields(objectidentifierValue BACnetApplicationTagObjectIdentifier) BACnetPriorityValueObjectidentifierBuilder {

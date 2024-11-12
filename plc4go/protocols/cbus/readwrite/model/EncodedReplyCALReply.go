@@ -109,6 +109,7 @@ var _ (EncodedReplyCALReplyBuilder) = (*_EncodedReplyCALReplyBuilder)(nil)
 
 func (b *_EncodedReplyCALReplyBuilder) setParent(contract EncodedReplyContract) {
 	b.EncodedReplyContract = contract
+	contract.(*_EncodedReply)._SubType = b._EncodedReplyCALReply
 }
 
 func (b *_EncodedReplyCALReplyBuilder) WithMandatoryFields(calReply CALReply) EncodedReplyCALReplyBuilder {

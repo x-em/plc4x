@@ -109,6 +109,7 @@ var _ (CloseSessionResponseBuilder) = (*_CloseSessionResponseBuilder)(nil)
 
 func (b *_CloseSessionResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CloseSessionResponse
 }
 
 func (b *_CloseSessionResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader) CloseSessionResponseBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLastCredentialAddedTimeBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataLastCredentialAddedTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLastCredentialAddedTime
 }
 
 func (b *_BACnetConstructedDataLastCredentialAddedTimeBuilder) WithMandatoryFields(lastCredentialAddedTime BACnetDateTime) BACnetConstructedDataLastCredentialAddedTimeBuilder {

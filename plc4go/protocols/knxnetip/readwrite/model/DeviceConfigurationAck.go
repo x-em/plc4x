@@ -111,6 +111,7 @@ var _ (DeviceConfigurationAckBuilder) = (*_DeviceConfigurationAckBuilder)(nil)
 
 func (b *_DeviceConfigurationAckBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._DeviceConfigurationAck
 }
 
 func (b *_DeviceConfigurationAckBuilder) WithMandatoryFields(deviceConfigurationAckDataBlock DeviceConfigurationAckDataBlock) DeviceConfigurationAckBuilder {

@@ -116,6 +116,7 @@ var _ (ComObjectTableRealisationType2Builder) = (*_ComObjectTableRealisationType
 
 func (b *_ComObjectTableRealisationType2Builder) setParent(contract ComObjectTableContract) {
 	b.ComObjectTableContract = contract
+	contract.(*_ComObjectTable)._SubType = b._ComObjectTableRealisationType2
 }
 
 func (b *_ComObjectTableRealisationType2Builder) WithMandatoryFields(numEntries uint8, ramFlagsTablePointer uint8, comObjectDescriptors []GroupObjectDescriptorRealisationType2) ComObjectTableRealisationType2Builder {

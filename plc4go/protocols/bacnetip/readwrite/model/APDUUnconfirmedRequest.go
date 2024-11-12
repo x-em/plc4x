@@ -111,6 +111,7 @@ var _ (APDUUnconfirmedRequestBuilder) = (*_APDUUnconfirmedRequestBuilder)(nil)
 
 func (b *_APDUUnconfirmedRequestBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUUnconfirmedRequest
 }
 
 func (b *_APDUUnconfirmedRequestBuilder) WithMandatoryFields(serviceRequest BACnetUnconfirmedServiceRequest) APDUUnconfirmedRequestBuilder {

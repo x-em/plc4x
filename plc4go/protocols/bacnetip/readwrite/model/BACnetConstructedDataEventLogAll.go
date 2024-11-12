@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataEventLogAllBuilder) = (*_BACnetConstructedDataEventL
 
 func (b *_BACnetConstructedDataEventLogAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEventLogAll
 }
 
 func (b *_BACnetConstructedDataEventLogAllBuilder) WithMandatoryFields() BACnetConstructedDataEventLogAllBuilder {

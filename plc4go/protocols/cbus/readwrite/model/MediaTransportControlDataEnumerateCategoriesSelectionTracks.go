@@ -118,6 +118,7 @@ var _ (MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) = (*_
 
 func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataEnumerateCategoriesSelectionTracks
 }
 
 func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) WithMandatoryFields(enumerateType byte, start uint8) MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder {

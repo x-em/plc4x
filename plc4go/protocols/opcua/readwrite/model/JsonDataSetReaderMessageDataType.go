@@ -110,6 +110,7 @@ var _ (JsonDataSetReaderMessageDataTypeBuilder) = (*_JsonDataSetReaderMessageDat
 
 func (b *_JsonDataSetReaderMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._JsonDataSetReaderMessageDataType
 }
 
 func (b *_JsonDataSetReaderMessageDataTypeBuilder) WithMandatoryFields(networkMessageContentMask JsonNetworkMessageContentMask, dataSetMessageContentMask JsonDataSetMessageContentMask) JsonDataSetReaderMessageDataTypeBuilder {

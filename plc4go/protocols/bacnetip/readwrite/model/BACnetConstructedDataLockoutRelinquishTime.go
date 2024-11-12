@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLockoutRelinquishTimeBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataLockoutRelinquishTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLockoutRelinquishTime
 }
 
 func (b *_BACnetConstructedDataLockoutRelinquishTimeBuilder) WithMandatoryFields(lockoutRelinquishTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataLockoutRelinquishTimeBuilder {

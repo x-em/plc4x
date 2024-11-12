@@ -137,6 +137,7 @@ var _ (OpenSecureChannelResponseBuilder) = (*_OpenSecureChannelResponseBuilder)(
 
 func (b *_OpenSecureChannelResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._OpenSecureChannelResponse
 }
 
 func (b *_OpenSecureChannelResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, serverProtocolVersion uint32, securityToken ChannelSecurityToken, serverNonce PascalByteString) OpenSecureChannelResponseBuilder {

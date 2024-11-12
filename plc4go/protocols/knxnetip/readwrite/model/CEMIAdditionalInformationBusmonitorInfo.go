@@ -137,6 +137,7 @@ var _ (CEMIAdditionalInformationBusmonitorInfoBuilder) = (*_CEMIAdditionalInform
 
 func (b *_CEMIAdditionalInformationBusmonitorInfoBuilder) setParent(contract CEMIAdditionalInformationContract) {
 	b.CEMIAdditionalInformationContract = contract
+	contract.(*_CEMIAdditionalInformation)._SubType = b._CEMIAdditionalInformationBusmonitorInfo
 }
 
 func (b *_CEMIAdditionalInformationBusmonitorInfoBuilder) WithMandatoryFields(frameErrorFlag bool, bitErrorFlag bool, parityErrorFlag bool, unknownFlag bool, lostFlag bool, sequenceNumber uint8) CEMIAdditionalInformationBusmonitorInfoBuilder {

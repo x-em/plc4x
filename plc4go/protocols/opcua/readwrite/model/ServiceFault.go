@@ -109,6 +109,7 @@ var _ (ServiceFaultBuilder) = (*_ServiceFaultBuilder)(nil)
 
 func (b *_ServiceFaultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ServiceFault
 }
 
 func (b *_ServiceFaultBuilder) WithMandatoryFields(responseHeader ResponseHeader) ServiceFaultBuilder {

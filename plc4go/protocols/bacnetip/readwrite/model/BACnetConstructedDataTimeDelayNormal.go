@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTimeDelayNormalBuilder) = (*_BACnetConstructedDataTi
 
 func (b *_BACnetConstructedDataTimeDelayNormalBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimeDelayNormal
 }
 
 func (b *_BACnetConstructedDataTimeDelayNormalBuilder) WithMandatoryFields(timeDelayNormal BACnetApplicationTagUnsignedInteger) BACnetConstructedDataTimeDelayNormalBuilder {

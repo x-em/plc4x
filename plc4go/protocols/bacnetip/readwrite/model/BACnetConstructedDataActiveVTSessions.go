@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataActiveVTSessionsBuilder) = (*_BACnetConstructedDataA
 
 func (b *_BACnetConstructedDataActiveVTSessionsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataActiveVTSessions
 }
 
 func (b *_BACnetConstructedDataActiveVTSessionsBuilder) WithMandatoryFields(activeVTSession []BACnetVTSession) BACnetConstructedDataActiveVTSessionsBuilder {

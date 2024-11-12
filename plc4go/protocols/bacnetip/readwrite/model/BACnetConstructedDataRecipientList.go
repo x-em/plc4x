@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataRecipientListBuilder) = (*_BACnetConstructedDataReci
 
 func (b *_BACnetConstructedDataRecipientListBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataRecipientList
 }
 
 func (b *_BACnetConstructedDataRecipientListBuilder) WithMandatoryFields(recipientList []BACnetDestination) BACnetConstructedDataRecipientListBuilder {

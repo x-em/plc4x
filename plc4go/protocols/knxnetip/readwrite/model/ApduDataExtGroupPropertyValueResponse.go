@@ -96,6 +96,7 @@ var _ (ApduDataExtGroupPropertyValueResponseBuilder) = (*_ApduDataExtGroupProper
 
 func (b *_ApduDataExtGroupPropertyValueResponseBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtGroupPropertyValueResponse
 }
 
 func (b *_ApduDataExtGroupPropertyValueResponseBuilder) WithMandatoryFields() ApduDataExtGroupPropertyValueResponseBuilder {

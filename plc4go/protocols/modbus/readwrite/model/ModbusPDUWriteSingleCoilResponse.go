@@ -110,6 +110,7 @@ var _ (ModbusPDUWriteSingleCoilResponseBuilder) = (*_ModbusPDUWriteSingleCoilRes
 
 func (b *_ModbusPDUWriteSingleCoilResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUWriteSingleCoilResponse
 }
 
 func (b *_ModbusPDUWriteSingleCoilResponseBuilder) WithMandatoryFields(address uint16, value uint16) ModbusPDUWriteSingleCoilResponseBuilder {

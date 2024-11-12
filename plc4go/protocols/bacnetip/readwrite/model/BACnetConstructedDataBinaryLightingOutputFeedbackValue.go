@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBinaryLightingOutputFeedbackValueBuilder) = (*_BACne
 
 func (b *_BACnetConstructedDataBinaryLightingOutputFeedbackValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBinaryLightingOutputFeedbackValue
 }
 
 func (b *_BACnetConstructedDataBinaryLightingOutputFeedbackValueBuilder) WithMandatoryFields(feedbackValue BACnetBinaryLightingPVTagged) BACnetConstructedDataBinaryLightingOutputFeedbackValueBuilder {

@@ -127,6 +127,7 @@ var _ (ReadRequestBuilder) = (*_ReadRequestBuilder)(nil)
 
 func (b *_ReadRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadRequest
 }
 
 func (b *_ReadRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, maxAge float64, timestampsToReturn TimestampsToReturn, nodesToRead []ReadValueId) ReadRequestBuilder {

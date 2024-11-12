@@ -128,6 +128,7 @@ var _ (BACnetServiceAckConfirmedPrivateTransferBuilder) = (*_BACnetServiceAckCon
 
 func (b *_BACnetServiceAckConfirmedPrivateTransferBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckConfirmedPrivateTransfer
 }
 
 func (b *_BACnetServiceAckConfirmedPrivateTransferBuilder) WithMandatoryFields(vendorId BACnetVendorIdTagged, serviceNumber BACnetContextTagUnsignedInteger) BACnetServiceAckConfirmedPrivateTransferBuilder {

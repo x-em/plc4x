@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPositiveIntegerValueMaxPresValueBuilder) = (*_BACnet
 
 func (b *_BACnetConstructedDataPositiveIntegerValueMaxPresValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPositiveIntegerValueMaxPresValue
 }
 
 func (b *_BACnetConstructedDataPositiveIntegerValueMaxPresValueBuilder) WithMandatoryFields(maxPresValue BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPositiveIntegerValueMaxPresValueBuilder {

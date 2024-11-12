@@ -137,6 +137,7 @@ var _ (EUInformationBuilder) = (*_EUInformationBuilder)(nil)
 
 func (b *_EUInformationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EUInformation
 }
 
 func (b *_EUInformationBuilder) WithMandatoryFields(namespaceUri PascalString, unitId int32, displayName LocalizedText, description LocalizedText) EUInformationBuilder {

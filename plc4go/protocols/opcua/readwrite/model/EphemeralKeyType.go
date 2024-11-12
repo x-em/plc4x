@@ -120,6 +120,7 @@ var _ (EphemeralKeyTypeBuilder) = (*_EphemeralKeyTypeBuilder)(nil)
 
 func (b *_EphemeralKeyTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EphemeralKeyType
 }
 
 func (b *_EphemeralKeyTypeBuilder) WithMandatoryFields(publicKey PascalByteString, signature PascalByteString) EphemeralKeyTypeBuilder {

@@ -144,6 +144,7 @@ var _ (ServerStatusDataTypeBuilder) = (*_ServerStatusDataTypeBuilder)(nil)
 
 func (b *_ServerStatusDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ServerStatusDataType
 }
 
 func (b *_ServerStatusDataTypeBuilder) WithMandatoryFields(startTime int64, currentTime int64, state ServerState, buildInfo BuildInfo, secondsTillShutdown uint32, shutdownReason LocalizedText) ServerStatusDataTypeBuilder {

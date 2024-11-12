@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataVTClassesSupportedBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataVTClassesSupportedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataVTClassesSupported
 }
 
 func (b *_BACnetConstructedDataVTClassesSupportedBuilder) WithMandatoryFields(vtClassesSupported []BACnetVTClassTagged) BACnetConstructedDataVTClassesSupportedBuilder {

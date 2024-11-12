@@ -115,6 +115,7 @@ var _ (RegisterNodesRequestBuilder) = (*_RegisterNodesRequestBuilder)(nil)
 
 func (b *_RegisterNodesRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RegisterNodesRequest
 }
 
 func (b *_RegisterNodesRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, nodesToRegister []NodeId) RegisterNodesRequestBuilder {

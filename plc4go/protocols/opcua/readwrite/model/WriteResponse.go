@@ -121,6 +121,7 @@ var _ (WriteResponseBuilder) = (*_WriteResponseBuilder)(nil)
 
 func (b *_WriteResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._WriteResponse
 }
 
 func (b *_WriteResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) WriteResponseBuilder {

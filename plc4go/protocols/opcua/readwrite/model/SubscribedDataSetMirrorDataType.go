@@ -115,6 +115,7 @@ var _ (SubscribedDataSetMirrorDataTypeBuilder) = (*_SubscribedDataSetMirrorDataT
 
 func (b *_SubscribedDataSetMirrorDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SubscribedDataSetMirrorDataType
 }
 
 func (b *_SubscribedDataSetMirrorDataTypeBuilder) WithMandatoryFields(parentNodeName PascalString, rolePermissions []RolePermissionType) SubscribedDataSetMirrorDataTypeBuilder {

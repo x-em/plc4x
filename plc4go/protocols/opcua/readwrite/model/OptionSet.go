@@ -120,6 +120,7 @@ var _ (OptionSetBuilder) = (*_OptionSetBuilder)(nil)
 
 func (b *_OptionSetBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._OptionSet
 }
 
 func (b *_OptionSetBuilder) WithMandatoryFields(value PascalByteString, validBits PascalByteString) OptionSetBuilder {

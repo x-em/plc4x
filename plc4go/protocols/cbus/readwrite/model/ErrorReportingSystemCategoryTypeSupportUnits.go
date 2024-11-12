@@ -104,6 +104,7 @@ var _ (ErrorReportingSystemCategoryTypeSupportUnitsBuilder) = (*_ErrorReportingS
 
 func (b *_ErrorReportingSystemCategoryTypeSupportUnitsBuilder) setParent(contract ErrorReportingSystemCategoryTypeContract) {
 	b.ErrorReportingSystemCategoryTypeContract = contract
+	contract.(*_ErrorReportingSystemCategoryType)._SubType = b._ErrorReportingSystemCategoryTypeSupportUnits
 }
 
 func (b *_ErrorReportingSystemCategoryTypeSupportUnitsBuilder) WithMandatoryFields(categoryForType ErrorReportingSystemCategoryTypeForSupportUnits) ErrorReportingSystemCategoryTypeSupportUnitsBuilder {

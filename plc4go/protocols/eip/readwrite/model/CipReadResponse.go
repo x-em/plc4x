@@ -120,6 +120,7 @@ var _ (CipReadResponseBuilder) = (*_CipReadResponseBuilder)(nil)
 
 func (b *_CipReadResponseBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipReadResponse
 }
 
 func (b *_CipReadResponseBuilder) WithMandatoryFields(status uint8, extStatus uint8) CipReadResponseBuilder {

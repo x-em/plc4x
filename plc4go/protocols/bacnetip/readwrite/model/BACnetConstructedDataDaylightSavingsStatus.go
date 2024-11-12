@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDaylightSavingsStatusBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataDaylightSavingsStatusBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDaylightSavingsStatus
 }
 
 func (b *_BACnetConstructedDataDaylightSavingsStatusBuilder) WithMandatoryFields(daylightSavingsStatus BACnetApplicationTagBoolean) BACnetConstructedDataDaylightSavingsStatusBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIntegerValuePresentValueBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataIntegerValuePresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIntegerValuePresentValue
 }
 
 func (b *_BACnetConstructedDataIntegerValuePresentValueBuilder) WithMandatoryFields(presentValue BACnetApplicationTagSignedInteger) BACnetConstructedDataIntegerValuePresentValueBuilder {

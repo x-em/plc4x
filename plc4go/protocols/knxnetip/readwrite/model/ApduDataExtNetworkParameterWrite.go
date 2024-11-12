@@ -96,6 +96,7 @@ var _ (ApduDataExtNetworkParameterWriteBuilder) = (*_ApduDataExtNetworkParameter
 
 func (b *_ApduDataExtNetworkParameterWriteBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtNetworkParameterWrite
 }
 
 func (b *_ApduDataExtNetworkParameterWriteBuilder) WithMandatoryFields() ApduDataExtNetworkParameterWriteBuilder {

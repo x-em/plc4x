@@ -109,6 +109,7 @@ var _ (BACnetCalendarEntryDateRangeBuilder) = (*_BACnetCalendarEntryDateRangeBui
 
 func (b *_BACnetCalendarEntryDateRangeBuilder) setParent(contract BACnetCalendarEntryContract) {
 	b.BACnetCalendarEntryContract = contract
+	contract.(*_BACnetCalendarEntry)._SubType = b._BACnetCalendarEntryDateRange
 }
 
 func (b *_BACnetCalendarEntryDateRangeBuilder) WithMandatoryFields(dateRange BACnetDateRangeEnclosed) BACnetCalendarEntryDateRangeBuilder {

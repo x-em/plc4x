@@ -109,6 +109,7 @@ var _ (BACnetTimerStateChangeValueEnumeratedBuilder) = (*_BACnetTimerStateChange
 
 func (b *_BACnetTimerStateChangeValueEnumeratedBuilder) setParent(contract BACnetTimerStateChangeValueContract) {
 	b.BACnetTimerStateChangeValueContract = contract
+	contract.(*_BACnetTimerStateChangeValue)._SubType = b._BACnetTimerStateChangeValueEnumerated
 }
 
 func (b *_BACnetTimerStateChangeValueEnumeratedBuilder) WithMandatoryFields(enumeratedValue BACnetApplicationTagEnumerated) BACnetTimerStateChangeValueEnumeratedBuilder {

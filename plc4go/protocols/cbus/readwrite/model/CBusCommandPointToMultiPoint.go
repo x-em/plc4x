@@ -109,6 +109,7 @@ var _ (CBusCommandPointToMultiPointBuilder) = (*_CBusCommandPointToMultiPointBui
 
 func (b *_CBusCommandPointToMultiPointBuilder) setParent(contract CBusCommandContract) {
 	b.CBusCommandContract = contract
+	contract.(*_CBusCommand)._SubType = b._CBusCommandPointToMultiPoint
 }
 
 func (b *_CBusCommandPointToMultiPointBuilder) WithMandatoryFields(command CBusPointToMultiPointCommand) CBusCommandPointToMultiPointBuilder {

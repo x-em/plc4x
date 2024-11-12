@@ -109,6 +109,7 @@ var _ (BACnetTimerStateChangeValueOctetStringBuilder) = (*_BACnetTimerStateChang
 
 func (b *_BACnetTimerStateChangeValueOctetStringBuilder) setParent(contract BACnetTimerStateChangeValueContract) {
 	b.BACnetTimerStateChangeValueContract = contract
+	contract.(*_BACnetTimerStateChangeValue)._SubType = b._BACnetTimerStateChangeValueOctetString
 }
 
 func (b *_BACnetTimerStateChangeValueOctetStringBuilder) WithMandatoryFields(octetStringValue BACnetApplicationTagOctetString) BACnetTimerStateChangeValueOctetStringBuilder {

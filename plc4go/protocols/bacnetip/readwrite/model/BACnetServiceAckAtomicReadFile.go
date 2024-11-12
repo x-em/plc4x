@@ -120,6 +120,7 @@ var _ (BACnetServiceAckAtomicReadFileBuilder) = (*_BACnetServiceAckAtomicReadFil
 
 func (b *_BACnetServiceAckAtomicReadFileBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckAtomicReadFile
 }
 
 func (b *_BACnetServiceAckAtomicReadFileBuilder) WithMandatoryFields(endOfFile BACnetApplicationTagBoolean, accessMethod BACnetServiceAckAtomicReadFileStreamOrRecord) BACnetServiceAckAtomicReadFileBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLastCredentialRemovedBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataLastCredentialRemovedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLastCredentialRemoved
 }
 
 func (b *_BACnetConstructedDataLastCredentialRemovedBuilder) WithMandatoryFields(lastCredentialRemoved BACnetDeviceObjectReference) BACnetConstructedDataLastCredentialRemovedBuilder {

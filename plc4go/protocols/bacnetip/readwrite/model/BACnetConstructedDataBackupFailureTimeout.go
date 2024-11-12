@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBackupFailureTimeoutBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataBackupFailureTimeoutBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBackupFailureTimeout
 }
 
 func (b *_BACnetConstructedDataBackupFailureTimeoutBuilder) WithMandatoryFields(backupFailureTimeout BACnetApplicationTagUnsignedInteger) BACnetConstructedDataBackupFailureTimeoutBuilder {

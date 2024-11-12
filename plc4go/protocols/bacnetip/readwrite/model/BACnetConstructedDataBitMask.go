@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBitMaskBuilder) = (*_BACnetConstructedDataBitMaskBui
 
 func (b *_BACnetConstructedDataBitMaskBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBitMask
 }
 
 func (b *_BACnetConstructedDataBitMaskBuilder) WithMandatoryFields(bitString BACnetApplicationTagBitString) BACnetConstructedDataBitMaskBuilder {

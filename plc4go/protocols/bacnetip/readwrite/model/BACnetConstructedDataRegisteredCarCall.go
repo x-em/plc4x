@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataRegisteredCarCallBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataRegisteredCarCallBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataRegisteredCarCall
 }
 
 func (b *_BACnetConstructedDataRegisteredCarCallBuilder) WithMandatoryFields(registeredCarCall []BACnetLiftCarCallList) BACnetConstructedDataRegisteredCarCallBuilder {

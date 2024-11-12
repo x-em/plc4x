@@ -109,6 +109,7 @@ var _ (BACnetFaultParameterFaultExtendedParametersEntryRealBuilder) = (*_BACnetF
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryRealBuilder) setParent(contract BACnetFaultParameterFaultExtendedParametersEntryContract) {
 	b.BACnetFaultParameterFaultExtendedParametersEntryContract = contract
+	contract.(*_BACnetFaultParameterFaultExtendedParametersEntry)._SubType = b._BACnetFaultParameterFaultExtendedParametersEntryReal
 }
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryRealBuilder) WithMandatoryFields(realValue BACnetApplicationTagReal) BACnetFaultParameterFaultExtendedParametersEntryRealBuilder {

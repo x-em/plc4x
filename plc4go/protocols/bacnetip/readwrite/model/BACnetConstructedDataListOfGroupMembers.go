@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataListOfGroupMembersBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataListOfGroupMembersBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataListOfGroupMembers
 }
 
 func (b *_BACnetConstructedDataListOfGroupMembersBuilder) WithMandatoryFields(listOfGroupMembers []BACnetReadAccessSpecification) BACnetConstructedDataListOfGroupMembersBuilder {

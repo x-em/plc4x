@@ -100,6 +100,7 @@ var _ (NullAddressItemBuilder) = (*_NullAddressItemBuilder)(nil)
 
 func (b *_NullAddressItemBuilder) setParent(contract TypeIdContract) {
 	b.TypeIdContract = contract
+	contract.(*_TypeId)._SubType = b._NullAddressItem
 }
 
 func (b *_NullAddressItemBuilder) WithMandatoryFields() NullAddressItemBuilder {

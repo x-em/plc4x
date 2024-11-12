@@ -146,6 +146,7 @@ var _ (BrowseDescriptionBuilder) = (*_BrowseDescriptionBuilder)(nil)
 
 func (b *_BrowseDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrowseDescription
 }
 
 func (b *_BrowseDescriptionBuilder) WithMandatoryFields(nodeId NodeId, browseDirection BrowseDirection, referenceTypeId NodeId, includeSubtypes bool, nodeClassMask uint32, resultMask uint32) BrowseDescriptionBuilder {

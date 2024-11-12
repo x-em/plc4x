@@ -116,6 +116,7 @@ var _ (AdsMultiRequestItemWriteBuilder) = (*_AdsMultiRequestItemWriteBuilder)(ni
 
 func (b *_AdsMultiRequestItemWriteBuilder) setParent(contract AdsMultiRequestItemContract) {
 	b.AdsMultiRequestItemContract = contract
+	contract.(*_AdsMultiRequestItem)._SubType = b._AdsMultiRequestItemWrite
 }
 
 func (b *_AdsMultiRequestItemWriteBuilder) WithMandatoryFields(itemIndexGroup uint32, itemIndexOffset uint32, itemWriteLength uint32) AdsMultiRequestItemWriteBuilder {

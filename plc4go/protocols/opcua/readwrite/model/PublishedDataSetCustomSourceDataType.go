@@ -106,6 +106,7 @@ var _ (PublishedDataSetCustomSourceDataTypeBuilder) = (*_PublishedDataSetCustomS
 
 func (b *_PublishedDataSetCustomSourceDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishedDataSetCustomSourceDataType
 }
 
 func (b *_PublishedDataSetCustomSourceDataTypeBuilder) WithMandatoryFields(cyclicDataSet bool) PublishedDataSetCustomSourceDataTypeBuilder {

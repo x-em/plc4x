@@ -131,6 +131,7 @@ var _ (TransactionErrorTypeBuilder) = (*_TransactionErrorTypeBuilder)(nil)
 
 func (b *_TransactionErrorTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TransactionErrorType
 }
 
 func (b *_TransactionErrorTypeBuilder) WithMandatoryFields(targetId NodeId, error StatusCode, message LocalizedText) TransactionErrorTypeBuilder {

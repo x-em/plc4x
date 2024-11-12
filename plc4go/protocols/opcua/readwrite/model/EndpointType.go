@@ -137,6 +137,7 @@ var _ (EndpointTypeBuilder) = (*_EndpointTypeBuilder)(nil)
 
 func (b *_EndpointTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EndpointType
 }
 
 func (b *_EndpointTypeBuilder) WithMandatoryFields(endpointUrl PascalString, securityMode MessageSecurityMode, securityPolicyUri PascalString, transportProfileUri PascalString) EndpointTypeBuilder {

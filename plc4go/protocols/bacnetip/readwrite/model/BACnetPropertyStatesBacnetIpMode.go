@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesBacnetIpModeBuilder) = (*_BACnetPropertyStatesBacnetI
 
 func (b *_BACnetPropertyStatesBacnetIpModeBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesBacnetIpMode
 }
 
 func (b *_BACnetPropertyStatesBacnetIpModeBuilder) WithMandatoryFields(bacnetIpMode BACnetIPModeTagged) BACnetPropertyStatesBacnetIpModeBuilder {

@@ -109,6 +109,7 @@ var _ (S7PayloadAlarmSCBuilder) = (*_S7PayloadAlarmSCBuilder)(nil)
 
 func (b *_S7PayloadAlarmSCBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadAlarmSC
 }
 
 func (b *_S7PayloadAlarmSCBuilder) WithMandatoryFields(alarmMessage AlarmMessagePushType) S7PayloadAlarmSCBuilder {

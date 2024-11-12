@@ -96,6 +96,7 @@ var _ (FrameBuilder) = (*_FrameBuilder)(nil)
 
 func (b *_FrameBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._Frame
 }
 
 func (b *_FrameBuilder) WithMandatoryFields() FrameBuilder {

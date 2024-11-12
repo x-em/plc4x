@@ -116,6 +116,7 @@ var _ (ModbusPDUWriteMultipleCoilsRequestBuilder) = (*_ModbusPDUWriteMultipleCoi
 
 func (b *_ModbusPDUWriteMultipleCoilsRequestBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUWriteMultipleCoilsRequest
 }
 
 func (b *_ModbusPDUWriteMultipleCoilsRequestBuilder) WithMandatoryFields(startingAddress uint16, quantity uint16, value []byte) ModbusPDUWriteMultipleCoilsRequestBuilder {

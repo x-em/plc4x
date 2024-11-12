@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAverageValueBuilder) = (*_BACnetConstructedDataAvera
 
 func (b *_BACnetConstructedDataAverageValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAverageValue
 }
 
 func (b *_BACnetConstructedDataAverageValueBuilder) WithMandatoryFields(averageValue BACnetApplicationTagReal) BACnetConstructedDataAverageValueBuilder {

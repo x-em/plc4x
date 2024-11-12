@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataLifeSafetyZoneFaultValuesBuilder) = (*_BACnetConstru
 
 func (b *_BACnetConstructedDataLifeSafetyZoneFaultValuesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLifeSafetyZoneFaultValues
 }
 
 func (b *_BACnetConstructedDataLifeSafetyZoneFaultValuesBuilder) WithMandatoryFields(faultValues []BACnetLifeSafetyStateTagged) BACnetConstructedDataLifeSafetyZoneFaultValuesBuilder {

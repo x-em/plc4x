@@ -115,6 +115,7 @@ var _ (IdentityMappingRuleTypeBuilder) = (*_IdentityMappingRuleTypeBuilder)(nil)
 
 func (b *_IdentityMappingRuleTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._IdentityMappingRuleType
 }
 
 func (b *_IdentityMappingRuleTypeBuilder) WithMandatoryFields(criteriaType IdentityCriteriaType, criteria PascalString) IdentityMappingRuleTypeBuilder {

@@ -110,6 +110,7 @@ var _ (VariantGuidBuilder) = (*_VariantGuidBuilder)(nil)
 
 func (b *_VariantGuidBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantGuid
 }
 
 func (b *_VariantGuidBuilder) WithMandatoryFields(value []GuidValue) VariantGuidBuilder {

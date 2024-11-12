@@ -114,6 +114,7 @@ var _ (LevelInformationNormalBuilder) = (*_LevelInformationNormalBuilder)(nil)
 
 func (b *_LevelInformationNormalBuilder) setParent(contract LevelInformationContract) {
 	b.LevelInformationContract = contract
+	contract.(*_LevelInformation)._SubType = b._LevelInformationNormal
 }
 
 func (b *_LevelInformationNormalBuilder) WithMandatoryFields(pair1 LevelInformationNibblePair, pair2 LevelInformationNibblePair) LevelInformationNormalBuilder {

@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataVirtualMACAddressTableBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataVirtualMACAddressTableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataVirtualMACAddressTable
 }
 
 func (b *_BACnetConstructedDataVirtualMACAddressTableBuilder) WithMandatoryFields(virtualMacAddressTable []BACnetVMACEntry) BACnetConstructedDataVirtualMACAddressTableBuilder {

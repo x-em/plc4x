@@ -130,6 +130,7 @@ var _ (MultipleServiceResponseBuilder) = (*_MultipleServiceResponseBuilder)(nil)
 
 func (b *_MultipleServiceResponseBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._MultipleServiceResponse
 }
 
 func (b *_MultipleServiceResponseBuilder) WithMandatoryFields(status uint8, extStatus uint8, serviceNb uint16, offsets []uint16, servicesData []byte) MultipleServiceResponseBuilder {

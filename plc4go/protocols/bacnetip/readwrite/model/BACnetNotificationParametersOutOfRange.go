@@ -164,6 +164,7 @@ var _ (BACnetNotificationParametersOutOfRangeBuilder) = (*_BACnetNotificationPar
 
 func (b *_BACnetNotificationParametersOutOfRangeBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersOutOfRange
 }
 
 func (b *_BACnetNotificationParametersOutOfRangeBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, exceedingValue BACnetContextTagReal, statusFlags BACnetStatusFlagsTagged, deadband BACnetContextTagReal, exceededLimit BACnetContextTagReal, innerClosingTag BACnetClosingTag) BACnetNotificationParametersOutOfRangeBuilder {

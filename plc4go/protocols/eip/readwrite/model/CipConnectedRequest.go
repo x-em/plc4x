@@ -107,6 +107,7 @@ var _ (CipConnectedRequestBuilder) = (*_CipConnectedRequestBuilder)(nil)
 
 func (b *_CipConnectedRequestBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipConnectedRequest
 }
 
 func (b *_CipConnectedRequestBuilder) WithMandatoryFields(pathSegments []byte) CipConnectedRequestBuilder {

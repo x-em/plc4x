@@ -109,6 +109,7 @@ var _ (SALDataAudioAndVideoBuilder) = (*_SALDataAudioAndVideoBuilder)(nil)
 
 func (b *_SALDataAudioAndVideoBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataAudioAndVideo
 }
 
 func (b *_SALDataAudioAndVideoBuilder) WithMandatoryFields(audioVideoData LightingData) SALDataAudioAndVideoBuilder {

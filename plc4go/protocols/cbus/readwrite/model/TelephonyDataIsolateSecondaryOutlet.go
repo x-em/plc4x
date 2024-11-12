@@ -108,6 +108,7 @@ var _ (TelephonyDataIsolateSecondaryOutletBuilder) = (*_TelephonyDataIsolateSeco
 
 func (b *_TelephonyDataIsolateSecondaryOutletBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataIsolateSecondaryOutlet
 }
 
 func (b *_TelephonyDataIsolateSecondaryOutletBuilder) WithMandatoryFields(isolateStatus byte) TelephonyDataIsolateSecondaryOutletBuilder {

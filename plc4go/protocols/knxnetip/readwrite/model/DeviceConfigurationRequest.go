@@ -125,6 +125,7 @@ var _ (DeviceConfigurationRequestBuilder) = (*_DeviceConfigurationRequestBuilder
 
 func (b *_DeviceConfigurationRequestBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._DeviceConfigurationRequest
 }
 
 func (b *_DeviceConfigurationRequestBuilder) WithMandatoryFields(deviceConfigurationRequestDataBlock DeviceConfigurationRequestDataBlock, cemi CEMI) DeviceConfigurationRequestBuilder {

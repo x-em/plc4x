@@ -108,6 +108,7 @@ var _ (MediaTransportControlDataPauseResumeBuilder) = (*_MediaTransportControlDa
 
 func (b *_MediaTransportControlDataPauseResumeBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataPauseResume
 }
 
 func (b *_MediaTransportControlDataPauseResumeBuilder) WithMandatoryFields(operation byte) MediaTransportControlDataPauseResumeBuilder {

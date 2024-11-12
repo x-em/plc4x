@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCredentialDisableBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataCredentialDisableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCredentialDisable
 }
 
 func (b *_BACnetConstructedDataCredentialDisableBuilder) WithMandatoryFields(credentialDisable BACnetAccessCredentialDisableTagged) BACnetConstructedDataCredentialDisableBuilder {

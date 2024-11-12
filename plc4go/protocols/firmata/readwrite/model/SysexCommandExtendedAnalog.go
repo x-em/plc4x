@@ -96,6 +96,7 @@ var _ (SysexCommandExtendedAnalogBuilder) = (*_SysexCommandExtendedAnalogBuilder
 
 func (b *_SysexCommandExtendedAnalogBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandExtendedAnalog
 }
 
 func (b *_SysexCommandExtendedAnalogBuilder) WithMandatoryFields() SysexCommandExtendedAnalogBuilder {

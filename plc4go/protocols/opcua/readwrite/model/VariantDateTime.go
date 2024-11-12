@@ -110,6 +110,7 @@ var _ (VariantDateTimeBuilder) = (*_VariantDateTimeBuilder)(nil)
 
 func (b *_VariantDateTimeBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantDateTime
 }
 
 func (b *_VariantDateTimeBuilder) WithMandatoryFields(value []int64) VariantDateTimeBuilder {

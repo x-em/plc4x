@@ -104,6 +104,7 @@ var _ (KnxNetIpDeviceManagementBuilder) = (*_KnxNetIpDeviceManagementBuilder)(ni
 
 func (b *_KnxNetIpDeviceManagementBuilder) setParent(contract ServiceIdContract) {
 	b.ServiceIdContract = contract
+	contract.(*_ServiceId)._SubType = b._KnxNetIpDeviceManagement
 }
 
 func (b *_KnxNetIpDeviceManagementBuilder) WithMandatoryFields(version uint8) KnxNetIpDeviceManagementBuilder {

@@ -112,6 +112,7 @@ var _ (FirmataCommandSetDigitalPinValueBuilder) = (*_FirmataCommandSetDigitalPin
 
 func (b *_FirmataCommandSetDigitalPinValueBuilder) setParent(contract FirmataCommandContract) {
 	b.FirmataCommandContract = contract
+	contract.(*_FirmataCommand)._SubType = b._FirmataCommandSetDigitalPinValue
 }
 
 func (b *_FirmataCommandSetDigitalPinValueBuilder) WithMandatoryFields(pin uint8, on bool) FirmataCommandSetDigitalPinValueBuilder {

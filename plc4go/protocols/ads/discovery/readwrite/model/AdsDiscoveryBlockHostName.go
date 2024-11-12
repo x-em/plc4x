@@ -109,6 +109,7 @@ var _ (AdsDiscoveryBlockHostNameBuilder) = (*_AdsDiscoveryBlockHostNameBuilder)(
 
 func (b *_AdsDiscoveryBlockHostNameBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockHostName
 }
 
 func (b *_AdsDiscoveryBlockHostNameBuilder) WithMandatoryFields(hostName AmsString) AdsDiscoveryBlockHostNameBuilder {

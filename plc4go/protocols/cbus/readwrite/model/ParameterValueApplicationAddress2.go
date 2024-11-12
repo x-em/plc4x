@@ -115,6 +115,7 @@ var _ (ParameterValueApplicationAddress2Builder) = (*_ParameterValueApplicationA
 
 func (b *_ParameterValueApplicationAddress2Builder) setParent(contract ParameterValueContract) {
 	b.ParameterValueContract = contract
+	contract.(*_ParameterValue)._SubType = b._ParameterValueApplicationAddress2
 }
 
 func (b *_ParameterValueApplicationAddress2Builder) WithMandatoryFields(value ApplicationAddress2, data []byte) ParameterValueApplicationAddress2Builder {

@@ -110,6 +110,7 @@ var _ (UnsignedRationalNumberBuilder) = (*_UnsignedRationalNumberBuilder)(nil)
 
 func (b *_UnsignedRationalNumberBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UnsignedRationalNumber
 }
 
 func (b *_UnsignedRationalNumberBuilder) WithMandatoryFields(numerator uint32, denominator uint32) UnsignedRationalNumberBuilder {

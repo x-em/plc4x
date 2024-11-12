@@ -142,6 +142,7 @@ var _ (BACnetUnconfirmedServiceRequestIAmBuilder) = (*_BACnetUnconfirmedServiceR
 
 func (b *_BACnetUnconfirmedServiceRequestIAmBuilder) setParent(contract BACnetUnconfirmedServiceRequestContract) {
 	b.BACnetUnconfirmedServiceRequestContract = contract
+	contract.(*_BACnetUnconfirmedServiceRequest)._SubType = b._BACnetUnconfirmedServiceRequestIAm
 }
 
 func (b *_BACnetUnconfirmedServiceRequestIAmBuilder) WithMandatoryFields(deviceIdentifier BACnetApplicationTagObjectIdentifier, maximumApduLengthAcceptedLength BACnetApplicationTagUnsignedInteger, segmentationSupported BACnetSegmentationTagged, vendorId BACnetVendorIdTagged) BACnetUnconfirmedServiceRequestIAmBuilder {

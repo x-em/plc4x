@@ -109,6 +109,7 @@ var _ (BACnetChannelValueObjectidentifierBuilder) = (*_BACnetChannelValueObjecti
 
 func (b *_BACnetChannelValueObjectidentifierBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueObjectidentifier
 }
 
 func (b *_BACnetChannelValueObjectidentifierBuilder) WithMandatoryFields(objectidentifierValue BACnetApplicationTagObjectIdentifier) BACnetChannelValueObjectidentifierBuilder {

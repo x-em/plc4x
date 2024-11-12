@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAccessZoneAdjustValueBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataAccessZoneAdjustValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAccessZoneAdjustValue
 }
 
 func (b *_BACnetConstructedDataAccessZoneAdjustValueBuilder) WithMandatoryFields(adjustValue BACnetApplicationTagSignedInteger) BACnetConstructedDataAccessZoneAdjustValueBuilder {

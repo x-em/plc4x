@@ -110,6 +110,7 @@ var _ (VariantStringBuilder) = (*_VariantStringBuilder)(nil)
 
 func (b *_VariantStringBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantString
 }
 
 func (b *_VariantStringBuilder) WithMandatoryFields(value []PascalString) VariantStringBuilder {

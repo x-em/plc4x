@@ -109,6 +109,7 @@ var _ (StandaloneSubscribedDataSetRefDataTypeBuilder) = (*_StandaloneSubscribedD
 
 func (b *_StandaloneSubscribedDataSetRefDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._StandaloneSubscribedDataSetRefDataType
 }
 
 func (b *_StandaloneSubscribedDataSetRefDataTypeBuilder) WithMandatoryFields(dataSetName PascalString) StandaloneSubscribedDataSetRefDataTypeBuilder {

@@ -135,6 +135,7 @@ var _ (BitFieldDefinitionBuilder) = (*_BitFieldDefinitionBuilder)(nil)
 
 func (b *_BitFieldDefinitionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BitFieldDefinition
 }
 
 func (b *_BitFieldDefinitionBuilder) WithMandatoryFields(name PascalString, description LocalizedText, startingBitPosition uint32, endingBitPosition uint32) BitFieldDefinitionBuilder {

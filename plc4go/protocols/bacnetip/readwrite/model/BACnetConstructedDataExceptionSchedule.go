@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataExceptionScheduleBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataExceptionScheduleBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataExceptionSchedule
 }
 
 func (b *_BACnetConstructedDataExceptionScheduleBuilder) WithMandatoryFields(exceptionSchedule []BACnetSpecialEvent) BACnetConstructedDataExceptionScheduleBuilder {

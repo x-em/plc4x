@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataUserInformationReferenceBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataUserInformationReferenceBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataUserInformationReference
 }
 
 func (b *_BACnetConstructedDataUserInformationReferenceBuilder) WithMandatoryFields(userInformationReference BACnetApplicationTagCharacterString) BACnetConstructedDataUserInformationReferenceBuilder {

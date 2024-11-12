@@ -110,6 +110,7 @@ var _ (ApduDataMemoryResponseBuilder) = (*_ApduDataMemoryResponseBuilder)(nil)
 
 func (b *_ApduDataMemoryResponseBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataMemoryResponse
 }
 
 func (b *_ApduDataMemoryResponseBuilder) WithMandatoryFields(address uint16, data []byte) ApduDataMemoryResponseBuilder {

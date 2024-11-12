@@ -160,6 +160,7 @@ var _ (PubSubConfiguration2DataTypeBuilder) = (*_PubSubConfiguration2DataTypeBui
 
 func (b *_PubSubConfiguration2DataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PubSubConfiguration2DataType
 }
 
 func (b *_PubSubConfiguration2DataTypeBuilder) WithMandatoryFields(publishedDataSets []PublishedDataSetDataType, connections []PubSubConnectionDataType, enabled bool, subscribedDataSets []StandaloneSubscribedDataSetDataType, dataSetClasses []DataSetMetaDataType, defaultSecurityKeyServices []EndpointDescription, securityGroups []SecurityGroupDataType, pubSubKeyPushTargets []PubSubKeyPushTargetDataType, configurationVersion uint32, configurationProperties []KeyValuePair) PubSubConfiguration2DataTypeBuilder {

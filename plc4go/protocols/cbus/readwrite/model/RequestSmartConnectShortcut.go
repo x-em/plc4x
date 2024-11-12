@@ -113,6 +113,7 @@ var _ (RequestSmartConnectShortcutBuilder) = (*_RequestSmartConnectShortcutBuild
 
 func (b *_RequestSmartConnectShortcutBuilder) setParent(contract RequestContract) {
 	b.RequestContract = contract
+	contract.(*_Request)._SubType = b._RequestSmartConnectShortcut
 }
 
 func (b *_RequestSmartConnectShortcutBuilder) WithMandatoryFields(pipePeek RequestType) RequestSmartConnectShortcutBuilder {

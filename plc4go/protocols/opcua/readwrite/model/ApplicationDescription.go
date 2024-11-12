@@ -165,6 +165,7 @@ var _ (ApplicationDescriptionBuilder) = (*_ApplicationDescriptionBuilder)(nil)
 
 func (b *_ApplicationDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ApplicationDescription
 }
 
 func (b *_ApplicationDescriptionBuilder) WithMandatoryFields(applicationUri PascalString, productUri PascalString, applicationName LocalizedText, applicationType ApplicationType, gatewayServerUri PascalString, discoveryProfileUri PascalString, discoveryUrls []PascalString) ApplicationDescriptionBuilder {

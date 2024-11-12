@@ -123,6 +123,7 @@ var _ (TransferSubscriptionsRequestBuilder) = (*_TransferSubscriptionsRequestBui
 
 func (b *_TransferSubscriptionsRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._TransferSubscriptionsRequest
 }
 
 func (b *_TransferSubscriptionsRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, subscriptionIds []uint32, sendInitialValues bool) TransferSubscriptionsRequestBuilder {

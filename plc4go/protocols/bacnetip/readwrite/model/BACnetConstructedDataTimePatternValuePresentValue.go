@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTimePatternValuePresentValueBuilder) = (*_BACnetCons
 
 func (b *_BACnetConstructedDataTimePatternValuePresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimePatternValuePresentValue
 }
 
 func (b *_BACnetConstructedDataTimePatternValuePresentValueBuilder) WithMandatoryFields(presentValue BACnetApplicationTagTime) BACnetConstructedDataTimePatternValuePresentValueBuilder {

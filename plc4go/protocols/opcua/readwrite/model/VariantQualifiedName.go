@@ -110,6 +110,7 @@ var _ (VariantQualifiedNameBuilder) = (*_VariantQualifiedNameBuilder)(nil)
 
 func (b *_VariantQualifiedNameBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantQualifiedName
 }
 
 func (b *_VariantQualifiedNameBuilder) WithMandatoryFields(value []QualifiedName) VariantQualifiedNameBuilder {

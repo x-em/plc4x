@@ -153,6 +153,7 @@ var _ (BACnetEventParameterUnsignedRangeBuilder) = (*_BACnetEventParameterUnsign
 
 func (b *_BACnetEventParameterUnsignedRangeBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterUnsignedRange
 }
 
 func (b *_BACnetEventParameterUnsignedRangeBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, timeDelay BACnetContextTagUnsignedInteger, lowLimit BACnetContextTagUnsignedInteger, highLimit BACnetContextTagUnsignedInteger, closingTag BACnetClosingTag) BACnetEventParameterUnsignedRangeBuilder {

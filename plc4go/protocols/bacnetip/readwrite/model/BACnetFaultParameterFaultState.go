@@ -131,6 +131,7 @@ var _ (BACnetFaultParameterFaultStateBuilder) = (*_BACnetFaultParameterFaultStat
 
 func (b *_BACnetFaultParameterFaultStateBuilder) setParent(contract BACnetFaultParameterContract) {
 	b.BACnetFaultParameterContract = contract
+	contract.(*_BACnetFaultParameter)._SubType = b._BACnetFaultParameterFaultState
 }
 
 func (b *_BACnetFaultParameterFaultStateBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, listOfFaultValues BACnetFaultParameterFaultStateListOfFaultValues, closingTag BACnetClosingTag) BACnetFaultParameterFaultStateBuilder {

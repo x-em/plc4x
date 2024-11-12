@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataOutOfServiceBuilder) = (*_BACnetConstructedDataOutOf
 
 func (b *_BACnetConstructedDataOutOfServiceBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataOutOfService
 }
 
 func (b *_BACnetConstructedDataOutOfServiceBuilder) WithMandatoryFields(outOfService BACnetApplicationTagBoolean) BACnetConstructedDataOutOfServiceBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueDateTimeBuilder) = (*_BACnetPriorityValueDateTimeBuild
 
 func (b *_BACnetPriorityValueDateTimeBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueDateTime
 }
 
 func (b *_BACnetPriorityValueDateTimeBuilder) WithMandatoryFields(dateTimeValue BACnetDateTimeEnclosed) BACnetPriorityValueDateTimeBuilder {

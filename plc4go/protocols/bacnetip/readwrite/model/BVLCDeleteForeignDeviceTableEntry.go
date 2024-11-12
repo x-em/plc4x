@@ -112,6 +112,7 @@ var _ (BVLCDeleteForeignDeviceTableEntryBuilder) = (*_BVLCDeleteForeignDeviceTab
 
 func (b *_BVLCDeleteForeignDeviceTableEntryBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCDeleteForeignDeviceTableEntry
 }
 
 func (b *_BVLCDeleteForeignDeviceTableEntryBuilder) WithMandatoryFields(ip []uint8, port uint16) BVLCDeleteForeignDeviceTableEntryBuilder {

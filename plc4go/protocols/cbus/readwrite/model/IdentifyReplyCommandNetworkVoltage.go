@@ -114,6 +114,7 @@ var _ (IdentifyReplyCommandNetworkVoltageBuilder) = (*_IdentifyReplyCommandNetwo
 
 func (b *_IdentifyReplyCommandNetworkVoltageBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandNetworkVoltage
 }
 
 func (b *_IdentifyReplyCommandNetworkVoltageBuilder) WithMandatoryFields(volts string, voltsDecimalPlace string) IdentifyReplyCommandNetworkVoltageBuilder {

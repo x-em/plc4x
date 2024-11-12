@@ -96,6 +96,7 @@ var _ (MResetIndBuilder) = (*_MResetIndBuilder)(nil)
 
 func (b *_MResetIndBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MResetInd
 }
 
 func (b *_MResetIndBuilder) WithMandatoryFields() MResetIndBuilder {

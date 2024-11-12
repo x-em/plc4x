@@ -152,6 +152,7 @@ var _ (MethodAttributesBuilder) = (*_MethodAttributesBuilder)(nil)
 
 func (b *_MethodAttributesBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._MethodAttributes
 }
 
 func (b *_MethodAttributesBuilder) WithMandatoryFields(specifiedAttributes uint32, displayName LocalizedText, description LocalizedText, writeMask uint32, userWriteMask uint32, userExecutable bool, executable bool) MethodAttributesBuilder {

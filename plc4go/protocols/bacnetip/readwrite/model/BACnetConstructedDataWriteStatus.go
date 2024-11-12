@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataWriteStatusBuilder) = (*_BACnetConstructedDataWriteS
 
 func (b *_BACnetConstructedDataWriteStatusBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataWriteStatus
 }
 
 func (b *_BACnetConstructedDataWriteStatusBuilder) WithMandatoryFields(writeStatus BACnetWriteStatusTagged) BACnetConstructedDataWriteStatusBuilder {

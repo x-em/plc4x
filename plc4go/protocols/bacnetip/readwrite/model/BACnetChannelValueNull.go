@@ -109,6 +109,7 @@ var _ (BACnetChannelValueNullBuilder) = (*_BACnetChannelValueNullBuilder)(nil)
 
 func (b *_BACnetChannelValueNullBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueNull
 }
 
 func (b *_BACnetChannelValueNullBuilder) WithMandatoryFields(nullValue BACnetApplicationTagNull) BACnetChannelValueNullBuilder {

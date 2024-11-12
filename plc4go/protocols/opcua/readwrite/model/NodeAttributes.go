@@ -138,6 +138,7 @@ var _ (NodeAttributesBuilder) = (*_NodeAttributesBuilder)(nil)
 
 func (b *_NodeAttributesBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._NodeAttributes
 }
 
 func (b *_NodeAttributesBuilder) WithMandatoryFields(specifiedAttributes uint32, displayName LocalizedText, description LocalizedText, writeMask uint32, userWriteMask uint32) NodeAttributesBuilder {

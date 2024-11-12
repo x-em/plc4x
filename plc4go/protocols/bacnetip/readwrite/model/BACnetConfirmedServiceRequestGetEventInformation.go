@@ -106,6 +106,7 @@ var _ (BACnetConfirmedServiceRequestGetEventInformationBuilder) = (*_BACnetConfi
 
 func (b *_BACnetConfirmedServiceRequestGetEventInformationBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestGetEventInformation
 }
 
 func (b *_BACnetConfirmedServiceRequestGetEventInformationBuilder) WithMandatoryFields() BACnetConfirmedServiceRequestGetEventInformationBuilder {

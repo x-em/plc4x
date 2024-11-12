@@ -109,6 +109,7 @@ var _ (BACnetLogRecordLogDatumBitStringValueBuilder) = (*_BACnetLogRecordLogDatu
 
 func (b *_BACnetLogRecordLogDatumBitStringValueBuilder) setParent(contract BACnetLogRecordLogDatumContract) {
 	b.BACnetLogRecordLogDatumContract = contract
+	contract.(*_BACnetLogRecordLogDatum)._SubType = b._BACnetLogRecordLogDatumBitStringValue
 }
 
 func (b *_BACnetLogRecordLogDatumBitStringValueBuilder) WithMandatoryFields(bitStringValue BACnetContextTagBitString) BACnetLogRecordLogDatumBitStringValueBuilder {

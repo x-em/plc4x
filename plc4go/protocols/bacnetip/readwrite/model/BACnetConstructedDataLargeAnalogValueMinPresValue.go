@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLargeAnalogValueMinPresValueBuilder) = (*_BACnetCons
 
 func (b *_BACnetConstructedDataLargeAnalogValueMinPresValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLargeAnalogValueMinPresValue
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueMinPresValueBuilder) WithMandatoryFields(minPresValue BACnetApplicationTagDouble) BACnetConstructedDataLargeAnalogValueMinPresValueBuilder {

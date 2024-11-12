@@ -137,6 +137,7 @@ var _ (AdsAddDeviceNotificationRequestBuilder) = (*_AdsAddDeviceNotificationRequ
 
 func (b *_AdsAddDeviceNotificationRequestBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsAddDeviceNotificationRequest
 }
 
 func (b *_AdsAddDeviceNotificationRequestBuilder) WithMandatoryFields(indexGroup uint32, indexOffset uint32, length uint32, transmissionMode AdsTransMode, maxDelayInMs uint32, cycleTimeInMs uint32) AdsAddDeviceNotificationRequestBuilder {

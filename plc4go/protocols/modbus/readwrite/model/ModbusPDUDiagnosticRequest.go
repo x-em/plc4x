@@ -110,6 +110,7 @@ var _ (ModbusPDUDiagnosticRequestBuilder) = (*_ModbusPDUDiagnosticRequestBuilder
 
 func (b *_ModbusPDUDiagnosticRequestBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUDiagnosticRequest
 }
 
 func (b *_ModbusPDUDiagnosticRequestBuilder) WithMandatoryFields(subFunction uint16, data uint16) ModbusPDUDiagnosticRequestBuilder {

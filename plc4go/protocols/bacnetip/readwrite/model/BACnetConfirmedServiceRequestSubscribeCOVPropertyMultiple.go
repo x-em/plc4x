@@ -144,6 +144,7 @@ var _ (BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleBuilder) = (*_BA
 
 func (b *_BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestSubscribeCOVPropertyMultiple
 }
 
 func (b *_BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleBuilder) WithMandatoryFields(subscriberProcessIdentifier BACnetContextTagUnsignedInteger, listOfCovSubscriptionSpecifications BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleListOfCovSubscriptionSpecificationsList) BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleBuilder {

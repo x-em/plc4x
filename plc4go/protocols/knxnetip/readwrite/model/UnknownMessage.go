@@ -109,6 +109,7 @@ var _ (UnknownMessageBuilder) = (*_UnknownMessageBuilder)(nil)
 
 func (b *_UnknownMessageBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._UnknownMessage
 }
 
 func (b *_UnknownMessageBuilder) WithMandatoryFields(unknownData []byte) UnknownMessageBuilder {

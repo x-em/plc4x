@@ -142,6 +142,7 @@ var _ (HistoryReadValueIdBuilder) = (*_HistoryReadValueIdBuilder)(nil)
 
 func (b *_HistoryReadValueIdBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._HistoryReadValueId
 }
 
 func (b *_HistoryReadValueIdBuilder) WithMandatoryFields(nodeId NodeId, indexRange PascalString, dataEncoding QualifiedName, continuationPoint PascalByteString) HistoryReadValueIdBuilder {

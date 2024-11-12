@@ -96,6 +96,7 @@ var _ (SecurityDataRaiseTamperBuilder) = (*_SecurityDataRaiseTamperBuilder)(nil)
 
 func (b *_SecurityDataRaiseTamperBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataRaiseTamper
 }
 
 func (b *_SecurityDataRaiseTamperBuilder) WithMandatoryFields() SecurityDataRaiseTamperBuilder {

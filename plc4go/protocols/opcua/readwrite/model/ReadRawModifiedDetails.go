@@ -131,6 +131,7 @@ var _ (ReadRawModifiedDetailsBuilder) = (*_ReadRawModifiedDetailsBuilder)(nil)
 
 func (b *_ReadRawModifiedDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadRawModifiedDetails
 }
 
 func (b *_ReadRawModifiedDetailsBuilder) WithMandatoryFields(isReadModified bool, startTime int64, endTime int64, numValuesPerNode uint32, returnBounds bool) ReadRawModifiedDetailsBuilder {

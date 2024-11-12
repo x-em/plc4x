@@ -104,6 +104,7 @@ var _ (EipListIdentityResponseBuilder) = (*_EipListIdentityResponseBuilder)(nil)
 
 func (b *_EipListIdentityResponseBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._EipListIdentityResponse
 }
 
 func (b *_EipListIdentityResponseBuilder) WithMandatoryFields(items []CommandSpecificDataItem) EipListIdentityResponseBuilder {

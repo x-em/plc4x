@@ -120,6 +120,7 @@ var _ (BACnetConstructedDataEventMessageTextsConfigBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataEventMessageTextsConfigBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEventMessageTextsConfig
 }
 
 func (b *_BACnetConstructedDataEventMessageTextsConfigBuilder) WithMandatoryFields(eventMessageTextsConfig []BACnetOptionalCharacterString) BACnetConstructedDataEventMessageTextsConfigBuilder {

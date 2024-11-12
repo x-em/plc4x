@@ -104,6 +104,7 @@ var _ (DF1CommandResponseMessageProtectedTypedLogicalReadBuilder) = (*_DF1Comman
 
 func (b *_DF1CommandResponseMessageProtectedTypedLogicalReadBuilder) setParent(contract DF1ResponseMessageContract) {
 	b.DF1ResponseMessageContract = contract
+	contract.(*_DF1ResponseMessage)._SubType = b._DF1CommandResponseMessageProtectedTypedLogicalRead
 }
 
 func (b *_DF1CommandResponseMessageProtectedTypedLogicalReadBuilder) WithMandatoryFields(data []uint8) DF1CommandResponseMessageProtectedTypedLogicalReadBuilder {

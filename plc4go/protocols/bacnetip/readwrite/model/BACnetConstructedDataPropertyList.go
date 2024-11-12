@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataPropertyListBuilder) = (*_BACnetConstructedDataPrope
 
 func (b *_BACnetConstructedDataPropertyListBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPropertyList
 }
 
 func (b *_BACnetConstructedDataPropertyListBuilder) WithMandatoryFields(propertyList []BACnetPropertyIdentifierTagged) BACnetConstructedDataPropertyListBuilder {

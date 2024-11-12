@@ -115,6 +115,7 @@ var _ (ConnectedDataItemBuilder) = (*_ConnectedDataItemBuilder)(nil)
 
 func (b *_ConnectedDataItemBuilder) setParent(contract TypeIdContract) {
 	b.TypeIdContract = contract
+	contract.(*_TypeId)._SubType = b._ConnectedDataItem
 }
 
 func (b *_ConnectedDataItemBuilder) WithMandatoryFields(sequenceCount uint16, service CipService) ConnectedDataItemBuilder {

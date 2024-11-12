@@ -109,6 +109,7 @@ var _ (BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder) = (*
 
 func (b *_BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder) setParent(contract BACnetNotificationParametersChangeOfValueNewValueContract) {
 	b.BACnetNotificationParametersChangeOfValueNewValueContract = contract
+	contract.(*_BACnetNotificationParametersChangeOfValueNewValue)._SubType = b._BACnetNotificationParametersChangeOfValueNewValueChangedBits
 }
 
 func (b *_BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder) WithMandatoryFields(changedBits BACnetContextTagBitString) BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder {

@@ -121,6 +121,7 @@ var _ (ParsingResultBuilder) = (*_ParsingResultBuilder)(nil)
 
 func (b *_ParsingResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ParsingResult
 }
 
 func (b *_ParsingResultBuilder) WithMandatoryFields(statusCode StatusCode, dataStatusCodes []StatusCode, dataDiagnosticInfos []DiagnosticInfo) ParsingResultBuilder {

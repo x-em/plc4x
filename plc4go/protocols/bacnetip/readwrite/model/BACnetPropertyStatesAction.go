@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesActionBuilder) = (*_BACnetPropertyStatesActionBuilder
 
 func (b *_BACnetPropertyStatesActionBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesAction
 }
 
 func (b *_BACnetPropertyStatesActionBuilder) WithMandatoryFields(action BACnetActionTagged) BACnetPropertyStatesActionBuilder {

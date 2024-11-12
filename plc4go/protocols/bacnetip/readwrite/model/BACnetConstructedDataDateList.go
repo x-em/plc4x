@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataDateListBuilder) = (*_BACnetConstructedDataDateListB
 
 func (b *_BACnetConstructedDataDateListBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDateList
 }
 
 func (b *_BACnetConstructedDataDateListBuilder) WithMandatoryFields(dateList []BACnetCalendarEntry) BACnetConstructedDataDateListBuilder {

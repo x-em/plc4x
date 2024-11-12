@@ -109,6 +109,7 @@ var _ (BACnetValueSourceAddressBuilder) = (*_BACnetValueSourceAddressBuilder)(ni
 
 func (b *_BACnetValueSourceAddressBuilder) setParent(contract BACnetValueSourceContract) {
 	b.BACnetValueSourceContract = contract
+	contract.(*_BACnetValueSource)._SubType = b._BACnetValueSourceAddress
 }
 
 func (b *_BACnetValueSourceAddressBuilder) WithMandatoryFields(address BACnetAddressEnclosed) BACnetValueSourceAddressBuilder {

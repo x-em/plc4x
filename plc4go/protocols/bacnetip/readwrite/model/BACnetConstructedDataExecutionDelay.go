@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataExecutionDelayBuilder) = (*_BACnetConstructedDataExe
 
 func (b *_BACnetConstructedDataExecutionDelayBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataExecutionDelay
 }
 
 func (b *_BACnetConstructedDataExecutionDelayBuilder) WithMandatoryFields(executionDelay []BACnetApplicationTagUnsignedInteger) BACnetConstructedDataExecutionDelayBuilder {

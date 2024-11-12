@@ -96,6 +96,7 @@ var _ (NullCommandRequestBuilder) = (*_NullCommandRequestBuilder)(nil)
 
 func (b *_NullCommandRequestBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._NullCommandRequest
 }
 
 func (b *_NullCommandRequestBuilder) WithMandatoryFields() NullCommandRequestBuilder {

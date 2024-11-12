@@ -152,6 +152,7 @@ var _ (PubSubGroupDataTypeBuilder) = (*_PubSubGroupDataTypeBuilder)(nil)
 
 func (b *_PubSubGroupDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PubSubGroupDataType
 }
 
 func (b *_PubSubGroupDataTypeBuilder) WithMandatoryFields(name PascalString, enabled bool, securityMode MessageSecurityMode, securityGroupId PascalString, securityKeyServices []EndpointDescription, maxNetworkMessageSize uint32, groupProperties []KeyValuePair) PubSubGroupDataTypeBuilder {

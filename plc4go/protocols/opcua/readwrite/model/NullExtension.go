@@ -96,6 +96,7 @@ var _ (NullExtensionBuilder) = (*_NullExtensionBuilder)(nil)
 
 func (b *_NullExtensionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._NullExtension
 }
 
 func (b *_NullExtensionBuilder) WithMandatoryFields() NullExtensionBuilder {

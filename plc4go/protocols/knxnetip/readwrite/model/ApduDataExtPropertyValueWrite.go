@@ -128,6 +128,7 @@ var _ (ApduDataExtPropertyValueWriteBuilder) = (*_ApduDataExtPropertyValueWriteB
 
 func (b *_ApduDataExtPropertyValueWriteBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtPropertyValueWrite
 }
 
 func (b *_ApduDataExtPropertyValueWriteBuilder) WithMandatoryFields(objectIndex uint8, propertyId uint8, count uint8, index uint16, data []byte) ApduDataExtPropertyValueWriteBuilder {

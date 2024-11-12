@@ -121,6 +121,7 @@ var _ (DeleteNodesResponseBuilder) = (*_DeleteNodesResponseBuilder)(nil)
 
 func (b *_DeleteNodesResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteNodesResponse
 }
 
 func (b *_DeleteNodesResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) DeleteNodesResponseBuilder {

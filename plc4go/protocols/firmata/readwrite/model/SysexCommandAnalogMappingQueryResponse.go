@@ -104,6 +104,7 @@ var _ (SysexCommandAnalogMappingQueryResponseBuilder) = (*_SysexCommandAnalogMap
 
 func (b *_SysexCommandAnalogMappingQueryResponseBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandAnalogMappingQueryResponse
 }
 
 func (b *_SysexCommandAnalogMappingQueryResponseBuilder) WithMandatoryFields(pin uint8) SysexCommandAnalogMappingQueryResponseBuilder {

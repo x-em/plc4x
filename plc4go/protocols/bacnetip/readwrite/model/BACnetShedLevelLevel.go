@@ -109,6 +109,7 @@ var _ (BACnetShedLevelLevelBuilder) = (*_BACnetShedLevelLevelBuilder)(nil)
 
 func (b *_BACnetShedLevelLevelBuilder) setParent(contract BACnetShedLevelContract) {
 	b.BACnetShedLevelContract = contract
+	contract.(*_BACnetShedLevel)._SubType = b._BACnetShedLevelLevel
 }
 
 func (b *_BACnetShedLevelLevelBuilder) WithMandatoryFields(level BACnetContextTagUnsignedInteger) BACnetShedLevelLevelBuilder {

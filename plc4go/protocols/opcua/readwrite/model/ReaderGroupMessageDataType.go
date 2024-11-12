@@ -96,6 +96,7 @@ var _ (ReaderGroupMessageDataTypeBuilder) = (*_ReaderGroupMessageDataTypeBuilder
 
 func (b *_ReaderGroupMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReaderGroupMessageDataType
 }
 
 func (b *_ReaderGroupMessageDataTypeBuilder) WithMandatoryFields() ReaderGroupMessageDataTypeBuilder {

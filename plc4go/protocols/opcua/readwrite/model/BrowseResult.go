@@ -126,6 +126,7 @@ var _ (BrowseResultBuilder) = (*_BrowseResultBuilder)(nil)
 
 func (b *_BrowseResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BrowseResult
 }
 
 func (b *_BrowseResultBuilder) WithMandatoryFields(statusCode StatusCode, continuationPoint PascalByteString, references []ReferenceDescription) BrowseResultBuilder {

@@ -96,6 +96,7 @@ var _ (MonitoringFilterBuilder) = (*_MonitoringFilterBuilder)(nil)
 
 func (b *_MonitoringFilterBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._MonitoringFilter
 }
 
 func (b *_MonitoringFilterBuilder) WithMandatoryFields() MonitoringFilterBuilder {

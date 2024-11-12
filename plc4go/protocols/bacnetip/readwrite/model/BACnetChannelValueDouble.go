@@ -109,6 +109,7 @@ var _ (BACnetChannelValueDoubleBuilder) = (*_BACnetChannelValueDoubleBuilder)(ni
 
 func (b *_BACnetChannelValueDoubleBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueDouble
 }
 
 func (b *_BACnetChannelValueDoubleBuilder) WithMandatoryFields(doubleValue BACnetApplicationTagDouble) BACnetChannelValueDoubleBuilder {

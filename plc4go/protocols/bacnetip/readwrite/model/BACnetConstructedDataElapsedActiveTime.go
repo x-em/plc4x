@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataElapsedActiveTimeBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataElapsedActiveTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataElapsedActiveTime
 }
 
 func (b *_BACnetConstructedDataElapsedActiveTimeBuilder) WithMandatoryFields(elapsedActiveTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataElapsedActiveTimeBuilder {

@@ -137,6 +137,7 @@ var _ (CipConnectionManagerCloseResponseBuilder) = (*_CipConnectionManagerCloseR
 
 func (b *_CipConnectionManagerCloseResponseBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipConnectionManagerCloseResponse
 }
 
 func (b *_CipConnectionManagerCloseResponseBuilder) WithMandatoryFields(status uint8, additionalStatusWords uint8, connectionSerialNumber uint16, originatorVendorId uint16, originatorSerialNumber uint32, applicationReplySize uint8) CipConnectionManagerCloseResponseBuilder {

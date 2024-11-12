@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAccessEventTagBuilder) = (*_BACnetConstructedDataAcc
 
 func (b *_BACnetConstructedDataAccessEventTagBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAccessEventTag
 }
 
 func (b *_BACnetConstructedDataAccessEventTagBuilder) WithMandatoryFields(accessEventTag BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAccessEventTagBuilder {

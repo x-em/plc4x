@@ -120,6 +120,7 @@ var _ (PortableQualifiedNameBuilder) = (*_PortableQualifiedNameBuilder)(nil)
 
 func (b *_PortableQualifiedNameBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PortableQualifiedName
 }
 
 func (b *_PortableQualifiedNameBuilder) WithMandatoryFields(namespaceUri PascalString, name PascalString) PortableQualifiedNameBuilder {

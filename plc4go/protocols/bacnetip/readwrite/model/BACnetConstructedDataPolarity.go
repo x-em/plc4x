@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPolarityBuilder) = (*_BACnetConstructedDataPolarityB
 
 func (b *_BACnetConstructedDataPolarityBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPolarity
 }
 
 func (b *_BACnetConstructedDataPolarityBuilder) WithMandatoryFields(polarity BACnetPolarityTagged) BACnetConstructedDataPolarityBuilder {

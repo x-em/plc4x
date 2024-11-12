@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAbsenteeLimitBuilder) = (*_BACnetConstructedDataAbse
 
 func (b *_BACnetConstructedDataAbsenteeLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAbsenteeLimit
 }
 
 func (b *_BACnetConstructedDataAbsenteeLimitBuilder) WithMandatoryFields(absenteeLimit BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAbsenteeLimitBuilder {

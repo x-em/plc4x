@@ -109,6 +109,7 @@ var _ (BACnetChannelValueBitStringBuilder) = (*_BACnetChannelValueBitStringBuild
 
 func (b *_BACnetChannelValueBitStringBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueBitString
 }
 
 func (b *_BACnetChannelValueBitStringBuilder) WithMandatoryFields(bitStringValue BACnetApplicationTagBitString) BACnetChannelValueBitStringBuilder {

@@ -96,6 +96,7 @@ var _ (S7MessageUserDataBuilder) = (*_S7MessageUserDataBuilder)(nil)
 
 func (b *_S7MessageUserDataBuilder) setParent(contract S7MessageContract) {
 	b.S7MessageContract = contract
+	contract.(*_S7Message)._SubType = b._S7MessageUserData
 }
 
 func (b *_S7MessageUserDataBuilder) WithMandatoryFields() S7MessageUserDataBuilder {

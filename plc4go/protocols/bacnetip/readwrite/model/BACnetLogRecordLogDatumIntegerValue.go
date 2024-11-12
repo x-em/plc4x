@@ -109,6 +109,7 @@ var _ (BACnetLogRecordLogDatumIntegerValueBuilder) = (*_BACnetLogRecordLogDatumI
 
 func (b *_BACnetLogRecordLogDatumIntegerValueBuilder) setParent(contract BACnetLogRecordLogDatumContract) {
 	b.BACnetLogRecordLogDatumContract = contract
+	contract.(*_BACnetLogRecordLogDatum)._SubType = b._BACnetLogRecordLogDatumIntegerValue
 }
 
 func (b *_BACnetLogRecordLogDatumIntegerValueBuilder) WithMandatoryFields(integerValue BACnetContextTagSignedInteger) BACnetLogRecordLogDatumIntegerValueBuilder {

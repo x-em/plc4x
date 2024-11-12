@@ -115,6 +115,7 @@ var _ (DeleteSubscriptionsRequestBuilder) = (*_DeleteSubscriptionsRequestBuilder
 
 func (b *_DeleteSubscriptionsRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteSubscriptionsRequest
 }
 
 func (b *_DeleteSubscriptionsRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, subscriptionIds []uint32) DeleteSubscriptionsRequestBuilder {

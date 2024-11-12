@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDefaultTimeoutBuilder) = (*_BACnetConstructedDataDef
 
 func (b *_BACnetConstructedDataDefaultTimeoutBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDefaultTimeout
 }
 
 func (b *_BACnetConstructedDataDefaultTimeoutBuilder) WithMandatoryFields(defaultTimeout BACnetApplicationTagUnsignedInteger) BACnetConstructedDataDefaultTimeoutBuilder {

@@ -132,6 +132,7 @@ var _ (PriorityMappingEntryTypeBuilder) = (*_PriorityMappingEntryTypeBuilder)(ni
 
 func (b *_PriorityMappingEntryTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PriorityMappingEntryType
 }
 
 func (b *_PriorityMappingEntryTypeBuilder) WithMandatoryFields(mappingUri PascalString, priorityLabel PascalString, priorityValue_PCP uint8, priorityValue_DSCP uint32) PriorityMappingEntryTypeBuilder {

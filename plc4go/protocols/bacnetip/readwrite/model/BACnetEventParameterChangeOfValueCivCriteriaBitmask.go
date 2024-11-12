@@ -109,6 +109,7 @@ var _ (BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder) = (*_BACnetEv
 
 func (b *_BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder) setParent(contract BACnetEventParameterChangeOfValueCivCriteriaContract) {
 	b.BACnetEventParameterChangeOfValueCivCriteriaContract = contract
+	contract.(*_BACnetEventParameterChangeOfValueCivCriteria)._SubType = b._BACnetEventParameterChangeOfValueCivCriteriaBitmask
 }
 
 func (b *_BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder) WithMandatoryFields(bitmask BACnetContextTagBitString) BACnetEventParameterChangeOfValueCivCriteriaBitmaskBuilder {

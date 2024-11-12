@@ -120,6 +120,7 @@ var _ (SubscribeCOVPropertyMultipleErrorBuilder) = (*_SubscribeCOVPropertyMultip
 
 func (b *_SubscribeCOVPropertyMultipleErrorBuilder) setParent(contract BACnetErrorContract) {
 	b.BACnetErrorContract = contract
+	contract.(*_BACnetError)._SubType = b._SubscribeCOVPropertyMultipleError
 }
 
 func (b *_SubscribeCOVPropertyMultipleErrorBuilder) WithMandatoryFields(errorType ErrorEnclosed, firstFailedSubscription SubscribeCOVPropertyMultipleErrorFirstFailedSubscription) SubscribeCOVPropertyMultipleErrorBuilder {

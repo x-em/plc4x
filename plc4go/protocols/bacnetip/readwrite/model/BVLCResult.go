@@ -106,6 +106,7 @@ var _ (BVLCResultBuilder) = (*_BVLCResultBuilder)(nil)
 
 func (b *_BVLCResultBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCResult
 }
 
 func (b *_BVLCResultBuilder) WithMandatoryFields(code BVLCResultCode) BVLCResultBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLargeAnalogValueResolutionBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataLargeAnalogValueResolutionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLargeAnalogValueResolution
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueResolutionBuilder) WithMandatoryFields(resolution BACnetApplicationTagDouble) BACnetConstructedDataLargeAnalogValueResolutionBuilder {

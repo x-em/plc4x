@@ -109,6 +109,7 @@ var _ (BACnetClientCOVNoneBuilder) = (*_BACnetClientCOVNoneBuilder)(nil)
 
 func (b *_BACnetClientCOVNoneBuilder) setParent(contract BACnetClientCOVContract) {
 	b.BACnetClientCOVContract = contract
+	contract.(*_BACnetClientCOV)._SubType = b._BACnetClientCOVNone
 }
 
 func (b *_BACnetClientCOVNoneBuilder) WithMandatoryFields(defaultIncrement BACnetApplicationTagNull) BACnetClientCOVNoneBuilder {

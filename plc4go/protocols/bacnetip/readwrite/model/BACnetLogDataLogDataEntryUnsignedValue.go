@@ -109,6 +109,7 @@ var _ (BACnetLogDataLogDataEntryUnsignedValueBuilder) = (*_BACnetLogDataLogDataE
 
 func (b *_BACnetLogDataLogDataEntryUnsignedValueBuilder) setParent(contract BACnetLogDataLogDataEntryContract) {
 	b.BACnetLogDataLogDataEntryContract = contract
+	contract.(*_BACnetLogDataLogDataEntry)._SubType = b._BACnetLogDataLogDataEntryUnsignedValue
 }
 
 func (b *_BACnetLogDataLogDataEntryUnsignedValueBuilder) WithMandatoryFields(unsignedValue BACnetContextTagUnsignedInteger) BACnetLogDataLogDataEntryUnsignedValueBuilder {

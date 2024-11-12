@@ -138,6 +138,7 @@ var _ (MeasurementDataChannelMeasurementDataBuilder) = (*_MeasurementDataChannel
 
 func (b *_MeasurementDataChannelMeasurementDataBuilder) setParent(contract MeasurementDataContract) {
 	b.MeasurementDataContract = contract
+	contract.(*_MeasurementData)._SubType = b._MeasurementDataChannelMeasurementData
 }
 
 func (b *_MeasurementDataChannelMeasurementDataBuilder) WithMandatoryFields(deviceId uint8, channel uint8, units MeasurementUnits, multiplier int8, msb uint8, lsb uint8) MeasurementDataChannelMeasurementDataBuilder {

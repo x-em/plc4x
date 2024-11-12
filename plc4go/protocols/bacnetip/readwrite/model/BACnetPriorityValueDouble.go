@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueDoubleBuilder) = (*_BACnetPriorityValueDoubleBuilder)(
 
 func (b *_BACnetPriorityValueDoubleBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueDouble
 }
 
 func (b *_BACnetPriorityValueDoubleBuilder) WithMandatoryFields(doubleValue BACnetApplicationTagDouble) BACnetPriorityValueDoubleBuilder {

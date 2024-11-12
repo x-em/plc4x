@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMaximumValueTimestampBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataMaximumValueTimestampBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMaximumValueTimestamp
 }
 
 func (b *_BACnetConstructedDataMaximumValueTimestampBuilder) WithMandatoryFields(maximumValueTimestamp BACnetDateTime) BACnetConstructedDataMaximumValueTimestampBuilder {

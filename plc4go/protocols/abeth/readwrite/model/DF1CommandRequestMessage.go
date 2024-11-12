@@ -109,6 +109,7 @@ var _ (DF1CommandRequestMessageBuilder) = (*_DF1CommandRequestMessageBuilder)(ni
 
 func (b *_DF1CommandRequestMessageBuilder) setParent(contract DF1RequestMessageContract) {
 	b.DF1RequestMessageContract = contract
+	contract.(*_DF1RequestMessage)._SubType = b._DF1CommandRequestMessage
 }
 
 func (b *_DF1CommandRequestMessageBuilder) WithMandatoryFields(command DF1RequestCommand) DF1CommandRequestMessageBuilder {

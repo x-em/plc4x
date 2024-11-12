@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAccessDoorRelinquishDefaultBuilder) = (*_BACnetConst
 
 func (b *_BACnetConstructedDataAccessDoorRelinquishDefaultBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAccessDoorRelinquishDefault
 }
 
 func (b *_BACnetConstructedDataAccessDoorRelinquishDefaultBuilder) WithMandatoryFields(relinquishDefault BACnetDoorValueTagged) BACnetConstructedDataAccessDoorRelinquishDefaultBuilder {

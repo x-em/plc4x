@@ -109,6 +109,7 @@ var _ (SALDataHvacActuatorBuilder) = (*_SALDataHvacActuatorBuilder)(nil)
 
 func (b *_SALDataHvacActuatorBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataHvacActuator
 }
 
 func (b *_SALDataHvacActuatorBuilder) WithMandatoryFields(hvacActuatorData LightingData) SALDataHvacActuatorBuilder {

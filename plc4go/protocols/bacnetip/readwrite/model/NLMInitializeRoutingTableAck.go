@@ -110,6 +110,7 @@ var _ (NLMInitializeRoutingTableAckBuilder) = (*_NLMInitializeRoutingTableAckBui
 
 func (b *_NLMInitializeRoutingTableAckBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMInitializeRoutingTableAck
 }
 
 func (b *_NLMInitializeRoutingTableAckBuilder) WithMandatoryFields(numberOfPorts uint8, portMappings []NLMInitializeRoutingTablePortMapping) NLMInitializeRoutingTableAckBuilder {

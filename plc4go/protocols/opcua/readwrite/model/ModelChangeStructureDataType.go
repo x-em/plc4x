@@ -126,6 +126,7 @@ var _ (ModelChangeStructureDataTypeBuilder) = (*_ModelChangeStructureDataTypeBui
 
 func (b *_ModelChangeStructureDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ModelChangeStructureDataType
 }
 
 func (b *_ModelChangeStructureDataTypeBuilder) WithMandatoryFields(affected NodeId, affectedType NodeId, verb uint8) ModelChangeStructureDataTypeBuilder {

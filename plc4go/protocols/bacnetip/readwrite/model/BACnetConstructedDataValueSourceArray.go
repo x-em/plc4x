@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataValueSourceArrayBuilder) = (*_BACnetConstructedDataV
 
 func (b *_BACnetConstructedDataValueSourceArrayBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataValueSourceArray
 }
 
 func (b *_BACnetConstructedDataValueSourceArrayBuilder) WithMandatoryFields(vtClassesSupported []BACnetValueSource) BACnetConstructedDataValueSourceArrayBuilder {

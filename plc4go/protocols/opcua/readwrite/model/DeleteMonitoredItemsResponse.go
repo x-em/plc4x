@@ -121,6 +121,7 @@ var _ (DeleteMonitoredItemsResponseBuilder) = (*_DeleteMonitoredItemsResponseBui
 
 func (b *_DeleteMonitoredItemsResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteMonitoredItemsResponse
 }
 
 func (b *_DeleteMonitoredItemsResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) DeleteMonitoredItemsResponseBuilder {

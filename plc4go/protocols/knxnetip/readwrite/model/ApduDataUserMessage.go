@@ -96,6 +96,7 @@ var _ (ApduDataUserMessageBuilder) = (*_ApduDataUserMessageBuilder)(nil)
 
 func (b *_ApduDataUserMessageBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataUserMessage
 }
 
 func (b *_ApduDataUserMessageBuilder) WithMandatoryFields() ApduDataUserMessageBuilder {

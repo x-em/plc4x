@@ -121,6 +121,7 @@ var _ (ViewDescriptionBuilder) = (*_ViewDescriptionBuilder)(nil)
 
 func (b *_ViewDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ViewDescription
 }
 
 func (b *_ViewDescriptionBuilder) WithMandatoryFields(viewId NodeId, timestamp int64, viewVersion uint32) ViewDescriptionBuilder {

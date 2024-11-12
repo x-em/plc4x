@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataObjectNameBuilder) = (*_BACnetConstructedDataObjectN
 
 func (b *_BACnetConstructedDataObjectNameBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataObjectName
 }
 
 func (b *_BACnetConstructedDataObjectNameBuilder) WithMandatoryFields(objectName BACnetApplicationTagCharacterString) BACnetConstructedDataObjectNameBuilder {

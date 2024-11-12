@@ -133,6 +133,7 @@ var _ (SetTriggeringRequestBuilder) = (*_SetTriggeringRequestBuilder)(nil)
 
 func (b *_SetTriggeringRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SetTriggeringRequest
 }
 
 func (b *_SetTriggeringRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, subscriptionId uint32, triggeringItemId uint32, linksToAdd []uint32, linksToRemove []uint32) SetTriggeringRequestBuilder {

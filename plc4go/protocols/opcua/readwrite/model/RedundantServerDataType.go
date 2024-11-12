@@ -121,6 +121,7 @@ var _ (RedundantServerDataTypeBuilder) = (*_RedundantServerDataTypeBuilder)(nil)
 
 func (b *_RedundantServerDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RedundantServerDataType
 }
 
 func (b *_RedundantServerDataTypeBuilder) WithMandatoryFields(serverId PascalString, serviceLevel uint8, serverState ServerState) RedundantServerDataTypeBuilder {

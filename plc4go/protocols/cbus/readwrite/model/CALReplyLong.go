@@ -149,6 +149,7 @@ var _ (CALReplyLongBuilder) = (*_CALReplyLongBuilder)(nil)
 
 func (b *_CALReplyLongBuilder) setParent(contract CALReplyContract) {
 	b.CALReplyContract = contract
+	contract.(*_CALReply)._SubType = b._CALReplyLong
 }
 
 func (b *_CALReplyLongBuilder) WithMandatoryFields(terminatingByte uint32, serialInterfaceAddress SerialInterfaceAddress) CALReplyLongBuilder {

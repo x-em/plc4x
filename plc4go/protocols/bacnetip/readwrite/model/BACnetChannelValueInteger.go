@@ -109,6 +109,7 @@ var _ (BACnetChannelValueIntegerBuilder) = (*_BACnetChannelValueIntegerBuilder)(
 
 func (b *_BACnetChannelValueIntegerBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueInteger
 }
 
 func (b *_BACnetChannelValueIntegerBuilder) WithMandatoryFields(integerValue BACnetApplicationTagSignedInteger) BACnetChannelValueIntegerBuilder {

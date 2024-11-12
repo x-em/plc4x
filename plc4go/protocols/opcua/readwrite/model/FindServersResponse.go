@@ -115,6 +115,7 @@ var _ (FindServersResponseBuilder) = (*_FindServersResponseBuilder)(nil)
 
 func (b *_FindServersResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._FindServersResponse
 }
 
 func (b *_FindServersResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, servers []ApplicationDescription) FindServersResponseBuilder {

@@ -132,6 +132,7 @@ var _ (AggregateFilterBuilder) = (*_AggregateFilterBuilder)(nil)
 
 func (b *_AggregateFilterBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AggregateFilter
 }
 
 func (b *_AggregateFilterBuilder) WithMandatoryFields(startTime int64, aggregateType NodeId, processingInterval float64, aggregateConfiguration AggregateConfiguration) AggregateFilterBuilder {

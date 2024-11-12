@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataOccupancyLowerLimitEnforcedBuilder) = (*_BACnetConst
 
 func (b *_BACnetConstructedDataOccupancyLowerLimitEnforcedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataOccupancyLowerLimitEnforced
 }
 
 func (b *_BACnetConstructedDataOccupancyLowerLimitEnforcedBuilder) WithMandatoryFields(occupancyLowerLimitEnforced BACnetApplicationTagBoolean) BACnetConstructedDataOccupancyLowerLimitEnforcedBuilder {

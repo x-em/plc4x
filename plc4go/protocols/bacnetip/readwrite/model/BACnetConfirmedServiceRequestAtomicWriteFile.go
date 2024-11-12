@@ -147,6 +147,7 @@ var _ (BACnetConfirmedServiceRequestAtomicWriteFileBuilder) = (*_BACnetConfirmed
 
 func (b *_BACnetConfirmedServiceRequestAtomicWriteFileBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestAtomicWriteFile
 }
 
 func (b *_BACnetConfirmedServiceRequestAtomicWriteFileBuilder) WithMandatoryFields(deviceIdentifier BACnetApplicationTagObjectIdentifier, fileStartPosition BACnetApplicationTagSignedInteger, fileData BACnetApplicationTagOctetString) BACnetConfirmedServiceRequestAtomicWriteFileBuilder {

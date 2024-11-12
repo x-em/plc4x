@@ -168,6 +168,7 @@ var _ (RegisteredServerBuilder) = (*_RegisteredServerBuilder)(nil)
 
 func (b *_RegisteredServerBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RegisteredServer
 }
 
 func (b *_RegisteredServerBuilder) WithMandatoryFields(serverUri PascalString, productUri PascalString, serverNames []LocalizedText, serverType ApplicationType, gatewayServerUri PascalString, discoveryUrls []PascalString, semaphoreFilePath PascalString, isOnline bool) RegisteredServerBuilder {

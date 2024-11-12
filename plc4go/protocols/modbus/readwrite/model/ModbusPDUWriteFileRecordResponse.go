@@ -104,6 +104,7 @@ var _ (ModbusPDUWriteFileRecordResponseBuilder) = (*_ModbusPDUWriteFileRecordRes
 
 func (b *_ModbusPDUWriteFileRecordResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUWriteFileRecordResponse
 }
 
 func (b *_ModbusPDUWriteFileRecordResponseBuilder) WithMandatoryFields(items []ModbusPDUWriteFileRecordResponseItem) ModbusPDUWriteFileRecordResponseBuilder {

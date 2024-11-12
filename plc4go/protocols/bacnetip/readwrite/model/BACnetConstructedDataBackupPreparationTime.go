@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBackupPreparationTimeBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataBackupPreparationTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBackupPreparationTime
 }
 
 func (b *_BACnetConstructedDataBackupPreparationTimeBuilder) WithMandatoryFields(backupPreparationTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataBackupPreparationTimeBuilder {

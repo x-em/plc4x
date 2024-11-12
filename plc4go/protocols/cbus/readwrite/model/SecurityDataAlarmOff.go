@@ -96,6 +96,7 @@ var _ (SecurityDataAlarmOffBuilder) = (*_SecurityDataAlarmOffBuilder)(nil)
 
 func (b *_SecurityDataAlarmOffBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataAlarmOff
 }
 
 func (b *_SecurityDataAlarmOffBuilder) WithMandatoryFields() SecurityDataAlarmOffBuilder {

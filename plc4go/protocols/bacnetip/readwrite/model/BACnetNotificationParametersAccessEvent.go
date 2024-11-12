@@ -183,6 +183,7 @@ var _ (BACnetNotificationParametersAccessEventBuilder) = (*_BACnetNotificationPa
 
 func (b *_BACnetNotificationParametersAccessEventBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersAccessEvent
 }
 
 func (b *_BACnetNotificationParametersAccessEventBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, accessEvent BACnetAccessEventTagged, statusFlags BACnetStatusFlagsTagged, accessEventTag BACnetContextTagUnsignedInteger, accessEventTime BACnetTimeStampEnclosed, accessCredential BACnetDeviceObjectReferenceEnclosed, innerClosingTag BACnetClosingTag) BACnetNotificationParametersAccessEventBuilder {

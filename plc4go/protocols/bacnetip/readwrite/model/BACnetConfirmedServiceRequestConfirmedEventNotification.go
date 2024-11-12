@@ -229,6 +229,7 @@ var _ (BACnetConfirmedServiceRequestConfirmedEventNotificationBuilder) = (*_BACn
 
 func (b *_BACnetConfirmedServiceRequestConfirmedEventNotificationBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestConfirmedEventNotification
 }
 
 func (b *_BACnetConfirmedServiceRequestConfirmedEventNotificationBuilder) WithMandatoryFields(processIdentifier BACnetContextTagUnsignedInteger, initiatingDeviceIdentifier BACnetContextTagObjectIdentifier, eventObjectIdentifier BACnetContextTagObjectIdentifier, timestamp BACnetTimeStampEnclosed, notificationClass BACnetContextTagUnsignedInteger, priority BACnetContextTagUnsignedInteger, eventType BACnetEventTypeTagged, notifyType BACnetNotifyTypeTagged, toState BACnetEventStateTagged) BACnetConfirmedServiceRequestConfirmedEventNotificationBuilder {

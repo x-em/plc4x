@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDoorAlarmStateBuilder) = (*_BACnetConstructedDataDoo
 
 func (b *_BACnetConstructedDataDoorAlarmStateBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDoorAlarmState
 }
 
 func (b *_BACnetConstructedDataDoorAlarmStateBuilder) WithMandatoryFields(doorAlarmState BACnetDoorAlarmStateTagged) BACnetConstructedDataDoorAlarmStateBuilder {

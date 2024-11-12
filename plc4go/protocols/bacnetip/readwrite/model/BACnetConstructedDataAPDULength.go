@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAPDULengthBuilder) = (*_BACnetConstructedDataAPDULen
 
 func (b *_BACnetConstructedDataAPDULengthBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAPDULength
 }
 
 func (b *_BACnetConstructedDataAPDULengthBuilder) WithMandatoryFields(apduLength BACnetApplicationTagUnsignedInteger) BACnetConstructedDataAPDULengthBuilder {

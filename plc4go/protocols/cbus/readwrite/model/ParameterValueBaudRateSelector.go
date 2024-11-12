@@ -110,6 +110,7 @@ var _ (ParameterValueBaudRateSelectorBuilder) = (*_ParameterValueBaudRateSelecto
 
 func (b *_ParameterValueBaudRateSelectorBuilder) setParent(contract ParameterValueContract) {
 	b.ParameterValueContract = contract
+	contract.(*_ParameterValue)._SubType = b._ParameterValueBaudRateSelector
 }
 
 func (b *_ParameterValueBaudRateSelectorBuilder) WithMandatoryFields(value BaudRateSelector, data []byte) ParameterValueBaudRateSelectorBuilder {

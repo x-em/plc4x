@@ -121,6 +121,7 @@ var _ (SetMonitoringModeResponseBuilder) = (*_SetMonitoringModeResponseBuilder)(
 
 func (b *_SetMonitoringModeResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SetMonitoringModeResponse
 }
 
 func (b *_SetMonitoringModeResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) SetMonitoringModeResponseBuilder {

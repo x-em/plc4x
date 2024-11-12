@@ -109,6 +109,7 @@ var _ (SALDataTelephonyStatusAndControlBuilder) = (*_SALDataTelephonyStatusAndCo
 
 func (b *_SALDataTelephonyStatusAndControlBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataTelephonyStatusAndControl
 }
 
 func (b *_SALDataTelephonyStatusAndControlBuilder) WithMandatoryFields(telephonyData TelephonyData) SALDataTelephonyStatusAndControlBuilder {

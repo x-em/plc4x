@@ -120,6 +120,7 @@ var _ (SignatureDataBuilder) = (*_SignatureDataBuilder)(nil)
 
 func (b *_SignatureDataBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SignatureData
 }
 
 func (b *_SignatureDataBuilder) WithMandatoryFields(algorithm PascalString, signature PascalByteString) SignatureDataBuilder {

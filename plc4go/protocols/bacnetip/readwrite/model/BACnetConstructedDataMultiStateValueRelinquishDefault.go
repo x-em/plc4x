@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMultiStateValueRelinquishDefaultBuilder) = (*_BACnet
 
 func (b *_BACnetConstructedDataMultiStateValueRelinquishDefaultBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateValueRelinquishDefault
 }
 
 func (b *_BACnetConstructedDataMultiStateValueRelinquishDefaultBuilder) WithMandatoryFields(relinquishDefault BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMultiStateValueRelinquishDefaultBuilder {

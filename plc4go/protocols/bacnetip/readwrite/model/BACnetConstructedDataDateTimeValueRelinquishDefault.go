@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDateTimeValueRelinquishDefaultBuilder) = (*_BACnetCo
 
 func (b *_BACnetConstructedDataDateTimeValueRelinquishDefaultBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDateTimeValueRelinquishDefault
 }
 
 func (b *_BACnetConstructedDataDateTimeValueRelinquishDefaultBuilder) WithMandatoryFields(relinquishDefault BACnetDateTime) BACnetConstructedDataDateTimeValueRelinquishDefaultBuilder {

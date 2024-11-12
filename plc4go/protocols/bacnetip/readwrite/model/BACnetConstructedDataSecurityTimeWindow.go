@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataSecurityTimeWindowBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataSecurityTimeWindowBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSecurityTimeWindow
 }
 
 func (b *_BACnetConstructedDataSecurityTimeWindowBuilder) WithMandatoryFields(securityTimeWindow BACnetApplicationTagUnsignedInteger) BACnetConstructedDataSecurityTimeWindowBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLastNotifyRecordBuilder) = (*_BACnetConstructedDataL
 
 func (b *_BACnetConstructedDataLastNotifyRecordBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLastNotifyRecord
 }
 
 func (b *_BACnetConstructedDataLastNotifyRecordBuilder) WithMandatoryFields(lastNotifyRecord BACnetApplicationTagUnsignedInteger) BACnetConstructedDataLastNotifyRecordBuilder {

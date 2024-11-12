@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBackupAndRestoreStateBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataBackupAndRestoreStateBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBackupAndRestoreState
 }
 
 func (b *_BACnetConstructedDataBackupAndRestoreStateBuilder) WithMandatoryFields(backupAndRestoreState BACnetBackupStateTagged) BACnetConstructedDataBackupAndRestoreStateBuilder {

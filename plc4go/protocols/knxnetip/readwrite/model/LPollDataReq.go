@@ -96,6 +96,7 @@ var _ (LPollDataReqBuilder) = (*_LPollDataReqBuilder)(nil)
 
 func (b *_LPollDataReqBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._LPollDataReq
 }
 
 func (b *_LPollDataReqBuilder) WithMandatoryFields() LPollDataReqBuilder {

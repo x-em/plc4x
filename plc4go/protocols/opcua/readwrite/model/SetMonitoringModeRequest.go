@@ -127,6 +127,7 @@ var _ (SetMonitoringModeRequestBuilder) = (*_SetMonitoringModeRequestBuilder)(ni
 
 func (b *_SetMonitoringModeRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SetMonitoringModeRequest
 }
 
 func (b *_SetMonitoringModeRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, subscriptionId uint32, monitoringMode MonitoringMode, monitoredItemIds []uint32) SetMonitoringModeRequestBuilder {

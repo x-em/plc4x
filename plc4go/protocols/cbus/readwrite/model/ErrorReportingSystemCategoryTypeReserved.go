@@ -104,6 +104,7 @@ var _ (ErrorReportingSystemCategoryTypeReservedBuilder) = (*_ErrorReportingSyste
 
 func (b *_ErrorReportingSystemCategoryTypeReservedBuilder) setParent(contract ErrorReportingSystemCategoryTypeContract) {
 	b.ErrorReportingSystemCategoryTypeContract = contract
+	contract.(*_ErrorReportingSystemCategoryType)._SubType = b._ErrorReportingSystemCategoryTypeReserved
 }
 
 func (b *_ErrorReportingSystemCategoryTypeReservedBuilder) WithMandatoryFields(reservedValue uint8) ErrorReportingSystemCategoryTypeReservedBuilder {

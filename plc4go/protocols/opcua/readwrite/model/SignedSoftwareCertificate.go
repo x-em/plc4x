@@ -120,6 +120,7 @@ var _ (SignedSoftwareCertificateBuilder) = (*_SignedSoftwareCertificateBuilder)(
 
 func (b *_SignedSoftwareCertificateBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SignedSoftwareCertificate
 }
 
 func (b *_SignedSoftwareCertificateBuilder) WithMandatoryFields(certificateData PascalByteString, signature PascalByteString) SignedSoftwareCertificateBuilder {

@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandMaximumLevelsBuilder) = (*_IdentifyReplyCommandMaximu
 
 func (b *_IdentifyReplyCommandMaximumLevelsBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandMaximumLevels
 }
 
 func (b *_IdentifyReplyCommandMaximumLevelsBuilder) WithMandatoryFields(maximumLevels []byte) IdentifyReplyCommandMaximumLevelsBuilder {

@@ -131,6 +131,7 @@ var _ (CBusPointToPointCommandIndirectBuilder) = (*_CBusPointToPointCommandIndir
 
 func (b *_CBusPointToPointCommandIndirectBuilder) setParent(contract CBusPointToPointCommandContract) {
 	b.CBusPointToPointCommandContract = contract
+	contract.(*_CBusPointToPointCommand)._SubType = b._CBusPointToPointCommandIndirect
 }
 
 func (b *_CBusPointToPointCommandIndirectBuilder) WithMandatoryFields(bridgeAddress BridgeAddress, networkRoute NetworkRoute, unitAddress UnitAddress) CBusPointToPointCommandIndirectBuilder {

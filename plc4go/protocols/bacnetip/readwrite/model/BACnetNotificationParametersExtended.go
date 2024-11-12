@@ -153,6 +153,7 @@ var _ (BACnetNotificationParametersExtendedBuilder) = (*_BACnetNotificationParam
 
 func (b *_BACnetNotificationParametersExtendedBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersExtended
 }
 
 func (b *_BACnetNotificationParametersExtendedBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, vendorId BACnetVendorIdTagged, extendedEventType BACnetContextTagUnsignedInteger, parameters BACnetNotificationParametersExtendedParameters, innerClosingTag BACnetClosingTag) BACnetNotificationParametersExtendedBuilder {

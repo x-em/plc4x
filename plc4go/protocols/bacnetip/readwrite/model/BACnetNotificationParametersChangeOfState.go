@@ -142,6 +142,7 @@ var _ (BACnetNotificationParametersChangeOfStateBuilder) = (*_BACnetNotification
 
 func (b *_BACnetNotificationParametersChangeOfStateBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersChangeOfState
 }
 
 func (b *_BACnetNotificationParametersChangeOfStateBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, changeOfState BACnetPropertyStatesEnclosed, statusFlags BACnetStatusFlagsTagged, innerClosingTag BACnetClosingTag) BACnetNotificationParametersChangeOfStateBuilder {

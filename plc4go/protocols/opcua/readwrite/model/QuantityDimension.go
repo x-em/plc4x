@@ -146,6 +146,7 @@ var _ (QuantityDimensionBuilder) = (*_QuantityDimensionBuilder)(nil)
 
 func (b *_QuantityDimensionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._QuantityDimension
 }
 
 func (b *_QuantityDimensionBuilder) WithMandatoryFields(massExponent int8, lengthExponent int8, timeExponent int8, electricCurrentExponent int8, amountOfSubstanceExponent int8, luminousIntensityExponent int8, absoluteTemperatureExponent int8, dimensionlessExponent int8) QuantityDimensionBuilder {

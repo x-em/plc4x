@@ -104,6 +104,7 @@ var _ (MeteringDataGasConsumptionBuilder) = (*_MeteringDataGasConsumptionBuilder
 
 func (b *_MeteringDataGasConsumptionBuilder) setParent(contract MeteringDataContract) {
 	b.MeteringDataContract = contract
+	contract.(*_MeteringData)._SubType = b._MeteringDataGasConsumption
 }
 
 func (b *_MeteringDataGasConsumptionBuilder) WithMandatoryFields(mJ uint32) MeteringDataGasConsumptionBuilder {

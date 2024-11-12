@@ -126,6 +126,7 @@ var _ (BVLCForwardedNPDUBuilder) = (*_BVLCForwardedNPDUBuilder)(nil)
 
 func (b *_BVLCForwardedNPDUBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCForwardedNPDU
 }
 
 func (b *_BVLCForwardedNPDUBuilder) WithMandatoryFields(ip []uint8, port uint16, npdu NPDU) BVLCForwardedNPDUBuilder {

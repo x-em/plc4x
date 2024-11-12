@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandGAVPhysicalAddressesBuilder) = (*_IdentifyReplyComman
 
 func (b *_IdentifyReplyCommandGAVPhysicalAddressesBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandGAVPhysicalAddresses
 }
 
 func (b *_IdentifyReplyCommandGAVPhysicalAddressesBuilder) WithMandatoryFields(values []byte) IdentifyReplyCommandGAVPhysicalAddressesBuilder {

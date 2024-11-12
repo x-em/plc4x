@@ -109,6 +109,7 @@ var _ (BACnetOptionalCharacterStringNullBuilder) = (*_BACnetOptionalCharacterStr
 
 func (b *_BACnetOptionalCharacterStringNullBuilder) setParent(contract BACnetOptionalCharacterStringContract) {
 	b.BACnetOptionalCharacterStringContract = contract
+	contract.(*_BACnetOptionalCharacterString)._SubType = b._BACnetOptionalCharacterStringNull
 }
 
 func (b *_BACnetOptionalCharacterStringNullBuilder) WithMandatoryFields(nullValue BACnetApplicationTagNull) BACnetOptionalCharacterStringNullBuilder {

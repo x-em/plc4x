@@ -96,6 +96,7 @@ var _ (SysexCommandCapabilityResponseBuilder) = (*_SysexCommandCapabilityRespons
 
 func (b *_SysexCommandCapabilityResponseBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandCapabilityResponse
 }
 
 func (b *_SysexCommandCapabilityResponseBuilder) WithMandatoryFields() SysexCommandCapabilityResponseBuilder {

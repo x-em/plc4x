@@ -147,6 +147,7 @@ var _ (CreateSubscriptionRequestBuilder) = (*_CreateSubscriptionRequestBuilder)(
 
 func (b *_CreateSubscriptionRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CreateSubscriptionRequest
 }
 
 func (b *_CreateSubscriptionRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, requestedPublishingInterval float64, requestedLifetimeCount uint32, requestedMaxKeepAliveCount uint32, maxNotificationsPerPublish uint32, publishingEnabled bool, priority uint8) CreateSubscriptionRequestBuilder {

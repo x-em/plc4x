@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIsUTCBuilder) = (*_BACnetConstructedDataIsUTCBuilder
 
 func (b *_BACnetConstructedDataIsUTCBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIsUTC
 }
 
 func (b *_BACnetConstructedDataIsUTCBuilder) WithMandatoryFields(isUtc BACnetApplicationTagBoolean) BACnetConstructedDataIsUTCBuilder {

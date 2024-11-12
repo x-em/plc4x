@@ -121,6 +121,7 @@ var _ (DeleteSubscriptionsResponseBuilder) = (*_DeleteSubscriptionsResponseBuild
 
 func (b *_DeleteSubscriptionsResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteSubscriptionsResponse
 }
 
 func (b *_DeleteSubscriptionsResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) DeleteSubscriptionsResponseBuilder {

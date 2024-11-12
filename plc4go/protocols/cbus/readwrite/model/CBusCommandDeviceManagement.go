@@ -113,6 +113,7 @@ var _ (CBusCommandDeviceManagementBuilder) = (*_CBusCommandDeviceManagementBuild
 
 func (b *_CBusCommandDeviceManagementBuilder) setParent(contract CBusCommandContract) {
 	b.CBusCommandContract = contract
+	contract.(*_CBusCommand)._SubType = b._CBusCommandDeviceManagement
 }
 
 func (b *_CBusCommandDeviceManagementBuilder) WithMandatoryFields(paramNo Parameter, parameterValue byte) CBusCommandDeviceManagementBuilder {

@@ -96,6 +96,7 @@ var _ (LRawReqBuilder) = (*_LRawReqBuilder)(nil)
 
 func (b *_LRawReqBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._LRawReq
 }
 
 func (b *_LRawReqBuilder) WithMandatoryFields() LRawReqBuilder {

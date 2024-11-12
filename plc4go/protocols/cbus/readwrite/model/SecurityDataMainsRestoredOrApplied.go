@@ -96,6 +96,7 @@ var _ (SecurityDataMainsRestoredOrAppliedBuilder) = (*_SecurityDataMainsRestored
 
 func (b *_SecurityDataMainsRestoredOrAppliedBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataMainsRestoredOrApplied
 }
 
 func (b *_SecurityDataMainsRestoredOrAppliedBuilder) WithMandatoryFields() SecurityDataMainsRestoredOrAppliedBuilder {

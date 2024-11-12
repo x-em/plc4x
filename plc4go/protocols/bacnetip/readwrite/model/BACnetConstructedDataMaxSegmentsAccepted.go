@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMaxSegmentsAcceptedBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataMaxSegmentsAcceptedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMaxSegmentsAccepted
 }
 
 func (b *_BACnetConstructedDataMaxSegmentsAcceptedBuilder) WithMandatoryFields(maxSegmentsAccepted BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMaxSegmentsAcceptedBuilder {

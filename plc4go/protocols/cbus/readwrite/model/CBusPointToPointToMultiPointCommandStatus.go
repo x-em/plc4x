@@ -111,6 +111,7 @@ var _ (CBusPointToPointToMultiPointCommandStatusBuilder) = (*_CBusPointToPointTo
 
 func (b *_CBusPointToPointToMultiPointCommandStatusBuilder) setParent(contract CBusPointToPointToMultiPointCommandContract) {
 	b.CBusPointToPointToMultiPointCommandContract = contract
+	contract.(*_CBusPointToPointToMultiPointCommand)._SubType = b._CBusPointToPointToMultiPointCommandStatus
 }
 
 func (b *_CBusPointToPointToMultiPointCommandStatusBuilder) WithMandatoryFields(statusRequest StatusRequest) CBusPointToPointToMultiPointCommandStatusBuilder {

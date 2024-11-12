@@ -104,6 +104,7 @@ var _ (S7PayloadReadVarResponseBuilder) = (*_S7PayloadReadVarResponseBuilder)(ni
 
 func (b *_S7PayloadReadVarResponseBuilder) setParent(contract S7PayloadContract) {
 	b.S7PayloadContract = contract
+	contract.(*_S7Payload)._SubType = b._S7PayloadReadVarResponse
 }
 
 func (b *_S7PayloadReadVarResponseBuilder) WithMandatoryFields(items []S7VarPayloadDataItem) S7PayloadReadVarResponseBuilder {

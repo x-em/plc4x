@@ -104,6 +104,7 @@ var _ (S7ParameterWriteVarRequestBuilder) = (*_S7ParameterWriteVarRequestBuilder
 
 func (b *_S7ParameterWriteVarRequestBuilder) setParent(contract S7ParameterContract) {
 	b.S7ParameterContract = contract
+	contract.(*_S7Parameter)._SubType = b._S7ParameterWriteVarRequest
 }
 
 func (b *_S7ParameterWriteVarRequestBuilder) WithMandatoryFields(items []S7VarRequestParameterItem) S7ParameterWriteVarRequestBuilder {

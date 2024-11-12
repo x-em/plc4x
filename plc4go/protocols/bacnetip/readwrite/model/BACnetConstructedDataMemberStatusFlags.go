@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMemberStatusFlagsBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataMemberStatusFlagsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMemberStatusFlags
 }
 
 func (b *_BACnetConstructedDataMemberStatusFlagsBuilder) WithMandatoryFields(statusFlags BACnetStatusFlagsTagged) BACnetConstructedDataMemberStatusFlagsBuilder {

@@ -96,6 +96,7 @@ var _ (TriggerControlDataTriggerMinBuilder) = (*_TriggerControlDataTriggerMinBui
 
 func (b *_TriggerControlDataTriggerMinBuilder) setParent(contract TriggerControlDataContract) {
 	b.TriggerControlDataContract = contract
+	contract.(*_TriggerControlData)._SubType = b._TriggerControlDataTriggerMin
 }
 
 func (b *_TriggerControlDataTriggerMinBuilder) WithMandatoryFields() TriggerControlDataTriggerMinBuilder {

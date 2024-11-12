@@ -121,6 +121,7 @@ var _ (AggregateFilterResultBuilder) = (*_AggregateFilterResultBuilder)(nil)
 
 func (b *_AggregateFilterResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AggregateFilterResult
 }
 
 func (b *_AggregateFilterResultBuilder) WithMandatoryFields(revisedStartTime int64, revisedProcessingInterval float64, revisedAggregateConfiguration AggregateConfiguration) AggregateFilterResultBuilder {

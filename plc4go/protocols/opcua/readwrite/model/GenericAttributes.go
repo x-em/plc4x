@@ -144,6 +144,7 @@ var _ (GenericAttributesBuilder) = (*_GenericAttributesBuilder)(nil)
 
 func (b *_GenericAttributesBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._GenericAttributes
 }
 
 func (b *_GenericAttributesBuilder) WithMandatoryFields(specifiedAttributes uint32, displayName LocalizedText, description LocalizedText, writeMask uint32, userWriteMask uint32, attributeValues []GenericAttributeValue) GenericAttributesBuilder {

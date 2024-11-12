@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataInstallationIDBuilder) = (*_BACnetConstructedDataIns
 
 func (b *_BACnetConstructedDataInstallationIDBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataInstallationID
 }
 
 func (b *_BACnetConstructedDataInstallationIDBuilder) WithMandatoryFields(installationId BACnetApplicationTagUnsignedInteger) BACnetConstructedDataInstallationIDBuilder {

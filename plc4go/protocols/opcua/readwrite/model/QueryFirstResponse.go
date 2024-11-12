@@ -149,6 +149,7 @@ var _ (QueryFirstResponseBuilder) = (*_QueryFirstResponseBuilder)(nil)
 
 func (b *_QueryFirstResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._QueryFirstResponse
 }
 
 func (b *_QueryFirstResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, queryDataSets []QueryDataSet, continuationPoint PascalByteString, parsingResults []ParsingResult, diagnosticInfos []DiagnosticInfo, filterResult ContentFilterResult) QueryFirstResponseBuilder {

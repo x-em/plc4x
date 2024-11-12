@@ -120,6 +120,7 @@ var _ (OpcuaCloseRequestBuilder) = (*_OpcuaCloseRequestBuilder)(nil)
 
 func (b *_OpcuaCloseRequestBuilder) setParent(contract MessagePDUContract) {
 	b.MessagePDUContract = contract
+	contract.(*_MessagePDU)._SubType = b._OpcuaCloseRequest
 }
 
 func (b *_OpcuaCloseRequestBuilder) WithMandatoryFields(securityHeader SecurityHeader, message Payload) OpcuaCloseRequestBuilder {

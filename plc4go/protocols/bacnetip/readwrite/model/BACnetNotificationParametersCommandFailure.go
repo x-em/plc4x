@@ -153,6 +153,7 @@ var _ (BACnetNotificationParametersCommandFailureBuilder) = (*_BACnetNotificatio
 
 func (b *_BACnetNotificationParametersCommandFailureBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersCommandFailure
 }
 
 func (b *_BACnetNotificationParametersCommandFailureBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, commandValue BACnetConstructedData, statusFlags BACnetStatusFlagsTagged, feedbackValue BACnetConstructedData, innerClosingTag BACnetClosingTag) BACnetNotificationParametersCommandFailureBuilder {

@@ -110,6 +110,7 @@ var _ (CycServiceItemDbReadTypeBuilder) = (*_CycServiceItemDbReadTypeBuilder)(ni
 
 func (b *_CycServiceItemDbReadTypeBuilder) setParent(contract CycServiceItemTypeContract) {
 	b.CycServiceItemTypeContract = contract
+	contract.(*_CycServiceItemType)._SubType = b._CycServiceItemDbReadType
 }
 
 func (b *_CycServiceItemDbReadTypeBuilder) WithMandatoryFields(numberOfAreas uint8, items []SubItem) CycServiceItemDbReadTypeBuilder {

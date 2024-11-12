@@ -187,6 +187,7 @@ var _ (SessionSecurityDiagnosticsDataTypeBuilder) = (*_SessionSecurityDiagnostic
 
 func (b *_SessionSecurityDiagnosticsDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SessionSecurityDiagnosticsDataType
 }
 
 func (b *_SessionSecurityDiagnosticsDataTypeBuilder) WithMandatoryFields(sessionId NodeId, clientUserIdOfSession PascalString, clientUserIdHistory []PascalString, authenticationMechanism PascalString, encoding PascalString, transportProtocol PascalString, securityMode MessageSecurityMode, securityPolicyUri PascalString, clientCertificate PascalByteString) SessionSecurityDiagnosticsDataTypeBuilder {

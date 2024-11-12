@@ -109,6 +109,7 @@ var _ (NetworkAddressDataTypeBuilder) = (*_NetworkAddressDataTypeBuilder)(nil)
 
 func (b *_NetworkAddressDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._NetworkAddressDataType
 }
 
 func (b *_NetworkAddressDataTypeBuilder) WithMandatoryFields(networkInterface PascalString) NetworkAddressDataTypeBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetChannelValueRealBuilder) = (*_BACnetChannelValueRealBuilder)(nil)
 
 func (b *_BACnetChannelValueRealBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueReal
 }
 
 func (b *_BACnetChannelValueRealBuilder) WithMandatoryFields(realValue BACnetApplicationTagReal) BACnetChannelValueRealBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataManipulatedVariableReferenceBuilder) = (*_BACnetCons
 
 func (b *_BACnetConstructedDataManipulatedVariableReferenceBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataManipulatedVariableReference
 }
 
 func (b *_BACnetConstructedDataManipulatedVariableReferenceBuilder) WithMandatoryFields(manipulatedVariableReference BACnetObjectPropertyReference) BACnetConstructedDataManipulatedVariableReferenceBuilder {

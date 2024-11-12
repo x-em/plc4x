@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesPolarityBuilder) = (*_BACnetPropertyStatesPolarityBui
 
 func (b *_BACnetPropertyStatesPolarityBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesPolarity
 }
 
 func (b *_BACnetPropertyStatesPolarityBuilder) WithMandatoryFields(polarity BACnetPolarityTagged) BACnetPropertyStatesPolarityBuilder {

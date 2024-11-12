@@ -96,6 +96,7 @@ var _ (VariantNullBuilder) = (*_VariantNullBuilder)(nil)
 
 func (b *_VariantNullBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantNull
 }
 
 func (b *_VariantNullBuilder) WithMandatoryFields() VariantNullBuilder {

@@ -104,6 +104,7 @@ var _ (COTPParameterCallingTsapBuilder) = (*_COTPParameterCallingTsapBuilder)(ni
 
 func (b *_COTPParameterCallingTsapBuilder) setParent(contract COTPParameterContract) {
 	b.COTPParameterContract = contract
+	contract.(*_COTPParameter)._SubType = b._COTPParameterCallingTsap
 }
 
 func (b *_COTPParameterCallingTsapBuilder) WithMandatoryFields(tsapId uint16) COTPParameterCallingTsapBuilder {

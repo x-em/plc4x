@@ -96,6 +96,7 @@ var _ (SysexCommandCapabilityQueryBuilder) = (*_SysexCommandCapabilityQueryBuild
 
 func (b *_SysexCommandCapabilityQueryBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandCapabilityQuery
 }
 
 func (b *_SysexCommandCapabilityQueryBuilder) WithMandatoryFields() SysexCommandCapabilityQueryBuilder {

@@ -115,6 +115,7 @@ var _ (NLMUpdateKeyDistributionKeyBuilder) = (*_NLMUpdateKeyDistributionKeyBuild
 
 func (b *_NLMUpdateKeyDistributionKeyBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMUpdateKeyDistributionKey
 }
 
 func (b *_NLMUpdateKeyDistributionKeyBuilder) WithMandatoryFields(keyRevision byte, key NLMUpdateKeyUpdateKeyEntry) NLMUpdateKeyDistributionKeyBuilder {

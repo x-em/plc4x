@@ -110,6 +110,7 @@ var _ (DF1UnprotectedReadRequestBuilder) = (*_DF1UnprotectedReadRequestBuilder)(
 
 func (b *_DF1UnprotectedReadRequestBuilder) setParent(contract DF1CommandContract) {
 	b.DF1CommandContract = contract
+	contract.(*_DF1Command)._SubType = b._DF1UnprotectedReadRequest
 }
 
 func (b *_DF1UnprotectedReadRequestBuilder) WithMandatoryFields(address uint16, size uint8) DF1UnprotectedReadRequestBuilder {

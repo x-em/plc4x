@@ -121,6 +121,7 @@ var _ (SetPublishingModeResponseBuilder) = (*_SetPublishingModeResponseBuilder)(
 
 func (b *_SetPublishingModeResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SetPublishingModeResponse
 }
 
 func (b *_SetPublishingModeResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) SetPublishingModeResponseBuilder {

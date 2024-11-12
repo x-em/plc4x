@@ -158,6 +158,7 @@ var _ (IdentifyReplyCommandDSIStatusBuilder) = (*_IdentifyReplyCommandDSIStatusB
 
 func (b *_IdentifyReplyCommandDSIStatusBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandDSIStatus
 }
 
 func (b *_IdentifyReplyCommandDSIStatusBuilder) WithMandatoryFields(channelStatus1 ChannelStatus, channelStatus2 ChannelStatus, channelStatus3 ChannelStatus, channelStatus4 ChannelStatus, channelStatus5 ChannelStatus, channelStatus6 ChannelStatus, channelStatus7 ChannelStatus, channelStatus8 ChannelStatus, unitStatus UnitStatus, dimmingUCRevisionNumber byte) IdentifyReplyCommandDSIStatusBuilder {

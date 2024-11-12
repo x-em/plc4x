@@ -178,6 +178,7 @@ var _ (FieldMetaDataBuilder) = (*_FieldMetaDataBuilder)(nil)
 
 func (b *_FieldMetaDataBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._FieldMetaData
 }
 
 func (b *_FieldMetaDataBuilder) WithMandatoryFields(name PascalString, description LocalizedText, fieldFlags DataSetFieldFlags, builtInType uint8, dataType NodeId, valueRank int32, arrayDimensions []uint32, maxStringLength uint32, dataSetFieldId GuidValue, properties []KeyValuePair) FieldMetaDataBuilder {

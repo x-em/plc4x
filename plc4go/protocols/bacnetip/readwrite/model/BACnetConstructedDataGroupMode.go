@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataGroupModeBuilder) = (*_BACnetConstructedDataGroupMod
 
 func (b *_BACnetConstructedDataGroupModeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataGroupMode
 }
 
 func (b *_BACnetConstructedDataGroupModeBuilder) WithMandatoryFields(groupMode BACnetLiftGroupModeTagged) BACnetConstructedDataGroupModeBuilder {

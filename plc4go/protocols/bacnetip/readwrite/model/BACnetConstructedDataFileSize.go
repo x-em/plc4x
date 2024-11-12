@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataFileSizeBuilder) = (*_BACnetConstructedDataFileSizeB
 
 func (b *_BACnetConstructedDataFileSizeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataFileSize
 }
 
 func (b *_BACnetConstructedDataFileSizeBuilder) WithMandatoryFields(fileSize BACnetApplicationTagUnsignedInteger) BACnetConstructedDataFileSizeBuilder {

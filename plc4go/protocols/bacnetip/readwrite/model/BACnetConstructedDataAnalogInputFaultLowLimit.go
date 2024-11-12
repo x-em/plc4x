@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAnalogInputFaultLowLimitBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataAnalogInputFaultLowLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAnalogInputFaultLowLimit
 }
 
 func (b *_BACnetConstructedDataAnalogInputFaultLowLimitBuilder) WithMandatoryFields(faultLowLimit BACnetApplicationTagReal) BACnetConstructedDataAnalogInputFaultLowLimitBuilder {

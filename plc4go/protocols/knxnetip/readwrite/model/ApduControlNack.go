@@ -96,6 +96,7 @@ var _ (ApduControlNackBuilder) = (*_ApduControlNackBuilder)(nil)
 
 func (b *_ApduControlNackBuilder) setParent(contract ApduControlContract) {
 	b.ApduControlContract = contract
+	contract.(*_ApduControl)._SubType = b._ApduControlNack
 }
 
 func (b *_ApduControlNackBuilder) WithMandatoryFields() ApduControlNackBuilder {

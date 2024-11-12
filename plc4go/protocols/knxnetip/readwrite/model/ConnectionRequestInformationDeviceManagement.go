@@ -96,6 +96,7 @@ var _ (ConnectionRequestInformationDeviceManagementBuilder) = (*_ConnectionReque
 
 func (b *_ConnectionRequestInformationDeviceManagementBuilder) setParent(contract ConnectionRequestInformationContract) {
 	b.ConnectionRequestInformationContract = contract
+	contract.(*_ConnectionRequestInformation)._SubType = b._ConnectionRequestInformationDeviceManagement
 }
 
 func (b *_ConnectionRequestInformationDeviceManagementBuilder) WithMandatoryFields() ConnectionRequestInformationDeviceManagementBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDefaultStepIncrementBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataDefaultStepIncrementBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDefaultStepIncrement
 }
 
 func (b *_BACnetConstructedDataDefaultStepIncrementBuilder) WithMandatoryFields(defaultStepIncrement BACnetApplicationTagReal) BACnetConstructedDataDefaultStepIncrementBuilder {

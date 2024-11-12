@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueTimeBuilder) = (*_BACnetPriorityValueTimeBuilder)(nil)
 
 func (b *_BACnetPriorityValueTimeBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueTime
 }
 
 func (b *_BACnetPriorityValueTimeBuilder) WithMandatoryFields(timeValue BACnetApplicationTagTime) BACnetPriorityValueTimeBuilder {

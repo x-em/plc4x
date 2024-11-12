@@ -110,6 +110,7 @@ var _ (FirmataCommandSetPinModeBuilder) = (*_FirmataCommandSetPinModeBuilder)(ni
 
 func (b *_FirmataCommandSetPinModeBuilder) setParent(contract FirmataCommandContract) {
 	b.FirmataCommandContract = contract
+	contract.(*_FirmataCommand)._SubType = b._FirmataCommandSetPinMode
 }
 
 func (b *_FirmataCommandSetPinModeBuilder) WithMandatoryFields(pin uint8, mode PinMode) FirmataCommandSetPinModeBuilder {

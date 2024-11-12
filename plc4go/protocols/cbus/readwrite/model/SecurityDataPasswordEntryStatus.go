@@ -114,6 +114,7 @@ var _ (SecurityDataPasswordEntryStatusBuilder) = (*_SecurityDataPasswordEntrySta
 
 func (b *_SecurityDataPasswordEntryStatusBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataPasswordEntryStatus
 }
 
 func (b *_SecurityDataPasswordEntryStatusBuilder) WithMandatoryFields(code byte) SecurityDataPasswordEntryStatusBuilder {

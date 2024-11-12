@@ -96,6 +96,7 @@ var _ (TDataIndividualIndBuilder) = (*_TDataIndividualIndBuilder)(nil)
 
 func (b *_TDataIndividualIndBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._TDataIndividualInd
 }
 
 func (b *_TDataIndividualIndBuilder) WithMandatoryFields() TDataIndividualIndBuilder {

@@ -104,6 +104,7 @@ var _ (LightingDataOffBuilder) = (*_LightingDataOffBuilder)(nil)
 
 func (b *_LightingDataOffBuilder) setParent(contract LightingDataContract) {
 	b.LightingDataContract = contract
+	contract.(*_LightingData)._SubType = b._LightingDataOff
 }
 
 func (b *_LightingDataOffBuilder) WithMandatoryFields(group byte) LightingDataOffBuilder {

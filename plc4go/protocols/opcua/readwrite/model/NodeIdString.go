@@ -119,6 +119,7 @@ var _ (NodeIdStringBuilder) = (*_NodeIdStringBuilder)(nil)
 
 func (b *_NodeIdStringBuilder) setParent(contract NodeIdTypeDefinitionContract) {
 	b.NodeIdTypeDefinitionContract = contract
+	contract.(*_NodeIdTypeDefinition)._SubType = b._NodeIdString
 }
 
 func (b *_NodeIdStringBuilder) WithMandatoryFields(namespaceIndex uint16, id PascalString) NodeIdStringBuilder {

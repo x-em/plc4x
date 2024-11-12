@@ -96,6 +96,7 @@ var _ (S7PayloadUserDataItemClkFRequestBuilder) = (*_S7PayloadUserDataItemClkFRe
 
 func (b *_S7PayloadUserDataItemClkFRequestBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemClkFRequest
 }
 
 func (b *_S7PayloadUserDataItemClkFRequestBuilder) WithMandatoryFields() S7PayloadUserDataItemClkFRequestBuilder {

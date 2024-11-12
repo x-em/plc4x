@@ -96,6 +96,7 @@ var _ (TriggerControlDataIndicatorKillBuilder) = (*_TriggerControlDataIndicatorK
 
 func (b *_TriggerControlDataIndicatorKillBuilder) setParent(contract TriggerControlDataContract) {
 	b.TriggerControlDataContract = contract
+	contract.(*_TriggerControlData)._SubType = b._TriggerControlDataIndicatorKill
 }
 
 func (b *_TriggerControlDataIndicatorKillBuilder) WithMandatoryFields() TriggerControlDataIndicatorKillBuilder {

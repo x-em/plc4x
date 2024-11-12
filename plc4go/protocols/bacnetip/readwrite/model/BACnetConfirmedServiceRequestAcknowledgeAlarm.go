@@ -164,6 +164,7 @@ var _ (BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder) = (*_BACnetConfirme
 
 func (b *_BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestAcknowledgeAlarm
 }
 
 func (b *_BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder) WithMandatoryFields(acknowledgingProcessIdentifier BACnetContextTagUnsignedInteger, eventObjectIdentifier BACnetContextTagObjectIdentifier, eventStateAcknowledged BACnetEventStateTagged, timestamp BACnetTimeStampEnclosed, acknowledgmentSource BACnetContextTagCharacterString, timeOfAcknowledgment BACnetTimeStampEnclosed) BACnetConfirmedServiceRequestAcknowledgeAlarmBuilder {

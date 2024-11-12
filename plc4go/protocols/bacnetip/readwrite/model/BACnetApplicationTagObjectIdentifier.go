@@ -113,6 +113,7 @@ var _ (BACnetApplicationTagObjectIdentifierBuilder) = (*_BACnetApplicationTagObj
 
 func (b *_BACnetApplicationTagObjectIdentifierBuilder) setParent(contract BACnetApplicationTagContract) {
 	b.BACnetApplicationTagContract = contract
+	contract.(*_BACnetApplicationTag)._SubType = b._BACnetApplicationTagObjectIdentifier
 }
 
 func (b *_BACnetApplicationTagObjectIdentifierBuilder) WithMandatoryFields(payload BACnetTagPayloadObjectIdentifier) BACnetApplicationTagObjectIdentifierBuilder {

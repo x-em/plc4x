@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesReasonForHaltBuilder) = (*_BACnetPropertyStatesReason
 
 func (b *_BACnetPropertyStatesReasonForHaltBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesReasonForHalt
 }
 
 func (b *_BACnetPropertyStatesReasonForHaltBuilder) WithMandatoryFields(reasonForHalt BACnetProgramErrorTagged) BACnetPropertyStatesReasonForHaltBuilder {

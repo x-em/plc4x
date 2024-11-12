@@ -136,6 +136,7 @@ var _ (BACnetConfirmedServiceRequestAddListElementBuilder) = (*_BACnetConfirmedS
 
 func (b *_BACnetConfirmedServiceRequestAddListElementBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestAddListElement
 }
 
 func (b *_BACnetConfirmedServiceRequestAddListElementBuilder) WithMandatoryFields(objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged) BACnetConfirmedServiceRequestAddListElementBuilder {

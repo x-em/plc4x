@@ -146,6 +146,7 @@ var _ (S7ParameterUserDataItemCPUFunctionsBuilder) = (*_S7ParameterUserDataItemC
 
 func (b *_S7ParameterUserDataItemCPUFunctionsBuilder) setParent(contract S7ParameterUserDataItemContract) {
 	b.S7ParameterUserDataItemContract = contract
+	contract.(*_S7ParameterUserDataItem)._SubType = b._S7ParameterUserDataItemCPUFunctions
 }
 
 func (b *_S7ParameterUserDataItemCPUFunctionsBuilder) WithMandatoryFields(method uint8, cpuFunctionType uint8, cpuFunctionGroup uint8, cpuSubfunction uint8, sequenceNumber uint8) S7ParameterUserDataItemCPUFunctionsBuilder {

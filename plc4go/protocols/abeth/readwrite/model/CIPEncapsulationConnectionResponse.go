@@ -97,6 +97,7 @@ var _ (CIPEncapsulationConnectionResponseBuilder) = (*_CIPEncapsulationConnectio
 
 func (b *_CIPEncapsulationConnectionResponseBuilder) setParent(contract CIPEncapsulationPacketContract) {
 	b.CIPEncapsulationPacketContract = contract
+	contract.(*_CIPEncapsulationPacket)._SubType = b._CIPEncapsulationConnectionResponse
 }
 
 func (b *_CIPEncapsulationConnectionResponseBuilder) WithMandatoryFields() CIPEncapsulationConnectionResponseBuilder {

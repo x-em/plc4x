@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataPriorityBuilder) = (*_BACnetConstructedDataPriorityB
 
 func (b *_BACnetConstructedDataPriorityBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPriority
 }
 
 func (b *_BACnetConstructedDataPriorityBuilder) WithMandatoryFields(priority []BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPriorityBuilder {

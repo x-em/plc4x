@@ -109,6 +109,7 @@ var _ (PortSegmentBuilder) = (*_PortSegmentBuilder)(nil)
 
 func (b *_PortSegmentBuilder) setParent(contract PathSegmentContract) {
 	b.PathSegmentContract = contract
+	contract.(*_PathSegment)._SubType = b._PortSegment
 }
 
 func (b *_PortSegmentBuilder) WithMandatoryFields(segmentType PortSegmentType) PortSegmentBuilder {

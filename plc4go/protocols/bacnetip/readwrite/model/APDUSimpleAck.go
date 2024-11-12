@@ -112,6 +112,7 @@ var _ (APDUSimpleAckBuilder) = (*_APDUSimpleAckBuilder)(nil)
 
 func (b *_APDUSimpleAckBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUSimpleAck
 }
 
 func (b *_APDUSimpleAckBuilder) WithMandatoryFields(originalInvokeId uint8, serviceChoice BACnetConfirmedServiceChoice) APDUSimpleAckBuilder {

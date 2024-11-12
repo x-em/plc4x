@@ -96,6 +96,7 @@ var _ (SecurityDataStatus1RequestBuilder) = (*_SecurityDataStatus1RequestBuilder
 
 func (b *_SecurityDataStatus1RequestBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataStatus1Request
 }
 
 func (b *_SecurityDataStatus1RequestBuilder) WithMandatoryFields() SecurityDataStatus1RequestBuilder {

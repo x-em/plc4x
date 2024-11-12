@@ -120,6 +120,7 @@ var _ (X509IdentityTokenBuilder) = (*_X509IdentityTokenBuilder)(nil)
 
 func (b *_X509IdentityTokenBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._X509IdentityToken
 }
 
 func (b *_X509IdentityTokenBuilder) WithMandatoryFields(policyId PascalString, certificateData PascalByteString) X509IdentityTokenBuilder {

@@ -111,6 +111,7 @@ var _ (FirmataMessageCommandBuilder) = (*_FirmataMessageCommandBuilder)(nil)
 
 func (b *_FirmataMessageCommandBuilder) setParent(contract FirmataMessageContract) {
 	b.FirmataMessageContract = contract
+	contract.(*_FirmataMessage)._SubType = b._FirmataMessageCommand
 }
 
 func (b *_FirmataMessageCommandBuilder) WithMandatoryFields(command FirmataCommand) FirmataMessageCommandBuilder {

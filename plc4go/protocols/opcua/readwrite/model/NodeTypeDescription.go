@@ -123,6 +123,7 @@ var _ (NodeTypeDescriptionBuilder) = (*_NodeTypeDescriptionBuilder)(nil)
 
 func (b *_NodeTypeDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._NodeTypeDescription
 }
 
 func (b *_NodeTypeDescriptionBuilder) WithMandatoryFields(typeDefinitionNode ExpandedNodeId, includeSubTypes bool, dataToReturn []QueryDataDescription) NodeTypeDescriptionBuilder {

@@ -104,6 +104,7 @@ var _ (KnxNetIpRoutingBuilder) = (*_KnxNetIpRoutingBuilder)(nil)
 
 func (b *_KnxNetIpRoutingBuilder) setParent(contract ServiceIdContract) {
 	b.ServiceIdContract = contract
+	contract.(*_ServiceId)._SubType = b._KnxNetIpRouting
 }
 
 func (b *_KnxNetIpRoutingBuilder) WithMandatoryFields(version uint8) KnxNetIpRoutingBuilder {

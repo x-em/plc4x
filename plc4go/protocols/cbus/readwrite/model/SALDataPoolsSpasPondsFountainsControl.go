@@ -109,6 +109,7 @@ var _ (SALDataPoolsSpasPondsFountainsControlBuilder) = (*_SALDataPoolsSpasPondsF
 
 func (b *_SALDataPoolsSpasPondsFountainsControlBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataPoolsSpasPondsFountainsControl
 }
 
 func (b *_SALDataPoolsSpasPondsFountainsControlBuilder) WithMandatoryFields(poolsSpaPondsFountainsData LightingData) SALDataPoolsSpasPondsFountainsControlBuilder {

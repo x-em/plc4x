@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesSystemStatusBuilder) = (*_BACnetPropertyStatesSystemS
 
 func (b *_BACnetPropertyStatesSystemStatusBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesSystemStatus
 }
 
 func (b *_BACnetPropertyStatesSystemStatusBuilder) WithMandatoryFields(systemStatus BACnetDeviceStatusTagged) BACnetPropertyStatesSystemStatusBuilder {

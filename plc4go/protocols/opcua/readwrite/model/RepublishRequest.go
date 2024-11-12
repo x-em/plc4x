@@ -121,6 +121,7 @@ var _ (RepublishRequestBuilder) = (*_RepublishRequestBuilder)(nil)
 
 func (b *_RepublishRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RepublishRequest
 }
 
 func (b *_RepublishRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, subscriptionId uint32, retransmitSequenceNumber uint32) RepublishRequestBuilder {

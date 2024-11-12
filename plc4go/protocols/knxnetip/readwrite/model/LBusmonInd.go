@@ -127,6 +127,7 @@ var _ (LBusmonIndBuilder) = (*_LBusmonIndBuilder)(nil)
 
 func (b *_LBusmonIndBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._LBusmonInd
 }
 
 func (b *_LBusmonIndBuilder) WithMandatoryFields(additionalInformationLength uint8, additionalInformation []CEMIAdditionalInformation, dataFrame LDataFrame) LBusmonIndBuilder {

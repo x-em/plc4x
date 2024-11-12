@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataControlledVariableUnitsBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataControlledVariableUnitsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataControlledVariableUnits
 }
 
 func (b *_BACnetConstructedDataControlledVariableUnitsBuilder) WithMandatoryFields(units BACnetEngineeringUnitsTagged) BACnetConstructedDataControlledVariableUnitsBuilder {

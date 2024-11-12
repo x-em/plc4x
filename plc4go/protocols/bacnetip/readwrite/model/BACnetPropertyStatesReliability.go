@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesReliabilityBuilder) = (*_BACnetPropertyStatesReliabil
 
 func (b *_BACnetPropertyStatesReliabilityBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesReliability
 }
 
 func (b *_BACnetPropertyStatesReliabilityBuilder) WithMandatoryFields(reliability BACnetReliabilityTagged) BACnetPropertyStatesReliabilityBuilder {

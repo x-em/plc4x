@@ -159,6 +159,7 @@ var _ (BuildInfoBuilder) = (*_BuildInfoBuilder)(nil)
 
 func (b *_BuildInfoBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._BuildInfo
 }
 
 func (b *_BuildInfoBuilder) WithMandatoryFields(productUri PascalString, manufacturerName PascalString, productName PascalString, softwareVersion PascalString, buildNumber PascalString, buildDate int64) BuildInfoBuilder {

@@ -152,6 +152,7 @@ var _ (ExtensionObjectWithMaskBuilder) = (*_ExtensionObjectWithMaskBuilder)(nil)
 
 func (b *_ExtensionObjectWithMaskBuilder) setParent(contract ExtensionObjectContract) {
 	b.ExtensionObjectContract = contract
+	contract.(*_ExtensionObject)._SubType = b._ExtensionObjectWithMask
 }
 
 func (b *_ExtensionObjectWithMaskBuilder) WithMandatoryFields(encodingMask ExtensionObjectEncodingMask) ExtensionObjectWithMaskBuilder {

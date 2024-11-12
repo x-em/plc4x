@@ -119,6 +119,7 @@ var _ (ConnectionStateRequestBuilder) = (*_ConnectionStateRequestBuilder)(nil)
 
 func (b *_ConnectionStateRequestBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._ConnectionStateRequest
 }
 
 func (b *_ConnectionStateRequestBuilder) WithMandatoryFields(communicationChannelId uint8, hpaiControlEndpoint HPAIControlEndpoint) ConnectionStateRequestBuilder {

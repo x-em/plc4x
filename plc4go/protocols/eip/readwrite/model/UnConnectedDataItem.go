@@ -109,6 +109,7 @@ var _ (UnConnectedDataItemBuilder) = (*_UnConnectedDataItemBuilder)(nil)
 
 func (b *_UnConnectedDataItemBuilder) setParent(contract TypeIdContract) {
 	b.TypeIdContract = contract
+	contract.(*_TypeId)._SubType = b._UnConnectedDataItem
 }
 
 func (b *_UnConnectedDataItemBuilder) WithMandatoryFields(service CipService) UnConnectedDataItemBuilder {

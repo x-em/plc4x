@@ -112,6 +112,7 @@ var _ (FirmataMessageDigitalIOBuilder) = (*_FirmataMessageDigitalIOBuilder)(nil)
 
 func (b *_FirmataMessageDigitalIOBuilder) setParent(contract FirmataMessageContract) {
 	b.FirmataMessageContract = contract
+	contract.(*_FirmataMessage)._SubType = b._FirmataMessageDigitalIO
 }
 
 func (b *_FirmataMessageDigitalIOBuilder) WithMandatoryFields(pinBlock uint8, data []int8) FirmataMessageDigitalIOBuilder {

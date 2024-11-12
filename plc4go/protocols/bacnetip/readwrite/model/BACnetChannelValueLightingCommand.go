@@ -109,6 +109,7 @@ var _ (BACnetChannelValueLightingCommandBuilder) = (*_BACnetChannelValueLighting
 
 func (b *_BACnetChannelValueLightingCommandBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueLightingCommand
 }
 
 func (b *_BACnetChannelValueLightingCommandBuilder) WithMandatoryFields(ligthingCommandValue BACnetLightingCommandEnclosed) BACnetChannelValueLightingCommandBuilder {

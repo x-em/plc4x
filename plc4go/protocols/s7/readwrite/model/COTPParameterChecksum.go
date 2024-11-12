@@ -104,6 +104,7 @@ var _ (COTPParameterChecksumBuilder) = (*_COTPParameterChecksumBuilder)(nil)
 
 func (b *_COTPParameterChecksumBuilder) setParent(contract COTPParameterContract) {
 	b.COTPParameterContract = contract
+	contract.(*_COTPParameter)._SubType = b._COTPParameterChecksum
 }
 
 func (b *_COTPParameterChecksumBuilder) WithMandatoryFields(crc uint8) COTPParameterChecksumBuilder {

@@ -109,6 +109,7 @@ var _ (AdsDiscoveryBlockPasswordBuilder) = (*_AdsDiscoveryBlockPasswordBuilder)(
 
 func (b *_AdsDiscoveryBlockPasswordBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockPassword
 }
 
 func (b *_AdsDiscoveryBlockPasswordBuilder) WithMandatoryFields(password AmsString) AdsDiscoveryBlockPasswordBuilder {

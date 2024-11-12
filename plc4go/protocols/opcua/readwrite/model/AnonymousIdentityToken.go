@@ -109,6 +109,7 @@ var _ (AnonymousIdentityTokenBuilder) = (*_AnonymousIdentityTokenBuilder)(nil)
 
 func (b *_AnonymousIdentityTokenBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AnonymousIdentityToken
 }
 
 func (b *_AnonymousIdentityTokenBuilder) WithMandatoryFields(policyId PascalString) AnonymousIdentityTokenBuilder {

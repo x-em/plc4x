@@ -143,6 +143,7 @@ var _ (CipConnectionManagerResponseBuilder) = (*_CipConnectionManagerResponseBui
 
 func (b *_CipConnectionManagerResponseBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipConnectionManagerResponse
 }
 
 func (b *_CipConnectionManagerResponseBuilder) WithMandatoryFields(otConnectionId uint32, toConnectionId uint32, connectionSerialNumber uint16, originatorVendorId uint16, originatorSerialNumber uint32, otApi uint32, toApi uint32) CipConnectionManagerResponseBuilder {

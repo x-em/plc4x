@@ -139,6 +139,7 @@ var _ (BACnetUnconfirmedServiceRequestUnconfirmedTextMessageBuilder) = (*_BACnet
 
 func (b *_BACnetUnconfirmedServiceRequestUnconfirmedTextMessageBuilder) setParent(contract BACnetUnconfirmedServiceRequestContract) {
 	b.BACnetUnconfirmedServiceRequestContract = contract
+	contract.(*_BACnetUnconfirmedServiceRequest)._SubType = b._BACnetUnconfirmedServiceRequestUnconfirmedTextMessage
 }
 
 func (b *_BACnetUnconfirmedServiceRequestUnconfirmedTextMessageBuilder) WithMandatoryFields(textMessageSourceDevice BACnetContextTagObjectIdentifier, messagePriority BACnetConfirmedServiceRequestConfirmedTextMessageMessagePriorityTagged, message BACnetContextTagCharacterString) BACnetUnconfirmedServiceRequestUnconfirmedTextMessageBuilder {

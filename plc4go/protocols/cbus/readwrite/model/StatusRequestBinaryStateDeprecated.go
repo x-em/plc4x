@@ -107,6 +107,7 @@ var _ (StatusRequestBinaryStateDeprecatedBuilder) = (*_StatusRequestBinaryStateD
 
 func (b *_StatusRequestBinaryStateDeprecatedBuilder) setParent(contract StatusRequestContract) {
 	b.StatusRequestContract = contract
+	contract.(*_StatusRequest)._SubType = b._StatusRequestBinaryStateDeprecated
 }
 
 func (b *_StatusRequestBinaryStateDeprecatedBuilder) WithMandatoryFields(application ApplicationIdContainer) StatusRequestBinaryStateDeprecatedBuilder {

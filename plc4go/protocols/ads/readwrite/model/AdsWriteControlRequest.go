@@ -116,6 +116,7 @@ var _ (AdsWriteControlRequestBuilder) = (*_AdsWriteControlRequestBuilder)(nil)
 
 func (b *_AdsWriteControlRequestBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsWriteControlRequest
 }
 
 func (b *_AdsWriteControlRequestBuilder) WithMandatoryFields(adsState uint16, deviceState uint16, data []byte) AdsWriteControlRequestBuilder {

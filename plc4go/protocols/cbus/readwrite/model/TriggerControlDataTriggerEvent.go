@@ -104,6 +104,7 @@ var _ (TriggerControlDataTriggerEventBuilder) = (*_TriggerControlDataTriggerEven
 
 func (b *_TriggerControlDataTriggerEventBuilder) setParent(contract TriggerControlDataContract) {
 	b.TriggerControlDataContract = contract
+	contract.(*_TriggerControlData)._SubType = b._TriggerControlDataTriggerEvent
 }
 
 func (b *_TriggerControlDataTriggerEventBuilder) WithMandatoryFields(actionSelector byte) TriggerControlDataTriggerEventBuilder {

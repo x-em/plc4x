@@ -128,6 +128,7 @@ var _ (AdsReadDeviceInfoResponseBuilder) = (*_AdsReadDeviceInfoResponseBuilder)(
 
 func (b *_AdsReadDeviceInfoResponseBuilder) setParent(contract AmsPacketContract) {
 	b.AmsPacketContract = contract
+	contract.(*_AmsPacket)._SubType = b._AdsReadDeviceInfoResponse
 }
 
 func (b *_AdsReadDeviceInfoResponseBuilder) WithMandatoryFields(result ReturnCode, majorVersion uint8, minorVersion uint8, version uint16, device []byte) AdsReadDeviceInfoResponseBuilder {

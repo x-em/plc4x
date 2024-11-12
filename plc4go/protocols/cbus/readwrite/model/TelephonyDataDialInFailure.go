@@ -104,6 +104,7 @@ var _ (TelephonyDataDialInFailureBuilder) = (*_TelephonyDataDialInFailureBuilder
 
 func (b *_TelephonyDataDialInFailureBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataDialInFailure
 }
 
 func (b *_TelephonyDataDialInFailureBuilder) WithMandatoryFields(reason DialInFailureReason) TelephonyDataDialInFailureBuilder {

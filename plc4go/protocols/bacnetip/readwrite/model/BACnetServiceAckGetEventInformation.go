@@ -120,6 +120,7 @@ var _ (BACnetServiceAckGetEventInformationBuilder) = (*_BACnetServiceAckGetEvent
 
 func (b *_BACnetServiceAckGetEventInformationBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckGetEventInformation
 }
 
 func (b *_BACnetServiceAckGetEventInformationBuilder) WithMandatoryFields(listOfEventSummaries BACnetEventSummariesList, moreEvents BACnetContextTagBoolean) BACnetServiceAckGetEventInformationBuilder {

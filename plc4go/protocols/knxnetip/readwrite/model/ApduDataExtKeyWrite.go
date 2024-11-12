@@ -96,6 +96,7 @@ var _ (ApduDataExtKeyWriteBuilder) = (*_ApduDataExtKeyWriteBuilder)(nil)
 
 func (b *_ApduDataExtKeyWriteBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtKeyWrite
 }
 
 func (b *_ApduDataExtKeyWriteBuilder) WithMandatoryFields() ApduDataExtKeyWriteBuilder {

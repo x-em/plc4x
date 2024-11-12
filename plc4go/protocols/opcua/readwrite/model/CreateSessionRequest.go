@@ -187,6 +187,7 @@ var _ (CreateSessionRequestBuilder) = (*_CreateSessionRequestBuilder)(nil)
 
 func (b *_CreateSessionRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CreateSessionRequest
 }
 
 func (b *_CreateSessionRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, clientDescription ApplicationDescription, serverUri PascalString, endpointUrl PascalString, sessionName PascalString, clientNonce PascalByteString, clientCertificate PascalByteString, requestedSessionTimeout float64, maxResponseMessageSize uint32) CreateSessionRequestBuilder {

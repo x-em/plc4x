@@ -115,6 +115,7 @@ var _ (MdnsDiscoveryConfigurationBuilder) = (*_MdnsDiscoveryConfigurationBuilder
 
 func (b *_MdnsDiscoveryConfigurationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._MdnsDiscoveryConfiguration
 }
 
 func (b *_MdnsDiscoveryConfigurationBuilder) WithMandatoryFields(mdnsServerName PascalString, serverCapabilities []PascalString) MdnsDiscoveryConfigurationBuilder {

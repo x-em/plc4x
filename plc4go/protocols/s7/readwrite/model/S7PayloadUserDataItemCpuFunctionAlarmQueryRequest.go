@@ -125,6 +125,7 @@ var _ (S7PayloadUserDataItemCpuFunctionAlarmQueryRequestBuilder) = (*_S7PayloadU
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmQueryRequestBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemCpuFunctionAlarmQueryRequest
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmQueryRequestBuilder) WithMandatoryFields(syntaxId SyntaxIdType, queryType QueryType, alarmType AlarmType) S7PayloadUserDataItemCpuFunctionAlarmQueryRequestBuilder {

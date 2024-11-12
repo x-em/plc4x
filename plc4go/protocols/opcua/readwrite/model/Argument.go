@@ -143,6 +143,7 @@ var _ (ArgumentBuilder) = (*_ArgumentBuilder)(nil)
 
 func (b *_ArgumentBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._Argument
 }
 
 func (b *_ArgumentBuilder) WithMandatoryFields(name PascalString, dataType NodeId, valueRank int32, arrayDimensions []uint32, description LocalizedText) ArgumentBuilder {

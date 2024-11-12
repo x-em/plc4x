@@ -96,6 +96,7 @@ var _ (ReaderGroupTransportDataTypeBuilder) = (*_ReaderGroupTransportDataTypeBui
 
 func (b *_ReaderGroupTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReaderGroupTransportDataType
 }
 
 func (b *_ReaderGroupTransportDataTypeBuilder) WithMandatoryFields() ReaderGroupTransportDataTypeBuilder {

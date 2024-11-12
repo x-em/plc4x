@@ -109,6 +109,7 @@ var _ (S7VarRequestParameterItemAddressBuilder) = (*_S7VarRequestParameterItemAd
 
 func (b *_S7VarRequestParameterItemAddressBuilder) setParent(contract S7VarRequestParameterItemContract) {
 	b.S7VarRequestParameterItemContract = contract
+	contract.(*_S7VarRequestParameterItem)._SubType = b._S7VarRequestParameterItemAddress
 }
 
 func (b *_S7VarRequestParameterItemAddressBuilder) WithMandatoryFields(address S7Address) S7VarRequestParameterItemAddressBuilder {

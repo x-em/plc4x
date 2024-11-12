@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataEventAlgorithmInhibitBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataEventAlgorithmInhibitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEventAlgorithmInhibit
 }
 
 func (b *_BACnetConstructedDataEventAlgorithmInhibitBuilder) WithMandatoryFields(eventAlgorithmInhibit BACnetApplicationTagBoolean) BACnetConstructedDataEventAlgorithmInhibitBuilder {

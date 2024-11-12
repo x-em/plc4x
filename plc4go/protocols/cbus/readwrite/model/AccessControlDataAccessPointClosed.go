@@ -96,6 +96,7 @@ var _ (AccessControlDataAccessPointClosedBuilder) = (*_AccessControlDataAccessPo
 
 func (b *_AccessControlDataAccessPointClosedBuilder) setParent(contract AccessControlDataContract) {
 	b.AccessControlDataContract = contract
+	contract.(*_AccessControlData)._SubType = b._AccessControlDataAccessPointClosed
 }
 
 func (b *_AccessControlDataAccessPointClosedBuilder) WithMandatoryFields() AccessControlDataAccessPointClosedBuilder {

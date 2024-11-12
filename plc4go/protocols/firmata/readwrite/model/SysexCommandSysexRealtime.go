@@ -96,6 +96,7 @@ var _ (SysexCommandSysexRealtimeBuilder) = (*_SysexCommandSysexRealtimeBuilder)(
 
 func (b *_SysexCommandSysexRealtimeBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandSysexRealtime
 }
 
 func (b *_SysexCommandSysexRealtimeBuilder) WithMandatoryFields() SysexCommandSysexRealtimeBuilder {

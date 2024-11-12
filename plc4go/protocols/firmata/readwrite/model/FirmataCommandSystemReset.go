@@ -96,6 +96,7 @@ var _ (FirmataCommandSystemResetBuilder) = (*_FirmataCommandSystemResetBuilder)(
 
 func (b *_FirmataCommandSystemResetBuilder) setParent(contract FirmataCommandContract) {
 	b.FirmataCommandContract = contract
+	contract.(*_FirmataCommand)._SubType = b._FirmataCommandSystemReset
 }
 
 func (b *_FirmataCommandSystemResetBuilder) WithMandatoryFields() FirmataCommandSystemResetBuilder {

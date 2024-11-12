@@ -137,6 +137,7 @@ var _ (ModbusPDUReadDeviceIdentificationResponseBuilder) = (*_ModbusPDUReadDevic
 
 func (b *_ModbusPDUReadDeviceIdentificationResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUReadDeviceIdentificationResponse
 }
 
 func (b *_ModbusPDUReadDeviceIdentificationResponseBuilder) WithMandatoryFields(level ModbusDeviceInformationLevel, individualAccess bool, conformityLevel ModbusDeviceInformationConformityLevel, moreFollows ModbusDeviceInformationMoreFollows, nextObjectId uint8, objects []ModbusDeviceInformationObject) ModbusPDUReadDeviceIdentificationResponseBuilder {

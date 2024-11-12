@@ -157,6 +157,7 @@ var _ (ErrorReportingDataGenericBuilder) = (*_ErrorReportingDataGenericBuilder)(
 
 func (b *_ErrorReportingDataGenericBuilder) setParent(contract ErrorReportingDataContract) {
 	b.ErrorReportingDataContract = contract
+	contract.(*_ErrorReportingData)._SubType = b._ErrorReportingDataGeneric
 }
 
 func (b *_ErrorReportingDataGenericBuilder) WithMandatoryFields(systemCategory ErrorReportingSystemCategory, mostRecent bool, acknowledge bool, mostSevere bool, severity ErrorReportingSeverity, deviceId uint8, errorData1 uint8, errorData2 uint8) ErrorReportingDataGenericBuilder {

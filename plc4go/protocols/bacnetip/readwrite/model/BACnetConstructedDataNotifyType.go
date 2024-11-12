@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataNotifyTypeBuilder) = (*_BACnetConstructedDataNotifyT
 
 func (b *_BACnetConstructedDataNotifyTypeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataNotifyType
 }
 
 func (b *_BACnetConstructedDataNotifyTypeBuilder) WithMandatoryFields(notifyType BACnetNotifyTypeTagged) BACnetConstructedDataNotifyTypeBuilder {

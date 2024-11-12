@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataRecordsSinceNotificationBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataRecordsSinceNotificationBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataRecordsSinceNotification
 }
 
 func (b *_BACnetConstructedDataRecordsSinceNotificationBuilder) WithMandatoryFields(recordsSinceNotifications BACnetApplicationTagUnsignedInteger) BACnetConstructedDataRecordsSinceNotificationBuilder {

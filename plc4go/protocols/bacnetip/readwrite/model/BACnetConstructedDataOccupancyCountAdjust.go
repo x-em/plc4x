@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataOccupancyCountAdjustBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataOccupancyCountAdjustBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataOccupancyCountAdjust
 }
 
 func (b *_BACnetConstructedDataOccupancyCountAdjustBuilder) WithMandatoryFields(occupancyCountAdjust BACnetApplicationTagBoolean) BACnetConstructedDataOccupancyCountAdjustBuilder {

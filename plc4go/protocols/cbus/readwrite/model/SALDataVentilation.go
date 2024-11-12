@@ -109,6 +109,7 @@ var _ (SALDataVentilationBuilder) = (*_SALDataVentilationBuilder)(nil)
 
 func (b *_SALDataVentilationBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataVentilation
 }
 
 func (b *_SALDataVentilationBuilder) WithMandatoryFields(ventilationData LightingData) SALDataVentilationBuilder {

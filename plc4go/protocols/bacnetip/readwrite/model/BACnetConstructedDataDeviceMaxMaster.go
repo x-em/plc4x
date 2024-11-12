@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDeviceMaxMasterBuilder) = (*_BACnetConstructedDataDe
 
 func (b *_BACnetConstructedDataDeviceMaxMasterBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDeviceMaxMaster
 }
 
 func (b *_BACnetConstructedDataDeviceMaxMasterBuilder) WithMandatoryFields(maxMaster BACnetApplicationTagUnsignedInteger) BACnetConstructedDataDeviceMaxMasterBuilder {

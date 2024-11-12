@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMultiStateInputInterfaceValueBuilder) = (*_BACnetCon
 
 func (b *_BACnetConstructedDataMultiStateInputInterfaceValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateInputInterfaceValue
 }
 
 func (b *_BACnetConstructedDataMultiStateInputInterfaceValueBuilder) WithMandatoryFields(interfaceValue BACnetOptionalBinaryPV) BACnetConstructedDataMultiStateInputInterfaceValueBuilder {

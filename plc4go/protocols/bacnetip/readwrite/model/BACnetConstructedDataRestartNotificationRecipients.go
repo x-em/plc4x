@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataRestartNotificationRecipientsBuilder) = (*_BACnetCon
 
 func (b *_BACnetConstructedDataRestartNotificationRecipientsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataRestartNotificationRecipients
 }
 
 func (b *_BACnetConstructedDataRestartNotificationRecipientsBuilder) WithMandatoryFields(restartNotificationRecipients []BACnetRecipient) BACnetConstructedDataRestartNotificationRecipientsBuilder {

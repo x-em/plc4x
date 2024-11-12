@@ -104,6 +104,7 @@ var _ (AirConditioningDataSetZoneGroupOnBuilder) = (*_AirConditioningDataSetZone
 
 func (b *_AirConditioningDataSetZoneGroupOnBuilder) setParent(contract AirConditioningDataContract) {
 	b.AirConditioningDataContract = contract
+	contract.(*_AirConditioningData)._SubType = b._AirConditioningDataSetZoneGroupOn
 }
 
 func (b *_AirConditioningDataSetZoneGroupOnBuilder) WithMandatoryFields(zoneGroup byte) AirConditioningDataSetZoneGroupOnBuilder {

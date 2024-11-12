@@ -109,6 +109,7 @@ var _ (ExtensiblePayloadBuilder) = (*_ExtensiblePayloadBuilder)(nil)
 
 func (b *_ExtensiblePayloadBuilder) setParent(contract PayloadContract) {
 	b.PayloadContract = contract
+	contract.(*_Payload)._SubType = b._ExtensiblePayload
 }
 
 func (b *_ExtensiblePayloadBuilder) WithMandatoryFields(payload RootExtensionObject) ExtensiblePayloadBuilder {

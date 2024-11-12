@@ -157,6 +157,7 @@ var _ (StructureFieldBuilder) = (*_StructureFieldBuilder)(nil)
 
 func (b *_StructureFieldBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._StructureField
 }
 
 func (b *_StructureFieldBuilder) WithMandatoryFields(name PascalString, description LocalizedText, dataType NodeId, valueRank int32, arrayDimensions []uint32, maxStringLength uint32, isOptional bool) StructureFieldBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIPv6PrefixLengthBuilder) = (*_BACnetConstructedDataI
 
 func (b *_BACnetConstructedDataIPv6PrefixLengthBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPv6PrefixLength
 }
 
 func (b *_BACnetConstructedDataIPv6PrefixLengthBuilder) WithMandatoryFields(ipv6PrefixLength BACnetApplicationTagUnsignedInteger) BACnetConstructedDataIPv6PrefixLengthBuilder {

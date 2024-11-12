@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTimeOfActiveTimeResetBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataTimeOfActiveTimeResetBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimeOfActiveTimeReset
 }
 
 func (b *_BACnetConstructedDataTimeOfActiveTimeResetBuilder) WithMandatoryFields(timeOfActiveTimeReset BACnetDateTime) BACnetConstructedDataTimeOfActiveTimeResetBuilder {

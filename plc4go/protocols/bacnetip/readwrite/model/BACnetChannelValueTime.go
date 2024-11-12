@@ -109,6 +109,7 @@ var _ (BACnetChannelValueTimeBuilder) = (*_BACnetChannelValueTimeBuilder)(nil)
 
 func (b *_BACnetChannelValueTimeBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueTime
 }
 
 func (b *_BACnetChannelValueTimeBuilder) WithMandatoryFields(timeValue BACnetApplicationTagTime) BACnetChannelValueTimeBuilder {

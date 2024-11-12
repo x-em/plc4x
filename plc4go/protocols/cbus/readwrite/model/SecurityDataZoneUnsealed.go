@@ -104,6 +104,7 @@ var _ (SecurityDataZoneUnsealedBuilder) = (*_SecurityDataZoneUnsealedBuilder)(ni
 
 func (b *_SecurityDataZoneUnsealedBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataZoneUnsealed
 }
 
 func (b *_SecurityDataZoneUnsealedBuilder) WithMandatoryFields(zoneNumber uint8) SecurityDataZoneUnsealedBuilder {

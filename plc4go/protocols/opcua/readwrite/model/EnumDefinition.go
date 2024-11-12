@@ -104,6 +104,7 @@ var _ (EnumDefinitionBuilder) = (*_EnumDefinitionBuilder)(nil)
 
 func (b *_EnumDefinitionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EnumDefinition
 }
 
 func (b *_EnumDefinitionBuilder) WithMandatoryFields(fields []EnumField) EnumDefinitionBuilder {

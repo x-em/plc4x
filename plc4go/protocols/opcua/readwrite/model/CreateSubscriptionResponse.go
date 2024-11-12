@@ -133,6 +133,7 @@ var _ (CreateSubscriptionResponseBuilder) = (*_CreateSubscriptionResponseBuilder
 
 func (b *_CreateSubscriptionResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CreateSubscriptionResponse
 }
 
 func (b *_CreateSubscriptionResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, subscriptionId uint32, revisedPublishingInterval float64, revisedLifetimeCount uint32, revisedMaxKeepAliveCount uint32) CreateSubscriptionResponseBuilder {

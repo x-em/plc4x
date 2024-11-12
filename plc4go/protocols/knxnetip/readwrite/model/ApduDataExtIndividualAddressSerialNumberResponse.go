@@ -96,6 +96,7 @@ var _ (ApduDataExtIndividualAddressSerialNumberResponseBuilder) = (*_ApduDataExt
 
 func (b *_ApduDataExtIndividualAddressSerialNumberResponseBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtIndividualAddressSerialNumberResponse
 }
 
 func (b *_ApduDataExtIndividualAddressSerialNumberResponseBuilder) WithMandatoryFields() ApduDataExtIndividualAddressSerialNumberResponseBuilder {

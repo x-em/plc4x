@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataProgramStateBuilder) = (*_BACnetConstructedDataProgr
 
 func (b *_BACnetConstructedDataProgramStateBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataProgramState
 }
 
 func (b *_BACnetConstructedDataProgramStateBuilder) WithMandatoryFields(programState BACnetProgramStateTagged) BACnetConstructedDataProgramStateBuilder {

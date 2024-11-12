@@ -110,6 +110,7 @@ var _ (ModbusPDUWriteSingleRegisterRequestBuilder) = (*_ModbusPDUWriteSingleRegi
 
 func (b *_ModbusPDUWriteSingleRegisterRequestBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUWriteSingleRegisterRequest
 }
 
 func (b *_ModbusPDUWriteSingleRegisterRequestBuilder) WithMandatoryFields(address uint16, value uint16) ModbusPDUWriteSingleRegisterRequestBuilder {

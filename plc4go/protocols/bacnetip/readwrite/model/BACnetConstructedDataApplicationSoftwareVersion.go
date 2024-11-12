@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataApplicationSoftwareVersionBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataApplicationSoftwareVersionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataApplicationSoftwareVersion
 }
 
 func (b *_BACnetConstructedDataApplicationSoftwareVersionBuilder) WithMandatoryFields(applicationSoftwareVersion BACnetApplicationTagCharacterString) BACnetConstructedDataApplicationSoftwareVersionBuilder {

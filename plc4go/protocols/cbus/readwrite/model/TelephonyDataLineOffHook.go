@@ -110,6 +110,7 @@ var _ (TelephonyDataLineOffHookBuilder) = (*_TelephonyDataLineOffHookBuilder)(ni
 
 func (b *_TelephonyDataLineOffHookBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataLineOffHook
 }
 
 func (b *_TelephonyDataLineOffHookBuilder) WithMandatoryFields(reason LineOffHookReason, number string) TelephonyDataLineOffHookBuilder {

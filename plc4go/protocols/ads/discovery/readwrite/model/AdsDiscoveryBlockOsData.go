@@ -104,6 +104,7 @@ var _ (AdsDiscoveryBlockOsDataBuilder) = (*_AdsDiscoveryBlockOsDataBuilder)(nil)
 
 func (b *_AdsDiscoveryBlockOsDataBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockOsData
 }
 
 func (b *_AdsDiscoveryBlockOsDataBuilder) WithMandatoryFields(osData []byte) AdsDiscoveryBlockOsDataBuilder {

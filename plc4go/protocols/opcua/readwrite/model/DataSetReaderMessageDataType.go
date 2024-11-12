@@ -96,6 +96,7 @@ var _ (DataSetReaderMessageDataTypeBuilder) = (*_DataSetReaderMessageDataTypeBui
 
 func (b *_DataSetReaderMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataSetReaderMessageDataType
 }
 
 func (b *_DataSetReaderMessageDataTypeBuilder) WithMandatoryFields() DataSetReaderMessageDataTypeBuilder {

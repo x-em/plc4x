@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataEffectivePeriodBuilder) = (*_BACnetConstructedDataEf
 
 func (b *_BACnetConstructedDataEffectivePeriodBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEffectivePeriod
 }
 
 func (b *_BACnetConstructedDataEffectivePeriodBuilder) WithMandatoryFields(dateRange BACnetDateRange) BACnetConstructedDataEffectivePeriodBuilder {

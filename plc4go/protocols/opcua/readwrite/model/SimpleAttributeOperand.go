@@ -132,6 +132,7 @@ var _ (SimpleAttributeOperandBuilder) = (*_SimpleAttributeOperandBuilder)(nil)
 
 func (b *_SimpleAttributeOperandBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SimpleAttributeOperand
 }
 
 func (b *_SimpleAttributeOperandBuilder) WithMandatoryFields(typeDefinitionId NodeId, browsePath []QualifiedName, attributeId uint32, indexRange PascalString) SimpleAttributeOperandBuilder {

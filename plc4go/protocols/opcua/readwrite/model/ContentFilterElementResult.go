@@ -121,6 +121,7 @@ var _ (ContentFilterElementResultBuilder) = (*_ContentFilterElementResultBuilder
 
 func (b *_ContentFilterElementResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ContentFilterElementResult
 }
 
 func (b *_ContentFilterElementResultBuilder) WithMandatoryFields(statusCode StatusCode, operandStatusCodes []StatusCode, operandDiagnosticInfos []DiagnosticInfo) ContentFilterElementResultBuilder {

@@ -120,6 +120,7 @@ var _ (KeyValuePairBuilder) = (*_KeyValuePairBuilder)(nil)
 
 func (b *_KeyValuePairBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._KeyValuePair
 }
 
 func (b *_KeyValuePairBuilder) WithMandatoryFields(key QualifiedName, value Variant) KeyValuePairBuilder {

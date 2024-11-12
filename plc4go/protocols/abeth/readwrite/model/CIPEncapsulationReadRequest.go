@@ -111,6 +111,7 @@ var _ (CIPEncapsulationReadRequestBuilder) = (*_CIPEncapsulationReadRequestBuild
 
 func (b *_CIPEncapsulationReadRequestBuilder) setParent(contract CIPEncapsulationPacketContract) {
 	b.CIPEncapsulationPacketContract = contract
+	contract.(*_CIPEncapsulationPacket)._SubType = b._CIPEncapsulationReadRequest
 }
 
 func (b *_CIPEncapsulationReadRequestBuilder) WithMandatoryFields(request DF1RequestMessage) CIPEncapsulationReadRequestBuilder {

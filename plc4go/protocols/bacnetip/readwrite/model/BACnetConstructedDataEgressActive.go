@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataEgressActiveBuilder) = (*_BACnetConstructedDataEgres
 
 func (b *_BACnetConstructedDataEgressActiveBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEgressActive
 }
 
 func (b *_BACnetConstructedDataEgressActiveBuilder) WithMandatoryFields(egressActive BACnetApplicationTagBoolean) BACnetConstructedDataEgressActiveBuilder {

@@ -109,6 +109,7 @@ var _ (CBusMessageToClientBuilder) = (*_CBusMessageToClientBuilder)(nil)
 
 func (b *_CBusMessageToClientBuilder) setParent(contract CBusMessageContract) {
 	b.CBusMessageContract = contract
+	contract.(*_CBusMessage)._SubType = b._CBusMessageToClient
 }
 
 func (b *_CBusMessageToClientBuilder) WithMandatoryFields(reply ReplyOrConfirmation) CBusMessageToClientBuilder {

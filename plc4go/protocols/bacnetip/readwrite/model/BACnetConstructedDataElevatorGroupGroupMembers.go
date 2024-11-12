@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataElevatorGroupGroupMembersBuilder) = (*_BACnetConstru
 
 func (b *_BACnetConstructedDataElevatorGroupGroupMembersBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataElevatorGroupGroupMembers
 }
 
 func (b *_BACnetConstructedDataElevatorGroupGroupMembersBuilder) WithMandatoryFields(groupMembers []BACnetApplicationTagObjectIdentifier) BACnetConstructedDataElevatorGroupGroupMembersBuilder {

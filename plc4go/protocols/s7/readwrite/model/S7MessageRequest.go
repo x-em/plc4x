@@ -96,6 +96,7 @@ var _ (S7MessageRequestBuilder) = (*_S7MessageRequestBuilder)(nil)
 
 func (b *_S7MessageRequestBuilder) setParent(contract S7MessageContract) {
 	b.S7MessageContract = contract
+	contract.(*_S7Message)._SubType = b._S7MessageRequest
 }
 
 func (b *_S7MessageRequestBuilder) WithMandatoryFields() S7MessageRequestBuilder {

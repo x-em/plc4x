@@ -115,6 +115,7 @@ var _ (ParameterValueInterfaceOptions3Builder) = (*_ParameterValueInterfaceOptio
 
 func (b *_ParameterValueInterfaceOptions3Builder) setParent(contract ParameterValueContract) {
 	b.ParameterValueContract = contract
+	contract.(*_ParameterValue)._SubType = b._ParameterValueInterfaceOptions3
 }
 
 func (b *_ParameterValueInterfaceOptions3Builder) WithMandatoryFields(value InterfaceOptions3, data []byte) ParameterValueInterfaceOptions3Builder {

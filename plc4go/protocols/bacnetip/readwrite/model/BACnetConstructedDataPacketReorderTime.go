@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPacketReorderTimeBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataPacketReorderTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPacketReorderTime
 }
 
 func (b *_BACnetConstructedDataPacketReorderTimeBuilder) WithMandatoryFields(packetReorderTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPacketReorderTimeBuilder {

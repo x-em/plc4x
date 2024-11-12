@@ -101,6 +101,7 @@ var _ (RequestNullBuilder) = (*_RequestNullBuilder)(nil)
 
 func (b *_RequestNullBuilder) setParent(contract RequestContract) {
 	b.RequestContract = contract
+	contract.(*_Request)._SubType = b._RequestNull
 }
 
 func (b *_RequestNullBuilder) WithMandatoryFields() RequestNullBuilder {

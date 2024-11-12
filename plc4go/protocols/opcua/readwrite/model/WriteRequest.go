@@ -115,6 +115,7 @@ var _ (WriteRequestBuilder) = (*_WriteRequestBuilder)(nil)
 
 func (b *_WriteRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._WriteRequest
 }
 
 func (b *_WriteRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, nodesToWrite []WriteValue) WriteRequestBuilder {

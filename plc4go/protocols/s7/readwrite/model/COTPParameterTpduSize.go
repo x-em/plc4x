@@ -104,6 +104,7 @@ var _ (COTPParameterTpduSizeBuilder) = (*_COTPParameterTpduSizeBuilder)(nil)
 
 func (b *_COTPParameterTpduSizeBuilder) setParent(contract COTPParameterContract) {
 	b.COTPParameterContract = contract
+	contract.(*_COTPParameter)._SubType = b._COTPParameterTpduSize
 }
 
 func (b *_COTPParameterTpduSizeBuilder) WithMandatoryFields(tpduSize COTPTpduSize) COTPParameterTpduSizeBuilder {

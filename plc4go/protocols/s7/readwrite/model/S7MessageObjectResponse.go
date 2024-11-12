@@ -112,6 +112,7 @@ var _ (S7MessageObjectResponseBuilder) = (*_S7MessageObjectResponseBuilder)(nil)
 
 func (b *_S7MessageObjectResponseBuilder) setParent(contract S7DataAlarmMessageContract) {
 	b.S7DataAlarmMessageContract = contract
+	contract.(*_S7DataAlarmMessage)._SubType = b._S7MessageObjectResponse
 }
 
 func (b *_S7MessageObjectResponseBuilder) WithMandatoryFields(returnCode DataTransportErrorCode, transportSize DataTransportSize) S7MessageObjectResponseBuilder {

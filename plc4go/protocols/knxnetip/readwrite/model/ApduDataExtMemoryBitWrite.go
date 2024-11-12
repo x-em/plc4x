@@ -96,6 +96,7 @@ var _ (ApduDataExtMemoryBitWriteBuilder) = (*_ApduDataExtMemoryBitWriteBuilder)(
 
 func (b *_ApduDataExtMemoryBitWriteBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtMemoryBitWrite
 }
 
 func (b *_ApduDataExtMemoryBitWriteBuilder) WithMandatoryFields() ApduDataExtMemoryBitWriteBuilder {

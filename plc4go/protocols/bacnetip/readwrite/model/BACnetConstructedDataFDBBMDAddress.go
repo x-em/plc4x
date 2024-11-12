@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataFDBBMDAddressBuilder) = (*_BACnetConstructedDataFDBB
 
 func (b *_BACnetConstructedDataFDBBMDAddressBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataFDBBMDAddress
 }
 
 func (b *_BACnetConstructedDataFDBBMDAddressBuilder) WithMandatoryFields(fDBBMDAddress BACnetHostNPort) BACnetConstructedDataFDBBMDAddressBuilder {

@@ -129,6 +129,7 @@ var _ (DeleteRawModifiedDetailsBuilder) = (*_DeleteRawModifiedDetailsBuilder)(ni
 
 func (b *_DeleteRawModifiedDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteRawModifiedDetails
 }
 
 func (b *_DeleteRawModifiedDetailsBuilder) WithMandatoryFields(nodeId NodeId, isDeleteModified bool, startTime int64, endTime int64) DeleteRawModifiedDetailsBuilder {

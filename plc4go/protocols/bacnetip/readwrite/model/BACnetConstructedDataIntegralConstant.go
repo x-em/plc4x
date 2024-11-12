@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIntegralConstantBuilder) = (*_BACnetConstructedDataI
 
 func (b *_BACnetConstructedDataIntegralConstantBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIntegralConstant
 }
 
 func (b *_BACnetConstructedDataIntegralConstantBuilder) WithMandatoryFields(integralConstant BACnetApplicationTagReal) BACnetConstructedDataIntegralConstantBuilder {

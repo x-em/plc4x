@@ -96,6 +96,7 @@ var _ (CALDataResetBuilder) = (*_CALDataResetBuilder)(nil)
 
 func (b *_CALDataResetBuilder) setParent(contract CALDataContract) {
 	b.CALDataContract = contract
+	contract.(*_CALData)._SubType = b._CALDataReset
 }
 
 func (b *_CALDataResetBuilder) WithMandatoryFields() CALDataResetBuilder {

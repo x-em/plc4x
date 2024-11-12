@@ -96,6 +96,7 @@ var _ (ClockAndTimekeepingDataRequestRefreshBuilder) = (*_ClockAndTimekeepingDat
 
 func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) setParent(contract ClockAndTimekeepingDataContract) {
 	b.ClockAndTimekeepingDataContract = contract
+	contract.(*_ClockAndTimekeepingData)._SubType = b._ClockAndTimekeepingDataRequestRefresh
 }
 
 func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) WithMandatoryFields() ClockAndTimekeepingDataRequestRefreshBuilder {

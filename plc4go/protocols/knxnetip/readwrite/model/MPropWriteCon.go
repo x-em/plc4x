@@ -96,6 +96,7 @@ var _ (MPropWriteConBuilder) = (*_MPropWriteConBuilder)(nil)
 
 func (b *_MPropWriteConBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MPropWriteCon
 }
 
 func (b *_MPropWriteConBuilder) WithMandatoryFields() MPropWriteConBuilder {

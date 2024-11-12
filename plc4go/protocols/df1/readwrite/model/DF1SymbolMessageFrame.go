@@ -127,6 +127,7 @@ var _ (DF1SymbolMessageFrameBuilder) = (*_DF1SymbolMessageFrameBuilder)(nil)
 
 func (b *_DF1SymbolMessageFrameBuilder) setParent(contract DF1SymbolContract) {
 	b.DF1SymbolContract = contract
+	contract.(*_DF1Symbol)._SubType = b._DF1SymbolMessageFrame
 }
 
 func (b *_DF1SymbolMessageFrameBuilder) WithMandatoryFields(destinationAddress uint8, sourceAddress uint8, command DF1Command) DF1SymbolMessageFrameBuilder {

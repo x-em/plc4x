@@ -104,6 +104,7 @@ var _ (JsonDataSetWriterMessageDataTypeBuilder) = (*_JsonDataSetWriterMessageDat
 
 func (b *_JsonDataSetWriterMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._JsonDataSetWriterMessageDataType
 }
 
 func (b *_JsonDataSetWriterMessageDataTypeBuilder) WithMandatoryFields(dataSetMessageContentMask JsonDataSetMessageContentMask) JsonDataSetWriterMessageDataTypeBuilder {

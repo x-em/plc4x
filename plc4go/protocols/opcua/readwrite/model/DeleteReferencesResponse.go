@@ -121,6 +121,7 @@ var _ (DeleteReferencesResponseBuilder) = (*_DeleteReferencesResponseBuilder)(ni
 
 func (b *_DeleteReferencesResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteReferencesResponse
 }
 
 func (b *_DeleteReferencesResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, results []StatusCode, diagnosticInfos []DiagnosticInfo) DeleteReferencesResponseBuilder {

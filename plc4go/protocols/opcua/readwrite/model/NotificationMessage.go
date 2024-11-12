@@ -116,6 +116,7 @@ var _ (NotificationMessageBuilder) = (*_NotificationMessageBuilder)(nil)
 
 func (b *_NotificationMessageBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._NotificationMessage
 }
 
 func (b *_NotificationMessageBuilder) WithMandatoryFields(sequenceNumber uint32, publishTime int64, notificationData []ExtensionObject) NotificationMessageBuilder {

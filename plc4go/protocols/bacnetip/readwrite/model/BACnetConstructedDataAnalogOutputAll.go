@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataAnalogOutputAllBuilder) = (*_BACnetConstructedDataAn
 
 func (b *_BACnetConstructedDataAnalogOutputAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAnalogOutputAll
 }
 
 func (b *_BACnetConstructedDataAnalogOutputAllBuilder) WithMandatoryFields() BACnetConstructedDataAnalogOutputAllBuilder {

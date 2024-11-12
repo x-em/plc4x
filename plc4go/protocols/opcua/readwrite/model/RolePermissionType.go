@@ -115,6 +115,7 @@ var _ (RolePermissionTypeBuilder) = (*_RolePermissionTypeBuilder)(nil)
 
 func (b *_RolePermissionTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RolePermissionType
 }
 
 func (b *_RolePermissionTypeBuilder) WithMandatoryFields(roleId NodeId, permissions PermissionType) RolePermissionTypeBuilder {

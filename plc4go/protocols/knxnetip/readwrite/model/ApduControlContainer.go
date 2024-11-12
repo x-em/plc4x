@@ -109,6 +109,7 @@ var _ (ApduControlContainerBuilder) = (*_ApduControlContainerBuilder)(nil)
 
 func (b *_ApduControlContainerBuilder) setParent(contract ApduContract) {
 	b.ApduContract = contract
+	contract.(*_Apdu)._SubType = b._ApduControlContainer
 }
 
 func (b *_ApduControlContainerBuilder) WithMandatoryFields(controlApdu ApduControl) ApduControlContainerBuilder {

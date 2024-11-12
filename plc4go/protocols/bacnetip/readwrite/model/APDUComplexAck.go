@@ -154,6 +154,7 @@ var _ (APDUComplexAckBuilder) = (*_APDUComplexAckBuilder)(nil)
 
 func (b *_APDUComplexAckBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUComplexAck
 }
 
 func (b *_APDUComplexAckBuilder) WithMandatoryFields(segmentedMessage bool, moreFollows bool, originalInvokeId uint8, segment []byte) APDUComplexAckBuilder {

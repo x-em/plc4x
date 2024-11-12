@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBACnetIPMulticastAddressBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataBACnetIPMulticastAddressBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBACnetIPMulticastAddress
 }
 
 func (b *_BACnetConstructedDataBACnetIPMulticastAddressBuilder) WithMandatoryFields(ipMulticastAddress BACnetApplicationTagOctetString) BACnetConstructedDataBACnetIPMulticastAddressBuilder {

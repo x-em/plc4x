@@ -128,6 +128,7 @@ var _ (QueryNextRequestBuilder) = (*_QueryNextRequestBuilder)(nil)
 
 func (b *_QueryNextRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._QueryNextRequest
 }
 
 func (b *_QueryNextRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, releaseContinuationPoint bool, continuationPoint PascalByteString) QueryNextRequestBuilder {

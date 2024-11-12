@@ -109,6 +109,7 @@ var _ (BACnetConfirmedServiceRequestDeleteObjectBuilder) = (*_BACnetConfirmedSer
 
 func (b *_BACnetConfirmedServiceRequestDeleteObjectBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestDeleteObject
 }
 
 func (b *_BACnetConfirmedServiceRequestDeleteObjectBuilder) WithMandatoryFields(objectIdentifier BACnetApplicationTagObjectIdentifier) BACnetConfirmedServiceRequestDeleteObjectBuilder {

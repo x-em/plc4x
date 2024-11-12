@@ -96,6 +96,7 @@ var _ (WriterGroupMessageDataTypeBuilder) = (*_WriterGroupMessageDataTypeBuilder
 
 func (b *_WriterGroupMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._WriterGroupMessageDataType
 }
 
 func (b *_WriterGroupMessageDataTypeBuilder) WithMandatoryFields() WriterGroupMessageDataTypeBuilder {

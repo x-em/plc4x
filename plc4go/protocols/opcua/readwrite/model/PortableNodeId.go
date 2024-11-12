@@ -120,6 +120,7 @@ var _ (PortableNodeIdBuilder) = (*_PortableNodeIdBuilder)(nil)
 
 func (b *_PortableNodeIdBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PortableNodeId
 }
 
 func (b *_PortableNodeIdBuilder) WithMandatoryFields(namespaceUri PascalString, identifier NodeId) PortableNodeIdBuilder {

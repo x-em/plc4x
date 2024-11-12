@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataUpdateKeySetTimeoutBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataUpdateKeySetTimeoutBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataUpdateKeySetTimeout
 }
 
 func (b *_BACnetConstructedDataUpdateKeySetTimeoutBuilder) WithMandatoryFields(updateKeySetTimeout BACnetApplicationTagUnsignedInteger) BACnetConstructedDataUpdateKeySetTimeoutBuilder {

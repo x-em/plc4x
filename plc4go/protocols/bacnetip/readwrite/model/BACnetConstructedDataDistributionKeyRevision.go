@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataDistributionKeyRevisionBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataDistributionKeyRevisionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDistributionKeyRevision
 }
 
 func (b *_BACnetConstructedDataDistributionKeyRevisionBuilder) WithMandatoryFields(distributionKeyRevision BACnetApplicationTagUnsignedInteger) BACnetConstructedDataDistributionKeyRevisionBuilder {

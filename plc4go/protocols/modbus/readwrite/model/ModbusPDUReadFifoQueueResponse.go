@@ -104,6 +104,7 @@ var _ (ModbusPDUReadFifoQueueResponseBuilder) = (*_ModbusPDUReadFifoQueueRespons
 
 func (b *_ModbusPDUReadFifoQueueResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUReadFifoQueueResponse
 }
 
 func (b *_ModbusPDUReadFifoQueueResponseBuilder) WithMandatoryFields(fifoValue []uint16) ModbusPDUReadFifoQueueResponseBuilder {

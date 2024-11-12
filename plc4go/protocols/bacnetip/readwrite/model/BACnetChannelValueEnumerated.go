@@ -109,6 +109,7 @@ var _ (BACnetChannelValueEnumeratedBuilder) = (*_BACnetChannelValueEnumeratedBui
 
 func (b *_BACnetChannelValueEnumeratedBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueEnumerated
 }
 
 func (b *_BACnetChannelValueEnumeratedBuilder) WithMandatoryFields(enumeratedValue BACnetApplicationTagEnumerated) BACnetChannelValueEnumeratedBuilder {

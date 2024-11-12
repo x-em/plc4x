@@ -153,6 +153,7 @@ var _ (BACnetNotificationParametersUnsignedRangeBuilder) = (*_BACnetNotification
 
 func (b *_BACnetNotificationParametersUnsignedRangeBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersUnsignedRange
 }
 
 func (b *_BACnetNotificationParametersUnsignedRangeBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, sequenceNumber BACnetContextTagUnsignedInteger, statusFlags BACnetStatusFlagsTagged, exceededLimit BACnetContextTagUnsignedInteger, innerClosingTag BACnetClosingTag) BACnetNotificationParametersUnsignedRangeBuilder {

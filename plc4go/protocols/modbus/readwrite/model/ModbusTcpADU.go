@@ -126,6 +126,7 @@ var _ (ModbusTcpADUBuilder) = (*_ModbusTcpADUBuilder)(nil)
 
 func (b *_ModbusTcpADUBuilder) setParent(contract ModbusADUContract) {
 	b.ModbusADUContract = contract
+	contract.(*_ModbusADU)._SubType = b._ModbusTcpADU
 }
 
 func (b *_ModbusTcpADUBuilder) WithMandatoryFields(transactionIdentifier uint16, unitIdentifier uint8, pdu ModbusPDU) ModbusTcpADUBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPassbackTimeoutBuilder) = (*_BACnetConstructedDataPa
 
 func (b *_BACnetConstructedDataPassbackTimeoutBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPassbackTimeout
 }
 
 func (b *_BACnetConstructedDataPassbackTimeoutBuilder) WithMandatoryFields(passbackTimeout BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPassbackTimeoutBuilder {

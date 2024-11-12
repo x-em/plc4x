@@ -109,6 +109,7 @@ var _ (BACnetChannelValueBooleanBuilder) = (*_BACnetChannelValueBooleanBuilder)(
 
 func (b *_BACnetChannelValueBooleanBuilder) setParent(contract BACnetChannelValueContract) {
 	b.BACnetChannelValueContract = contract
+	contract.(*_BACnetChannelValue)._SubType = b._BACnetChannelValueBoolean
 }
 
 func (b *_BACnetChannelValueBooleanBuilder) WithMandatoryFields(booleanValue BACnetApplicationTagBoolean) BACnetChannelValueBooleanBuilder {

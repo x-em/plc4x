@@ -165,6 +165,7 @@ var _ (FieldTargetDataTypeBuilder) = (*_FieldTargetDataTypeBuilder)(nil)
 
 func (b *_FieldTargetDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._FieldTargetDataType
 }
 
 func (b *_FieldTargetDataTypeBuilder) WithMandatoryFields(dataSetFieldId GuidValue, receiverIndexRange PascalString, targetNodeId NodeId, attributeId uint32, writeIndexRange PascalString, overrideValueHandling OverrideValueHandling, overrideValue Variant) FieldTargetDataTypeBuilder {

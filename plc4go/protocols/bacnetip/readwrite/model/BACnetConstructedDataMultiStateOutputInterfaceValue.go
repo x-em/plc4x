@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMultiStateOutputInterfaceValueBuilder) = (*_BACnetCo
 
 func (b *_BACnetConstructedDataMultiStateOutputInterfaceValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateOutputInterfaceValue
 }
 
 func (b *_BACnetConstructedDataMultiStateOutputInterfaceValueBuilder) WithMandatoryFields(interfaceValue BACnetOptionalBinaryPV) BACnetConstructedDataMultiStateOutputInterfaceValueBuilder {

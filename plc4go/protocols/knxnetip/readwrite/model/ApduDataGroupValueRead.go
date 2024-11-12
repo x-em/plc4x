@@ -100,6 +100,7 @@ var _ (ApduDataGroupValueReadBuilder) = (*_ApduDataGroupValueReadBuilder)(nil)
 
 func (b *_ApduDataGroupValueReadBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataGroupValueRead
 }
 
 func (b *_ApduDataGroupValueReadBuilder) WithMandatoryFields() ApduDataGroupValueReadBuilder {

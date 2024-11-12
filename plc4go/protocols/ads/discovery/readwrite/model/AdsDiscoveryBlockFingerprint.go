@@ -104,6 +104,7 @@ var _ (AdsDiscoveryBlockFingerprintBuilder) = (*_AdsDiscoveryBlockFingerprintBui
 
 func (b *_AdsDiscoveryBlockFingerprintBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockFingerprint
 }
 
 func (b *_AdsDiscoveryBlockFingerprintBuilder) WithMandatoryFields(data []byte) AdsDiscoveryBlockFingerprintBuilder {

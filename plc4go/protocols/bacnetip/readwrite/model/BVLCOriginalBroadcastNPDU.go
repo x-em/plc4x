@@ -114,6 +114,7 @@ var _ (BVLCOriginalBroadcastNPDUBuilder) = (*_BVLCOriginalBroadcastNPDUBuilder)(
 
 func (b *_BVLCOriginalBroadcastNPDUBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCOriginalBroadcastNPDU
 }
 
 func (b *_BVLCOriginalBroadcastNPDUBuilder) WithMandatoryFields(npdu NPDU) BVLCOriginalBroadcastNPDUBuilder {

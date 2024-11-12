@@ -96,6 +96,7 @@ var _ (SALDataTestingBuilder) = (*_SALDataTestingBuilder)(nil)
 
 func (b *_SALDataTestingBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataTesting
 }
 
 func (b *_SALDataTestingBuilder) WithMandatoryFields() SALDataTestingBuilder {

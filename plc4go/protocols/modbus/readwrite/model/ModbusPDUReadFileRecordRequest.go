@@ -104,6 +104,7 @@ var _ (ModbusPDUReadFileRecordRequestBuilder) = (*_ModbusPDUReadFileRecordReques
 
 func (b *_ModbusPDUReadFileRecordRequestBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUReadFileRecordRequest
 }
 
 func (b *_ModbusPDUReadFileRecordRequestBuilder) WithMandatoryFields(items []ModbusPDUReadFileRecordRequestItem) ModbusPDUReadFileRecordRequestBuilder {

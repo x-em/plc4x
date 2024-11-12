@@ -96,6 +96,7 @@ var _ (SALDataFreeUsageBuilder) = (*_SALDataFreeUsageBuilder)(nil)
 
 func (b *_SALDataFreeUsageBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataFreeUsage
 }
 
 func (b *_SALDataFreeUsageBuilder) WithMandatoryFields() SALDataFreeUsageBuilder {

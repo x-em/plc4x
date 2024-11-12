@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataFileAccessMethodBuilder) = (*_BACnetConstructedDataF
 
 func (b *_BACnetConstructedDataFileAccessMethodBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataFileAccessMethod
 }
 
 func (b *_BACnetConstructedDataFileAccessMethodBuilder) WithMandatoryFields(fileAccessMethod BACnetFileAccessMethodTagged) BACnetConstructedDataFileAccessMethodBuilder {

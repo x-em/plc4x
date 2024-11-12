@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataFDSubscriptionLifetimeBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataFDSubscriptionLifetimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataFDSubscriptionLifetime
 }
 
 func (b *_BACnetConstructedDataFDSubscriptionLifetimeBuilder) WithMandatoryFields(fdSubscriptionLifetime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataFDSubscriptionLifetimeBuilder {

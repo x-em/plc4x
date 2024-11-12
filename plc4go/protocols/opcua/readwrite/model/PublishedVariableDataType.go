@@ -161,6 +161,7 @@ var _ (PublishedVariableDataTypeBuilder) = (*_PublishedVariableDataTypeBuilder)(
 
 func (b *_PublishedVariableDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishedVariableDataType
 }
 
 func (b *_PublishedVariableDataTypeBuilder) WithMandatoryFields(publishedVariable NodeId, attributeId uint32, samplingIntervalHint float64, deadbandType uint32, deadbandValue float64, indexRange PascalString, substituteValue Variant, metaDataProperties []QualifiedName) PublishedVariableDataTypeBuilder {

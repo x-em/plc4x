@@ -130,6 +130,7 @@ var _ (S7ParameterModeTransitionBuilder) = (*_S7ParameterModeTransitionBuilder)(
 
 func (b *_S7ParameterModeTransitionBuilder) setParent(contract S7ParameterContract) {
 	b.S7ParameterContract = contract
+	contract.(*_S7Parameter)._SubType = b._S7ParameterModeTransition
 }
 
 func (b *_S7ParameterModeTransitionBuilder) WithMandatoryFields(method uint8, cpuFunctionType uint8, cpuFunctionGroup uint8, currentMode uint8, sequenceNumber uint8) S7ParameterModeTransitionBuilder {

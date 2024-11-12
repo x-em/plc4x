@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataNotificationForwarderAllBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataNotificationForwarderAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataNotificationForwarderAll
 }
 
 func (b *_BACnetConstructedDataNotificationForwarderAllBuilder) WithMandatoryFields() BACnetConstructedDataNotificationForwarderAllBuilder {

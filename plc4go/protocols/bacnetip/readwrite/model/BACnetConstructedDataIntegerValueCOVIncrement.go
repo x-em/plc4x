@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIntegerValueCOVIncrementBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataIntegerValueCOVIncrementBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIntegerValueCOVIncrement
 }
 
 func (b *_BACnetConstructedDataIntegerValueCOVIncrementBuilder) WithMandatoryFields(covIncrement BACnetApplicationTagUnsignedInteger) BACnetConstructedDataIntegerValueCOVIncrementBuilder {

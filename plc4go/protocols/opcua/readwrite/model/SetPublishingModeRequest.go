@@ -123,6 +123,7 @@ var _ (SetPublishingModeRequestBuilder) = (*_SetPublishingModeRequestBuilder)(ni
 
 func (b *_SetPublishingModeRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SetPublishingModeRequest
 }
 
 func (b *_SetPublishingModeRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, publishingEnabled bool, subscriptionIds []uint32) SetPublishingModeRequestBuilder {

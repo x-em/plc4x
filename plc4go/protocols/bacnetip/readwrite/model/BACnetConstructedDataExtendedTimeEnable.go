@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataExtendedTimeEnableBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataExtendedTimeEnableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataExtendedTimeEnable
 }
 
 func (b *_BACnetConstructedDataExtendedTimeEnableBuilder) WithMandatoryFields(extendedTimeEnable BACnetApplicationTagBoolean) BACnetConstructedDataExtendedTimeEnableBuilder {

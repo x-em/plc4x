@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBitStringValueRelinquishDefaultBuilder) = (*_BACnetC
 
 func (b *_BACnetConstructedDataBitStringValueRelinquishDefaultBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBitStringValueRelinquishDefault
 }
 
 func (b *_BACnetConstructedDataBitStringValueRelinquishDefaultBuilder) WithMandatoryFields(relinquishDefault BACnetApplicationTagBitString) BACnetConstructedDataBitStringValueRelinquishDefaultBuilder {

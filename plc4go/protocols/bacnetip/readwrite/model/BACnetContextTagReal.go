@@ -111,6 +111,7 @@ var _ (BACnetContextTagRealBuilder) = (*_BACnetContextTagRealBuilder)(nil)
 
 func (b *_BACnetContextTagRealBuilder) setParent(contract BACnetContextTagContract) {
 	b.BACnetContextTagContract = contract
+	contract.(*_BACnetContextTag)._SubType = b._BACnetContextTagReal
 }
 
 func (b *_BACnetContextTagRealBuilder) WithMandatoryFields(payload BACnetTagPayloadReal) BACnetContextTagRealBuilder {

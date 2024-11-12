@@ -104,6 +104,7 @@ var _ (EndpointUrlListDataTypeBuilder) = (*_EndpointUrlListDataTypeBuilder)(nil)
 
 func (b *_EndpointUrlListDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EndpointUrlListDataType
 }
 
 func (b *_EndpointUrlListDataTypeBuilder) WithMandatoryFields(endpointUrlList []PascalString) EndpointUrlListDataTypeBuilder {

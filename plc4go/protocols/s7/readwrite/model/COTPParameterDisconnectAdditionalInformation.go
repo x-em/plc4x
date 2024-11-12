@@ -104,6 +104,7 @@ var _ (COTPParameterDisconnectAdditionalInformationBuilder) = (*_COTPParameterDi
 
 func (b *_COTPParameterDisconnectAdditionalInformationBuilder) setParent(contract COTPParameterContract) {
 	b.COTPParameterContract = contract
+	contract.(*_COTPParameter)._SubType = b._COTPParameterDisconnectAdditionalInformation
 }
 
 func (b *_COTPParameterDisconnectAdditionalInformationBuilder) WithMandatoryFields(data []byte) COTPParameterDisconnectAdditionalInformationBuilder {

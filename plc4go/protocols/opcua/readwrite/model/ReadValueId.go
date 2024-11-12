@@ -137,6 +137,7 @@ var _ (ReadValueIdBuilder) = (*_ReadValueIdBuilder)(nil)
 
 func (b *_ReadValueIdBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadValueId
 }
 
 func (b *_ReadValueIdBuilder) WithMandatoryFields(nodeId NodeId, attributeId uint32, indexRange PascalString, dataEncoding QualifiedName) ReadValueIdBuilder {

@@ -109,6 +109,7 @@ var _ (BVLCReadBroadcastDistributionTableAckBuilder) = (*_BVLCReadBroadcastDistr
 
 func (b *_BVLCReadBroadcastDistributionTableAckBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCReadBroadcastDistributionTableAck
 }
 
 func (b *_BVLCReadBroadcastDistributionTableAckBuilder) WithMandatoryFields(table []BVLCBroadcastDistributionTableEntry) BVLCReadBroadcastDistributionTableAckBuilder {

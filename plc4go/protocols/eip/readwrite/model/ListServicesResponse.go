@@ -104,6 +104,7 @@ var _ (ListServicesResponseBuilder) = (*_ListServicesResponseBuilder)(nil)
 
 func (b *_ListServicesResponseBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._ListServicesResponse
 }
 
 func (b *_ListServicesResponseBuilder) WithMandatoryFields(typeIds []TypeId) ListServicesResponseBuilder {

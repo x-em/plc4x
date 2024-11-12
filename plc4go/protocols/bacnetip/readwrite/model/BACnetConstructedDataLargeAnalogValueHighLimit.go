@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLargeAnalogValueHighLimitBuilder) = (*_BACnetConstru
 
 func (b *_BACnetConstructedDataLargeAnalogValueHighLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLargeAnalogValueHighLimit
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueHighLimitBuilder) WithMandatoryFields(highLimit BACnetApplicationTagDouble) BACnetConstructedDataLargeAnalogValueHighLimitBuilder {

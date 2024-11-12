@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataArchiveBuilder) = (*_BACnetConstructedDataArchiveBui
 
 func (b *_BACnetConstructedDataArchiveBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataArchive
 }
 
 func (b *_BACnetConstructedDataArchiveBuilder) WithMandatoryFields(archive BACnetApplicationTagBoolean) BACnetConstructedDataArchiveBuilder {

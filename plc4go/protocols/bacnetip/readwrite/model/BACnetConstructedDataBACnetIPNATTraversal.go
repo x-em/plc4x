@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBACnetIPNATTraversalBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataBACnetIPNATTraversalBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBACnetIPNATTraversal
 }
 
 func (b *_BACnetConstructedDataBACnetIPNATTraversalBuilder) WithMandatoryFields(bacnetIPNATTraversal BACnetApplicationTagBoolean) BACnetConstructedDataBACnetIPNATTraversalBuilder {

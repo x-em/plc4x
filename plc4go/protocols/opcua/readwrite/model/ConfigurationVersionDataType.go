@@ -110,6 +110,7 @@ var _ (ConfigurationVersionDataTypeBuilder) = (*_ConfigurationVersionDataTypeBui
 
 func (b *_ConfigurationVersionDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ConfigurationVersionDataType
 }
 
 func (b *_ConfigurationVersionDataTypeBuilder) WithMandatoryFields(majorVersion uint32, minorVersion uint32) ConfigurationVersionDataTypeBuilder {

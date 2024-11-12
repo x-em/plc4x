@@ -135,6 +135,7 @@ var _ (ReadEventDetails2Builder) = (*_ReadEventDetails2Builder)(nil)
 
 func (b *_ReadEventDetails2Builder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadEventDetails2
 }
 
 func (b *_ReadEventDetails2Builder) WithMandatoryFields(numValuesPerNode uint32, startTime int64, endTime int64, filter EventFilter, readModified bool) ReadEventDetails2Builder {

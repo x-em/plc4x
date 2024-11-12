@@ -132,6 +132,7 @@ var _ (GetEndpointsRequestBuilder) = (*_GetEndpointsRequestBuilder)(nil)
 
 func (b *_GetEndpointsRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._GetEndpointsRequest
 }
 
 func (b *_GetEndpointsRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, endpointUrl PascalString, localeIds []PascalString, profileUris []PascalString) GetEndpointsRequestBuilder {

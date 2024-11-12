@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLockoutBuilder) = (*_BACnetConstructedDataLockoutBui
 
 func (b *_BACnetConstructedDataLockoutBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLockout
 }
 
 func (b *_BACnetConstructedDataLockoutBuilder) WithMandatoryFields(lockout BACnetApplicationTagBoolean) BACnetConstructedDataLockoutBuilder {

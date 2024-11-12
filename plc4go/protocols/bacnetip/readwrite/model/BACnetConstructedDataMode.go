@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataModeBuilder) = (*_BACnetConstructedDataModeBuilder)(
 
 func (b *_BACnetConstructedDataModeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMode
 }
 
 func (b *_BACnetConstructedDataModeBuilder) WithMandatoryFields(mode BACnetLifeSafetyModeTagged) BACnetConstructedDataModeBuilder {

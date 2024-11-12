@@ -131,6 +131,7 @@ var _ (AggregateConfigurationBuilder) = (*_AggregateConfigurationBuilder)(nil)
 
 func (b *_AggregateConfigurationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._AggregateConfiguration
 }
 
 func (b *_AggregateConfigurationBuilder) WithMandatoryFields(treatUncertainAsBad bool, useServerCapabilitiesDefaults bool, percentDataBad uint8, percentDataGood uint8, useSlopedExtrapolation bool) AggregateConfigurationBuilder {

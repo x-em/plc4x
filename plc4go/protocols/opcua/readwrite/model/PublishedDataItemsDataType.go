@@ -104,6 +104,7 @@ var _ (PublishedDataItemsDataTypeBuilder) = (*_PublishedDataItemsDataTypeBuilder
 
 func (b *_PublishedDataItemsDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishedDataItemsDataType
 }
 
 func (b *_PublishedDataItemsDataTypeBuilder) WithMandatoryFields(publishedData []PublishedVariableDataType) PublishedDataItemsDataTypeBuilder {

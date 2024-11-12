@@ -157,6 +157,7 @@ var _ (UadpDataSetReaderMessageDataTypeBuilder) = (*_UadpDataSetReaderMessageDat
 
 func (b *_UadpDataSetReaderMessageDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UadpDataSetReaderMessageDataType
 }
 
 func (b *_UadpDataSetReaderMessageDataTypeBuilder) WithMandatoryFields(groupVersion uint32, networkMessageNumber uint16, dataSetOffset uint16, dataSetClassId GuidValue, networkMessageContentMask UadpNetworkMessageContentMask, dataSetMessageContentMask UadpDataSetMessageContentMask, publishingInterval float64, receiveOffset float64, processingOffset float64) UadpDataSetReaderMessageDataTypeBuilder {

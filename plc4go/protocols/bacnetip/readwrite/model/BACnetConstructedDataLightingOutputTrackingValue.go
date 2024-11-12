@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLightingOutputTrackingValueBuilder) = (*_BACnetConst
 
 func (b *_BACnetConstructedDataLightingOutputTrackingValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLightingOutputTrackingValue
 }
 
 func (b *_BACnetConstructedDataLightingOutputTrackingValueBuilder) WithMandatoryFields(trackingValue BACnetApplicationTagReal) BACnetConstructedDataLightingOutputTrackingValueBuilder {

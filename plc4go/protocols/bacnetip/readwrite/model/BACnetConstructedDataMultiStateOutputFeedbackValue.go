@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMultiStateOutputFeedbackValueBuilder) = (*_BACnetCon
 
 func (b *_BACnetConstructedDataMultiStateOutputFeedbackValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateOutputFeedbackValue
 }
 
 func (b *_BACnetConstructedDataMultiStateOutputFeedbackValueBuilder) WithMandatoryFields(feedbackValue BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMultiStateOutputFeedbackValueBuilder {

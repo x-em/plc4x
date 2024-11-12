@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataFaultTypeBuilder) = (*_BACnetConstructedDataFaultTyp
 
 func (b *_BACnetConstructedDataFaultTypeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataFaultType
 }
 
 func (b *_BACnetConstructedDataFaultTypeBuilder) WithMandatoryFields(faultType BACnetFaultTypeTagged) BACnetConstructedDataFaultTypeBuilder {

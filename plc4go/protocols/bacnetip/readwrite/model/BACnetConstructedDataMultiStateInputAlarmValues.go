@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataMultiStateInputAlarmValuesBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataMultiStateInputAlarmValuesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateInputAlarmValues
 }
 
 func (b *_BACnetConstructedDataMultiStateInputAlarmValuesBuilder) WithMandatoryFields(alarmValues []BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMultiStateInputAlarmValuesBuilder {

@@ -120,6 +120,7 @@ var _ (MediaTransportControlDataRewindBuilder) = (*_MediaTransportControlDataRew
 
 func (b *_MediaTransportControlDataRewindBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataRewind
 }
 
 func (b *_MediaTransportControlDataRewindBuilder) WithMandatoryFields(operation byte) MediaTransportControlDataRewindBuilder {

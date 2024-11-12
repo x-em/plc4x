@@ -138,6 +138,7 @@ var _ (MonitoredItemCreateResultBuilder) = (*_MonitoredItemCreateResultBuilder)(
 
 func (b *_MonitoredItemCreateResultBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._MonitoredItemCreateResult
 }
 
 func (b *_MonitoredItemCreateResultBuilder) WithMandatoryFields(statusCode StatusCode, monitoredItemId uint32, revisedSamplingInterval float64, revisedQueueSize uint32, filterResult ExtensionObject) MonitoredItemCreateResultBuilder {

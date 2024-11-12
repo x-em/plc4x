@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataSerialNumberBuilder) = (*_BACnetConstructedDataSeria
 
 func (b *_BACnetConstructedDataSerialNumberBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSerialNumber
 }
 
 func (b *_BACnetConstructedDataSerialNumberBuilder) WithMandatoryFields(serialNumber BACnetApplicationTagCharacterString) BACnetConstructedDataSerialNumberBuilder {

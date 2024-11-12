@@ -172,6 +172,7 @@ var _ (PubSubKeyPushTargetDataTypeBuilder) = (*_PubSubKeyPushTargetDataTypeBuild
 
 func (b *_PubSubKeyPushTargetDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PubSubKeyPushTargetDataType
 }
 
 func (b *_PubSubKeyPushTargetDataTypeBuilder) WithMandatoryFields(applicationUri PascalString, pushTargetFolder []PascalString, endpointUrl PascalString, securityPolicyUri PascalString, userTokenType UserTokenPolicy, requestedKeyCount uint16, retryInterval float64, pushTargetProperties []KeyValuePair, securityGroups []PascalString) PubSubKeyPushTargetDataTypeBuilder {

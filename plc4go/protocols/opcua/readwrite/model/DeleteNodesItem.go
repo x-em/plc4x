@@ -117,6 +117,7 @@ var _ (DeleteNodesItemBuilder) = (*_DeleteNodesItemBuilder)(nil)
 
 func (b *_DeleteNodesItemBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteNodesItem
 }
 
 func (b *_DeleteNodesItemBuilder) WithMandatoryFields(nodeId NodeId, deleteTargetReferences bool) DeleteNodesItemBuilder {

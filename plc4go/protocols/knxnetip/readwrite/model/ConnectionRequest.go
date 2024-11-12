@@ -133,6 +133,7 @@ var _ (ConnectionRequestBuilder) = (*_ConnectionRequestBuilder)(nil)
 
 func (b *_ConnectionRequestBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._ConnectionRequest
 }
 
 func (b *_ConnectionRequestBuilder) WithMandatoryFields(hpaiDiscoveryEndpoint HPAIDiscoveryEndpoint, hpaiDataEndpoint HPAIDataEndpoint, connectionRequestInformation ConnectionRequestInformation) ConnectionRequestBuilder {

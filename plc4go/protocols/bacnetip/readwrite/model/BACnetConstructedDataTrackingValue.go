@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTrackingValueBuilder) = (*_BACnetConstructedDataTrac
 
 func (b *_BACnetConstructedDataTrackingValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTrackingValue
 }
 
 func (b *_BACnetConstructedDataTrackingValueBuilder) WithMandatoryFields(trackingValue BACnetLifeSafetyStateTagged) BACnetConstructedDataTrackingValueBuilder {

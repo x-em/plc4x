@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataTrendLogMultipleAllBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataTrendLogMultipleAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTrendLogMultipleAll
 }
 
 func (b *_BACnetConstructedDataTrendLogMultipleAllBuilder) WithMandatoryFields() BACnetConstructedDataTrendLogMultipleAllBuilder {

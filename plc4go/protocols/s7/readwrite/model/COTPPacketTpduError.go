@@ -110,6 +110,7 @@ var _ (COTPPacketTpduErrorBuilder) = (*_COTPPacketTpduErrorBuilder)(nil)
 
 func (b *_COTPPacketTpduErrorBuilder) setParent(contract COTPPacketContract) {
 	b.COTPPacketContract = contract
+	contract.(*_COTPPacket)._SubType = b._COTPPacketTpduError
 }
 
 func (b *_COTPPacketTpduErrorBuilder) WithMandatoryFields(destinationReference uint16, rejectCause uint8) COTPPacketTpduErrorBuilder {

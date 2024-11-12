@@ -123,6 +123,7 @@ var _ (LPollDataBuilder) = (*_LPollDataBuilder)(nil)
 
 func (b *_LPollDataBuilder) setParent(contract LDataFrameContract) {
 	b.LDataFrameContract = contract
+	contract.(*_LDataFrame)._SubType = b._LPollData
 }
 
 func (b *_LPollDataBuilder) WithMandatoryFields(sourceAddress KnxAddress, targetAddress []byte, numberExpectedPollData uint8) LPollDataBuilder {

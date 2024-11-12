@@ -96,6 +96,7 @@ var _ (NLMWhatIsNetworkNumberBuilder) = (*_NLMWhatIsNetworkNumberBuilder)(nil)
 
 func (b *_NLMWhatIsNetworkNumberBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMWhatIsNetworkNumber
 }
 
 func (b *_NLMWhatIsNetworkNumberBuilder) WithMandatoryFields() NLMWhatIsNetworkNumberBuilder {

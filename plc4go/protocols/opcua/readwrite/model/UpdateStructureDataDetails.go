@@ -121,6 +121,7 @@ var _ (UpdateStructureDataDetailsBuilder) = (*_UpdateStructureDataDetailsBuilder
 
 func (b *_UpdateStructureDataDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UpdateStructureDataDetails
 }
 
 func (b *_UpdateStructureDataDetailsBuilder) WithMandatoryFields(nodeId NodeId, performInsertReplace PerformUpdateType, updateValues []DataValue) UpdateStructureDataDetailsBuilder {

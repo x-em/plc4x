@@ -137,6 +137,7 @@ var _ (EnumFieldBuilder) = (*_EnumFieldBuilder)(nil)
 
 func (b *_EnumFieldBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EnumField
 }
 
 func (b *_EnumFieldBuilder) WithMandatoryFields(value int64, displayName LocalizedText, description LocalizedText, name PascalString) EnumFieldBuilder {

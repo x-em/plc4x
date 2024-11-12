@@ -110,6 +110,7 @@ var _ (DatagramWriterGroupTransportDataTypeBuilder) = (*_DatagramWriterGroupTran
 
 func (b *_DatagramWriterGroupTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DatagramWriterGroupTransportDataType
 }
 
 func (b *_DatagramWriterGroupTransportDataTypeBuilder) WithMandatoryFields(messageRepeatCount uint8, messageRepeatDelay float64) DatagramWriterGroupTransportDataTypeBuilder {

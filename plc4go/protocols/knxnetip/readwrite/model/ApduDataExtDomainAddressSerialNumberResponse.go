@@ -96,6 +96,7 @@ var _ (ApduDataExtDomainAddressSerialNumberResponseBuilder) = (*_ApduDataExtDoma
 
 func (b *_ApduDataExtDomainAddressSerialNumberResponseBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtDomainAddressSerialNumberResponse
 }
 
 func (b *_ApduDataExtDomainAddressSerialNumberResponseBuilder) WithMandatoryFields() ApduDataExtDomainAddressSerialNumberResponseBuilder {

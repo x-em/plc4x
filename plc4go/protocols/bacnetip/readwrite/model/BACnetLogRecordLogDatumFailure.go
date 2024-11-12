@@ -109,6 +109,7 @@ var _ (BACnetLogRecordLogDatumFailureBuilder) = (*_BACnetLogRecordLogDatumFailur
 
 func (b *_BACnetLogRecordLogDatumFailureBuilder) setParent(contract BACnetLogRecordLogDatumContract) {
 	b.BACnetLogRecordLogDatumContract = contract
+	contract.(*_BACnetLogRecordLogDatum)._SubType = b._BACnetLogRecordLogDatumFailure
 }
 
 func (b *_BACnetLogRecordLogDatumFailureBuilder) WithMandatoryFields(failure ErrorEnclosed) BACnetLogRecordLogDatumFailureBuilder {

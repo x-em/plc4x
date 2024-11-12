@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataIPDNSServerBuilder) = (*_BACnetConstructedDataIPDNSS
 
 func (b *_BACnetConstructedDataIPDNSServerBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPDNSServer
 }
 
 func (b *_BACnetConstructedDataIPDNSServerBuilder) WithMandatoryFields(ipDnsServer []BACnetApplicationTagOctetString) BACnetConstructedDataIPDNSServerBuilder {

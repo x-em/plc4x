@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder) = (*
 
 func (b *_BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTrendLogMultipleLogDeviceObjectProperty
 }
 
 func (b *_BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder) WithMandatoryFields(groupMembers []BACnetDeviceObjectPropertyReference) BACnetConstructedDataTrendLogMultipleLogDeviceObjectPropertyBuilder {

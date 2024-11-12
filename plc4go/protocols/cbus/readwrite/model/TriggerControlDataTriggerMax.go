@@ -96,6 +96,7 @@ var _ (TriggerControlDataTriggerMaxBuilder) = (*_TriggerControlDataTriggerMaxBui
 
 func (b *_TriggerControlDataTriggerMaxBuilder) setParent(contract TriggerControlDataContract) {
 	b.TriggerControlDataContract = contract
+	contract.(*_TriggerControlData)._SubType = b._TriggerControlDataTriggerMax
 }
 
 func (b *_TriggerControlDataTriggerMaxBuilder) WithMandatoryFields() TriggerControlDataTriggerMaxBuilder {

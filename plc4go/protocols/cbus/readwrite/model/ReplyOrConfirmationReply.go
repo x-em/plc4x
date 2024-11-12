@@ -120,6 +120,7 @@ var _ (ReplyOrConfirmationReplyBuilder) = (*_ReplyOrConfirmationReplyBuilder)(ni
 
 func (b *_ReplyOrConfirmationReplyBuilder) setParent(contract ReplyOrConfirmationContract) {
 	b.ReplyOrConfirmationContract = contract
+	contract.(*_ReplyOrConfirmation)._SubType = b._ReplyOrConfirmationReply
 }
 
 func (b *_ReplyOrConfirmationReplyBuilder) WithMandatoryFields(reply Reply, termination ResponseTermination) ReplyOrConfirmationReplyBuilder {

@@ -109,6 +109,7 @@ var _ (ParameterChangeReplyBuilder) = (*_ParameterChangeReplyBuilder)(nil)
 
 func (b *_ParameterChangeReplyBuilder) setParent(contract ReplyContract) {
 	b.ReplyContract = contract
+	contract.(*_Reply)._SubType = b._ParameterChangeReply
 }
 
 func (b *_ParameterChangeReplyBuilder) WithMandatoryFields(parameterChange ParameterChange) ParameterChangeReplyBuilder {

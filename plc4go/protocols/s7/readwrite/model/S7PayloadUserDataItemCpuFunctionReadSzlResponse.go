@@ -104,6 +104,7 @@ var _ (S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) = (*_S7PayloadUse
 
 func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemCpuFunctionReadSzlResponse
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) WithMandatoryFields(items []byte) S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPulseRateBuilder) = (*_BACnetConstructedDataPulseRat
 
 func (b *_BACnetConstructedDataPulseRateBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPulseRate
 }
 
 func (b *_BACnetConstructedDataPulseRateBuilder) WithMandatoryFields(pulseRate BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPulseRateBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAllWritesSuccessfulBuilder) = (*_BACnetConstructedDa
 
 func (b *_BACnetConstructedDataAllWritesSuccessfulBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAllWritesSuccessful
 }
 
 func (b *_BACnetConstructedDataAllWritesSuccessfulBuilder) WithMandatoryFields(allWritesSuccessful BACnetApplicationTagBoolean) BACnetConstructedDataAllWritesSuccessfulBuilder {

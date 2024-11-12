@@ -115,6 +115,7 @@ var _ (PublishRequestBuilder) = (*_PublishRequestBuilder)(nil)
 
 func (b *_PublishRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishRequest
 }
 
 func (b *_PublishRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, subscriptionAcknowledgements []SubscriptionAcknowledgement) PublishRequestBuilder {

@@ -137,6 +137,7 @@ var _ (EnumDescriptionBuilder) = (*_EnumDescriptionBuilder)(nil)
 
 func (b *_EnumDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EnumDescription
 }
 
 func (b *_EnumDescriptionBuilder) WithMandatoryFields(dataTypeId NodeId, name QualifiedName, enumDefinition EnumDefinition, builtInType uint8) EnumDescriptionBuilder {

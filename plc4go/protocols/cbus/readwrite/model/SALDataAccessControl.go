@@ -109,6 +109,7 @@ var _ (SALDataAccessControlBuilder) = (*_SALDataAccessControlBuilder)(nil)
 
 func (b *_SALDataAccessControlBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataAccessControl
 }
 
 func (b *_SALDataAccessControlBuilder) WithMandatoryFields(accessControlData AccessControlData) SALDataAccessControlBuilder {

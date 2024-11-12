@@ -150,6 +150,7 @@ var _ (UABinaryFileDataTypeBuilder) = (*_UABinaryFileDataTypeBuilder)(nil)
 
 func (b *_UABinaryFileDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UABinaryFileDataType
 }
 
 func (b *_UABinaryFileDataTypeBuilder) WithMandatoryFields(namespaces []PascalString, structureDataTypes []StructureDescription, enumDataTypes []EnumDescription, simpleDataTypes []SimpleTypeDescription, schemaLocation PascalString, fileHeader []KeyValuePair, body Variant) UABinaryFileDataTypeBuilder {

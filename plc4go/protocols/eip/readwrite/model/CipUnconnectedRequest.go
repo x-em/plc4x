@@ -148,6 +148,7 @@ var _ (CipUnconnectedRequestBuilder) = (*_CipUnconnectedRequestBuilder)(nil)
 
 func (b *_CipUnconnectedRequestBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipUnconnectedRequest
 }
 
 func (b *_CipUnconnectedRequestBuilder) WithMandatoryFields(classSegment PathSegment, instanceSegment PathSegment, unconnectedService CipService, backPlane int8, slot int8) CipUnconnectedRequestBuilder {

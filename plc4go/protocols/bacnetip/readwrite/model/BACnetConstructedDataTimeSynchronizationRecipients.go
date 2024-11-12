@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataTimeSynchronizationRecipientsBuilder) = (*_BACnetCon
 
 func (b *_BACnetConstructedDataTimeSynchronizationRecipientsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimeSynchronizationRecipients
 }
 
 func (b *_BACnetConstructedDataTimeSynchronizationRecipientsBuilder) WithMandatoryFields(timeSynchronizationRecipients []BACnetRecipient) BACnetConstructedDataTimeSynchronizationRecipientsBuilder {

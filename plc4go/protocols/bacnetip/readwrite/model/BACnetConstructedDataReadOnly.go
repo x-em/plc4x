@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataReadOnlyBuilder) = (*_BACnetConstructedDataReadOnlyB
 
 func (b *_BACnetConstructedDataReadOnlyBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataReadOnly
 }
 
 func (b *_BACnetConstructedDataReadOnlyBuilder) WithMandatoryFields(readOnly BACnetApplicationTagBoolean) BACnetConstructedDataReadOnlyBuilder {

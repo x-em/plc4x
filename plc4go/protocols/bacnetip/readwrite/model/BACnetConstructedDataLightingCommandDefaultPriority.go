@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLightingCommandDefaultPriorityBuilder) = (*_BACnetCo
 
 func (b *_BACnetConstructedDataLightingCommandDefaultPriorityBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLightingCommandDefaultPriority
 }
 
 func (b *_BACnetConstructedDataLightingCommandDefaultPriorityBuilder) WithMandatoryFields(lightingCommandDefaultPriority BACnetApplicationTagUnsignedInteger) BACnetConstructedDataLightingCommandDefaultPriorityBuilder {

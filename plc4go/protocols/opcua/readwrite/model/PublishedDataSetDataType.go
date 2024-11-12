@@ -143,6 +143,7 @@ var _ (PublishedDataSetDataTypeBuilder) = (*_PublishedDataSetDataTypeBuilder)(ni
 
 func (b *_PublishedDataSetDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PublishedDataSetDataType
 }
 
 func (b *_PublishedDataSetDataTypeBuilder) WithMandatoryFields(name PascalString, dataSetFolder []PascalString, dataSetMetaData DataSetMetaDataType, extensionFields []KeyValuePair, dataSetSource ExtensionObject) PublishedDataSetDataTypeBuilder {

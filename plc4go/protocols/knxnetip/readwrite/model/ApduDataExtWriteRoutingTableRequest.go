@@ -96,6 +96,7 @@ var _ (ApduDataExtWriteRoutingTableRequestBuilder) = (*_ApduDataExtWriteRoutingT
 
 func (b *_ApduDataExtWriteRoutingTableRequestBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtWriteRoutingTableRequest
 }
 
 func (b *_ApduDataExtWriteRoutingTableRequestBuilder) WithMandatoryFields() ApduDataExtWriteRoutingTableRequestBuilder {

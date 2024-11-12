@@ -109,6 +109,7 @@ var _ (ApduDataOtherBuilder) = (*_ApduDataOtherBuilder)(nil)
 
 func (b *_ApduDataOtherBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataOther
 }
 
 func (b *_ApduDataOtherBuilder) WithMandatoryFields(extendedApdu ApduDataExt) ApduDataOtherBuilder {

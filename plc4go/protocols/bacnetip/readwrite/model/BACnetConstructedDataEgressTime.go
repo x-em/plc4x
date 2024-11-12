@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataEgressTimeBuilder) = (*_BACnetConstructedDataEgressT
 
 func (b *_BACnetConstructedDataEgressTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataEgressTime
 }
 
 func (b *_BACnetConstructedDataEgressTimeBuilder) WithMandatoryFields(egressTime BACnetApplicationTagUnsignedInteger) BACnetConstructedDataEgressTimeBuilder {

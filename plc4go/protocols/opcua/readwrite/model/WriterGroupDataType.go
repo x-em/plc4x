@@ -221,6 +221,7 @@ var _ (WriterGroupDataTypeBuilder) = (*_WriterGroupDataTypeBuilder)(nil)
 
 func (b *_WriterGroupDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._WriterGroupDataType
 }
 
 func (b *_WriterGroupDataTypeBuilder) WithMandatoryFields(name PascalString, enabled bool, securityMode MessageSecurityMode, securityGroupId PascalString, securityKeyServices []EndpointDescription, maxNetworkMessageSize uint32, groupProperties []KeyValuePair, writerGroupId uint16, publishingInterval float64, keepAliveTime float64, priority uint8, localeIds []PascalString, headerLayoutUri PascalString, transportSettings ExtensionObject, messageSettings ExtensionObject, dataSetWriters []DataSetWriterDataType) WriterGroupDataTypeBuilder {

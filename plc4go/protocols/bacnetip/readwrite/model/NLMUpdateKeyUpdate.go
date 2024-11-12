@@ -169,6 +169,7 @@ var _ (NLMUpdateKeyUpdateBuilder) = (*_NLMUpdateKeyUpdateBuilder)(nil)
 
 func (b *_NLMUpdateKeyUpdateBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMUpdateKeyUpdate
 }
 
 func (b *_NLMUpdateKeyUpdateBuilder) WithMandatoryFields(controlFlags NLMUpdateKeyUpdateControlFlags, set1Keys []NLMUpdateKeyUpdateKeyEntry, set2Keys []NLMUpdateKeyUpdateKeyEntry) NLMUpdateKeyUpdateBuilder {

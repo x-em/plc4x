@@ -127,6 +127,7 @@ var _ (TriggerControlDataLabelBuilder) = (*_TriggerControlDataLabelBuilder)(nil)
 
 func (b *_TriggerControlDataLabelBuilder) setParent(contract TriggerControlDataContract) {
 	b.TriggerControlDataContract = contract
+	contract.(*_TriggerControlData)._SubType = b._TriggerControlDataLabel
 }
 
 func (b *_TriggerControlDataLabelBuilder) WithMandatoryFields(triggerControlOptions TriggerControlLabelOptions, actionSelector byte, data []byte) TriggerControlDataLabelBuilder {

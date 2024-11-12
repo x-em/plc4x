@@ -126,6 +126,7 @@ var _ (MonitoredItemCreateRequestBuilder) = (*_MonitoredItemCreateRequestBuilder
 
 func (b *_MonitoredItemCreateRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._MonitoredItemCreateRequest
 }
 
 func (b *_MonitoredItemCreateRequestBuilder) WithMandatoryFields(itemToMonitor ReadValueId, monitoringMode MonitoringMode, requestedParameters MonitoringParameters) MonitoredItemCreateRequestBuilder {

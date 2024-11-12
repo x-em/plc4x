@@ -120,6 +120,7 @@ var _ (CreateObjectErrorBuilder) = (*_CreateObjectErrorBuilder)(nil)
 
 func (b *_CreateObjectErrorBuilder) setParent(contract BACnetErrorContract) {
 	b.BACnetErrorContract = contract
+	contract.(*_BACnetError)._SubType = b._CreateObjectError
 }
 
 func (b *_CreateObjectErrorBuilder) WithMandatoryFields(errorType ErrorEnclosed, firstFailedElementNumber BACnetContextTagUnsignedInteger) CreateObjectErrorBuilder {

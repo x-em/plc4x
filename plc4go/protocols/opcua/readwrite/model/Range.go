@@ -110,6 +110,7 @@ var _ (RangeBuilder) = (*_RangeBuilder)(nil)
 
 func (b *_RangeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._Range
 }
 
 func (b *_RangeBuilder) WithMandatoryFields(low float64, high float64) RangeBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTimerResolutionBuilder) = (*_BACnetConstructedDataTi
 
 func (b *_BACnetConstructedDataTimerResolutionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimerResolution
 }
 
 func (b *_BACnetConstructedDataTimerResolutionBuilder) WithMandatoryFields(resolution BACnetApplicationTagUnsignedInteger) BACnetConstructedDataTimerResolutionBuilder {

@@ -177,6 +177,7 @@ var _ (BACnetNotificationParametersChangeOfTimerBuilder) = (*_BACnetNotification
 
 func (b *_BACnetNotificationParametersChangeOfTimerBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersChangeOfTimer
 }
 
 func (b *_BACnetNotificationParametersChangeOfTimerBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, newValue BACnetTimerStateTagged, statusFlags BACnetStatusFlagsTagged, updateTime BACnetDateTimeEnclosed, innerClosingTag BACnetClosingTag) BACnetNotificationParametersChangeOfTimerBuilder {

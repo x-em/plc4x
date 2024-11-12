@@ -120,6 +120,7 @@ var _ (CipConnectedResponseBuilder) = (*_CipConnectedResponseBuilder)(nil)
 
 func (b *_CipConnectedResponseBuilder) setParent(contract CipServiceContract) {
 	b.CipServiceContract = contract
+	contract.(*_CipService)._SubType = b._CipConnectedResponse
 }
 
 func (b *_CipConnectedResponseBuilder) WithMandatoryFields(status uint8, additionalStatusWords uint8) CipConnectedResponseBuilder {

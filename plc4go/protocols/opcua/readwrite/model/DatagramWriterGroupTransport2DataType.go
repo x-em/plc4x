@@ -155,6 +155,7 @@ var _ (DatagramWriterGroupTransport2DataTypeBuilder) = (*_DatagramWriterGroupTra
 
 func (b *_DatagramWriterGroupTransport2DataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DatagramWriterGroupTransport2DataType
 }
 
 func (b *_DatagramWriterGroupTransport2DataTypeBuilder) WithMandatoryFields(messageRepeatCount uint8, messageRepeatDelay float64, address ExtensionObject, qosCategory PascalString, datagramQos []ExtensionObject, discoveryAnnounceRate uint32, topic PascalString) DatagramWriterGroupTransport2DataTypeBuilder {

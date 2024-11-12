@@ -115,6 +115,7 @@ var _ (DeleteEventDetailsBuilder) = (*_DeleteEventDetailsBuilder)(nil)
 
 func (b *_DeleteEventDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteEventDetails
 }
 
 func (b *_DeleteEventDetailsBuilder) WithMandatoryFields(nodeId NodeId, eventIds []PascalByteString) DeleteEventDetailsBuilder {

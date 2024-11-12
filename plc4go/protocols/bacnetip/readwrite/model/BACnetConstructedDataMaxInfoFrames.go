@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMaxInfoFramesBuilder) = (*_BACnetConstructedDataMaxI
 
 func (b *_BACnetConstructedDataMaxInfoFramesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMaxInfoFrames
 }
 
 func (b *_BACnetConstructedDataMaxInfoFramesBuilder) WithMandatoryFields(maxInfoFrames BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMaxInfoFramesBuilder {

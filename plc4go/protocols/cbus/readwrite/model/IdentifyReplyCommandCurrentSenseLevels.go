@@ -104,6 +104,7 @@ var _ (IdentifyReplyCommandCurrentSenseLevelsBuilder) = (*_IdentifyReplyCommandC
 
 func (b *_IdentifyReplyCommandCurrentSenseLevelsBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandCurrentSenseLevels
 }
 
 func (b *_IdentifyReplyCommandCurrentSenseLevelsBuilder) WithMandatoryFields(currentSenseLevels []byte) IdentifyReplyCommandCurrentSenseLevelsBuilder {

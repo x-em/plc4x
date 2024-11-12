@@ -104,6 +104,7 @@ var _ (NLMReservedBuilder) = (*_NLMReservedBuilder)(nil)
 
 func (b *_NLMReservedBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMReserved
 }
 
 func (b *_NLMReservedBuilder) WithMandatoryFields(unknownBytes []byte) NLMReservedBuilder {

@@ -112,6 +112,7 @@ var _ (ReadAtTimeDetailsBuilder) = (*_ReadAtTimeDetailsBuilder)(nil)
 
 func (b *_ReadAtTimeDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadAtTimeDetails
 }
 
 func (b *_ReadAtTimeDetailsBuilder) WithMandatoryFields(reqTimes []int64, useSimpleBounds bool) ReadAtTimeDetailsBuilder {

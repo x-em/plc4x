@@ -96,6 +96,7 @@ var _ (DataSetWriterTransportDataTypeBuilder) = (*_DataSetWriterTransportDataTyp
 
 func (b *_DataSetWriterTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataSetWriterTransportDataType
 }
 
 func (b *_DataSetWriterTransportDataTypeBuilder) WithMandatoryFields() DataSetWriterTransportDataTypeBuilder {

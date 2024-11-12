@@ -109,6 +109,7 @@ var _ (ParameterValueCustomManufacturerBuilder) = (*_ParameterValueCustomManufac
 
 func (b *_ParameterValueCustomManufacturerBuilder) setParent(contract ParameterValueContract) {
 	b.ParameterValueContract = contract
+	contract.(*_ParameterValue)._SubType = b._ParameterValueCustomManufacturer
 }
 
 func (b *_ParameterValueCustomManufacturerBuilder) WithMandatoryFields(value CustomManufacturer) ParameterValueCustomManufacturerBuilder {

@@ -137,6 +137,7 @@ var _ (DatagramDataSetReaderTransportDataTypeBuilder) = (*_DatagramDataSetReader
 
 func (b *_DatagramDataSetReaderTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DatagramDataSetReaderTransportDataType
 }
 
 func (b *_DatagramDataSetReaderTransportDataTypeBuilder) WithMandatoryFields(address ExtensionObject, qosCategory PascalString, datagramQos []ExtensionObject, topic PascalString) DatagramDataSetReaderTransportDataTypeBuilder {

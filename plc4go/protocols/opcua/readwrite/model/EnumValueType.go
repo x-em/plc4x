@@ -126,6 +126,7 @@ var _ (EnumValueTypeBuilder) = (*_EnumValueTypeBuilder)(nil)
 
 func (b *_EnumValueTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._EnumValueType
 }
 
 func (b *_EnumValueTypeBuilder) WithMandatoryFields(value int64, displayName LocalizedText, description LocalizedText) EnumValueTypeBuilder {

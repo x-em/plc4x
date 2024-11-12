@@ -109,6 +109,7 @@ var _ (UnregisterNodesResponseBuilder) = (*_UnregisterNodesResponseBuilder)(nil)
 
 func (b *_UnregisterNodesResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UnregisterNodesResponse
 }
 
 func (b *_UnregisterNodesResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader) UnregisterNodesResponseBuilder {

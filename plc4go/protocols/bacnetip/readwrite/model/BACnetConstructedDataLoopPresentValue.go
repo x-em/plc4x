@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLoopPresentValueBuilder) = (*_BACnetConstructedDataL
 
 func (b *_BACnetConstructedDataLoopPresentValueBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLoopPresentValue
 }
 
 func (b *_BACnetConstructedDataLoopPresentValueBuilder) WithMandatoryFields(presentValue BACnetApplicationTagReal) BACnetConstructedDataLoopPresentValueBuilder {

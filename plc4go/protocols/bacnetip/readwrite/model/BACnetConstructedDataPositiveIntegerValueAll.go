@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataPositiveIntegerValueAllBuilder) = (*_BACnetConstruct
 
 func (b *_BACnetConstructedDataPositiveIntegerValueAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPositiveIntegerValueAll
 }
 
 func (b *_BACnetConstructedDataPositiveIntegerValueAllBuilder) WithMandatoryFields() BACnetConstructedDataPositiveIntegerValueAllBuilder {

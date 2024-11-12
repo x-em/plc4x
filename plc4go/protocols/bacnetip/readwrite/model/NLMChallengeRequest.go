@@ -116,6 +116,7 @@ var _ (NLMChallengeRequestBuilder) = (*_NLMChallengeRequestBuilder)(nil)
 
 func (b *_NLMChallengeRequestBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMChallengeRequest
 }
 
 func (b *_NLMChallengeRequestBuilder) WithMandatoryFields(messageChallenge byte, originalMessageId uint32, originalTimestamp uint32) NLMChallengeRequestBuilder {

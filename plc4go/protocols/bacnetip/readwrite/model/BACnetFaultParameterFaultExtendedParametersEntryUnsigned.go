@@ -109,6 +109,7 @@ var _ (BACnetFaultParameterFaultExtendedParametersEntryUnsignedBuilder) = (*_BAC
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryUnsignedBuilder) setParent(contract BACnetFaultParameterFaultExtendedParametersEntryContract) {
 	b.BACnetFaultParameterFaultExtendedParametersEntryContract = contract
+	contract.(*_BACnetFaultParameterFaultExtendedParametersEntry)._SubType = b._BACnetFaultParameterFaultExtendedParametersEntryUnsigned
 }
 
 func (b *_BACnetFaultParameterFaultExtendedParametersEntryUnsignedBuilder) WithMandatoryFields(unsignedValue BACnetApplicationTagUnsignedInteger) BACnetFaultParameterFaultExtendedParametersEntryUnsignedBuilder {

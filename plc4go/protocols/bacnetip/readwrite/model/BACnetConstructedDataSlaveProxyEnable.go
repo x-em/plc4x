@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataSlaveProxyEnableBuilder) = (*_BACnetConstructedDataS
 
 func (b *_BACnetConstructedDataSlaveProxyEnableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSlaveProxyEnable
 }
 
 func (b *_BACnetConstructedDataSlaveProxyEnableBuilder) WithMandatoryFields(slaveProxyEnable BACnetApplicationTagBoolean) BACnetConstructedDataSlaveProxyEnableBuilder {

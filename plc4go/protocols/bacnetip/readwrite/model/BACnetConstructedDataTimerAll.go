@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataTimerAllBuilder) = (*_BACnetConstructedDataTimerAllB
 
 func (b *_BACnetConstructedDataTimerAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTimerAll
 }
 
 func (b *_BACnetConstructedDataTimerAllBuilder) WithMandatoryFields() BACnetConstructedDataTimerAllBuilder {

@@ -116,6 +116,7 @@ var _ (IdentifyReplyCommandSummaryBuilder) = (*_IdentifyReplyCommandSummaryBuild
 
 func (b *_IdentifyReplyCommandSummaryBuilder) setParent(contract IdentifyReplyCommandContract) {
 	b.IdentifyReplyCommandContract = contract
+	contract.(*_IdentifyReplyCommand)._SubType = b._IdentifyReplyCommandSummary
 }
 
 func (b *_IdentifyReplyCommandSummaryBuilder) WithMandatoryFields(partName string, unitServiceType byte, version string) IdentifyReplyCommandSummaryBuilder {

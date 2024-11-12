@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataInstantaneousPowerBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataInstantaneousPowerBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataInstantaneousPower
 }
 
 func (b *_BACnetConstructedDataInstantaneousPowerBuilder) WithMandatoryFields(instantaneousPower BACnetApplicationTagReal) BACnetConstructedDataInstantaneousPowerBuilder {

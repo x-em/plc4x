@@ -112,6 +112,7 @@ var _ (RootExtensionObjectBuilder) = (*_RootExtensionObjectBuilder)(nil)
 
 func (b *_RootExtensionObjectBuilder) setParent(contract ExtensionObjectContract) {
 	b.ExtensionObjectContract = contract
+	contract.(*_ExtensionObject)._SubType = b._RootExtensionObject
 }
 
 func (b *_RootExtensionObjectBuilder) WithMandatoryFields(body ExtensionObjectDefinition) RootExtensionObjectBuilder {

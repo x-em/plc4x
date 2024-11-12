@@ -127,6 +127,7 @@ var _ (ModifyMonitoredItemsRequestBuilder) = (*_ModifyMonitoredItemsRequestBuild
 
 func (b *_ModifyMonitoredItemsRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ModifyMonitoredItemsRequest
 }
 
 func (b *_ModifyMonitoredItemsRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, subscriptionId uint32, timestampsToReturn TimestampsToReturn, itemsToModify []MonitoredItemModifyRequest) ModifyMonitoredItemsRequestBuilder {

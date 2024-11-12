@@ -110,6 +110,7 @@ var _ (VariantExpandedNodeIdBuilder) = (*_VariantExpandedNodeIdBuilder)(nil)
 
 func (b *_VariantExpandedNodeIdBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantExpandedNodeId
 }
 
 func (b *_VariantExpandedNodeIdBuilder) WithMandatoryFields(value []ExpandedNodeId) VariantExpandedNodeIdBuilder {

@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataFloorTextBuilder) = (*_BACnetConstructedDataFloorTex
 
 func (b *_BACnetConstructedDataFloorTextBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataFloorText
 }
 
 func (b *_BACnetConstructedDataFloorTextBuilder) WithMandatoryFields(floorText []BACnetApplicationTagCharacterString) BACnetConstructedDataFloorTextBuilder {

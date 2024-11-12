@@ -133,6 +133,7 @@ var _ (ReadProcessedDetailsBuilder) = (*_ReadProcessedDetailsBuilder)(nil)
 
 func (b *_ReadProcessedDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReadProcessedDetails
 }
 
 func (b *_ReadProcessedDetailsBuilder) WithMandatoryFields(startTime int64, endTime int64, processingInterval float64, aggregateType []NodeId, aggregateConfiguration AggregateConfiguration) ReadProcessedDetailsBuilder {

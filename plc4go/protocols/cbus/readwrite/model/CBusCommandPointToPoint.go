@@ -109,6 +109,7 @@ var _ (CBusCommandPointToPointBuilder) = (*_CBusCommandPointToPointBuilder)(nil)
 
 func (b *_CBusCommandPointToPointBuilder) setParent(contract CBusCommandContract) {
 	b.CBusCommandContract = contract
+	contract.(*_CBusCommand)._SubType = b._CBusCommandPointToPoint
 }
 
 func (b *_CBusCommandPointToPointBuilder) WithMandatoryFields(command CBusPointToPointCommand) CBusCommandPointToPointBuilder {

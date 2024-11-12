@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataExpectedShedLevelBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataExpectedShedLevelBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataExpectedShedLevel
 }
 
 func (b *_BACnetConstructedDataExpectedShedLevelBuilder) WithMandatoryFields(expectedShedLevel BACnetShedLevel) BACnetConstructedDataExpectedShedLevelBuilder {

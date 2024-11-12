@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataMACAddressBuilder) = (*_BACnetConstructedDataMACAddr
 
 func (b *_BACnetConstructedDataMACAddressBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMACAddress
 }
 
 func (b *_BACnetConstructedDataMACAddressBuilder) WithMandatoryFields(macAddress BACnetApplicationTagOctetString) BACnetConstructedDataMACAddressBuilder {

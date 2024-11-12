@@ -107,6 +107,7 @@ var _ (BACnetServiceAckAuthenticateBuilder) = (*_BACnetServiceAckAuthenticateBui
 
 func (b *_BACnetServiceAckAuthenticateBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckAuthenticate
 }
 
 func (b *_BACnetServiceAckAuthenticateBuilder) WithMandatoryFields(bytesOfRemovedService []byte) BACnetServiceAckAuthenticateBuilder {

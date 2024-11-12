@@ -147,6 +147,7 @@ var _ (BACnetConfirmedServiceRequestWritePropertyBuilder) = (*_BACnetConfirmedSe
 
 func (b *_BACnetConfirmedServiceRequestWritePropertyBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestWriteProperty
 }
 
 func (b *_BACnetConfirmedServiceRequestWritePropertyBuilder) WithMandatoryFields(objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged, propertyValue BACnetConstructedData) BACnetConfirmedServiceRequestWritePropertyBuilder {

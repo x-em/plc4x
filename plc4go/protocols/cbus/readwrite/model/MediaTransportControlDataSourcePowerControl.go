@@ -108,6 +108,7 @@ var _ (MediaTransportControlDataSourcePowerControlBuilder) = (*_MediaTransportCo
 
 func (b *_MediaTransportControlDataSourcePowerControlBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataSourcePowerControl
 }
 
 func (b *_MediaTransportControlDataSourcePowerControlBuilder) WithMandatoryFields(state byte) MediaTransportControlDataSourcePowerControlBuilder {

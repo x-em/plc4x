@@ -115,6 +115,7 @@ var _ (DeleteAtTimeDetailsBuilder) = (*_DeleteAtTimeDetailsBuilder)(nil)
 
 func (b *_DeleteAtTimeDetailsBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteAtTimeDetails
 }
 
 func (b *_DeleteAtTimeDetailsBuilder) WithMandatoryFields(nodeId NodeId, reqTimes []int64) DeleteAtTimeDetailsBuilder {

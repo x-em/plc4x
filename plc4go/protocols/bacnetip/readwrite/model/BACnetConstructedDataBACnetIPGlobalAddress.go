@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBACnetIPGlobalAddressBuilder) = (*_BACnetConstructed
 
 func (b *_BACnetConstructedDataBACnetIPGlobalAddressBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBACnetIPGlobalAddress
 }
 
 func (b *_BACnetConstructedDataBACnetIPGlobalAddressBuilder) WithMandatoryFields(bacnetIpGlobalAddress BACnetHostNPort) BACnetConstructedDataBACnetIPGlobalAddressBuilder {

@@ -104,6 +104,7 @@ var _ (CALDataIdentifyBuilder) = (*_CALDataIdentifyBuilder)(nil)
 
 func (b *_CALDataIdentifyBuilder) setParent(contract CALDataContract) {
 	b.CALDataContract = contract
+	contract.(*_CALData)._SubType = b._CALDataIdentify
 }
 
 func (b *_CALDataIdentifyBuilder) WithMandatoryFields(attribute Attribute) CALDataIdentifyBuilder {

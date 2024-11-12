@@ -96,6 +96,7 @@ var _ (MResetReqBuilder) = (*_MResetReqBuilder)(nil)
 
 func (b *_MResetReqBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._MResetReq
 }
 
 func (b *_MResetReqBuilder) WithMandatoryFields() MResetReqBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataIPv6AddressBuilder) = (*_BACnetConstructedDataIPv6Ad
 
 func (b *_BACnetConstructedDataIPv6AddressBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataIPv6Address
 }
 
 func (b *_BACnetConstructedDataIPv6AddressBuilder) WithMandatoryFields(ipv6Address BACnetApplicationTagOctetString) BACnetConstructedDataIPv6AddressBuilder {

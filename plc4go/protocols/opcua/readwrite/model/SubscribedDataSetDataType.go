@@ -96,6 +96,7 @@ var _ (SubscribedDataSetDataTypeBuilder) = (*_SubscribedDataSetDataTypeBuilder)(
 
 func (b *_SubscribedDataSetDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._SubscribedDataSetDataType
 }
 
 func (b *_SubscribedDataSetDataTypeBuilder) WithMandatoryFields() SubscribedDataSetDataTypeBuilder {

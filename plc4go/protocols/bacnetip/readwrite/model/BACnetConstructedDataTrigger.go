@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTriggerBuilder) = (*_BACnetConstructedDataTriggerBui
 
 func (b *_BACnetConstructedDataTriggerBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTrigger
 }
 
 func (b *_BACnetConstructedDataTriggerBuilder) WithMandatoryFields(trigger BACnetApplicationTagBoolean) BACnetConstructedDataTriggerBuilder {

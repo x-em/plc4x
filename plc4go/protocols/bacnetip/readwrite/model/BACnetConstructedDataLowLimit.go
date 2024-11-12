@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLowLimitBuilder) = (*_BACnetConstructedDataLowLimitB
 
 func (b *_BACnetConstructedDataLowLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLowLimit
 }
 
 func (b *_BACnetConstructedDataLowLimitBuilder) WithMandatoryFields(lowLimit BACnetApplicationTagReal) BACnetConstructedDataLowLimitBuilder {

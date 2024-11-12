@@ -99,6 +99,7 @@ var _ (NullExtensionObjectWithMaskBuilder) = (*_NullExtensionObjectWithMaskBuild
 
 func (b *_NullExtensionObjectWithMaskBuilder) setParent(contract ExtensionObjectWithMaskContract) {
 	b.ExtensionObjectWithMaskContract = contract
+	contract.(*_ExtensionObjectWithMask)._SubType = b._NullExtensionObjectWithMask
 }
 
 func (b *_NullExtensionObjectWithMaskBuilder) WithMandatoryFields() NullExtensionObjectWithMaskBuilder {

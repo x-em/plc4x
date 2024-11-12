@@ -96,6 +96,7 @@ var _ (SALDataRoomControlSystemBuilder) = (*_SALDataRoomControlSystemBuilder)(ni
 
 func (b *_SALDataRoomControlSystemBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataRoomControlSystem
 }
 
 func (b *_SALDataRoomControlSystemBuilder) WithMandatoryFields() SALDataRoomControlSystemBuilder {

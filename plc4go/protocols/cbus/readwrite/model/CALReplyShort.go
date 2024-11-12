@@ -96,6 +96,7 @@ var _ (CALReplyShortBuilder) = (*_CALReplyShortBuilder)(nil)
 
 func (b *_CALReplyShortBuilder) setParent(contract CALReplyContract) {
 	b.CALReplyContract = contract
+	contract.(*_CALReply)._SubType = b._CALReplyShort
 }
 
 func (b *_CALReplyShortBuilder) WithMandatoryFields() CALReplyShortBuilder {

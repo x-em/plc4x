@@ -109,6 +109,7 @@ var _ (BACnetApplicationTagTimeBuilder) = (*_BACnetApplicationTagTimeBuilder)(ni
 
 func (b *_BACnetApplicationTagTimeBuilder) setParent(contract BACnetApplicationTagContract) {
 	b.BACnetApplicationTagContract = contract
+	contract.(*_BACnetApplicationTag)._SubType = b._BACnetApplicationTagTime
 }
 
 func (b *_BACnetApplicationTagTimeBuilder) WithMandatoryFields(payload BACnetTagPayloadTime) BACnetApplicationTagTimeBuilder {

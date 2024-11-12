@@ -109,6 +109,7 @@ var _ (BACnetFaultParameterNoneBuilder) = (*_BACnetFaultParameterNoneBuilder)(ni
 
 func (b *_BACnetFaultParameterNoneBuilder) setParent(contract BACnetFaultParameterContract) {
 	b.BACnetFaultParameterContract = contract
+	contract.(*_BACnetFaultParameter)._SubType = b._BACnetFaultParameterNone
 }
 
 func (b *_BACnetFaultParameterNoneBuilder) WithMandatoryFields(none BACnetContextTagNull) BACnetFaultParameterNoneBuilder {

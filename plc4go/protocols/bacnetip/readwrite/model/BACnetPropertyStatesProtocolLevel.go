@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesProtocolLevelBuilder) = (*_BACnetPropertyStatesProtoc
 
 func (b *_BACnetPropertyStatesProtocolLevelBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesProtocolLevel
 }
 
 func (b *_BACnetPropertyStatesProtocolLevelBuilder) WithMandatoryFields(protocolLevel BACnetProtocolLevelTagged) BACnetPropertyStatesProtocolLevelBuilder {

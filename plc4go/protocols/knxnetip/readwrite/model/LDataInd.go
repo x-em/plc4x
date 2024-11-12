@@ -121,6 +121,7 @@ var _ (LDataIndBuilder) = (*_LDataIndBuilder)(nil)
 
 func (b *_LDataIndBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._LDataInd
 }
 
 func (b *_LDataIndBuilder) WithMandatoryFields(additionalInformationLength uint8, additionalInformation []CEMIAdditionalInformation, dataFrame LDataFrame) LDataIndBuilder {

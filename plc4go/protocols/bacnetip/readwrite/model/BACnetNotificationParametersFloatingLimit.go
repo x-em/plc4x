@@ -164,6 +164,7 @@ var _ (BACnetNotificationParametersFloatingLimitBuilder) = (*_BACnetNotification
 
 func (b *_BACnetNotificationParametersFloatingLimitBuilder) setParent(contract BACnetNotificationParametersContract) {
 	b.BACnetNotificationParametersContract = contract
+	contract.(*_BACnetNotificationParameters)._SubType = b._BACnetNotificationParametersFloatingLimit
 }
 
 func (b *_BACnetNotificationParametersFloatingLimitBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, referenceValue BACnetContextTagReal, statusFlags BACnetStatusFlagsTagged, setPointValue BACnetContextTagReal, errorLimit BACnetContextTagReal, innerClosingTag BACnetClosingTag) BACnetNotificationParametersFloatingLimitBuilder {

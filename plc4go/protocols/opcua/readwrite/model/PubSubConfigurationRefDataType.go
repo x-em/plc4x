@@ -122,6 +122,7 @@ var _ (PubSubConfigurationRefDataTypeBuilder) = (*_PubSubConfigurationRefDataTyp
 
 func (b *_PubSubConfigurationRefDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PubSubConfigurationRefDataType
 }
 
 func (b *_PubSubConfigurationRefDataTypeBuilder) WithMandatoryFields(configurationMask PubSubConfigurationRefMask, elementIndex uint16, connectionIndex uint16, groupIndex uint16) PubSubConfigurationRefDataTypeBuilder {

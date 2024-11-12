@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataChangesPendingBuilder) = (*_BACnetConstructedDataCha
 
 func (b *_BACnetConstructedDataChangesPendingBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataChangesPending
 }
 
 func (b *_BACnetConstructedDataChangesPendingBuilder) WithMandatoryFields(changesPending BACnetApplicationTagBoolean) BACnetConstructedDataChangesPendingBuilder {

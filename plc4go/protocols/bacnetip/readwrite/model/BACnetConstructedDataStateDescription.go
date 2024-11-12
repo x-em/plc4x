@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataStateDescriptionBuilder) = (*_BACnetConstructedDataS
 
 func (b *_BACnetConstructedDataStateDescriptionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataStateDescription
 }
 
 func (b *_BACnetConstructedDataStateDescriptionBuilder) WithMandatoryFields(stateDescription BACnetApplicationTagCharacterString) BACnetConstructedDataStateDescriptionBuilder {

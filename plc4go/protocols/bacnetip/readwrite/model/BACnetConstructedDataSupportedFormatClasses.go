@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataSupportedFormatClassesBuilder) = (*_BACnetConstructe
 
 func (b *_BACnetConstructedDataSupportedFormatClassesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSupportedFormatClasses
 }
 
 func (b *_BACnetConstructedDataSupportedFormatClassesBuilder) WithMandatoryFields(supportedFormats []BACnetApplicationTagUnsignedInteger) BACnetConstructedDataSupportedFormatClassesBuilder {

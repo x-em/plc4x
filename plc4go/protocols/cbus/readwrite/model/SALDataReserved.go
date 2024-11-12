@@ -96,6 +96,7 @@ var _ (SALDataReservedBuilder) = (*_SALDataReservedBuilder)(nil)
 
 func (b *_SALDataReservedBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataReserved
 }
 
 func (b *_SALDataReservedBuilder) WithMandatoryFields() SALDataReservedBuilder {

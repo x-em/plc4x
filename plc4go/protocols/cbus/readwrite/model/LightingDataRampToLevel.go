@@ -110,6 +110,7 @@ var _ (LightingDataRampToLevelBuilder) = (*_LightingDataRampToLevelBuilder)(nil)
 
 func (b *_LightingDataRampToLevelBuilder) setParent(contract LightingDataContract) {
 	b.LightingDataContract = contract
+	contract.(*_LightingData)._SubType = b._LightingDataRampToLevel
 }
 
 func (b *_LightingDataRampToLevelBuilder) WithMandatoryFields(group byte, level byte) LightingDataRampToLevelBuilder {

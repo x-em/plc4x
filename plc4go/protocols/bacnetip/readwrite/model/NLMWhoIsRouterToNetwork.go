@@ -104,6 +104,7 @@ var _ (NLMWhoIsRouterToNetworkBuilder) = (*_NLMWhoIsRouterToNetworkBuilder)(nil)
 
 func (b *_NLMWhoIsRouterToNetworkBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMWhoIsRouterToNetwork
 }
 
 func (b *_NLMWhoIsRouterToNetworkBuilder) WithMandatoryFields() NLMWhoIsRouterToNetworkBuilder {

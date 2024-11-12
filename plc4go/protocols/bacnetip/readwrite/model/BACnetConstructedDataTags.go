@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataTagsBuilder) = (*_BACnetConstructedDataTagsBuilder)(
 
 func (b *_BACnetConstructedDataTagsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTags
 }
 
 func (b *_BACnetConstructedDataTagsBuilder) WithMandatoryFields(tags []BACnetNameValue) BACnetConstructedDataTagsBuilder {

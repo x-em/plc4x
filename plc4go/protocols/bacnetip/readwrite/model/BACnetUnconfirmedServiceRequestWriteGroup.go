@@ -139,6 +139,7 @@ var _ (BACnetUnconfirmedServiceRequestWriteGroupBuilder) = (*_BACnetUnconfirmedS
 
 func (b *_BACnetUnconfirmedServiceRequestWriteGroupBuilder) setParent(contract BACnetUnconfirmedServiceRequestContract) {
 	b.BACnetUnconfirmedServiceRequestContract = contract
+	contract.(*_BACnetUnconfirmedServiceRequest)._SubType = b._BACnetUnconfirmedServiceRequestWriteGroup
 }
 
 func (b *_BACnetUnconfirmedServiceRequestWriteGroupBuilder) WithMandatoryFields(groupNumber BACnetContextTagUnsignedInteger, writePriority BACnetContextTagUnsignedInteger, changeList BACnetGroupChannelValueList) BACnetUnconfirmedServiceRequestWriteGroupBuilder {

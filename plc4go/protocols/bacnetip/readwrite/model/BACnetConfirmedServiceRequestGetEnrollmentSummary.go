@@ -149,6 +149,7 @@ var _ (BACnetConfirmedServiceRequestGetEnrollmentSummaryBuilder) = (*_BACnetConf
 
 func (b *_BACnetConfirmedServiceRequestGetEnrollmentSummaryBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestGetEnrollmentSummary
 }
 
 func (b *_BACnetConfirmedServiceRequestGetEnrollmentSummaryBuilder) WithMandatoryFields(acknowledgmentFilter BACnetConfirmedServiceRequestGetEnrollmentSummaryAcknowledgementFilterTagged) BACnetConfirmedServiceRequestGetEnrollmentSummaryBuilder {

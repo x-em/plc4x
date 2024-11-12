@@ -144,6 +144,7 @@ var _ (OpenSecureChannelRequestBuilder) = (*_OpenSecureChannelRequestBuilder)(ni
 
 func (b *_OpenSecureChannelRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._OpenSecureChannelRequest
 }
 
 func (b *_OpenSecureChannelRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, clientProtocolVersion uint32, requestType SecurityTokenRequestType, securityMode MessageSecurityMode, clientNonce PascalByteString, requestedLifetime uint32) OpenSecureChannelRequestBuilder {

@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataLifeSafetyPointAlarmValuesBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataLifeSafetyPointAlarmValuesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLifeSafetyPointAlarmValues
 }
 
 func (b *_BACnetConstructedDataLifeSafetyPointAlarmValuesBuilder) WithMandatoryFields(alarmValues []BACnetLifeSafetyStateTagged) BACnetConstructedDataLifeSafetyPointAlarmValuesBuilder {

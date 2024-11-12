@@ -406,6 +406,7 @@ var _ (${type.name}Builder) = (*_${type.name}Builder)(nil)
 	<#assign parentType=type.getParentType().orElseThrow()>
 func (b *_${type.name}Builder) setParent(contract ${parentType.name}Contract) {
 	b.${parentType.name}Contract = contract
+	contract.(*_${parentType.name})._SubType = b._${type.name}
 }
 </#if>
 

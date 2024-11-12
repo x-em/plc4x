@@ -96,6 +96,7 @@ var _ (ApduDataAdcResponseBuilder) = (*_ApduDataAdcResponseBuilder)(nil)
 
 func (b *_ApduDataAdcResponseBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataAdcResponse
 }
 
 func (b *_ApduDataAdcResponseBuilder) WithMandatoryFields() ApduDataAdcResponseBuilder {

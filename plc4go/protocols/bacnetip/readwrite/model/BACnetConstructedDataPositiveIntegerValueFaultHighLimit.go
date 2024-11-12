@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPositiveIntegerValueFaultHighLimitBuilder) = (*_BACn
 
 func (b *_BACnetConstructedDataPositiveIntegerValueFaultHighLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPositiveIntegerValueFaultHighLimit
 }
 
 func (b *_BACnetConstructedDataPositiveIntegerValueFaultHighLimitBuilder) WithMandatoryFields(faultHighLimit BACnetApplicationTagUnsignedInteger) BACnetConstructedDataPositiveIntegerValueFaultHighLimitBuilder {

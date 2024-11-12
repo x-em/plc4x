@@ -242,6 +242,7 @@ var _ (DataSetReaderDataTypeBuilder) = (*_DataSetReaderDataTypeBuilder)(nil)
 
 func (b *_DataSetReaderDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataSetReaderDataType
 }
 
 func (b *_DataSetReaderDataTypeBuilder) WithMandatoryFields(name PascalString, enabled bool, publisherId Variant, writerGroupId uint16, dataSetWriterId uint16, dataSetMetaData DataSetMetaDataType, dataSetFieldContentMask DataSetFieldContentMask, messageReceiveTimeout float64, keyFrameCount uint32, headerLayoutUri PascalString, securityMode MessageSecurityMode, securityGroupId PascalString, securityKeyServices []EndpointDescription, dataSetReaderProperties []KeyValuePair, transportSettings ExtensionObject, messageSettings ExtensionObject, subscribedDataSet ExtensionObject) DataSetReaderDataTypeBuilder {

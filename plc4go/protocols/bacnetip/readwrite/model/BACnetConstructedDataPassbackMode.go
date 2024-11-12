@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataPassbackModeBuilder) = (*_BACnetConstructedDataPassb
 
 func (b *_BACnetConstructedDataPassbackModeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPassbackMode
 }
 
 func (b *_BACnetConstructedDataPassbackModeBuilder) WithMandatoryFields(passbackMode BACnetAccessPassbackModeTagged) BACnetConstructedDataPassbackModeBuilder {

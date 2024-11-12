@@ -109,6 +109,7 @@ var _ (BACnetEventParameterNoneBuilder) = (*_BACnetEventParameterNoneBuilder)(ni
 
 func (b *_BACnetEventParameterNoneBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterNone
 }
 
 func (b *_BACnetEventParameterNoneBuilder) WithMandatoryFields(none BACnetContextTagNull) BACnetEventParameterNoneBuilder {

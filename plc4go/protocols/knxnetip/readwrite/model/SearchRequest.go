@@ -111,6 +111,7 @@ var _ (SearchRequestBuilder) = (*_SearchRequestBuilder)(nil)
 
 func (b *_SearchRequestBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._SearchRequest
 }
 
 func (b *_SearchRequestBuilder) WithMandatoryFields(hpaiIDiscoveryEndpoint HPAIDiscoveryEndpoint) SearchRequestBuilder {

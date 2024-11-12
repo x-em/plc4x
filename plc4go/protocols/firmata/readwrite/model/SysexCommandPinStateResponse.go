@@ -116,6 +116,7 @@ var _ (SysexCommandPinStateResponseBuilder) = (*_SysexCommandPinStateResponseBui
 
 func (b *_SysexCommandPinStateResponseBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandPinStateResponse
 }
 
 func (b *_SysexCommandPinStateResponseBuilder) WithMandatoryFields(pin uint8, pinMode uint8, pinState uint8) SysexCommandPinStateResponseBuilder {

@@ -115,6 +115,7 @@ var _ (UnregisterNodesRequestBuilder) = (*_UnregisterNodesRequestBuilder)(nil)
 
 func (b *_UnregisterNodesRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UnregisterNodesRequest
 }
 
 func (b *_UnregisterNodesRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, nodesToUnregister []NodeId) UnregisterNodesRequestBuilder {

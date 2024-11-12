@@ -110,6 +110,7 @@ var _ (DoubleComplexNumberTypeBuilder) = (*_DoubleComplexNumberTypeBuilder)(nil)
 
 func (b *_DoubleComplexNumberTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DoubleComplexNumberType
 }
 
 func (b *_DoubleComplexNumberTypeBuilder) WithMandatoryFields(real float64, imaginary float64) DoubleComplexNumberTypeBuilder {

@@ -109,6 +109,7 @@ var _ (BACnetPriorityValueCharacterStringBuilder) = (*_BACnetPriorityValueCharac
 
 func (b *_BACnetPriorityValueCharacterStringBuilder) setParent(contract BACnetPriorityValueContract) {
 	b.BACnetPriorityValueContract = contract
+	contract.(*_BACnetPriorityValue)._SubType = b._BACnetPriorityValueCharacterString
 }
 
 func (b *_BACnetPriorityValueCharacterStringBuilder) WithMandatoryFields(characterStringValue BACnetApplicationTagCharacterString) BACnetPriorityValueCharacterStringBuilder {

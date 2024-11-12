@@ -108,6 +108,7 @@ var _ (TelephonyDataRecallLastNumberRequestBuilder) = (*_TelephonyDataRecallLast
 
 func (b *_TelephonyDataRecallLastNumberRequestBuilder) setParent(contract TelephonyDataContract) {
 	b.TelephonyDataContract = contract
+	contract.(*_TelephonyData)._SubType = b._TelephonyDataRecallLastNumberRequest
 }
 
 func (b *_TelephonyDataRecallLastNumberRequestBuilder) WithMandatoryFields(recallLastNumberType byte) TelephonyDataRecallLastNumberRequestBuilder {

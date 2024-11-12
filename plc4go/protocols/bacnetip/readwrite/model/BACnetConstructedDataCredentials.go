@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataCredentialsBuilder) = (*_BACnetConstructedDataCreden
 
 func (b *_BACnetConstructedDataCredentialsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCredentials
 }
 
 func (b *_BACnetConstructedDataCredentialsBuilder) WithMandatoryFields(credentials []BACnetDeviceObjectReference) BACnetConstructedDataCredentialsBuilder {

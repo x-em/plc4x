@@ -120,6 +120,7 @@ var _ (RepublishResponseBuilder) = (*_RepublishResponseBuilder)(nil)
 
 func (b *_RepublishResponseBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RepublishResponse
 }
 
 func (b *_RepublishResponseBuilder) WithMandatoryFields(responseHeader ResponseHeader, notificationMessage NotificationMessage) RepublishResponseBuilder {

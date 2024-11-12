@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBaseDeviceSecurityPolicyBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataBaseDeviceSecurityPolicyBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBaseDeviceSecurityPolicy
 }
 
 func (b *_BACnetConstructedDataBaseDeviceSecurityPolicyBuilder) WithMandatoryFields(baseDeviceSecurityPolicy BACnetSecurityLevelTagged) BACnetConstructedDataBaseDeviceSecurityPolicyBuilder {

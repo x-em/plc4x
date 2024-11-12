@@ -109,6 +109,7 @@ var _ (BACnetLandingCallStatusCommandDestinationBuilder) = (*_BACnetLandingCallS
 
 func (b *_BACnetLandingCallStatusCommandDestinationBuilder) setParent(contract BACnetLandingCallStatusCommandContract) {
 	b.BACnetLandingCallStatusCommandContract = contract
+	contract.(*_BACnetLandingCallStatusCommand)._SubType = b._BACnetLandingCallStatusCommandDestination
 }
 
 func (b *_BACnetLandingCallStatusCommandDestinationBuilder) WithMandatoryFields(destination BACnetContextTagUnsignedInteger) BACnetLandingCallStatusCommandDestinationBuilder {

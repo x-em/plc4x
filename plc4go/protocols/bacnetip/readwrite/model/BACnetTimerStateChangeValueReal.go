@@ -109,6 +109,7 @@ var _ (BACnetTimerStateChangeValueRealBuilder) = (*_BACnetTimerStateChangeValueR
 
 func (b *_BACnetTimerStateChangeValueRealBuilder) setParent(contract BACnetTimerStateChangeValueContract) {
 	b.BACnetTimerStateChangeValueContract = contract
+	contract.(*_BACnetTimerStateChangeValue)._SubType = b._BACnetTimerStateChangeValueReal
 }
 
 func (b *_BACnetTimerStateChangeValueRealBuilder) WithMandatoryFields(realValue BACnetApplicationTagReal) BACnetTimerStateChangeValueRealBuilder {

@@ -96,6 +96,7 @@ var _ (ApduDataExtReadRouterMemoryRequestBuilder) = (*_ApduDataExtReadRouterMemo
 
 func (b *_ApduDataExtReadRouterMemoryRequestBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtReadRouterMemoryRequest
 }
 
 func (b *_ApduDataExtReadRouterMemoryRequestBuilder) WithMandatoryFields() ApduDataExtReadRouterMemoryRequestBuilder {

@@ -96,6 +96,7 @@ var _ (DiscoveryConfigurationBuilder) = (*_DiscoveryConfigurationBuilder)(nil)
 
 func (b *_DiscoveryConfigurationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DiscoveryConfiguration
 }
 
 func (b *_DiscoveryConfigurationBuilder) WithMandatoryFields() DiscoveryConfigurationBuilder {

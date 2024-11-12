@@ -174,6 +174,7 @@ var _ (DataSetWriterDataTypeBuilder) = (*_DataSetWriterDataTypeBuilder)(nil)
 
 func (b *_DataSetWriterDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DataSetWriterDataType
 }
 
 func (b *_DataSetWriterDataTypeBuilder) WithMandatoryFields(name PascalString, enabled bool, dataSetWriterId uint16, dataSetFieldContentMask DataSetFieldContentMask, keyFrameCount uint32, dataSetName PascalString, dataSetWriterProperties []KeyValuePair, transportSettings ExtensionObject, messageSettings ExtensionObject) DataSetWriterDataTypeBuilder {

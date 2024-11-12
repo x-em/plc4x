@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataInProcessBuilder) = (*_BACnetConstructedDataInProces
 
 func (b *_BACnetConstructedDataInProcessBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataInProcess
 }
 
 func (b *_BACnetConstructedDataInProcessBuilder) WithMandatoryFields(inProcess BACnetApplicationTagBoolean) BACnetConstructedDataInProcessBuilder {

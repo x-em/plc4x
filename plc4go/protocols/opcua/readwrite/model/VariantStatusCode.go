@@ -110,6 +110,7 @@ var _ (VariantStatusCodeBuilder) = (*_VariantStatusCodeBuilder)(nil)
 
 func (b *_VariantStatusCodeBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantStatusCode
 }
 
 func (b *_VariantStatusCodeBuilder) WithMandatoryFields(value []StatusCode) VariantStatusCodeBuilder {

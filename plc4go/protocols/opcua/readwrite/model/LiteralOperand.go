@@ -109,6 +109,7 @@ var _ (LiteralOperandBuilder) = (*_LiteralOperandBuilder)(nil)
 
 func (b *_LiteralOperandBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._LiteralOperand
 }
 
 func (b *_LiteralOperandBuilder) WithMandatoryFields(value Variant) LiteralOperandBuilder {

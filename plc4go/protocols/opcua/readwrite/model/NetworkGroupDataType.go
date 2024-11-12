@@ -115,6 +115,7 @@ var _ (NetworkGroupDataTypeBuilder) = (*_NetworkGroupDataTypeBuilder)(nil)
 
 func (b *_NetworkGroupDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._NetworkGroupDataType
 }
 
 func (b *_NetworkGroupDataTypeBuilder) WithMandatoryFields(serverUri PascalString, networkPaths []EndpointUrlListDataType) NetworkGroupDataTypeBuilder {

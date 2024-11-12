@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesLiftCarDoorCommandBuilder) = (*_BACnetPropertyStatesL
 
 func (b *_BACnetPropertyStatesLiftCarDoorCommandBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesLiftCarDoorCommand
 }
 
 func (b *_BACnetPropertyStatesLiftCarDoorCommandBuilder) WithMandatoryFields(liftCarDoorCommand BACnetLiftCarDoorCommandTagged) BACnetPropertyStatesLiftCarDoorCommandBuilder {

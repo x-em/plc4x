@@ -104,6 +104,7 @@ var _ (ParameterValueRawBuilder) = (*_ParameterValueRawBuilder)(nil)
 
 func (b *_ParameterValueRawBuilder) setParent(contract ParameterValueContract) {
 	b.ParameterValueContract = contract
+	contract.(*_ParameterValue)._SubType = b._ParameterValueRaw
 }
 
 func (b *_ParameterValueRawBuilder) WithMandatoryFields(data []byte) ParameterValueRawBuilder {

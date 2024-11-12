@@ -96,6 +96,7 @@ var _ (ApduControlDisconnectBuilder) = (*_ApduControlDisconnectBuilder)(nil)
 
 func (b *_ApduControlDisconnectBuilder) setParent(contract ApduControlContract) {
 	b.ApduControlContract = contract
+	contract.(*_ApduControl)._SubType = b._ApduControlDisconnect
 }
 
 func (b *_ApduControlDisconnectBuilder) WithMandatoryFields() ApduControlDisconnectBuilder {

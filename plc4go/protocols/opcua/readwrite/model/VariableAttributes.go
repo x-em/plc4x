@@ -198,6 +198,7 @@ var _ (VariableAttributesBuilder) = (*_VariableAttributesBuilder)(nil)
 
 func (b *_VariableAttributesBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._VariableAttributes
 }
 
 func (b *_VariableAttributesBuilder) WithMandatoryFields(specifiedAttributes uint32, displayName LocalizedText, description LocalizedText, writeMask uint32, userWriteMask uint32, value Variant, dataType NodeId, valueRank int32, arrayDimensions []uint32, accessLevel uint8, userAccessLevel uint8, minimumSamplingInterval float64, historizing bool) VariableAttributesBuilder {

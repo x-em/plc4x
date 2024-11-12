@@ -110,6 +110,7 @@ var _ (VariantSByteBuilder) = (*_VariantSByteBuilder)(nil)
 
 func (b *_VariantSByteBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantSByte
 }
 
 func (b *_VariantSByteBuilder) WithMandatoryFields(value []byte) VariantSByteBuilder {

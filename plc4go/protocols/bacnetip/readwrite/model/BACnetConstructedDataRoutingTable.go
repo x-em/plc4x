@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataRoutingTableBuilder) = (*_BACnetConstructedDataRouti
 
 func (b *_BACnetConstructedDataRoutingTableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataRoutingTable
 }
 
 func (b *_BACnetConstructedDataRoutingTableBuilder) WithMandatoryFields(routingTable []BACnetRouterEntry) BACnetConstructedDataRoutingTableBuilder {

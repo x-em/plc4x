@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataNextStoppingFloorBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataNextStoppingFloorBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataNextStoppingFloor
 }
 
 func (b *_BACnetConstructedDataNextStoppingFloorBuilder) WithMandatoryFields(nextStoppingFloor BACnetApplicationTagUnsignedInteger) BACnetConstructedDataNextStoppingFloorBuilder {

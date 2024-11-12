@@ -109,6 +109,7 @@ var _ (BACnetValueSourceNoneBuilder) = (*_BACnetValueSourceNoneBuilder)(nil)
 
 func (b *_BACnetValueSourceNoneBuilder) setParent(contract BACnetValueSourceContract) {
 	b.BACnetValueSourceContract = contract
+	contract.(*_BACnetValueSource)._SubType = b._BACnetValueSourceNone
 }
 
 func (b *_BACnetValueSourceNoneBuilder) WithMandatoryFields(none BACnetContextTagNull) BACnetValueSourceNoneBuilder {

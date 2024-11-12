@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataPulseConverterAllBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataPulseConverterAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataPulseConverterAll
 }
 
 func (b *_BACnetConstructedDataPulseConverterAllBuilder) WithMandatoryFields() BACnetConstructedDataPulseConverterAllBuilder {

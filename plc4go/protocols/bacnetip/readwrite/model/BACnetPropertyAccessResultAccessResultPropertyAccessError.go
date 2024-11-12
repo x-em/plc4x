@@ -109,6 +109,7 @@ var _ (BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder) = (*_BA
 
 func (b *_BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder) setParent(contract BACnetPropertyAccessResultAccessResultContract) {
 	b.BACnetPropertyAccessResultAccessResultContract = contract
+	contract.(*_BACnetPropertyAccessResultAccessResult)._SubType = b._BACnetPropertyAccessResultAccessResultPropertyAccessError
 }
 
 func (b *_BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder) WithMandatoryFields(propertyAccessError ErrorEnclosed) BACnetPropertyAccessResultAccessResultPropertyAccessErrorBuilder {

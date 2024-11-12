@@ -107,6 +107,7 @@ var _ (StatusRequestBinaryStateBuilder) = (*_StatusRequestBinaryStateBuilder)(ni
 
 func (b *_StatusRequestBinaryStateBuilder) setParent(contract StatusRequestContract) {
 	b.StatusRequestContract = contract
+	contract.(*_StatusRequest)._SubType = b._StatusRequestBinaryState
 }
 
 func (b *_StatusRequestBinaryStateBuilder) WithMandatoryFields(application ApplicationIdContainer) StatusRequestBinaryStateBuilder {

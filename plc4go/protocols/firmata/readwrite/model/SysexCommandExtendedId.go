@@ -104,6 +104,7 @@ var _ (SysexCommandExtendedIdBuilder) = (*_SysexCommandExtendedIdBuilder)(nil)
 
 func (b *_SysexCommandExtendedIdBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandExtendedId
 }
 
 func (b *_SysexCommandExtendedIdBuilder) WithMandatoryFields(id []int8) SysexCommandExtendedIdBuilder {

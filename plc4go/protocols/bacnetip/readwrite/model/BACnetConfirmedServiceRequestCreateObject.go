@@ -117,6 +117,7 @@ var _ (BACnetConfirmedServiceRequestCreateObjectBuilder) = (*_BACnetConfirmedSer
 
 func (b *_BACnetConfirmedServiceRequestCreateObjectBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestCreateObject
 }
 
 func (b *_BACnetConfirmedServiceRequestCreateObjectBuilder) WithMandatoryFields(objectSpecifier BACnetConfirmedServiceRequestCreateObjectObjectSpecifier) BACnetConfirmedServiceRequestCreateObjectBuilder {

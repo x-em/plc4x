@@ -106,6 +106,7 @@ var _ (BACnetLogDataLogDataEntryAnyValueBuilder) = (*_BACnetLogDataLogDataEntryA
 
 func (b *_BACnetLogDataLogDataEntryAnyValueBuilder) setParent(contract BACnetLogDataLogDataEntryContract) {
 	b.BACnetLogDataLogDataEntryContract = contract
+	contract.(*_BACnetLogDataLogDataEntry)._SubType = b._BACnetLogDataLogDataEntryAnyValue
 }
 
 func (b *_BACnetLogDataLogDataEntryAnyValueBuilder) WithMandatoryFields() BACnetLogDataLogDataEntryAnyValueBuilder {

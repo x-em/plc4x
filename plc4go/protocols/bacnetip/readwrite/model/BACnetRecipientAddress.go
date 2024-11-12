@@ -109,6 +109,7 @@ var _ (BACnetRecipientAddressBuilder) = (*_BACnetRecipientAddressBuilder)(nil)
 
 func (b *_BACnetRecipientAddressBuilder) setParent(contract BACnetRecipientContract) {
 	b.BACnetRecipientContract = contract
+	contract.(*_BACnetRecipient)._SubType = b._BACnetRecipientAddress
 }
 
 func (b *_BACnetRecipientAddressBuilder) WithMandatoryFields(addressValue BACnetAddressEnclosed) BACnetRecipientAddressBuilder {

@@ -142,6 +142,7 @@ var _ (BACnetEventParameterBufferReadyBuilder) = (*_BACnetEventParameterBufferRe
 
 func (b *_BACnetEventParameterBufferReadyBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterBufferReady
 }
 
 func (b *_BACnetEventParameterBufferReadyBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, notificationThreshold BACnetContextTagUnsignedInteger, previousNotificationCount BACnetContextTagUnsignedInteger, closingTag BACnetClosingTag) BACnetEventParameterBufferReadyBuilder {

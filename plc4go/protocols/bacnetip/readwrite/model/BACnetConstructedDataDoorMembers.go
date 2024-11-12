@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataDoorMembersBuilder) = (*_BACnetConstructedDataDoorMe
 
 func (b *_BACnetConstructedDataDoorMembersBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataDoorMembers
 }
 
 func (b *_BACnetConstructedDataDoorMembersBuilder) WithMandatoryFields(doorMembers []BACnetDeviceObjectReference) BACnetConstructedDataDoorMembersBuilder {

@@ -155,6 +155,7 @@ var _ (RequestHeaderBuilder) = (*_RequestHeaderBuilder)(nil)
 
 func (b *_RequestHeaderBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._RequestHeader
 }
 
 func (b *_RequestHeaderBuilder) WithMandatoryFields(authenticationToken NodeId, timestamp int64, requestHandle uint32, returnDiagnostics uint32, auditEntryId PascalString, timeoutHint uint32, additionalHeader ExtensionObject) RequestHeaderBuilder {

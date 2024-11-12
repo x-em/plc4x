@@ -117,6 +117,7 @@ var _ (CloseSessionRequestBuilder) = (*_CloseSessionRequestBuilder)(nil)
 
 func (b *_CloseSessionRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CloseSessionRequest
 }
 
 func (b *_CloseSessionRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, deleteSubscriptions bool) CloseSessionRequestBuilder {

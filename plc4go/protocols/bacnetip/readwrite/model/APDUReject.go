@@ -117,6 +117,7 @@ var _ (APDURejectBuilder) = (*_APDURejectBuilder)(nil)
 
 func (b *_APDURejectBuilder) setParent(contract APDUContract) {
 	b.APDUContract = contract
+	contract.(*_APDU)._SubType = b._APDUReject
 }
 
 func (b *_APDURejectBuilder) WithMandatoryFields(originalInvokeId uint8, rejectReason BACnetRejectReasonTagged) APDURejectBuilder {

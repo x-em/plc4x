@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesFileAccessMethodBuilder) = (*_BACnetPropertyStatesFil
 
 func (b *_BACnetPropertyStatesFileAccessMethodBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesFileAccessMethod
 }
 
 func (b *_BACnetPropertyStatesFileAccessMethodBuilder) WithMandatoryFields(fileAccessMethod BACnetFileAccessMethodTagged) BACnetPropertyStatesFileAccessMethodBuilder {

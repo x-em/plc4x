@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataTrendLogLogBufferBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataTrendLogLogBufferBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTrendLogLogBuffer
 }
 
 func (b *_BACnetConstructedDataTrendLogLogBufferBuilder) WithMandatoryFields(floorText []BACnetLogRecord) BACnetConstructedDataTrendLogLogBufferBuilder {

@@ -109,6 +109,7 @@ var _ (SALDataIrrigationControlBuilder) = (*_SALDataIrrigationControlBuilder)(ni
 
 func (b *_SALDataIrrigationControlBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataIrrigationControl
 }
 
 func (b *_SALDataIrrigationControlBuilder) WithMandatoryFields(irrigationControlData LightingData) SALDataIrrigationControlBuilder {

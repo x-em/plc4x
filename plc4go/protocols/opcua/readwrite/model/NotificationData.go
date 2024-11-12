@@ -96,6 +96,7 @@ var _ (NotificationDataBuilder) = (*_NotificationDataBuilder)(nil)
 
 func (b *_NotificationDataBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._NotificationData
 }
 
 func (b *_NotificationDataBuilder) WithMandatoryFields() NotificationDataBuilder {

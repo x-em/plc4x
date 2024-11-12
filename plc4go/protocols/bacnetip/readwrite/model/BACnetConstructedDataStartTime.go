@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataStartTimeBuilder) = (*_BACnetConstructedDataStartTim
 
 func (b *_BACnetConstructedDataStartTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataStartTime
 }
 
 func (b *_BACnetConstructedDataStartTimeBuilder) WithMandatoryFields(startTime BACnetDateTime) BACnetConstructedDataStartTimeBuilder {

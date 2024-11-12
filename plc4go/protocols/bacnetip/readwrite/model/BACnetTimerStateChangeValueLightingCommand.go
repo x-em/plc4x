@@ -109,6 +109,7 @@ var _ (BACnetTimerStateChangeValueLightingCommandBuilder) = (*_BACnetTimerStateC
 
 func (b *_BACnetTimerStateChangeValueLightingCommandBuilder) setParent(contract BACnetTimerStateChangeValueContract) {
 	b.BACnetTimerStateChangeValueContract = contract
+	contract.(*_BACnetTimerStateChangeValue)._SubType = b._BACnetTimerStateChangeValueLightingCommand
 }
 
 func (b *_BACnetTimerStateChangeValueLightingCommandBuilder) WithMandatoryFields(ligthingCommandValue BACnetLightingCommandEnclosed) BACnetTimerStateChangeValueLightingCommandBuilder {

@@ -116,6 +116,7 @@ var _ (ModbusPDUMaskWriteHoldingRegisterResponseBuilder) = (*_ModbusPDUMaskWrite
 
 func (b *_ModbusPDUMaskWriteHoldingRegisterResponseBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUMaskWriteHoldingRegisterResponse
 }
 
 func (b *_ModbusPDUMaskWriteHoldingRegisterResponseBuilder) WithMandatoryFields(referenceAddress uint16, andMask uint16, orMask uint16) ModbusPDUMaskWriteHoldingRegisterResponseBuilder {

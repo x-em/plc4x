@@ -96,6 +96,7 @@ var _ (QosDataTypeBuilder) = (*_QosDataTypeBuilder)(nil)
 
 func (b *_QosDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._QosDataType
 }
 
 func (b *_QosDataTypeBuilder) WithMandatoryFields() QosDataTypeBuilder {

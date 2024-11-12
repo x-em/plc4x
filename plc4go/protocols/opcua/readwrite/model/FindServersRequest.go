@@ -132,6 +132,7 @@ var _ (FindServersRequestBuilder) = (*_FindServersRequestBuilder)(nil)
 
 func (b *_FindServersRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._FindServersRequest
 }
 
 func (b *_FindServersRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, endpointUrl PascalString, localeIds []PascalString, serverUris []PascalString) FindServersRequestBuilder {

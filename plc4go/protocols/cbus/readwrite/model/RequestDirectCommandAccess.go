@@ -119,6 +119,7 @@ var _ (RequestDirectCommandAccessBuilder) = (*_RequestDirectCommandAccessBuilder
 
 func (b *_RequestDirectCommandAccessBuilder) setParent(contract RequestContract) {
 	b.RequestContract = contract
+	contract.(*_Request)._SubType = b._RequestDirectCommandAccess
 }
 
 func (b *_RequestDirectCommandAccessBuilder) WithMandatoryFields(calData CALData) RequestDirectCommandAccessBuilder {

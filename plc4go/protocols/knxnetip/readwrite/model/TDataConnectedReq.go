@@ -96,6 +96,7 @@ var _ (TDataConnectedReqBuilder) = (*_TDataConnectedReqBuilder)(nil)
 
 func (b *_TDataConnectedReqBuilder) setParent(contract CEMIContract) {
 	b.CEMIContract = contract
+	contract.(*_CEMI)._SubType = b._TDataConnectedReq
 }
 
 func (b *_TDataConnectedReqBuilder) WithMandatoryFields() TDataConnectedReqBuilder {

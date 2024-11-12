@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataHigherDeckBuilder) = (*_BACnetConstructedDataHigherD
 
 func (b *_BACnetConstructedDataHigherDeckBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataHigherDeck
 }
 
 func (b *_BACnetConstructedDataHigherDeckBuilder) WithMandatoryFields(higherDeck BACnetApplicationTagObjectIdentifier) BACnetConstructedDataHigherDeckBuilder {

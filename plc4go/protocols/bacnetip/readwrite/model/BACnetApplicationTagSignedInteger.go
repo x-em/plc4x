@@ -111,6 +111,7 @@ var _ (BACnetApplicationTagSignedIntegerBuilder) = (*_BACnetApplicationTagSigned
 
 func (b *_BACnetApplicationTagSignedIntegerBuilder) setParent(contract BACnetApplicationTagContract) {
 	b.BACnetApplicationTagContract = contract
+	contract.(*_BACnetApplicationTag)._SubType = b._BACnetApplicationTagSignedInteger
 }
 
 func (b *_BACnetApplicationTagSignedIntegerBuilder) WithMandatoryFields(payload BACnetTagPayloadSignedInteger) BACnetApplicationTagSignedIntegerBuilder {

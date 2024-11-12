@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLargeAnalogValueLowLimitBuilder) = (*_BACnetConstruc
 
 func (b *_BACnetConstructedDataLargeAnalogValueLowLimitBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLargeAnalogValueLowLimit
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueLowLimitBuilder) WithMandatoryFields(lowLimit BACnetApplicationTagDouble) BACnetConstructedDataLargeAnalogValueLowLimitBuilder {

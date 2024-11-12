@@ -109,6 +109,7 @@ var _ (ParameterValueInterfaceOptions1PowerUpSettingsBuilder) = (*_ParameterValu
 
 func (b *_ParameterValueInterfaceOptions1PowerUpSettingsBuilder) setParent(contract ParameterValueContract) {
 	b.ParameterValueContract = contract
+	contract.(*_ParameterValue)._SubType = b._ParameterValueInterfaceOptions1PowerUpSettings
 }
 
 func (b *_ParameterValueInterfaceOptions1PowerUpSettingsBuilder) WithMandatoryFields(value InterfaceOptions1PowerUpSettings) ParameterValueInterfaceOptions1PowerUpSettingsBuilder {

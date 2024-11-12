@@ -130,6 +130,7 @@ var _ (ClockAndTimekeepingDataUpdateTimeBuilder) = (*_ClockAndTimekeepingDataUpd
 
 func (b *_ClockAndTimekeepingDataUpdateTimeBuilder) setParent(contract ClockAndTimekeepingDataContract) {
 	b.ClockAndTimekeepingDataContract = contract
+	contract.(*_ClockAndTimekeepingData)._SubType = b._ClockAndTimekeepingDataUpdateTime
 }
 
 func (b *_ClockAndTimekeepingDataUpdateTimeBuilder) WithMandatoryFields(hours uint8, minute uint8, second uint8, daylightSaving byte) ClockAndTimekeepingDataUpdateTimeBuilder {

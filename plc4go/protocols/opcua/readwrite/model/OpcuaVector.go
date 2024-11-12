@@ -96,6 +96,7 @@ var _ (OpcuaVectorBuilder) = (*_OpcuaVectorBuilder)(nil)
 
 func (b *_OpcuaVectorBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._OpcuaVector
 }
 
 func (b *_OpcuaVectorBuilder) WithMandatoryFields() OpcuaVectorBuilder {

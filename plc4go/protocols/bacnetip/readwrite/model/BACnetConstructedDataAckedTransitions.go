@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataAckedTransitionsBuilder) = (*_BACnetConstructedDataA
 
 func (b *_BACnetConstructedDataAckedTransitionsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataAckedTransitions
 }
 
 func (b *_BACnetConstructedDataAckedTransitionsBuilder) WithMandatoryFields(ackedTransitions BACnetEventTransitionBitsTagged) BACnetConstructedDataAckedTransitionsBuilder {

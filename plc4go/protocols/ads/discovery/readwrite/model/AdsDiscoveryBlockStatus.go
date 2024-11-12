@@ -107,6 +107,7 @@ var _ (AdsDiscoveryBlockStatusBuilder) = (*_AdsDiscoveryBlockStatusBuilder)(nil)
 
 func (b *_AdsDiscoveryBlockStatusBuilder) setParent(contract AdsDiscoveryBlockContract) {
 	b.AdsDiscoveryBlockContract = contract
+	contract.(*_AdsDiscoveryBlock)._SubType = b._AdsDiscoveryBlockStatus
 }
 
 func (b *_AdsDiscoveryBlockStatusBuilder) WithMandatoryFields(status Status) AdsDiscoveryBlockStatusBuilder {

@@ -126,6 +126,7 @@ var _ (OpcuaHelloRequestBuilder) = (*_OpcuaHelloRequestBuilder)(nil)
 
 func (b *_OpcuaHelloRequestBuilder) setParent(contract MessagePDUContract) {
 	b.MessagePDUContract = contract
+	contract.(*_MessagePDU)._SubType = b._OpcuaHelloRequest
 }
 
 func (b *_OpcuaHelloRequestBuilder) WithMandatoryFields(version uint32, limits OpcuaProtocolLimits, endpoint PascalString) OpcuaHelloRequestBuilder {

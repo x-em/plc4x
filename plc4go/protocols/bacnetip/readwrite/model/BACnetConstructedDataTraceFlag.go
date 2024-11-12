@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTraceFlagBuilder) = (*_BACnetConstructedDataTraceFla
 
 func (b *_BACnetConstructedDataTraceFlagBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTraceFlag
 }
 
 func (b *_BACnetConstructedDataTraceFlagBuilder) WithMandatoryFields(traceFlag BACnetApplicationTagBoolean) BACnetConstructedDataTraceFlagBuilder {

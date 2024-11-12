@@ -116,6 +116,7 @@ var _ (CipRRDataBuilder) = (*_CipRRDataBuilder)(nil)
 
 func (b *_CipRRDataBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._CipRRData
 }
 
 func (b *_CipRRDataBuilder) WithMandatoryFields(interfaceHandle uint32, timeout uint16, typeIds []TypeId) CipRRDataBuilder {

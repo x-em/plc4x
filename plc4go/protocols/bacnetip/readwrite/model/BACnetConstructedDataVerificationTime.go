@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataVerificationTimeBuilder) = (*_BACnetConstructedDataV
 
 func (b *_BACnetConstructedDataVerificationTimeBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataVerificationTime
 }
 
 func (b *_BACnetConstructedDataVerificationTimeBuilder) WithMandatoryFields(verificationTime BACnetApplicationTagSignedInteger) BACnetConstructedDataVerificationTimeBuilder {

@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataMultiStateValueFaultValuesBuilder) = (*_BACnetConstr
 
 func (b *_BACnetConstructedDataMultiStateValueFaultValuesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateValueFaultValues
 }
 
 func (b *_BACnetConstructedDataMultiStateValueFaultValuesBuilder) WithMandatoryFields(faultValues []BACnetApplicationTagUnsignedInteger) BACnetConstructedDataMultiStateValueFaultValuesBuilder {

@@ -96,6 +96,7 @@ var _ (EipDisconnectRequestBuilder) = (*_EipDisconnectRequestBuilder)(nil)
 
 func (b *_EipDisconnectRequestBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._EipDisconnectRequest
 }
 
 func (b *_EipDisconnectRequestBuilder) WithMandatoryFields() EipDisconnectRequestBuilder {

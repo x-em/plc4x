@@ -109,6 +109,7 @@ var _ (MonitoredSALReplyBuilder) = (*_MonitoredSALReplyBuilder)(nil)
 
 func (b *_MonitoredSALReplyBuilder) setParent(contract EncodedReplyContract) {
 	b.EncodedReplyContract = contract
+	contract.(*_EncodedReply)._SubType = b._MonitoredSALReply
 }
 
 func (b *_MonitoredSALReplyBuilder) WithMandatoryFields(monitoredSAL MonitoredSAL) MonitoredSALReplyBuilder {

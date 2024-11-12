@@ -165,6 +165,7 @@ var _ (AirConditioningDataHumidityScheduleEntryBuilder) = (*_AirConditioningData
 
 func (b *_AirConditioningDataHumidityScheduleEntryBuilder) setParent(contract AirConditioningDataContract) {
 	b.AirConditioningDataContract = contract
+	contract.(*_AirConditioningData)._SubType = b._AirConditioningDataHumidityScheduleEntry
 }
 
 func (b *_AirConditioningDataHumidityScheduleEntryBuilder) WithMandatoryFields(zoneGroup byte, zoneList HVACZoneList, entry uint8, format byte, humidityModeAndFlags HVACHumidityModeAndFlags, startTime HVACStartTime) AirConditioningDataHumidityScheduleEntryBuilder {

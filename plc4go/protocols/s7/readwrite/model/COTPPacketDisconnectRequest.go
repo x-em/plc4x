@@ -116,6 +116,7 @@ var _ (COTPPacketDisconnectRequestBuilder) = (*_COTPPacketDisconnectRequestBuild
 
 func (b *_COTPPacketDisconnectRequestBuilder) setParent(contract COTPPacketContract) {
 	b.COTPPacketContract = contract
+	contract.(*_COTPPacket)._SubType = b._COTPPacketDisconnectRequest
 }
 
 func (b *_COTPPacketDisconnectRequestBuilder) WithMandatoryFields(destinationReference uint16, sourceReference uint16, protocolClass COTPProtocolClass) COTPPacketDisconnectRequestBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBACnetIPv6UDPPortBuilder) = (*_BACnetConstructedData
 
 func (b *_BACnetConstructedDataBACnetIPv6UDPPortBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBACnetIPv6UDPPort
 }
 
 func (b *_BACnetConstructedDataBACnetIPv6UDPPortBuilder) WithMandatoryFields(ipv6UdpPort BACnetApplicationTagUnsignedInteger) BACnetConstructedDataBACnetIPv6UDPPortBuilder {

@@ -96,6 +96,7 @@ var _ (BACnetConstructedDataMultiStateInputAllBuilder) = (*_BACnetConstructedDat
 
 func (b *_BACnetConstructedDataMultiStateInputAllBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataMultiStateInputAll
 }
 
 func (b *_BACnetConstructedDataMultiStateInputAllBuilder) WithMandatoryFields() BACnetConstructedDataMultiStateInputAllBuilder {

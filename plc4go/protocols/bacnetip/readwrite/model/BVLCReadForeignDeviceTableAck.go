@@ -109,6 +109,7 @@ var _ (BVLCReadForeignDeviceTableAckBuilder) = (*_BVLCReadForeignDeviceTableAckB
 
 func (b *_BVLCReadForeignDeviceTableAckBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCReadForeignDeviceTableAck
 }
 
 func (b *_BVLCReadForeignDeviceTableAckBuilder) WithMandatoryFields(table []BVLCForeignDeviceTableEntry) BVLCReadForeignDeviceTableAckBuilder {

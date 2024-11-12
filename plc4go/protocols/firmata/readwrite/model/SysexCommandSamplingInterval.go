@@ -96,6 +96,7 @@ var _ (SysexCommandSamplingIntervalBuilder) = (*_SysexCommandSamplingIntervalBui
 
 func (b *_SysexCommandSamplingIntervalBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandSamplingInterval
 }
 
 func (b *_SysexCommandSamplingIntervalBuilder) WithMandatoryFields() SysexCommandSamplingIntervalBuilder {

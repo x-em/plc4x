@@ -104,6 +104,7 @@ var _ (SecurityDataArmReadyNotReadyBuilder) = (*_SecurityDataArmReadyNotReadyBui
 
 func (b *_SecurityDataArmReadyNotReadyBuilder) setParent(contract SecurityDataContract) {
 	b.SecurityDataContract = contract
+	contract.(*_SecurityData)._SubType = b._SecurityDataArmReadyNotReady
 }
 
 func (b *_SecurityDataArmReadyNotReadyBuilder) WithMandatoryFields(zoneNumber uint8) SecurityDataArmReadyNotReadyBuilder {

@@ -96,6 +96,7 @@ var _ (MeteringDataMeasureOilBuilder) = (*_MeteringDataMeasureOilBuilder)(nil)
 
 func (b *_MeteringDataMeasureOilBuilder) setParent(contract MeteringDataContract) {
 	b.MeteringDataContract = contract
+	contract.(*_MeteringData)._SubType = b._MeteringDataMeasureOil
 }
 
 func (b *_MeteringDataMeasureOilBuilder) WithMandatoryFields() MeteringDataMeasureOilBuilder {

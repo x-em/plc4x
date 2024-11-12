@@ -104,6 +104,7 @@ var _ (ModbusPDUErrorBuilder) = (*_ModbusPDUErrorBuilder)(nil)
 
 func (b *_ModbusPDUErrorBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUError
 }
 
 func (b *_ModbusPDUErrorBuilder) WithMandatoryFields(exceptionCode ModbusErrorCode) ModbusPDUErrorBuilder {

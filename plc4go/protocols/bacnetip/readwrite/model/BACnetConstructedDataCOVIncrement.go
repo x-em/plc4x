@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataCOVIncrementBuilder) = (*_BACnetConstructedDataCOVIn
 
 func (b *_BACnetConstructedDataCOVIncrementBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCOVIncrement
 }
 
 func (b *_BACnetConstructedDataCOVIncrementBuilder) WithMandatoryFields(covIncrement BACnetApplicationTagReal) BACnetConstructedDataCOVIncrementBuilder {

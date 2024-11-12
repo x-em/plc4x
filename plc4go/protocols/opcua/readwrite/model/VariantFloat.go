@@ -110,6 +110,7 @@ var _ (VariantFloatBuilder) = (*_VariantFloatBuilder)(nil)
 
 func (b *_VariantFloatBuilder) setParent(contract VariantContract) {
 	b.VariantContract = contract
+	contract.(*_Variant)._SubType = b._VariantFloat
 }
 
 func (b *_VariantFloatBuilder) WithMandatoryFields(value []float32) VariantFloatBuilder {

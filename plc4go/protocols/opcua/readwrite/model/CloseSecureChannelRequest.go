@@ -109,6 +109,7 @@ var _ (CloseSecureChannelRequestBuilder) = (*_CloseSecureChannelRequestBuilder)(
 
 func (b *_CloseSecureChannelRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._CloseSecureChannelRequest
 }
 
 func (b *_CloseSecureChannelRequestBuilder) WithMandatoryFields(requestHeader RequestHeader) CloseSecureChannelRequestBuilder {

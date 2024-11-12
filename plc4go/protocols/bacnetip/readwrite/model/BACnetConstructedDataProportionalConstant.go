@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataProportionalConstantBuilder) = (*_BACnetConstructedD
 
 func (b *_BACnetConstructedDataProportionalConstantBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataProportionalConstant
 }
 
 func (b *_BACnetConstructedDataProportionalConstantBuilder) WithMandatoryFields(proportionalConstant BACnetApplicationTagReal) BACnetConstructedDataProportionalConstantBuilder {

@@ -96,6 +96,7 @@ var _ (ApduDataExtLinkResponseBuilder) = (*_ApduDataExtLinkResponseBuilder)(nil)
 
 func (b *_ApduDataExtLinkResponseBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtLinkResponse
 }
 
 func (b *_ApduDataExtLinkResponseBuilder) WithMandatoryFields() ApduDataExtLinkResponseBuilder {

@@ -101,6 +101,7 @@ var _ (ServerErrorReplyBuilder) = (*_ServerErrorReplyBuilder)(nil)
 
 func (b *_ServerErrorReplyBuilder) setParent(contract ReplyOrConfirmationContract) {
 	b.ReplyOrConfirmationContract = contract
+	contract.(*_ReplyOrConfirmation)._SubType = b._ServerErrorReply
 }
 
 func (b *_ServerErrorReplyBuilder) WithMandatoryFields() ServerErrorReplyBuilder {

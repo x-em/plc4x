@@ -122,6 +122,7 @@ var _ (RequestResetBuilder) = (*_RequestResetBuilder)(nil)
 
 func (b *_RequestResetBuilder) setParent(contract RequestContract) {
 	b.RequestContract = contract
+	contract.(*_Request)._SubType = b._RequestReset
 }
 
 func (b *_RequestResetBuilder) WithMandatoryFields(tildePeek RequestType, tildePeek2 RequestType) RequestResetBuilder {

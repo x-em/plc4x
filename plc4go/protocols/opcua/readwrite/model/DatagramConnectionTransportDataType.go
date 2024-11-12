@@ -109,6 +109,7 @@ var _ (DatagramConnectionTransportDataTypeBuilder) = (*_DatagramConnectionTransp
 
 func (b *_DatagramConnectionTransportDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DatagramConnectionTransportDataType
 }
 
 func (b *_DatagramConnectionTransportDataTypeBuilder) WithMandatoryFields(discoveryAddress ExtensionObject) DatagramConnectionTransportDataTypeBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetApplicationTagCharacterStringBuilder) = (*_BACnetApplicationTagChar
 
 func (b *_BACnetApplicationTagCharacterStringBuilder) setParent(contract BACnetApplicationTagContract) {
 	b.BACnetApplicationTagContract = contract
+	contract.(*_BACnetApplicationTag)._SubType = b._BACnetApplicationTagCharacterString
 }
 
 func (b *_BACnetApplicationTagCharacterStringBuilder) WithMandatoryFields(payload BACnetTagPayloadCharacterString) BACnetApplicationTagCharacterStringBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataReasonForHaltBuilder) = (*_BACnetConstructedDataReas
 
 func (b *_BACnetConstructedDataReasonForHaltBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataReasonForHalt
 }
 
 func (b *_BACnetConstructedDataReasonForHaltBuilder) WithMandatoryFields(programError BACnetProgramErrorTagged) BACnetConstructedDataReasonForHaltBuilder {

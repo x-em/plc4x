@@ -115,6 +115,7 @@ var _ (MonitoredItemNotificationBuilder) = (*_MonitoredItemNotificationBuilder)(
 
 func (b *_MonitoredItemNotificationBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._MonitoredItemNotification
 }
 
 func (b *_MonitoredItemNotificationBuilder) WithMandatoryFields(clientHandle uint32, value DataValue) MonitoredItemNotificationBuilder {

@@ -122,6 +122,7 @@ var _ (DescriptionResponseBuilder) = (*_DescriptionResponseBuilder)(nil)
 
 func (b *_DescriptionResponseBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._DescriptionResponse
 }
 
 func (b *_DescriptionResponseBuilder) WithMandatoryFields(dibDeviceInfo DIBDeviceInfo, dibSuppSvcFamilies DIBSuppSvcFamilies) DescriptionResponseBuilder {

@@ -116,6 +116,7 @@ var _ (ModbusPDUWriteMultipleHoldingRegistersRequestBuilder) = (*_ModbusPDUWrite
 
 func (b *_ModbusPDUWriteMultipleHoldingRegistersRequestBuilder) setParent(contract ModbusPDUContract) {
 	b.ModbusPDUContract = contract
+	contract.(*_ModbusPDU)._SubType = b._ModbusPDUWriteMultipleHoldingRegistersRequest
 }
 
 func (b *_ModbusPDUWriteMultipleHoldingRegistersRequestBuilder) WithMandatoryFields(startingAddress uint16, quantity uint16, value []byte) ModbusPDUWriteMultipleHoldingRegistersRequestBuilder {

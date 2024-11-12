@@ -109,6 +109,7 @@ var _ (BACnetPropertyStatesLightningInProgressBuilder) = (*_BACnetPropertyStates
 
 func (b *_BACnetPropertyStatesLightningInProgressBuilder) setParent(contract BACnetPropertyStatesContract) {
 	b.BACnetPropertyStatesContract = contract
+	contract.(*_BACnetPropertyStates)._SubType = b._BACnetPropertyStatesLightningInProgress
 }
 
 func (b *_BACnetPropertyStatesLightningInProgressBuilder) WithMandatoryFields(lightningInProgress BACnetLightingInProgressTagged) BACnetPropertyStatesLightningInProgressBuilder {

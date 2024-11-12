@@ -109,6 +109,7 @@ var _ (BVLCWriteBroadcastDistributionTableBuilder) = (*_BVLCWriteBroadcastDistri
 
 func (b *_BVLCWriteBroadcastDistributionTableBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCWriteBroadcastDistributionTable
 }
 
 func (b *_BVLCWriteBroadcastDistributionTableBuilder) WithMandatoryFields(table []BVLCBroadcastDistributionTableEntry) BVLCWriteBroadcastDistributionTableBuilder {

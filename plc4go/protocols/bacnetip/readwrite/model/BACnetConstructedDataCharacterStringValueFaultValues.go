@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataCharacterStringValueFaultValuesBuilder) = (*_BACnetC
 
 func (b *_BACnetConstructedDataCharacterStringValueFaultValuesBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCharacterStringValueFaultValues
 }
 
 func (b *_BACnetConstructedDataCharacterStringValueFaultValuesBuilder) WithMandatoryFields(faultValues []BACnetOptionalCharacterString) BACnetConstructedDataCharacterStringValueFaultValuesBuilder {

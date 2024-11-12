@@ -115,6 +115,7 @@ var _ (DeleteNodesRequestBuilder) = (*_DeleteNodesRequestBuilder)(nil)
 
 func (b *_DeleteNodesRequestBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._DeleteNodesRequest
 }
 
 func (b *_DeleteNodesRequestBuilder) WithMandatoryFields(requestHeader RequestHeader, nodesToDelete []DeleteNodesItem) DeleteNodesRequestBuilder {

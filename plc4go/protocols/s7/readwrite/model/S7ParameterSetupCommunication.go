@@ -118,6 +118,7 @@ var _ (S7ParameterSetupCommunicationBuilder) = (*_S7ParameterSetupCommunicationB
 
 func (b *_S7ParameterSetupCommunicationBuilder) setParent(contract S7ParameterContract) {
 	b.S7ParameterContract = contract
+	contract.(*_S7Parameter)._SubType = b._S7ParameterSetupCommunication
 }
 
 func (b *_S7ParameterSetupCommunicationBuilder) WithMandatoryFields(maxAmqCaller uint16, maxAmqCallee uint16, pduLength uint16) S7ParameterSetupCommunicationBuilder {

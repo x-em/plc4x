@@ -109,6 +109,7 @@ var _ (BACnetOptionalBinaryPVValueBuilder) = (*_BACnetOptionalBinaryPVValueBuild
 
 func (b *_BACnetOptionalBinaryPVValueBuilder) setParent(contract BACnetOptionalBinaryPVContract) {
 	b.BACnetOptionalBinaryPVContract = contract
+	contract.(*_BACnetOptionalBinaryPV)._SubType = b._BACnetOptionalBinaryPVValue
 }
 
 func (b *_BACnetOptionalBinaryPVValueBuilder) WithMandatoryFields(binaryPv BACnetBinaryPVTagged) BACnetOptionalBinaryPVValueBuilder {

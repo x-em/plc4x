@@ -110,6 +110,7 @@ var _ (S7PayloadUserDataItemCyclicServicesUnsubscribeRequestBuilder) = (*_S7Payl
 
 func (b *_S7PayloadUserDataItemCyclicServicesUnsubscribeRequestBuilder) setParent(contract S7PayloadUserDataItemContract) {
 	b.S7PayloadUserDataItemContract = contract
+	contract.(*_S7PayloadUserDataItem)._SubType = b._S7PayloadUserDataItemCyclicServicesUnsubscribeRequest
 }
 
 func (b *_S7PayloadUserDataItemCyclicServicesUnsubscribeRequestBuilder) WithMandatoryFields(function uint8, jobId uint8) S7PayloadUserDataItemCyclicServicesUnsubscribeRequestBuilder {

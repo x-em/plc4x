@@ -96,6 +96,7 @@ var _ (ConnectionResponseDataBlockDeviceManagementBuilder) = (*_ConnectionRespon
 
 func (b *_ConnectionResponseDataBlockDeviceManagementBuilder) setParent(contract ConnectionResponseDataBlockContract) {
 	b.ConnectionResponseDataBlockContract = contract
+	contract.(*_ConnectionResponseDataBlock)._SubType = b._ConnectionResponseDataBlockDeviceManagement
 }
 
 func (b *_ConnectionResponseDataBlockDeviceManagementBuilder) WithMandatoryFields() ConnectionResponseDataBlockDeviceManagementBuilder {

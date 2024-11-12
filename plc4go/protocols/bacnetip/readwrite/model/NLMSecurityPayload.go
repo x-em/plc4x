@@ -110,6 +110,7 @@ var _ (NLMSecurityPayloadBuilder) = (*_NLMSecurityPayloadBuilder)(nil)
 
 func (b *_NLMSecurityPayloadBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMSecurityPayload
 }
 
 func (b *_NLMSecurityPayloadBuilder) WithMandatoryFields(payloadLength uint16, payload []byte) NLMSecurityPayloadBuilder {

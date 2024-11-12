@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataLargeAnalogValueCOVIncrementBuilder) = (*_BACnetCons
 
 func (b *_BACnetConstructedDataLargeAnalogValueCOVIncrementBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLargeAnalogValueCOVIncrement
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueCOVIncrementBuilder) WithMandatoryFields(covIncrement BACnetApplicationTagDouble) BACnetConstructedDataLargeAnalogValueCOVIncrementBuilder {

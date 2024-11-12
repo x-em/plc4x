@@ -107,6 +107,7 @@ var _ (BACnetConfirmedServiceRequestReadPropertyMultipleBuilder) = (*_BACnetConf
 
 func (b *_BACnetConfirmedServiceRequestReadPropertyMultipleBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestReadPropertyMultiple
 }
 
 func (b *_BACnetConfirmedServiceRequestReadPropertyMultipleBuilder) WithMandatoryFields(data []BACnetReadAccessSpecification) BACnetConfirmedServiceRequestReadPropertyMultipleBuilder {

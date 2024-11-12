@@ -109,6 +109,7 @@ var _ (LogicalSegmentBuilder) = (*_LogicalSegmentBuilder)(nil)
 
 func (b *_LogicalSegmentBuilder) setParent(contract PathSegmentContract) {
 	b.PathSegmentContract = contract
+	contract.(*_PathSegment)._SubType = b._LogicalSegment
 }
 
 func (b *_LogicalSegmentBuilder) WithMandatoryFields(segmentType LogicalSegmentType) LogicalSegmentBuilder {

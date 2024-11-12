@@ -126,6 +126,7 @@ var _ (UserManagementDataTypeBuilder) = (*_UserManagementDataTypeBuilder)(nil)
 
 func (b *_UserManagementDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._UserManagementDataType
 }
 
 func (b *_UserManagementDataTypeBuilder) WithMandatoryFields(userName PascalString, userConfiguration UserConfigurationMask, description PascalString) UserManagementDataTypeBuilder {

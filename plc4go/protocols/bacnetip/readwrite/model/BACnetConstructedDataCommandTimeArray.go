@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataCommandTimeArrayBuilder) = (*_BACnetConstructedDataC
 
 func (b *_BACnetConstructedDataCommandTimeArrayBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataCommandTimeArray
 }
 
 func (b *_BACnetConstructedDataCommandTimeArrayBuilder) WithMandatoryFields(commandTimeArray []BACnetTimeStamp) BACnetConstructedDataCommandTimeArrayBuilder {

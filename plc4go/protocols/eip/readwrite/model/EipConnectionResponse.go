@@ -102,6 +102,7 @@ var _ (EipConnectionResponseBuilder) = (*_EipConnectionResponseBuilder)(nil)
 
 func (b *_EipConnectionResponseBuilder) setParent(contract EipPacketContract) {
 	b.EipPacketContract = contract
+	contract.(*_EipPacket)._SubType = b._EipConnectionResponse
 }
 
 func (b *_EipConnectionResponseBuilder) WithMandatoryFields() EipConnectionResponseBuilder {

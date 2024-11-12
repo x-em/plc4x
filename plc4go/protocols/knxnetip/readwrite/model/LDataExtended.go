@@ -144,6 +144,7 @@ var _ (LDataExtendedBuilder) = (*_LDataExtendedBuilder)(nil)
 
 func (b *_LDataExtendedBuilder) setParent(contract LDataFrameContract) {
 	b.LDataFrameContract = contract
+	contract.(*_LDataFrame)._SubType = b._LDataExtended
 }
 
 func (b *_LDataExtendedBuilder) WithMandatoryFields(groupAddress bool, hopCount uint8, extendedFrameFormat uint8, sourceAddress KnxAddress, destinationAddress []byte, apdu Apdu) LDataExtendedBuilder {

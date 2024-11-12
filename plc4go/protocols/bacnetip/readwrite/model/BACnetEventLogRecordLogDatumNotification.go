@@ -131,6 +131,7 @@ var _ (BACnetEventLogRecordLogDatumNotificationBuilder) = (*_BACnetEventLogRecor
 
 func (b *_BACnetEventLogRecordLogDatumNotificationBuilder) setParent(contract BACnetEventLogRecordLogDatumContract) {
 	b.BACnetEventLogRecordLogDatumContract = contract
+	contract.(*_BACnetEventLogRecordLogDatum)._SubType = b._BACnetEventLogRecordLogDatumNotification
 }
 
 func (b *_BACnetEventLogRecordLogDatumNotificationBuilder) WithMandatoryFields(innerOpeningTag BACnetOpeningTag, notification ConfirmedEventNotificationRequest, innerClosingTag BACnetClosingTag) BACnetEventLogRecordLogDatumNotificationBuilder {

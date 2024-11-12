@@ -180,6 +180,7 @@ var _ (ReaderGroupDataTypeBuilder) = (*_ReaderGroupDataTypeBuilder)(nil)
 
 func (b *_ReaderGroupDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._ReaderGroupDataType
 }
 
 func (b *_ReaderGroupDataTypeBuilder) WithMandatoryFields(name PascalString, enabled bool, securityMode MessageSecurityMode, securityGroupId PascalString, securityKeyServices []EndpointDescription, maxNetworkMessageSize uint32, groupProperties []KeyValuePair, transportSettings ExtensionObject, messageSettings ExtensionObject, dataSetReaders []DataSetReaderDataType) ReaderGroupDataTypeBuilder {

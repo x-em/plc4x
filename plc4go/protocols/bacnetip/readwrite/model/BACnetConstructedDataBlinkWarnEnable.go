@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataBlinkWarnEnableBuilder) = (*_BACnetConstructedDataBl
 
 func (b *_BACnetConstructedDataBlinkWarnEnableBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataBlinkWarnEnable
 }
 
 func (b *_BACnetConstructedDataBlinkWarnEnableBuilder) WithMandatoryFields(blinkWarnEnable BACnetApplicationTagBoolean) BACnetConstructedDataBlinkWarnEnableBuilder {

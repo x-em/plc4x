@@ -179,6 +179,7 @@ var _ (PubSubConnectionDataTypeBuilder) = (*_PubSubConnectionDataTypeBuilder)(ni
 
 func (b *_PubSubConnectionDataTypeBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._PubSubConnectionDataType
 }
 
 func (b *_PubSubConnectionDataTypeBuilder) WithMandatoryFields(name PascalString, enabled bool, publisherId Variant, transportProfileUri PascalString, address ExtensionObject, connectionProperties []KeyValuePair, transportSettings ExtensionObject, writerGroups []WriterGroupDataType, readerGroups []ReaderGroupDataType) PubSubConnectionDataTypeBuilder {

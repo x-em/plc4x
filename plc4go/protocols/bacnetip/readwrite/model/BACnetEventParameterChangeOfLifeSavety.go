@@ -164,6 +164,7 @@ var _ (BACnetEventParameterChangeOfLifeSavetyBuilder) = (*_BACnetEventParameterC
 
 func (b *_BACnetEventParameterChangeOfLifeSavetyBuilder) setParent(contract BACnetEventParameterContract) {
 	b.BACnetEventParameterContract = contract
+	contract.(*_BACnetEventParameter)._SubType = b._BACnetEventParameterChangeOfLifeSavety
 }
 
 func (b *_BACnetEventParameterChangeOfLifeSavetyBuilder) WithMandatoryFields(openingTag BACnetOpeningTag, timeDelay BACnetContextTagUnsignedInteger, listOfLifeSavetyAlarmValues BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValues, listOfAlarmValues BACnetEventParameterChangeOfLifeSavetyListOfAlarmValues, modePropertyReference BACnetDeviceObjectPropertyReferenceEnclosed, closingTag BACnetClosingTag) BACnetEventParameterChangeOfLifeSavetyBuilder {

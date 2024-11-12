@@ -126,6 +126,7 @@ var _ (QueryDataSetBuilder) = (*_QueryDataSetBuilder)(nil)
 
 func (b *_QueryDataSetBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._QueryDataSet
 }
 
 func (b *_QueryDataSetBuilder) WithMandatoryFields(nodeId ExpandedNodeId, typeDefinitionNode ExpandedNodeId, values []Variant) QueryDataSetBuilder {

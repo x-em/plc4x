@@ -104,6 +104,7 @@ var _ (BACnetConstructedDataSupportedSecurityAlgorithmsBuilder) = (*_BACnetConst
 
 func (b *_BACnetConstructedDataSupportedSecurityAlgorithmsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataSupportedSecurityAlgorithms
 }
 
 func (b *_BACnetConstructedDataSupportedSecurityAlgorithmsBuilder) WithMandatoryFields(supportedSecurityAlgorithms []BACnetApplicationTagUnsignedInteger) BACnetConstructedDataSupportedSecurityAlgorithmsBuilder {

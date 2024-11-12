@@ -126,6 +126,7 @@ var _ (QueryDataDescriptionBuilder) = (*_QueryDataDescriptionBuilder)(nil)
 
 func (b *_QueryDataDescriptionBuilder) setParent(contract ExtensionObjectDefinitionContract) {
 	b.ExtensionObjectDefinitionContract = contract
+	contract.(*_ExtensionObjectDefinition)._SubType = b._QueryDataDescription
 }
 
 func (b *_QueryDataDescriptionBuilder) WithMandatoryFields(relativePath RelativePath, attributeId uint32, indexRange PascalString) QueryDataDescriptionBuilder {

@@ -114,6 +114,7 @@ var _ (BACnetConstructedDataLinkSpeedsBuilder) = (*_BACnetConstructedDataLinkSpe
 
 func (b *_BACnetConstructedDataLinkSpeedsBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataLinkSpeeds
 }
 
 func (b *_BACnetConstructedDataLinkSpeedsBuilder) WithMandatoryFields(linkSpeeds []BACnetApplicationTagReal) BACnetConstructedDataLinkSpeedsBuilder {

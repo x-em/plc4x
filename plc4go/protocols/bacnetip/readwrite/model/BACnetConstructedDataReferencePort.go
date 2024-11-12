@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataReferencePortBuilder) = (*_BACnetConstructedDataRefe
 
 func (b *_BACnetConstructedDataReferencePortBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataReferencePort
 }
 
 func (b *_BACnetConstructedDataReferencePortBuilder) WithMandatoryFields(referencePort BACnetApplicationTagUnsignedInteger) BACnetConstructedDataReferencePortBuilder {

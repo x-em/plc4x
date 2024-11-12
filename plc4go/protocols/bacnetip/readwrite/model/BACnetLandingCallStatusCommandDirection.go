@@ -109,6 +109,7 @@ var _ (BACnetLandingCallStatusCommandDirectionBuilder) = (*_BACnetLandingCallSta
 
 func (b *_BACnetLandingCallStatusCommandDirectionBuilder) setParent(contract BACnetLandingCallStatusCommandContract) {
 	b.BACnetLandingCallStatusCommandContract = contract
+	contract.(*_BACnetLandingCallStatusCommand)._SubType = b._BACnetLandingCallStatusCommandDirection
 }
 
 func (b *_BACnetLandingCallStatusCommandDirectionBuilder) WithMandatoryFields(direction BACnetLiftCarDirectionTagged) BACnetLandingCallStatusCommandDirectionBuilder {

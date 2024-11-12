@@ -112,6 +112,7 @@ var _ (FirmataMessageAnalogIOBuilder) = (*_FirmataMessageAnalogIOBuilder)(nil)
 
 func (b *_FirmataMessageAnalogIOBuilder) setParent(contract FirmataMessageContract) {
 	b.FirmataMessageContract = contract
+	contract.(*_FirmataMessage)._SubType = b._FirmataMessageAnalogIO
 }
 
 func (b *_FirmataMessageAnalogIOBuilder) WithMandatoryFields(pin uint8, data []int8) FirmataMessageAnalogIOBuilder {

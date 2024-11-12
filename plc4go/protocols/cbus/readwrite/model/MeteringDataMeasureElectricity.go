@@ -96,6 +96,7 @@ var _ (MeteringDataMeasureElectricityBuilder) = (*_MeteringDataMeasureElectricit
 
 func (b *_MeteringDataMeasureElectricityBuilder) setParent(contract MeteringDataContract) {
 	b.MeteringDataContract = contract
+	contract.(*_MeteringData)._SubType = b._MeteringDataMeasureElectricity
 }
 
 func (b *_MeteringDataMeasureElectricityBuilder) WithMandatoryFields() MeteringDataMeasureElectricityBuilder {

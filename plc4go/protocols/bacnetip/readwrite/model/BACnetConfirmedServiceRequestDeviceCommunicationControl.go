@@ -125,6 +125,7 @@ var _ (BACnetConfirmedServiceRequestDeviceCommunicationControlBuilder) = (*_BACn
 
 func (b *_BACnetConfirmedServiceRequestDeviceCommunicationControlBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestDeviceCommunicationControl
 }
 
 func (b *_BACnetConfirmedServiceRequestDeviceCommunicationControlBuilder) WithMandatoryFields(enableDisable BACnetConfirmedServiceRequestDeviceCommunicationControlEnableDisableTagged) BACnetConfirmedServiceRequestDeviceCommunicationControlBuilder {

@@ -96,6 +96,7 @@ var _ (SysexCommandReportFirmwareRequestBuilder) = (*_SysexCommandReportFirmware
 
 func (b *_SysexCommandReportFirmwareRequestBuilder) setParent(contract SysexCommandContract) {
 	b.SysexCommandContract = contract
+	contract.(*_SysexCommand)._SubType = b._SysexCommandReportFirmwareRequest
 }
 
 func (b *_SysexCommandReportFirmwareRequestBuilder) WithMandatoryFields() SysexCommandReportFirmwareRequestBuilder {

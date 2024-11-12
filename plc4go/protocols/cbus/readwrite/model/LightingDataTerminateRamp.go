@@ -104,6 +104,7 @@ var _ (LightingDataTerminateRampBuilder) = (*_LightingDataTerminateRampBuilder)(
 
 func (b *_LightingDataTerminateRampBuilder) setParent(contract LightingDataContract) {
 	b.LightingDataContract = contract
+	contract.(*_LightingData)._SubType = b._LightingDataTerminateRamp
 }
 
 func (b *_LightingDataTerminateRampBuilder) WithMandatoryFields(group byte) LightingDataTerminateRampBuilder {

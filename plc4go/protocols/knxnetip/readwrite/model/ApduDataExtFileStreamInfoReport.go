@@ -96,6 +96,7 @@ var _ (ApduDataExtFileStreamInfoReportBuilder) = (*_ApduDataExtFileStreamInfoRep
 
 func (b *_ApduDataExtFileStreamInfoReportBuilder) setParent(contract ApduDataExtContract) {
 	b.ApduDataExtContract = contract
+	contract.(*_ApduDataExt)._SubType = b._ApduDataExtFileStreamInfoReport
 }
 
 func (b *_ApduDataExtFileStreamInfoReportBuilder) WithMandatoryFields() ApduDataExtFileStreamInfoReportBuilder {

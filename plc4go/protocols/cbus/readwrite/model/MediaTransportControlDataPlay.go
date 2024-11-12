@@ -96,6 +96,7 @@ var _ (MediaTransportControlDataPlayBuilder) = (*_MediaTransportControlDataPlayB
 
 func (b *_MediaTransportControlDataPlayBuilder) setParent(contract MediaTransportControlDataContract) {
 	b.MediaTransportControlDataContract = contract
+	contract.(*_MediaTransportControlData)._SubType = b._MediaTransportControlDataPlay
 }
 
 func (b *_MediaTransportControlDataPlayBuilder) WithMandatoryFields() MediaTransportControlDataPlayBuilder {

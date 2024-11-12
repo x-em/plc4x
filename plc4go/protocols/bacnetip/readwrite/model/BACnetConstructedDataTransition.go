@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataTransitionBuilder) = (*_BACnetConstructedDataTransit
 
 func (b *_BACnetConstructedDataTransitionBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataTransition
 }
 
 func (b *_BACnetConstructedDataTransitionBuilder) WithMandatoryFields(transition BACnetLightingTransitionTagged) BACnetConstructedDataTransitionBuilder {

@@ -111,6 +111,7 @@ var _ (BACnetConstructedDataProtocolServicesSupportedBuilder) = (*_BACnetConstru
 
 func (b *_BACnetConstructedDataProtocolServicesSupportedBuilder) setParent(contract BACnetConstructedDataContract) {
 	b.BACnetConstructedDataContract = contract
+	contract.(*_BACnetConstructedData)._SubType = b._BACnetConstructedDataProtocolServicesSupported
 }
 
 func (b *_BACnetConstructedDataProtocolServicesSupportedBuilder) WithMandatoryFields(protocolServicesSupported BACnetServicesSupportedTagged) BACnetConstructedDataProtocolServicesSupportedBuilder {

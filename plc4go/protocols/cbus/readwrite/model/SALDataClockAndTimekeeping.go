@@ -109,6 +109,7 @@ var _ (SALDataClockAndTimekeepingBuilder) = (*_SALDataClockAndTimekeepingBuilder
 
 func (b *_SALDataClockAndTimekeepingBuilder) setParent(contract SALDataContract) {
 	b.SALDataContract = contract
+	contract.(*_SALData)._SubType = b._SALDataClockAndTimekeeping
 }
 
 func (b *_SALDataClockAndTimekeepingBuilder) WithMandatoryFields(clockAndTimekeepingData ClockAndTimekeepingData) SALDataClockAndTimekeepingBuilder {

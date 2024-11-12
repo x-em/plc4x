@@ -131,6 +131,7 @@ var _ (BACnetUnconfirmedServiceRequestIHaveBuilder) = (*_BACnetUnconfirmedServic
 
 func (b *_BACnetUnconfirmedServiceRequestIHaveBuilder) setParent(contract BACnetUnconfirmedServiceRequestContract) {
 	b.BACnetUnconfirmedServiceRequestContract = contract
+	contract.(*_BACnetUnconfirmedServiceRequest)._SubType = b._BACnetUnconfirmedServiceRequestIHave
 }
 
 func (b *_BACnetUnconfirmedServiceRequestIHaveBuilder) WithMandatoryFields(deviceIdentifier BACnetApplicationTagObjectIdentifier, objectIdentifier BACnetApplicationTagObjectIdentifier, objectName BACnetApplicationTagCharacterString) BACnetUnconfirmedServiceRequestIHaveBuilder {

@@ -96,6 +96,7 @@ var _ (ApduDataRestartBuilder) = (*_ApduDataRestartBuilder)(nil)
 
 func (b *_ApduDataRestartBuilder) setParent(contract ApduDataContract) {
 	b.ApduDataContract = contract
+	contract.(*_ApduData)._SubType = b._ApduDataRestart
 }
 
 func (b *_ApduDataRestartBuilder) WithMandatoryFields() ApduDataRestartBuilder {

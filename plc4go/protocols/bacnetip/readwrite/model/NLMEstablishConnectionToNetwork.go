@@ -110,6 +110,7 @@ var _ (NLMEstablishConnectionToNetworkBuilder) = (*_NLMEstablishConnectionToNetw
 
 func (b *_NLMEstablishConnectionToNetworkBuilder) setParent(contract NLMContract) {
 	b.NLMContract = contract
+	contract.(*_NLM)._SubType = b._NLMEstablishConnectionToNetwork
 }
 
 func (b *_NLMEstablishConnectionToNetworkBuilder) WithMandatoryFields(destinationNetworkAddress uint16, terminationTime uint8) NLMEstablishConnectionToNetworkBuilder {
