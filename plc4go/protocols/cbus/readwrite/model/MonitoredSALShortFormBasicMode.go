@@ -455,7 +455,7 @@ func (m *_MonitoredSALShortFormBasicMode) deepCopy() *_MonitoredSALShortFormBasi
 		m.Application,
 		utils.DeepCopy[SALData](m.SalData),
 	}
-	m.MonitoredSALContract.(*_MonitoredSAL)._SubType = m
+	_MonitoredSALShortFormBasicModeCopy.MonitoredSALContract.(*_MonitoredSAL)._SubType = m
 	return _MonitoredSALShortFormBasicModeCopy
 }
 

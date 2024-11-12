@@ -409,7 +409,7 @@ func (m *_ApduDataExtPropertyValueResponse) deepCopy() *_ApduDataExtPropertyValu
 		m.Index,
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtPropertyValueResponseCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtPropertyValueResponseCopy
 }
 

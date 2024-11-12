@@ -450,7 +450,7 @@ func (m *_ReadValueId) deepCopy() *_ReadValueId {
 		utils.DeepCopy[PascalString](m.IndexRange),
 		utils.DeepCopy[QualifiedName](m.DataEncoding),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadValueIdCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadValueIdCopy
 }
 

@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataSerialNumber) deepCopy() *_BACnetConstructedDataS
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagCharacterString](m.SerialNumber),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataSerialNumberCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSerialNumberCopy
 }
 

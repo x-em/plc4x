@@ -373,7 +373,7 @@ func (m *_ModbusPDUWriteMultipleHoldingRegistersRequest) deepCopy() *_ModbusPDUW
 		m.Quantity,
 		utils.DeepCopySlice[byte, byte](m.Value),
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUWriteMultipleHoldingRegistersRequestCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUWriteMultipleHoldingRegistersRequestCopy
 }
 

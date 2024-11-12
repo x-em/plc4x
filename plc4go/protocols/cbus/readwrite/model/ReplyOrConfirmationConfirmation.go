@@ -361,7 +361,7 @@ func (m *_ReplyOrConfirmationConfirmation) deepCopy() *_ReplyOrConfirmationConfi
 		utils.DeepCopy[Confirmation](m.Confirmation),
 		utils.DeepCopy[ReplyOrConfirmation](m.EmbeddedReply),
 	}
-	m.ReplyOrConfirmationContract.(*_ReplyOrConfirmation)._SubType = m
+	_ReplyOrConfirmationConfirmationCopy.ReplyOrConfirmationContract.(*_ReplyOrConfirmation)._SubType = m
 	return _ReplyOrConfirmationConfirmationCopy
 }
 

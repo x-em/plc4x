@@ -291,7 +291,7 @@ func (m *_JsonWriterGroupMessageDataType) deepCopy() *_JsonWriterGroupMessageDat
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.NetworkMessageContentMask,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_JsonWriterGroupMessageDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _JsonWriterGroupMessageDataTypeCopy
 }
 

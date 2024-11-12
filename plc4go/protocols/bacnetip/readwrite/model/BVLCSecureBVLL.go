@@ -309,7 +309,7 @@ func (m *_BVLCSecureBVLL) deepCopy() *_BVLCSecureBVLL {
 		utils.DeepCopySlice[byte, byte](m.SecurityWrapper),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCSecureBVLLCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCSecureBVLLCopy
 }
 

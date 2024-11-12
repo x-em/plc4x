@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataMaxSegmentsAccepted) deepCopy() *_BACnetConstruct
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MaxSegmentsAccepted),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataMaxSegmentsAcceptedCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMaxSegmentsAcceptedCopy
 }
 

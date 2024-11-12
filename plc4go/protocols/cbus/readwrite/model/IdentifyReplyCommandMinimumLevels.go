@@ -293,7 +293,7 @@ func (m *_IdentifyReplyCommandMinimumLevels) deepCopy() *_IdentifyReplyCommandMi
 		m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand).deepCopy(),
 		utils.DeepCopySlice[byte, byte](m.MinimumLevels),
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandMinimumLevelsCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandMinimumLevelsCopy
 }
 

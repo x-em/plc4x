@@ -474,7 +474,7 @@ func (m *_CALDataStatusExtended) deepCopy() *_CALDataStatusExtended {
 		utils.DeepCopySlice[StatusByte, StatusByte](m.StatusBytes),
 		utils.DeepCopySlice[LevelInformation, LevelInformation](m.LevelInformation),
 	}
-	m.CALDataContract.(*_CALData)._SubType = m
+	_CALDataStatusExtendedCopy.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataStatusExtendedCopy
 }
 

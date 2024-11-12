@@ -736,7 +736,7 @@ func (m *_CreateSessionResponse) deepCopy() *_CreateSessionResponse {
 		utils.DeepCopy[SignatureData](m.ServerSignature),
 		m.MaxRequestMessageSize,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CreateSessionResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CreateSessionResponseCopy
 }
 

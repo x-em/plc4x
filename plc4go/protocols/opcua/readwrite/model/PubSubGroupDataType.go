@@ -569,7 +569,7 @@ func (m *_PubSubGroupDataType) deepCopy() *_PubSubGroupDataType {
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.GroupProperties),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PubSubGroupDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PubSubGroupDataTypeCopy
 }
 

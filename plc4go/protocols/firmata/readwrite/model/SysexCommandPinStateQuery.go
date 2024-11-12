@@ -295,7 +295,7 @@ func (m *_SysexCommandPinStateQuery) deepCopy() *_SysexCommandPinStateQuery {
 		m.SysexCommandContract.(*_SysexCommand).deepCopy(),
 		m.Pin,
 	}
-	m.SysexCommandContract.(*_SysexCommand)._SubType = m
+	_SysexCommandPinStateQueryCopy.SysexCommandContract.(*_SysexCommand)._SubType = m
 	return _SysexCommandPinStateQueryCopy
 }
 

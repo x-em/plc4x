@@ -368,7 +368,7 @@ func (m *_StatusResult) deepCopy() *_StatusResult {
 		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopy[DiagnosticInfo](m.DiagnosticInfo),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_StatusResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StatusResultCopy
 }
 

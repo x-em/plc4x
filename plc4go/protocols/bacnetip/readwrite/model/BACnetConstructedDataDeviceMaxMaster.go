@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataDeviceMaxMaster) deepCopy() *_BACnetConstructedDa
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MaxMaster),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataDeviceMaxMasterCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDeviceMaxMasterCopy
 }
 

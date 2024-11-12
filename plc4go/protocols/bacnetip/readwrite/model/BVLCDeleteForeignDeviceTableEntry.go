@@ -324,7 +324,7 @@ func (m *_BVLCDeleteForeignDeviceTableEntry) deepCopy() *_BVLCDeleteForeignDevic
 		utils.DeepCopySlice[uint8, uint8](m.Ip),
 		m.Port,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCDeleteForeignDeviceTableEntryCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCDeleteForeignDeviceTableEntryCopy
 }
 

@@ -250,7 +250,7 @@ func (m *_ApduControlDisconnect) deepCopy() *_ApduControlDisconnect {
 	_ApduControlDisconnectCopy := &_ApduControlDisconnect{
 		m.ApduControlContract.(*_ApduControl).deepCopy(),
 	}
-	m.ApduControlContract.(*_ApduControl)._SubType = m
+	_ApduControlDisconnectCopy.ApduControlContract.(*_ApduControl)._SubType = m
 	return _ApduControlDisconnectCopy
 }
 

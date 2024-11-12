@@ -340,7 +340,7 @@ func (m *_CALDataReply) deepCopy() *_CALDataReply {
 		m.ParamNo,
 		utils.DeepCopy[ParameterValue](m.ParameterValue),
 	}
-	m.CALDataContract.(*_CALData)._SubType = m
+	_CALDataReplyCopy.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataReplyCopy
 }
 

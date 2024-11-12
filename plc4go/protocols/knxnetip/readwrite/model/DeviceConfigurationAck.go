@@ -317,7 +317,7 @@ func (m *_DeviceConfigurationAck) deepCopy() *_DeviceConfigurationAck {
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
 		utils.DeepCopy[DeviceConfigurationAckDataBlock](m.DeviceConfigurationAckDataBlock),
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_DeviceConfigurationAckCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _DeviceConfigurationAckCopy
 }
 

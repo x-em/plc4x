@@ -406,7 +406,7 @@ func (m *_SecurityDataPasswordEntryStatus) deepCopy() *_SecurityDataPasswordEntr
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 		m.Code,
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataPasswordEntryStatusCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataPasswordEntryStatusCopy
 }
 

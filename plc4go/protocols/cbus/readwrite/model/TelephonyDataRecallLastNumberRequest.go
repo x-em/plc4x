@@ -340,7 +340,7 @@ func (m *_TelephonyDataRecallLastNumberRequest) deepCopy() *_TelephonyDataRecall
 		m.TelephonyDataContract.(*_TelephonyData).deepCopy(),
 		m.RecallLastNumberType,
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataRecallLastNumberRequestCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataRecallLastNumberRequestCopy
 }
 

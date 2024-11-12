@@ -353,7 +353,7 @@ func (m *_AdsReadRequest) deepCopy() *_AdsReadRequest {
 		m.IndexOffset,
 		m.Length,
 	}
-	m.AmsPacketContract.(*_AmsPacket)._SubType = m
+	_AdsReadRequestCopy.AmsPacketContract.(*_AmsPacket)._SubType = m
 	return _AdsReadRequestCopy
 }
 

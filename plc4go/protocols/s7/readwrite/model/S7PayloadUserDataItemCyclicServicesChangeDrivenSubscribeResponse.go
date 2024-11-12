@@ -336,7 +336,7 @@ func (m *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse) deep
 		m.ItemsCount,
 		utils.DeepCopySlice[AssociatedQueryValueType, AssociatedQueryValueType](m.Items),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseCopy
 }
 

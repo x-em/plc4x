@@ -315,7 +315,7 @@ func (m *_ParameterValueCustomManufacturer) deepCopy() *_ParameterValueCustomMan
 		m.ParameterValueContract.(*_ParameterValue).deepCopy(),
 		utils.DeepCopy[CustomManufacturer](m.Value),
 	}
-	m.ParameterValueContract.(*_ParameterValue)._SubType = m
+	_ParameterValueCustomManufacturerCopy.ParameterValueContract.(*_ParameterValue)._SubType = m
 	return _ParameterValueCustomManufacturerCopy
 }
 

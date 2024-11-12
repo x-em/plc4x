@@ -646,7 +646,7 @@ func (m *_RegisteredServer) deepCopy() *_RegisteredServer {
 		m.IsOnline,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RegisteredServerCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RegisteredServerCopy
 }
 

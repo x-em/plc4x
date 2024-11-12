@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataFirmwareRevision) deepCopy() *_BACnetConstructedD
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagCharacterString](m.FirmwareRevision),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataFirmwareRevisionCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataFirmwareRevisionCopy
 }
 

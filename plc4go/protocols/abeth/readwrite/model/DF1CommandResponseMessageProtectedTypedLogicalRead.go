@@ -294,7 +294,7 @@ func (m *_DF1CommandResponseMessageProtectedTypedLogicalRead) deepCopy() *_DF1Co
 		m.DF1ResponseMessageContract.(*_DF1ResponseMessage).deepCopy(),
 		utils.DeepCopySlice[uint8, uint8](m.Data),
 	}
-	m.DF1ResponseMessageContract.(*_DF1ResponseMessage)._SubType = m
+	_DF1CommandResponseMessageProtectedTypedLogicalReadCopy.DF1ResponseMessageContract.(*_DF1ResponseMessage)._SubType = m
 	return _DF1CommandResponseMessageProtectedTypedLogicalReadCopy
 }
 

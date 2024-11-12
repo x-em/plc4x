@@ -810,7 +810,7 @@ func (m *_ProgramDiagnostic2DataType) deepCopy() *_ProgramDiagnostic2DataType {
 		m.LastMethodCallTime,
 		utils.DeepCopy[StatusCode](m.LastMethodReturnStatus),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ProgramDiagnostic2DataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ProgramDiagnostic2DataTypeCopy
 }
 

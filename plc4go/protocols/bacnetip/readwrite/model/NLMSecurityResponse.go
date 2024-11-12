@@ -380,7 +380,7 @@ func (m *_NLMSecurityResponse) deepCopy() *_NLMSecurityResponse {
 		m.OriginalTimestamp,
 		utils.DeepCopySlice[byte, byte](m.VariableParameters),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMSecurityResponseCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMSecurityResponseCopy
 }
 

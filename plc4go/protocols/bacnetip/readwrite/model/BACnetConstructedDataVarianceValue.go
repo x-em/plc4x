@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataVarianceValue) deepCopy() *_BACnetConstructedData
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.VarianceValue),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataVarianceValueCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataVarianceValueCopy
 }
 

@@ -320,7 +320,7 @@ func (m *_ConfigurationVersionDataType) deepCopy() *_ConfigurationVersionDataTyp
 		m.MajorVersion,
 		m.MinorVersion,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ConfigurationVersionDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ConfigurationVersionDataTypeCopy
 }
 

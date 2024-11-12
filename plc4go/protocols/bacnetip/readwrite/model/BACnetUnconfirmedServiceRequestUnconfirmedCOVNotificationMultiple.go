@@ -525,7 +525,7 @@ func (m *_BACnetUnconfirmedServiceRequestUnconfirmedCOVNotificationMultiple) dee
 		utils.DeepCopy[BACnetTimeStampEnclosed](m.Timestamp),
 		utils.DeepCopy[ListOfCovNotificationsList](m.ListOfCovNotifications),
 	}
-	m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
+	_BACnetUnconfirmedServiceRequestUnconfirmedCOVNotificationMultipleCopy.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
 	return _BACnetUnconfirmedServiceRequestUnconfirmedCOVNotificationMultipleCopy
 }
 

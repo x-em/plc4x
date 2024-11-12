@@ -388,7 +388,7 @@ func (m *_DeleteMonitoredItemsRequest) deepCopy() *_DeleteMonitoredItemsRequest 
 		m.SubscriptionId,
 		utils.DeepCopySlice[uint32, uint32](m.MonitoredItemIds),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteMonitoredItemsRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteMonitoredItemsRequestCopy
 }
 

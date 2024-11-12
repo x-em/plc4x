@@ -318,7 +318,7 @@ func (m *_AccessControlDataInvalidAccessRequest) deepCopy() *_AccessControlDataI
 		m.AccessControlDirection,
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.AccessControlDataContract.(*_AccessControlData)._SubType = m
+	_AccessControlDataInvalidAccessRequestCopy.AccessControlDataContract.(*_AccessControlData)._SubType = m
 	return _AccessControlDataInvalidAccessRequestCopy
 }
 

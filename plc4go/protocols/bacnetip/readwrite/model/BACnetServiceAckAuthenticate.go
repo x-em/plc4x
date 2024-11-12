@@ -307,7 +307,7 @@ func (m *_BACnetServiceAckAuthenticate) deepCopy() *_BACnetServiceAckAuthenticat
 		utils.DeepCopySlice[byte, byte](m.BytesOfRemovedService),
 		m.ServiceAckPayloadLength,
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckAuthenticateCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckAuthenticateCopy
 }
 

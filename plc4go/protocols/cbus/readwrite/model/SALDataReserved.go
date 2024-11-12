@@ -255,7 +255,7 @@ func (m *_SALDataReserved) deepCopy() *_SALDataReserved {
 	_SALDataReservedCopy := &_SALDataReserved{
 		m.SALDataContract.(*_SALData).deepCopy(),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataReservedCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataReservedCopy
 }
 

@@ -403,7 +403,7 @@ func (m *_TriggerControlDataLabel) deepCopy() *_TriggerControlDataLabel {
 		utils.CopyPtr[Language](m.Language),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.TriggerControlDataContract.(*_TriggerControlData)._SubType = m
+	_TriggerControlDataLabelCopy.TriggerControlDataContract.(*_TriggerControlData)._SubType = m
 	return _TriggerControlDataLabelCopy
 }
 

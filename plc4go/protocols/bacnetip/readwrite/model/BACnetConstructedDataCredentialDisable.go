@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataCredentialDisable) deepCopy() *_BACnetConstructed
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetAccessCredentialDisableTagged](m.CredentialDisable),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataCredentialDisableCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCredentialDisableCopy
 }
 

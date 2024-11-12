@@ -351,7 +351,7 @@ func (m *_BACnetConstructedDataEventAlgorithmInhibitRef) deepCopy() *_BACnetCons
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetObjectPropertyReference](m.EventAlgorithmInhibitRef),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataEventAlgorithmInhibitRefCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataEventAlgorithmInhibitRefCopy
 }
 

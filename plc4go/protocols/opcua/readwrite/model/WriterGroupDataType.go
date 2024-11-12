@@ -942,7 +942,7 @@ func (m *_WriterGroupDataType) deepCopy() *_WriterGroupDataType {
 		utils.DeepCopySlice[DataSetWriterDataType, DataSetWriterDataType](m.DataSetWriters),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_WriterGroupDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _WriterGroupDataTypeCopy
 }
 

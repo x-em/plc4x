@@ -413,7 +413,7 @@ func (m *_ContentFilterElementResult) deepCopy() *_ContentFilterElementResult {
 		utils.DeepCopySlice[StatusCode, StatusCode](m.OperandStatusCodes),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.OperandDiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ContentFilterElementResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ContentFilterElementResultCopy
 }
 

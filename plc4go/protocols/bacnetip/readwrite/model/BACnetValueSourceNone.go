@@ -311,7 +311,7 @@ func (m *_BACnetValueSourceNone) deepCopy() *_BACnetValueSourceNone {
 		m.BACnetValueSourceContract.(*_BACnetValueSource).deepCopy(),
 		utils.DeepCopy[BACnetContextTagNull](m.None),
 	}
-	m.BACnetValueSourceContract.(*_BACnetValueSource)._SubType = m
+	_BACnetValueSourceNoneCopy.BACnetValueSourceContract.(*_BACnetValueSource)._SubType = m
 	return _BACnetValueSourceNoneCopy
 }
 

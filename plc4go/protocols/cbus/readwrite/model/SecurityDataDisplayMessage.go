@@ -287,7 +287,7 @@ func (m *_SecurityDataDisplayMessage) deepCopy() *_SecurityDataDisplayMessage {
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 		m.Message,
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataDisplayMessageCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataDisplayMessageCopy
 }
 

@@ -382,7 +382,7 @@ func (m *_BACnetConstructedDataCarDoorStatus) deepCopy() *_BACnetConstructedData
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetDoorStatusTagged, BACnetDoorStatusTagged](m.CarDoorStatus),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataCarDoorStatusCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCarDoorStatusCopy
 }
 

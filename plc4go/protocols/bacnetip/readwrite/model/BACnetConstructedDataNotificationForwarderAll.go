@@ -260,7 +260,7 @@ func (m *_BACnetConstructedDataNotificationForwarderAll) deepCopy() *_BACnetCons
 	_BACnetConstructedDataNotificationForwarderAllCopy := &_BACnetConstructedDataNotificationForwarderAll{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataNotificationForwarderAllCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataNotificationForwarderAllCopy
 }
 

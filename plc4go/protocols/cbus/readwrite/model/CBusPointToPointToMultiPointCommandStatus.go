@@ -327,7 +327,7 @@ func (m *_CBusPointToPointToMultiPointCommandStatus) deepCopy() *_CBusPointToPoi
 		utils.DeepCopy[StatusRequest](m.StatusRequest),
 		m.reservedField0,
 	}
-	m.CBusPointToPointToMultiPointCommandContract.(*_CBusPointToPointToMultiPointCommand)._SubType = m
+	_CBusPointToPointToMultiPointCommandStatusCopy.CBusPointToPointToMultiPointCommandContract.(*_CBusPointToPointToMultiPointCommand)._SubType = m
 	return _CBusPointToPointToMultiPointCommandStatusCopy
 }
 

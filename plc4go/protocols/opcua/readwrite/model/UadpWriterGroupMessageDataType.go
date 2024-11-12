@@ -422,7 +422,7 @@ func (m *_UadpWriterGroupMessageDataType) deepCopy() *_UadpWriterGroupMessageDat
 		m.SamplingOffset,
 		utils.DeepCopySlice[float64, float64](m.PublishingOffset),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UadpWriterGroupMessageDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UadpWriterGroupMessageDataTypeCopy
 }
 

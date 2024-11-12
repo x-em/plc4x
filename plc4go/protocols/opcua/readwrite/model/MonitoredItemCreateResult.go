@@ -455,7 +455,7 @@ func (m *_MonitoredItemCreateResult) deepCopy() *_MonitoredItemCreateResult {
 		m.RevisedQueueSize,
 		utils.DeepCopy[ExtensionObject](m.FilterResult),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_MonitoredItemCreateResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _MonitoredItemCreateResultCopy
 }
 

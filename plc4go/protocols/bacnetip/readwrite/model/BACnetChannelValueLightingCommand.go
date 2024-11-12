@@ -311,7 +311,7 @@ func (m *_BACnetChannelValueLightingCommand) deepCopy() *_BACnetChannelValueLigh
 		m.BACnetChannelValueContract.(*_BACnetChannelValue).deepCopy(),
 		utils.DeepCopy[BACnetLightingCommandEnclosed](m.LigthingCommandValue),
 	}
-	m.BACnetChannelValueContract.(*_BACnetChannelValue)._SubType = m
+	_BACnetChannelValueLightingCommandCopy.BACnetChannelValueContract.(*_BACnetChannelValue)._SubType = m
 	return _BACnetChannelValueLightingCommandCopy
 }
 

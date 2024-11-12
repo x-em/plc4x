@@ -469,7 +469,7 @@ func (m *_BACnetConfirmedServiceRequestRemoveListElement) deepCopy() *_BACnetCon
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ArrayIndex),
 		utils.DeepCopy[BACnetConstructedData](m.ListOfElements),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestRemoveListElementCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestRemoveListElementCopy
 }
 

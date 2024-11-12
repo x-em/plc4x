@@ -250,7 +250,7 @@ func (m *_ApduDataExtGroupPropertyValueRead) deepCopy() *_ApduDataExtGroupProper
 	_ApduDataExtGroupPropertyValueReadCopy := &_ApduDataExtGroupPropertyValueRead{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtGroupPropertyValueReadCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtGroupPropertyValueReadCopy
 }
 

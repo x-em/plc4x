@@ -332,7 +332,7 @@ func (m *_BinaryExtensionObjectWithMask) deepCopy() *_BinaryExtensionObjectWithM
 		m.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask).deepCopy(),
 		utils.DeepCopy[ExtensionObjectDefinition](m.Body),
 	}
-	m.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask)._SubType = m
+	_BinaryExtensionObjectWithMaskCopy.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask)._SubType = m
 	return _BinaryExtensionObjectWithMaskCopy
 }
 

@@ -365,7 +365,7 @@ func (m *_BACnetConfirmedServiceRequestAtomicReadFileRecord) deepCopy() *_BACnet
 		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.FileStartRecord),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.RequestRecordCount),
 	}
-	m.BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordContract.(*_BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecord)._SubType = m
+	_BACnetConfirmedServiceRequestAtomicReadFileRecordCopy.BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordContract.(*_BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecord)._SubType = m
 	return _BACnetConfirmedServiceRequestAtomicReadFileRecordCopy
 }
 

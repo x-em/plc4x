@@ -466,7 +466,7 @@ func (m *_GetEndpointsRequest) deepCopy() *_GetEndpointsRequest {
 		utils.DeepCopySlice[PascalString, PascalString](m.LocaleIds),
 		utils.DeepCopySlice[PascalString, PascalString](m.ProfileUris),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_GetEndpointsRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _GetEndpointsRequestCopy
 }
 

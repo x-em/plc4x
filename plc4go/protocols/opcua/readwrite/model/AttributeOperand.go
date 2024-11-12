@@ -503,7 +503,7 @@ func (m *_AttributeOperand) deepCopy() *_AttributeOperand {
 		m.AttributeId,
 		utils.DeepCopy[PascalString](m.IndexRange),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AttributeOperandCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AttributeOperandCopy
 }
 

@@ -250,7 +250,7 @@ func (m *_NotificationData) deepCopy() *_NotificationData {
 	_NotificationDataCopy := &_NotificationData{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_NotificationDataCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NotificationDataCopy
 }
 

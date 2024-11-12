@@ -311,7 +311,7 @@ func (m *_EnumDefinition) deepCopy() *_EnumDefinition {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopySlice[EnumField, EnumField](m.Fields),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EnumDefinitionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EnumDefinitionCopy
 }
 

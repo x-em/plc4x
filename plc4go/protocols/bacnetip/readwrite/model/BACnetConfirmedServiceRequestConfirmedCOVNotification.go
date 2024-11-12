@@ -528,7 +528,7 @@ func (m *_BACnetConfirmedServiceRequestConfirmedCOVNotification) deepCopy() *_BA
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.LifetimeInSeconds),
 		utils.DeepCopy[BACnetPropertyValues](m.ListOfValues),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestConfirmedCOVNotificationCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedCOVNotificationCopy
 }
 

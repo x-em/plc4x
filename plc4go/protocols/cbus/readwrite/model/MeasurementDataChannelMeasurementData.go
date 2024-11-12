@@ -485,7 +485,7 @@ func (m *_MeasurementDataChannelMeasurementData) deepCopy() *_MeasurementDataCha
 		m.Msb,
 		m.Lsb,
 	}
-	m.MeasurementDataContract.(*_MeasurementData)._SubType = m
+	_MeasurementDataChannelMeasurementDataCopy.MeasurementDataContract.(*_MeasurementData)._SubType = m
 	return _MeasurementDataChannelMeasurementDataCopy
 }
 

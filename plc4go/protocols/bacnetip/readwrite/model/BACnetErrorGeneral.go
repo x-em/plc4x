@@ -315,7 +315,7 @@ func (m *_BACnetErrorGeneral) deepCopy() *_BACnetErrorGeneral {
 		m.BACnetErrorContract.(*_BACnetError).deepCopy(),
 		utils.DeepCopy[Error](m.Error),
 	}
-	m.BACnetErrorContract.(*_BACnetError)._SubType = m
+	_BACnetErrorGeneralCopy.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _BACnetErrorGeneralCopy
 }
 

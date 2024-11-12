@@ -366,7 +366,7 @@ func (m *_RequestReset) deepCopy() *_RequestReset {
 		m.TildePeek2,
 		utils.CopyPtr[RequestType](m.ThirdTilde),
 	}
-	m.RequestContract.(*_Request)._SubType = m
+	_RequestResetCopy.RequestContract.(*_Request)._SubType = m
 	return _RequestResetCopy
 }
 

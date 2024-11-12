@@ -315,7 +315,7 @@ func (m *_CBusMessageToClient) deepCopy() *_CBusMessageToClient {
 		m.CBusMessageContract.(*_CBusMessage).deepCopy(),
 		utils.DeepCopy[ReplyOrConfirmation](m.Reply),
 	}
-	m.CBusMessageContract.(*_CBusMessage)._SubType = m
+	_CBusMessageToClientCopy.CBusMessageContract.(*_CBusMessage)._SubType = m
 	return _CBusMessageToClientCopy
 }
 

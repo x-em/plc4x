@@ -320,7 +320,7 @@ func (m *_NLMICouldBeRouterToNetwork) deepCopy() *_NLMICouldBeRouterToNetwork {
 		m.DestinationNetworkAddress,
 		m.PerformanceIndex,
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMICouldBeRouterToNetworkCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMICouldBeRouterToNetworkCopy
 }
 

@@ -470,7 +470,7 @@ func (m *_StandaloneSubscribedDataSetDataType) deepCopy() *_StandaloneSubscribed
 		utils.DeepCopy[DataSetMetaDataType](m.DataSetMetaData),
 		utils.DeepCopy[ExtensionObject](m.SubscribedDataSet),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_StandaloneSubscribedDataSetDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StandaloneSubscribedDataSetDataTypeCopy
 }
 

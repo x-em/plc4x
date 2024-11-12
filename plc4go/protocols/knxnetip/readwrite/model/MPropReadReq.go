@@ -407,7 +407,7 @@ func (m *_MPropReadReq) deepCopy() *_MPropReadReq {
 		m.NumberOfElements,
 		m.StartIndex,
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_MPropReadReqCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _MPropReadReqCopy
 }
 

@@ -475,7 +475,7 @@ func (m *_DatagramConnectionTransport2DataType) deepCopy() *_DatagramConnectionT
 		utils.DeepCopy[PascalString](m.QosCategory),
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.DatagramQos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DatagramConnectionTransport2DataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramConnectionTransport2DataTypeCopy
 }
 

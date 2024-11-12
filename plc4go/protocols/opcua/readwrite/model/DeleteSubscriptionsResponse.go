@@ -413,7 +413,7 @@ func (m *_DeleteSubscriptionsResponse) deepCopy() *_DeleteSubscriptionsResponse 
 		utils.DeepCopySlice[StatusCode, StatusCode](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteSubscriptionsResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteSubscriptionsResponseCopy
 }
 

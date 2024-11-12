@@ -293,7 +293,7 @@ func (m *_NLMIAmRouterToNetwork) deepCopy() *_NLMIAmRouterToNetwork {
 		m.NLMContract.(*_NLM).deepCopy(),
 		utils.DeepCopySlice[uint16, uint16](m.DestinationNetworkAddresses),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMIAmRouterToNetworkCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMIAmRouterToNetworkCopy
 }
 

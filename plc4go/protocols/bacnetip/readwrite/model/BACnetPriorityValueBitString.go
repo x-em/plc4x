@@ -311,7 +311,7 @@ func (m *_BACnetPriorityValueBitString) deepCopy() *_BACnetPriorityValueBitStrin
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagBitString](m.BitStringValue),
 	}
-	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
+	_BACnetPriorityValueBitStringCopy.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueBitStringCopy
 }
 

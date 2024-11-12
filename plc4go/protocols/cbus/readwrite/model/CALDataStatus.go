@@ -352,7 +352,7 @@ func (m *_CALDataStatus) deepCopy() *_CALDataStatus {
 		m.BlockStart,
 		utils.DeepCopySlice[StatusByte, StatusByte](m.StatusBytes),
 	}
-	m.CALDataContract.(*_CALData)._SubType = m
+	_CALDataStatusCopy.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataStatusCopy
 }
 

@@ -368,7 +368,7 @@ func (m *_SignedSoftwareCertificate) deepCopy() *_SignedSoftwareCertificate {
 		utils.DeepCopy[PascalByteString](m.CertificateData),
 		utils.DeepCopy[PascalByteString](m.Signature),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SignedSoftwareCertificateCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SignedSoftwareCertificateCopy
 }
 

@@ -351,7 +351,7 @@ func (m *_BACnetConstructedDataOctetStringValueRelinquishDefault) deepCopy() *_B
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.RelinquishDefault),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataOctetStringValueRelinquishDefaultCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataOctetStringValueRelinquishDefaultCopy
 }
 

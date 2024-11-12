@@ -322,7 +322,7 @@ func (m *_NLMRequestMasterKey) deepCopy() *_NLMRequestMasterKey {
 		m.NumberOfSupportedKeyAlgorithms,
 		utils.DeepCopySlice[byte, byte](m.EncryptionAndSignatureAlgorithms),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMRequestMasterKeyCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMRequestMasterKeyCopy
 }
 

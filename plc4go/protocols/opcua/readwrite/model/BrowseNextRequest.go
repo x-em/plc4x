@@ -409,7 +409,7 @@ func (m *_BrowseNextRequest) deepCopy() *_BrowseNextRequest {
 		utils.DeepCopySlice[PascalByteString, PascalByteString](m.ContinuationPoints),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrowseNextRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrowseNextRequestCopy
 }
 

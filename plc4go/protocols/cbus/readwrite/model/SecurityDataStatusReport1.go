@@ -453,7 +453,7 @@ func (m *_SecurityDataStatusReport1) deepCopy() *_SecurityDataStatusReport1 {
 		utils.DeepCopy[PanicStatus](m.PanicStatus),
 		utils.DeepCopySlice[ZoneStatus, ZoneStatus](m.ZoneStatus),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataStatusReport1Copy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataStatusReport1Copy
 }
 

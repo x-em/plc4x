@@ -315,7 +315,7 @@ func (m *_SALDataPoolsSpasPondsFountainsControl) deepCopy() *_SALDataPoolsSpasPo
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[LightingData](m.PoolsSpaPondsFountainsData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataPoolsSpasPondsFountainsControlCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataPoolsSpasPondsFountainsControlCopy
 }
 

@@ -522,7 +522,7 @@ func (m *_BACnetConfirmedServiceRequestAtomicWriteFile) deepCopy() *_BACnetConfi
 		utils.DeepCopy[BACnetApplicationTagOctetString](m.FileData),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestAtomicWriteFileCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestAtomicWriteFileCopy
 }
 

@@ -316,7 +316,7 @@ func (m *_ConnectionResponseDataBlockTunnelConnection) deepCopy() *_ConnectionRe
 		m.ConnectionResponseDataBlockContract.(*_ConnectionResponseDataBlock).deepCopy(),
 		utils.DeepCopy[KnxAddress](m.KnxAddress),
 	}
-	m.ConnectionResponseDataBlockContract.(*_ConnectionResponseDataBlock)._SubType = m
+	_ConnectionResponseDataBlockTunnelConnectionCopy.ConnectionResponseDataBlockContract.(*_ConnectionResponseDataBlock)._SubType = m
 	return _ConnectionResponseDataBlockTunnelConnectionCopy
 }
 

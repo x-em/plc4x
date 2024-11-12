@@ -287,7 +287,7 @@ func (m *_AirConditioningDataSetZoneGroupOn) deepCopy() *_AirConditioningDataSet
 		m.AirConditioningDataContract.(*_AirConditioningData).deepCopy(),
 		m.ZoneGroup,
 	}
-	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
+	_AirConditioningDataSetZoneGroupOnCopy.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
 	return _AirConditioningDataSetZoneGroupOnCopy
 }
 

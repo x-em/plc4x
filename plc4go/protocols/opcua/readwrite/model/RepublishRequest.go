@@ -373,7 +373,7 @@ func (m *_RepublishRequest) deepCopy() *_RepublishRequest {
 		m.SubscriptionId,
 		m.RetransmitSequenceNumber,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RepublishRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RepublishRequestCopy
 }
 

@@ -315,7 +315,7 @@ func (m *_NetworkAddressDataType) deepCopy() *_NetworkAddressDataType {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopy[PascalString](m.NetworkInterface),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_NetworkAddressDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NetworkAddressDataTypeCopy
 }
 

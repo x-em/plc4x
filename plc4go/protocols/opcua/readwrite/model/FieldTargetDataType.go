@@ -585,7 +585,7 @@ func (m *_FieldTargetDataType) deepCopy() *_FieldTargetDataType {
 		m.OverrideValueHandling,
 		utils.DeepCopy[Variant](m.OverrideValue),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_FieldTargetDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _FieldTargetDataTypeCopy
 }
 

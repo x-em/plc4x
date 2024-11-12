@@ -293,7 +293,7 @@ func (m *_NLMReserved) deepCopy() *_NLMReserved {
 		m.NLMContract.(*_NLM).deepCopy(),
 		utils.DeepCopySlice[byte, byte](m.UnknownBytes),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMReservedCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMReservedCopy
 }
 

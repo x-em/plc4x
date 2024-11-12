@@ -352,7 +352,7 @@ func (m *_StatusRequestLevel) deepCopy() *_StatusRequestLevel {
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.StatusRequestContract.(*_StatusRequest)._SubType = m
+	_StatusRequestLevelCopy.StatusRequestContract.(*_StatusRequest)._SubType = m
 	return _StatusRequestLevelCopy
 }
 

@@ -246,7 +246,7 @@ func (m *_BACnetApplicationTagNull) deepCopy() *_BACnetApplicationTagNull {
 	_BACnetApplicationTagNullCopy := &_BACnetApplicationTagNull{
 		m.BACnetApplicationTagContract.(*_BACnetApplicationTag).deepCopy(),
 	}
-	m.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
+	_BACnetApplicationTagNullCopy.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
 	return _BACnetApplicationTagNullCopy
 }
 

@@ -594,7 +594,7 @@ func (m *_ErrorReportingDataGeneric) deepCopy() *_ErrorReportingDataGeneric {
 		m.ErrorData1,
 		m.ErrorData2,
 	}
-	m.ErrorReportingDataContract.(*_ErrorReportingData)._SubType = m
+	_ErrorReportingDataGenericCopy.ErrorReportingDataContract.(*_ErrorReportingData)._SubType = m
 	return _ErrorReportingDataGenericCopy
 }
 

@@ -291,7 +291,7 @@ func (m *_KnxNetIpRouting) deepCopy() *_KnxNetIpRouting {
 		m.ServiceIdContract.(*_ServiceId).deepCopy(),
 		m.Version,
 	}
-	m.ServiceIdContract.(*_ServiceId)._SubType = m
+	_KnxNetIpRoutingCopy.ServiceIdContract.(*_ServiceId)._SubType = m
 	return _KnxNetIpRoutingCopy
 }
 

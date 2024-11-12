@@ -287,7 +287,7 @@ func (m *_TriggerControlDataTriggerEvent) deepCopy() *_TriggerControlDataTrigger
 		m.TriggerControlDataContract.(*_TriggerControlData).deepCopy(),
 		m.ActionSelector,
 	}
-	m.TriggerControlDataContract.(*_TriggerControlData)._SubType = m
+	_TriggerControlDataTriggerEventCopy.TriggerControlDataContract.(*_TriggerControlData)._SubType = m
 	return _TriggerControlDataTriggerEventCopy
 }
 

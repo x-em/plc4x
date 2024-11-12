@@ -320,7 +320,7 @@ func (m *_UnsignedRationalNumber) deepCopy() *_UnsignedRationalNumber {
 		m.Numerator,
 		m.Denominator,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UnsignedRationalNumberCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UnsignedRationalNumberCopy
 }
 

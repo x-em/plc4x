@@ -311,7 +311,7 @@ func (m *_BACnetRecipientDevice) deepCopy() *_BACnetRecipientDevice {
 		m.BACnetRecipientContract.(*_BACnetRecipient).deepCopy(),
 		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.DeviceValue),
 	}
-	m.BACnetRecipientContract.(*_BACnetRecipient)._SubType = m
+	_BACnetRecipientDeviceCopy.BACnetRecipientContract.(*_BACnetRecipient)._SubType = m
 	return _BACnetRecipientDeviceCopy
 }
 

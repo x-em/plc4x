@@ -311,7 +311,7 @@ func (m *_BACnetPriorityValueReal) deepCopy() *_BACnetPriorityValueReal {
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.RealValue),
 	}
-	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
+	_BACnetPriorityValueRealCopy.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueRealCopy
 }
 

@@ -2345,7 +2345,7 @@ func (m *_SessionDiagnosticsDataType) deepCopy() *_SessionDiagnosticsDataType {
 		utils.DeepCopy[ServiceCounterDataType](m.RegisterNodesCount),
 		utils.DeepCopy[ServiceCounterDataType](m.UnregisterNodesCount),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SessionDiagnosticsDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SessionDiagnosticsDataTypeCopy
 }
 

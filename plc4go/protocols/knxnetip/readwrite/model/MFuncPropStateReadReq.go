@@ -250,7 +250,7 @@ func (m *_MFuncPropStateReadReq) deepCopy() *_MFuncPropStateReadReq {
 	_MFuncPropStateReadReqCopy := &_MFuncPropStateReadReq{
 		m.CEMIContract.(*_CEMI).deepCopy(),
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_MFuncPropStateReadReqCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _MFuncPropStateReadReqCopy
 }
 

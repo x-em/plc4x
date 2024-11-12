@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataIPDHCPEnable) deepCopy() *_BACnetConstructedDataI
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagBoolean](m.IpDhcpEnable),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataIPDHCPEnableCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataIPDHCPEnableCopy
 }
 

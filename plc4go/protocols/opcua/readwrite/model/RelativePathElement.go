@@ -442,7 +442,7 @@ func (m *_RelativePathElement) deepCopy() *_RelativePathElement {
 		utils.DeepCopy[QualifiedName](m.TargetName),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RelativePathElementCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RelativePathElementCopy
 }
 

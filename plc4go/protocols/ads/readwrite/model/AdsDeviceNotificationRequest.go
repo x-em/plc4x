@@ -360,7 +360,7 @@ func (m *_AdsDeviceNotificationRequest) deepCopy() *_AdsDeviceNotificationReques
 		m.Stamps,
 		utils.DeepCopySlice[AdsStampHeader, AdsStampHeader](m.AdsStampHeaders),
 	}
-	m.AmsPacketContract.(*_AmsPacket)._SubType = m
+	_AdsDeviceNotificationRequestCopy.AmsPacketContract.(*_AmsPacket)._SubType = m
 	return _AdsDeviceNotificationRequestCopy
 }
 

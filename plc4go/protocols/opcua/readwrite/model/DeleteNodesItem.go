@@ -360,7 +360,7 @@ func (m *_DeleteNodesItem) deepCopy() *_DeleteNodesItem {
 		m.DeleteTargetReferences,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteNodesItemCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteNodesItemCopy
 }
 

@@ -493,7 +493,7 @@ func (m *_ModbusPDUReadDeviceIdentificationResponse) deepCopy() *_ModbusPDUReadD
 		m.NextObjectId,
 		utils.DeepCopySlice[ModbusDeviceInformationObject, ModbusDeviceInformationObject](m.Objects),
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUReadDeviceIdentificationResponseCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUReadDeviceIdentificationResponseCopy
 }
 

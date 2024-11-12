@@ -364,7 +364,7 @@ func (m *_FindServersResponse) deepCopy() *_FindServersResponse {
 		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[ApplicationDescription, ApplicationDescription](m.Servers),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_FindServersResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _FindServersResponseCopy
 }
 

@@ -250,7 +250,7 @@ func (m *_DiscoveryConfiguration) deepCopy() *_DiscoveryConfiguration {
 	_DiscoveryConfigurationCopy := &_DiscoveryConfiguration{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DiscoveryConfigurationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DiscoveryConfigurationCopy
 }
 

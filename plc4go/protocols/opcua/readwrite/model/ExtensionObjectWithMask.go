@@ -426,6 +426,6 @@ func (m *_ExtensionObjectWithMask) deepCopy() *_ExtensionObjectWithMask {
 		utils.DeepCopy[ExtensionObjectEncodingMask](m.EncodingMask),
 		m.ExtensionId,
 	}
-	m.ExtensionObjectContract.(*_ExtensionObject)._SubType = m
+	_ExtensionObjectWithMaskCopy.ExtensionObjectContract.(*_ExtensionObject)._SubType = m
 	return _ExtensionObjectWithMaskCopy
 }

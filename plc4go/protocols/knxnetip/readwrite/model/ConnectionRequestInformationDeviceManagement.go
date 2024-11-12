@@ -251,7 +251,7 @@ func (m *_ConnectionRequestInformationDeviceManagement) deepCopy() *_ConnectionR
 	_ConnectionRequestInformationDeviceManagementCopy := &_ConnectionRequestInformationDeviceManagement{
 		m.ConnectionRequestInformationContract.(*_ConnectionRequestInformation).deepCopy(),
 	}
-	m.ConnectionRequestInformationContract.(*_ConnectionRequestInformation)._SubType = m
+	_ConnectionRequestInformationDeviceManagementCopy.ConnectionRequestInformationContract.(*_ConnectionRequestInformation)._SubType = m
 	return _ConnectionRequestInformationDeviceManagementCopy
 }
 

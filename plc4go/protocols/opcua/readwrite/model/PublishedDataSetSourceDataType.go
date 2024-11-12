@@ -250,7 +250,7 @@ func (m *_PublishedDataSetSourceDataType) deepCopy() *_PublishedDataSetSourceDat
 	_PublishedDataSetSourceDataTypeCopy := &_PublishedDataSetSourceDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PublishedDataSetSourceDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedDataSetSourceDataTypeCopy
 }
 

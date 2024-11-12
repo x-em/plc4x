@@ -655,7 +655,7 @@ func (m *_DataSetWriterDataType) deepCopy() *_DataSetWriterDataType {
 		utils.DeepCopy[ExtensionObject](m.MessageSettings),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataSetWriterDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataSetWriterDataTypeCopy
 }
 

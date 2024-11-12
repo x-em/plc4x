@@ -404,7 +404,7 @@ func (m *_TransferSubscriptionsRequest) deepCopy() *_TransferSubscriptionsReques
 		m.SendInitialValues,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_TransferSubscriptionsRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _TransferSubscriptionsRequestCopy
 }
 

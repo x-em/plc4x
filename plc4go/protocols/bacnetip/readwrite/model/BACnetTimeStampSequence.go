@@ -311,7 +311,7 @@ func (m *_BACnetTimeStampSequence) deepCopy() *_BACnetTimeStampSequence {
 		m.BACnetTimeStampContract.(*_BACnetTimeStamp).deepCopy(),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.SequenceNumber),
 	}
-	m.BACnetTimeStampContract.(*_BACnetTimeStamp)._SubType = m
+	_BACnetTimeStampSequenceCopy.BACnetTimeStampContract.(*_BACnetTimeStamp)._SubType = m
 	return _BACnetTimeStampSequenceCopy
 }
 

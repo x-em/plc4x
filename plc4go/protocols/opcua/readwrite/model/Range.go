@@ -320,7 +320,7 @@ func (m *_Range) deepCopy() *_Range {
 		m.Low,
 		m.High,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RangeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RangeCopy
 }
 

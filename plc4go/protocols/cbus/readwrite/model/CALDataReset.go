@@ -246,7 +246,7 @@ func (m *_CALDataReset) deepCopy() *_CALDataReset {
 	_CALDataResetCopy := &_CALDataReset{
 		m.CALDataContract.(*_CALData).deepCopy(),
 	}
-	m.CALDataContract.(*_CALData)._SubType = m
+	_CALDataResetCopy.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataResetCopy
 }
 

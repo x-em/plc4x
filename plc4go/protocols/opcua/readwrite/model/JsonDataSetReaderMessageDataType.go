@@ -320,7 +320,7 @@ func (m *_JsonDataSetReaderMessageDataType) deepCopy() *_JsonDataSetReaderMessag
 		m.NetworkMessageContentMask,
 		m.DataSetMessageContentMask,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_JsonDataSetReaderMessageDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _JsonDataSetReaderMessageDataTypeCopy
 }
 

@@ -450,7 +450,7 @@ func (m *_WriteValue) deepCopy() *_WriteValue {
 		utils.DeepCopy[PascalString](m.IndexRange),
 		utils.DeepCopy[DataValue](m.Value),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_WriteValueCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _WriteValueCopy
 }
 

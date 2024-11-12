@@ -370,7 +370,7 @@ func (m *_MultipleServiceRequest) deepCopy() *_MultipleServiceRequest {
 		m.CipServiceContract.(*_CipService).deepCopy(),
 		utils.DeepCopy[Services](m.Data),
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_MultipleServiceRequestCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _MultipleServiceRequestCopy
 }
 

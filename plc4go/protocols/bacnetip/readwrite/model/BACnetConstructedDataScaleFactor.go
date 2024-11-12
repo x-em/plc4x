@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataScaleFactor) deepCopy() *_BACnetConstructedDataSc
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.ScaleFactor),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataScaleFactorCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataScaleFactorCopy
 }
 

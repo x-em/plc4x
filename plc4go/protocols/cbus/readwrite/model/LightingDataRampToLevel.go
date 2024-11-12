@@ -316,7 +316,7 @@ func (m *_LightingDataRampToLevel) deepCopy() *_LightingDataRampToLevel {
 		m.Group,
 		m.Level,
 	}
-	m.LightingDataContract.(*_LightingData)._SubType = m
+	_LightingDataRampToLevelCopy.LightingDataContract.(*_LightingData)._SubType = m
 	return _LightingDataRampToLevelCopy
 }
 

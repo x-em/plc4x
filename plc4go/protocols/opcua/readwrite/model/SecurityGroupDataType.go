@@ -655,7 +655,7 @@ func (m *_SecurityGroupDataType) deepCopy() *_SecurityGroupDataType {
 		utils.DeepCopySlice[RolePermissionType, RolePermissionType](m.RolePermissions),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.GroupProperties),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SecurityGroupDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SecurityGroupDataTypeCopy
 }
 

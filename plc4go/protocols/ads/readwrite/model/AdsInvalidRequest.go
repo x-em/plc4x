@@ -254,7 +254,7 @@ func (m *_AdsInvalidRequest) deepCopy() *_AdsInvalidRequest {
 	_AdsInvalidRequestCopy := &_AdsInvalidRequest{
 		m.AmsPacketContract.(*_AmsPacket).deepCopy(),
 	}
-	m.AmsPacketContract.(*_AmsPacket)._SubType = m
+	_AdsInvalidRequestCopy.AmsPacketContract.(*_AmsPacket)._SubType = m
 	return _AdsInvalidRequestCopy
 }
 

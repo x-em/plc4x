@@ -364,7 +364,7 @@ func (m *_EventFilter) deepCopy() *_EventFilter {
 		utils.DeepCopySlice[SimpleAttributeOperand, SimpleAttributeOperand](m.SelectClauses),
 		utils.DeepCopy[ContentFilter](m.WhereClause),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EventFilterCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EventFilterCopy
 }
 

@@ -311,7 +311,7 @@ func (m *_BACnetApplicationTagDate) deepCopy() *_BACnetApplicationTagDate {
 		m.BACnetApplicationTagContract.(*_BACnetApplicationTag).deepCopy(),
 		utils.DeepCopy[BACnetTagPayloadDate](m.Payload),
 	}
-	m.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
+	_BACnetApplicationTagDateCopy.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
 	return _BACnetApplicationTagDateCopy
 }
 

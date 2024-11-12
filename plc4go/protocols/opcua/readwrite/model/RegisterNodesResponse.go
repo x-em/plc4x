@@ -364,7 +364,7 @@ func (m *_RegisterNodesResponse) deepCopy() *_RegisterNodesResponse {
 		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[NodeId, NodeId](m.RegisteredNodeIds),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RegisterNodesResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RegisterNodesResponseCopy
 }
 

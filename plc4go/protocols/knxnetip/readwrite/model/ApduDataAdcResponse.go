@@ -250,7 +250,7 @@ func (m *_ApduDataAdcResponse) deepCopy() *_ApduDataAdcResponse {
 	_ApduDataAdcResponseCopy := &_ApduDataAdcResponse{
 		m.ApduDataContract.(*_ApduData).deepCopy(),
 	}
-	m.ApduDataContract.(*_ApduData)._SubType = m
+	_ApduDataAdcResponseCopy.ApduDataContract.(*_ApduData)._SubType = m
 	return _ApduDataAdcResponseCopy
 }
 

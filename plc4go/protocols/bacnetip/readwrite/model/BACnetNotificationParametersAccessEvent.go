@@ -679,7 +679,7 @@ func (m *_BACnetNotificationParametersAccessEvent) deepCopy() *_BACnetNotificati
 		utils.DeepCopy[BACnetAuthenticationFactorTypeTagged](m.AuthenticationFactor),
 		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
-	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
+	_BACnetNotificationParametersAccessEventCopy.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersAccessEventCopy
 }
 

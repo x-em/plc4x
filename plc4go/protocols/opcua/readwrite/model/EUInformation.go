@@ -450,7 +450,7 @@ func (m *_EUInformation) deepCopy() *_EUInformation {
 		utils.DeepCopy[LocalizedText](m.DisplayName),
 		utils.DeepCopy[LocalizedText](m.Description),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EUInformationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EUInformationCopy
 }
 

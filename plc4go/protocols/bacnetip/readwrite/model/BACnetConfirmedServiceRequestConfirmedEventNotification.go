@@ -940,7 +940,7 @@ func (m *_BACnetConfirmedServiceRequestConfirmedEventNotification) deepCopy() *_
 		utils.DeepCopy[BACnetEventStateTagged](m.ToState),
 		utils.DeepCopy[BACnetNotificationParameters](m.EventValues),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestConfirmedEventNotificationCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedEventNotificationCopy
 }
 

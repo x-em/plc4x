@@ -330,7 +330,7 @@ func (m *_VariantLocalizedText) deepCopy() *_VariantLocalizedText {
 		utils.CopyPtr[int32](m.ArrayLength),
 		utils.DeepCopySlice[LocalizedText, LocalizedText](m.Value),
 	}
-	m.VariantContract.(*_Variant)._SubType = m
+	_VariantLocalizedTextCopy.VariantContract.(*_Variant)._SubType = m
 	return _VariantLocalizedTextCopy
 }
 

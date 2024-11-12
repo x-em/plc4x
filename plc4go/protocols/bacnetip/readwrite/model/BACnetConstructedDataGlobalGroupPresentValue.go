@@ -383,7 +383,7 @@ func (m *_BACnetConstructedDataGlobalGroupPresentValue) deepCopy() *_BACnetConst
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetPropertyAccessResult, BACnetPropertyAccessResult](m.PresentValue),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataGlobalGroupPresentValueCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataGlobalGroupPresentValueCopy
 }
 

@@ -447,7 +447,7 @@ func (m *_ReadEventDetails2) deepCopy() *_ReadEventDetails2 {
 		m.ReadModified,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadEventDetails2Copy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadEventDetails2Copy
 }
 

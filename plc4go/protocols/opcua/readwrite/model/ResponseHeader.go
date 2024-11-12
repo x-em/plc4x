@@ -528,7 +528,7 @@ func (m *_ResponseHeader) deepCopy() *_ResponseHeader {
 		utils.DeepCopySlice[PascalString, PascalString](m.StringTable),
 		utils.DeepCopy[ExtensionObject](m.AdditionalHeader),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ResponseHeaderCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ResponseHeaderCopy
 }
 

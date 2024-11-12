@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataMinimumValue) deepCopy() *_BACnetConstructedDataM
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.MinimumValue),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataMinimumValueCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMinimumValueCopy
 }
 

@@ -330,7 +330,7 @@ func (m *_VariantString) deepCopy() *_VariantString {
 		utils.CopyPtr[int32](m.ArrayLength),
 		utils.DeepCopySlice[PascalString, PascalString](m.Value),
 	}
-	m.VariantContract.(*_Variant)._SubType = m
+	_VariantStringCopy.VariantContract.(*_Variant)._SubType = m
 	return _VariantStringCopy
 }
 

@@ -394,7 +394,7 @@ func (m *_S7PayloadUserDataItemCyclicServicesSubscribeRequest) deepCopy() *_S7Pa
 		m.TimeFactor,
 		utils.DeepCopySlice[CycServiceItemType, CycServiceItemType](m.Item),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCyclicServicesSubscribeRequestCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCyclicServicesSubscribeRequestCopy
 }
 

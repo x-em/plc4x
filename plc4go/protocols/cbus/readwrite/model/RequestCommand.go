@@ -496,7 +496,7 @@ func (m *_RequestCommand) deepCopy() *_RequestCommand {
 		utils.DeepCopy[Checksum](m.Chksum),
 		utils.DeepCopy[Alpha](m.Alpha),
 	}
-	m.RequestContract.(*_Request)._SubType = m
+	_RequestCommandCopy.RequestContract.(*_Request)._SubType = m
 	return _RequestCommandCopy
 }
 

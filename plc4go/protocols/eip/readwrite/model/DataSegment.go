@@ -315,7 +315,7 @@ func (m *_DataSegment) deepCopy() *_DataSegment {
 		m.PathSegmentContract.(*_PathSegment).deepCopy(),
 		utils.DeepCopy[DataSegmentType](m.SegmentType),
 	}
-	m.PathSegmentContract.(*_PathSegment)._SubType = m
+	_DataSegmentCopy.PathSegmentContract.(*_PathSegment)._SubType = m
 	return _DataSegmentCopy
 }
 

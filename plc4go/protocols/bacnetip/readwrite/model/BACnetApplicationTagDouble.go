@@ -342,7 +342,7 @@ func (m *_BACnetApplicationTagDouble) deepCopy() *_BACnetApplicationTagDouble {
 		m.BACnetApplicationTagContract.(*_BACnetApplicationTag).deepCopy(),
 		utils.DeepCopy[BACnetTagPayloadDouble](m.Payload),
 	}
-	m.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
+	_BACnetApplicationTagDoubleCopy.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
 	return _BACnetApplicationTagDoubleCopy
 }
 

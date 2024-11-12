@@ -346,7 +346,7 @@ func (m *_BACnetContextTagEnumerated) deepCopy() *_BACnetContextTagEnumerated {
 		m.BACnetContextTagContract.(*_BACnetContextTag).deepCopy(),
 		utils.DeepCopy[BACnetTagPayloadEnumerated](m.Payload),
 	}
-	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
+	_BACnetContextTagEnumeratedCopy.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagEnumeratedCopy
 }
 

@@ -421,7 +421,7 @@ func (m *_HistoryReadResult) deepCopy() *_HistoryReadResult {
 		utils.DeepCopy[PascalByteString](m.ContinuationPoint),
 		utils.DeepCopy[ExtensionObject](m.HistoryData),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_HistoryReadResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _HistoryReadResultCopy
 }
 

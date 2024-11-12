@@ -547,7 +547,7 @@ func (m *_UadpDataSetReaderMessageDataType) deepCopy() *_UadpDataSetReaderMessag
 		m.ReceiveOffset,
 		m.ProcessingOffset,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UadpDataSetReaderMessageDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UadpDataSetReaderMessageDataTypeCopy
 }
 

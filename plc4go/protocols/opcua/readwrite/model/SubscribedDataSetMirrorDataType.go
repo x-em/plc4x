@@ -364,7 +364,7 @@ func (m *_SubscribedDataSetMirrorDataType) deepCopy() *_SubscribedDataSetMirrorD
 		utils.DeepCopy[PascalString](m.ParentNodeName),
 		utils.DeepCopySlice[RolePermissionType, RolePermissionType](m.RolePermissions),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SubscribedDataSetMirrorDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SubscribedDataSetMirrorDataTypeCopy
 }
 

@@ -328,7 +328,7 @@ func (m *_S7VarRequestParameterItemAddress) deepCopy() *_S7VarRequestParameterIt
 		m.S7VarRequestParameterItemContract.(*_S7VarRequestParameterItem).deepCopy(),
 		utils.DeepCopy[S7Address](m.Address),
 	}
-	m.S7VarRequestParameterItemContract.(*_S7VarRequestParameterItem)._SubType = m
+	_S7VarRequestParameterItemAddressCopy.S7VarRequestParameterItemContract.(*_S7VarRequestParameterItem)._SubType = m
 	return _S7VarRequestParameterItemAddressCopy
 }
 

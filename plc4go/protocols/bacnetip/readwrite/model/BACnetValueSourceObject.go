@@ -311,7 +311,7 @@ func (m *_BACnetValueSourceObject) deepCopy() *_BACnetValueSourceObject {
 		m.BACnetValueSourceContract.(*_BACnetValueSource).deepCopy(),
 		utils.DeepCopy[BACnetDeviceObjectReferenceEnclosed](m.Object),
 	}
-	m.BACnetValueSourceContract.(*_BACnetValueSource)._SubType = m
+	_BACnetValueSourceObjectCopy.BACnetValueSourceContract.(*_BACnetValueSource)._SubType = m
 	return _BACnetValueSourceObjectCopy
 }
 

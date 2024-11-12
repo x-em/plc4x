@@ -447,7 +447,7 @@ func (m *_AirConditioningDataSetHumidityLowerGuardLimit) deepCopy() *_AirConditi
 		utils.DeepCopy[HVACHumidity](m.Limit),
 		utils.DeepCopy[HVACHumidityModeAndFlags](m.HvacModeAndFlags),
 	}
-	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
+	_AirConditioningDataSetHumidityLowerGuardLimitCopy.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
 	return _AirConditioningDataSetHumidityLowerGuardLimitCopy
 }
 

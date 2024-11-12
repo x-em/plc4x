@@ -307,7 +307,7 @@ func (m *_PublishedDataSetCustomSourceDataType) deepCopy() *_PublishedDataSetCus
 		m.CyclicDataSet,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PublishedDataSetCustomSourceDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedDataSetCustomSourceDataTypeCopy
 }
 

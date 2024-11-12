@@ -246,7 +246,7 @@ func (m *_SecurityDataEntryDelayStarted) deepCopy() *_SecurityDataEntryDelayStar
 	_SecurityDataEntryDelayStartedCopy := &_SecurityDataEntryDelayStarted{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataEntryDelayStartedCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataEntryDelayStartedCopy
 }
 

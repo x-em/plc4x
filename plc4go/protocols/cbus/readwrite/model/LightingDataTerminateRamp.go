@@ -287,7 +287,7 @@ func (m *_LightingDataTerminateRamp) deepCopy() *_LightingDataTerminateRamp {
 		m.LightingDataContract.(*_LightingData).deepCopy(),
 		m.Group,
 	}
-	m.LightingDataContract.(*_LightingData)._SubType = m
+	_LightingDataTerminateRampCopy.LightingDataContract.(*_LightingData)._SubType = m
 	return _LightingDataTerminateRampCopy
 }
 

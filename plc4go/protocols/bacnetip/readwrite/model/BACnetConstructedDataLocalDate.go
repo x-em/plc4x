@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataLocalDate) deepCopy() *_BACnetConstructedDataLoca
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagDate](m.LocalDate),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataLocalDateCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLocalDateCopy
 }
 

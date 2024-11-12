@@ -413,7 +413,7 @@ func (m *_RegisterServer2Response) deepCopy() *_RegisterServer2Response {
 		utils.DeepCopySlice[StatusCode, StatusCode](m.ConfigurationResults),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RegisterServer2ResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RegisterServer2ResponseCopy
 }
 

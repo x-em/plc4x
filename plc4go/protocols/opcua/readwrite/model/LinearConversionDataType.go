@@ -378,7 +378,7 @@ func (m *_LinearConversionDataType) deepCopy() *_LinearConversionDataType {
 		m.Divisor,
 		m.FinalAddend,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_LinearConversionDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _LinearConversionDataTypeCopy
 }
 

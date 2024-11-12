@@ -258,7 +258,7 @@ func (m *_SetAttributeSingleResponse) deepCopy() *_SetAttributeSingleResponse {
 	_SetAttributeSingleResponseCopy := &_SetAttributeSingleResponse{
 		m.CipServiceContract.(*_CipService).deepCopy(),
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_SetAttributeSingleResponseCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _SetAttributeSingleResponseCopy
 }
 

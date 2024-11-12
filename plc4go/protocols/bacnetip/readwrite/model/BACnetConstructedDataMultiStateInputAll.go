@@ -259,7 +259,7 @@ func (m *_BACnetConstructedDataMultiStateInputAll) deepCopy() *_BACnetConstructe
 	_BACnetConstructedDataMultiStateInputAllCopy := &_BACnetConstructedDataMultiStateInputAll{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataMultiStateInputAllCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMultiStateInputAllCopy
 }
 

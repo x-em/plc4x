@@ -291,7 +291,7 @@ func (m *_COTPParameterChecksum) deepCopy() *_COTPParameterChecksum {
 		m.COTPParameterContract.(*_COTPParameter).deepCopy(),
 		m.Crc,
 	}
-	m.COTPParameterContract.(*_COTPParameter)._SubType = m
+	_COTPParameterChecksumCopy.COTPParameterContract.(*_COTPParameter)._SubType = m
 	return _COTPParameterChecksumCopy
 }
 

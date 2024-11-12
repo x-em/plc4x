@@ -470,7 +470,7 @@ func (m *_BACnetEventParameterChangeOfValue) deepCopy() *_BACnetEventParameterCh
 		utils.DeepCopy[BACnetEventParameterChangeOfValueCivCriteria](m.CovCriteria),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterChangeOfValueCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterChangeOfValueCopy
 }
 

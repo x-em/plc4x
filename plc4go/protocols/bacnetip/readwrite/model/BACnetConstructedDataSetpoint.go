@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataSetpoint) deepCopy() *_BACnetConstructedDataSetpo
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.Setpoint),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataSetpointCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSetpointCopy
 }
 

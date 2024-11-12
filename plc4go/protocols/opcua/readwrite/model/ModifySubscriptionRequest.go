@@ -489,7 +489,7 @@ func (m *_ModifySubscriptionRequest) deepCopy() *_ModifySubscriptionRequest {
 		m.MaxNotificationsPerPublish,
 		m.Priority,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ModifySubscriptionRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ModifySubscriptionRequestCopy
 }
 

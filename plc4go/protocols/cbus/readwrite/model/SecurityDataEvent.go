@@ -289,7 +289,7 @@ func (m *_SecurityDataEvent) deepCopy() *_SecurityDataEvent {
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataEventCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataEventCopy
 }
 

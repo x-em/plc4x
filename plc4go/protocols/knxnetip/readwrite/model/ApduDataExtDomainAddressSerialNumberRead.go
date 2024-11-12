@@ -250,7 +250,7 @@ func (m *_ApduDataExtDomainAddressSerialNumberRead) deepCopy() *_ApduDataExtDoma
 	_ApduDataExtDomainAddressSerialNumberReadCopy := &_ApduDataExtDomainAddressSerialNumberRead{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtDomainAddressSerialNumberReadCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtDomainAddressSerialNumberReadCopy
 }
 

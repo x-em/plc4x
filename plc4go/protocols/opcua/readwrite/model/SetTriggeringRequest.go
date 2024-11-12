@@ -461,7 +461,7 @@ func (m *_SetTriggeringRequest) deepCopy() *_SetTriggeringRequest {
 		utils.DeepCopySlice[uint32, uint32](m.LinksToAdd),
 		utils.DeepCopySlice[uint32, uint32](m.LinksToRemove),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SetTriggeringRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SetTriggeringRequestCopy
 }
 

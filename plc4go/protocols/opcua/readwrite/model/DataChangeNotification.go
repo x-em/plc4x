@@ -360,7 +360,7 @@ func (m *_DataChangeNotification) deepCopy() *_DataChangeNotification {
 		utils.DeepCopySlice[MonitoredItemNotification, MonitoredItemNotification](m.MonitoredItems),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataChangeNotificationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataChangeNotificationCopy
 }
 

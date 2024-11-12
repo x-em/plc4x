@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesReasonForHalt) deepCopy() *_BACnetPropertyStatesRe
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetProgramErrorTagged](m.ReasonForHalt),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesReasonForHaltCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesReasonForHaltCopy
 }
 

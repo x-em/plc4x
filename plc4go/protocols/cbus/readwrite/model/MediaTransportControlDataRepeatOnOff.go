@@ -362,7 +362,7 @@ func (m *_MediaTransportControlDataRepeatOnOff) deepCopy() *_MediaTransportContr
 		m.MediaTransportControlDataContract.(*_MediaTransportControlData).deepCopy(),
 		m.RepeatType,
 	}
-	m.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
+	_MediaTransportControlDataRepeatOnOffCopy.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
 	return _MediaTransportControlDataRepeatOnOffCopy
 }
 

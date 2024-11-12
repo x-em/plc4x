@@ -368,7 +368,7 @@ func (m *_KeyValuePair) deepCopy() *_KeyValuePair {
 		utils.DeepCopy[QualifiedName](m.Key),
 		utils.DeepCopy[Variant](m.Value),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_KeyValuePairCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _KeyValuePairCopy
 }
 

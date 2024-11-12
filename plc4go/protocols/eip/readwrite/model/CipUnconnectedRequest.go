@@ -558,7 +558,7 @@ func (m *_CipUnconnectedRequest) deepCopy() *_CipUnconnectedRequest {
 		m.Slot,
 		m.reservedField0,
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_CipUnconnectedRequestCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _CipUnconnectedRequestCopy
 }
 

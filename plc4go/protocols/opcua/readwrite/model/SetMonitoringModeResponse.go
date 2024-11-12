@@ -413,7 +413,7 @@ func (m *_SetMonitoringModeResponse) deepCopy() *_SetMonitoringModeResponse {
 		utils.DeepCopySlice[StatusCode, StatusCode](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SetMonitoringModeResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SetMonitoringModeResponseCopy
 }
 

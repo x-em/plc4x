@@ -566,7 +566,7 @@ func (m *_BACnetConfirmedServiceRequestGetEnrollmentSummary) deepCopy() *_BACnet
 		utils.DeepCopy[BACnetConfirmedServiceRequestGetEnrollmentSummaryPriorityFilter](m.PriorityFilter),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.NotificationClassFilter),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestGetEnrollmentSummaryCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestGetEnrollmentSummaryCopy
 }
 

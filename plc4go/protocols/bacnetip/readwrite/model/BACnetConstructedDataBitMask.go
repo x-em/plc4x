@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataBitMask) deepCopy() *_BACnetConstructedDataBitMas
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagBitString](m.BitString),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataBitMaskCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBitMaskCopy
 }
 

@@ -369,7 +369,7 @@ func (m *_NotificationMessage) deepCopy() *_NotificationMessage {
 		m.PublishTime,
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.NotificationData),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_NotificationMessageCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NotificationMessageCopy
 }
 

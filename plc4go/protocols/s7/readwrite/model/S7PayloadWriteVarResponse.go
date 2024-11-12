@@ -302,7 +302,7 @@ func (m *_S7PayloadWriteVarResponse) deepCopy() *_S7PayloadWriteVarResponse {
 		m.S7PayloadContract.(*_S7Payload).deepCopy(),
 		utils.DeepCopySlice[S7VarPayloadStatusItem, S7VarPayloadStatusItem](m.Items),
 	}
-	m.S7PayloadContract.(*_S7Payload)._SubType = m
+	_S7PayloadWriteVarResponseCopy.S7PayloadContract.(*_S7Payload)._SubType = m
 	return _S7PayloadWriteVarResponseCopy
 }
 

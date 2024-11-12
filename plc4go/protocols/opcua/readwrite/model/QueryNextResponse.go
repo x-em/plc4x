@@ -417,7 +417,7 @@ func (m *_QueryNextResponse) deepCopy() *_QueryNextResponse {
 		utils.DeepCopySlice[QueryDataSet, QueryDataSet](m.QueryDataSets),
 		utils.DeepCopy[PascalByteString](m.RevisedContinuationPoint),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_QueryNextResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _QueryNextResponseCopy
 }
 

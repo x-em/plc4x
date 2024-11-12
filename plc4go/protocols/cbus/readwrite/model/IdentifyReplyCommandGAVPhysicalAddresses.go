@@ -293,7 +293,7 @@ func (m *_IdentifyReplyCommandGAVPhysicalAddresses) deepCopy() *_IdentifyReplyCo
 		m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand).deepCopy(),
 		utils.DeepCopySlice[byte, byte](m.Values),
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandGAVPhysicalAddressesCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandGAVPhysicalAddressesCopy
 }
 

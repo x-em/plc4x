@@ -389,7 +389,7 @@ func (m *_APDUAbort) deepCopy() *_APDUAbort {
 		utils.DeepCopy[BACnetAbortReasonTagged](m.AbortReason),
 		m.reservedField0,
 	}
-	m.APDUContract.(*_APDU)._SubType = m
+	_APDUAbortCopy.APDUContract.(*_APDU)._SubType = m
 	return _APDUAbortCopy
 }
 

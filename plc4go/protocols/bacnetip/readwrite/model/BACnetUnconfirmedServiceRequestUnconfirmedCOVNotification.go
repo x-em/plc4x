@@ -528,7 +528,7 @@ func (m *_BACnetUnconfirmedServiceRequestUnconfirmedCOVNotification) deepCopy() 
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.LifetimeInSeconds),
 		utils.DeepCopy[BACnetPropertyValues](m.ListOfValues),
 	}
-	m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
+	_BACnetUnconfirmedServiceRequestUnconfirmedCOVNotificationCopy.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
 	return _BACnetUnconfirmedServiceRequestUnconfirmedCOVNotificationCopy
 }
 

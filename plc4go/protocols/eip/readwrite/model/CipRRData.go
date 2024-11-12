@@ -377,7 +377,7 @@ func (m *_CipRRData) deepCopy() *_CipRRData {
 		m.Timeout,
 		utils.DeepCopySlice[TypeId, TypeId](m.TypeIds),
 	}
-	m.EipPacketContract.(*_EipPacket)._SubType = m
+	_CipRRDataCopy.EipPacketContract.(*_EipPacket)._SubType = m
 	return _CipRRDataCopy
 }
 

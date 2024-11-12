@@ -532,7 +532,7 @@ func (m *_BrokerDataSetWriterTransportDataType) deepCopy() *_BrokerDataSetWriter
 		utils.DeepCopy[PascalString](m.MetaDataQueueName),
 		m.MetaDataUpdateTime,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrokerDataSetWriterTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrokerDataSetWriterTransportDataTypeCopy
 }
 

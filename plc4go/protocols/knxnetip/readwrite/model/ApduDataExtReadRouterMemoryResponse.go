@@ -250,7 +250,7 @@ func (m *_ApduDataExtReadRouterMemoryResponse) deepCopy() *_ApduDataExtReadRoute
 	_ApduDataExtReadRouterMemoryResponseCopy := &_ApduDataExtReadRouterMemoryResponse{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtReadRouterMemoryResponseCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtReadRouterMemoryResponseCopy
 }
 

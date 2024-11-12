@@ -315,7 +315,7 @@ func (m *_SALDataEnableControl) deepCopy() *_SALDataEnableControl {
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[EnableControlData](m.EnableControlData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataEnableControlCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataEnableControlCopy
 }
 

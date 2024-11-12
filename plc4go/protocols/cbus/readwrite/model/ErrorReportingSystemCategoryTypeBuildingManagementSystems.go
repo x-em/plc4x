@@ -292,7 +292,7 @@ func (m *_ErrorReportingSystemCategoryTypeBuildingManagementSystems) deepCopy() 
 		m.ErrorReportingSystemCategoryTypeContract.(*_ErrorReportingSystemCategoryType).deepCopy(),
 		m.CategoryForType,
 	}
-	m.ErrorReportingSystemCategoryTypeContract.(*_ErrorReportingSystemCategoryType)._SubType = m
+	_ErrorReportingSystemCategoryTypeBuildingManagementSystemsCopy.ErrorReportingSystemCategoryTypeContract.(*_ErrorReportingSystemCategoryType)._SubType = m
 	return _ErrorReportingSystemCategoryTypeBuildingManagementSystemsCopy
 }
 

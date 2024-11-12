@@ -417,7 +417,7 @@ func (m *_BACnetFaultParameterFaultState) deepCopy() *_BACnetFaultParameterFault
 		utils.DeepCopy[BACnetFaultParameterFaultStateListOfFaultValues](m.ListOfFaultValues),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetFaultParameterContract.(*_BACnetFaultParameter)._SubType = m
+	_BACnetFaultParameterFaultStateCopy.BACnetFaultParameterContract.(*_BACnetFaultParameter)._SubType = m
 	return _BACnetFaultParameterFaultStateCopy
 }
 

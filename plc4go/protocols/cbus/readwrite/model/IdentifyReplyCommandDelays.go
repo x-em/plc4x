@@ -322,7 +322,7 @@ func (m *_IdentifyReplyCommandDelays) deepCopy() *_IdentifyReplyCommandDelays {
 		utils.DeepCopySlice[byte, byte](m.TerminalLevels),
 		m.ReStrikeDelay,
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandDelaysCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandDelaysCopy
 }
 

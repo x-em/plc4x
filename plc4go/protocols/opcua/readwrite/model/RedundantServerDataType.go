@@ -373,7 +373,7 @@ func (m *_RedundantServerDataType) deepCopy() *_RedundantServerDataType {
 		m.ServiceLevel,
 		m.ServerState,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RedundantServerDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RedundantServerDataTypeCopy
 }
 

@@ -291,7 +291,7 @@ func (m *_KnxNetObjectServer) deepCopy() *_KnxNetObjectServer {
 		m.ServiceIdContract.(*_ServiceId).deepCopy(),
 		m.Version,
 	}
-	m.ServiceIdContract.(*_ServiceId)._SubType = m
+	_KnxNetObjectServerCopy.ServiceIdContract.(*_ServiceId)._SubType = m
 	return _KnxNetObjectServerCopy
 }
 

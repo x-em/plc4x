@@ -300,7 +300,7 @@ func (m *_BACnetConstructedDataAccessTransactionEvents) deepCopy() *_BACnetConst
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopySlice[BACnetAccessEventTagged, BACnetAccessEventTagged](m.AccessTransactionEvents),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataAccessTransactionEventsCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccessTransactionEventsCopy
 }
 

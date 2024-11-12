@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesSilencedState) deepCopy() *_BACnetPropertyStatesSi
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetSilencedStateTagged](m.SilencedState),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesSilencedStateCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesSilencedStateCopy
 }
 

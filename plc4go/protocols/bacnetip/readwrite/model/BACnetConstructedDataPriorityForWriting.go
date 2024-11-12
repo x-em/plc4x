@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataPriorityForWriting) deepCopy() *_BACnetConstructe
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.PriorityForWriting),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataPriorityForWritingCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPriorityForWritingCopy
 }
 

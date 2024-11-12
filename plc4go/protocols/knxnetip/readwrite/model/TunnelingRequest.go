@@ -384,7 +384,7 @@ func (m *_TunnelingRequest) deepCopy() *_TunnelingRequest {
 		utils.DeepCopy[CEMI](m.Cemi),
 		m.TotalLength,
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_TunnelingRequestCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _TunnelingRequestCopy
 }
 

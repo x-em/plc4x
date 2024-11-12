@@ -254,7 +254,7 @@ func (m *_LDataFrameACK) deepCopy() *_LDataFrameACK {
 	_LDataFrameACKCopy := &_LDataFrameACK{
 		m.LDataFrameContract.(*_LDataFrame).deepCopy(),
 	}
-	m.LDataFrameContract.(*_LDataFrame)._SubType = m
+	_LDataFrameACKCopy.LDataFrameContract.(*_LDataFrame)._SubType = m
 	return _LDataFrameACKCopy
 }
 

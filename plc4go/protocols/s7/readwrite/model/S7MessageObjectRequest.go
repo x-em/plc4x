@@ -427,7 +427,7 @@ func (m *_S7MessageObjectRequest) deepCopy() *_S7MessageObjectRequest {
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.S7DataAlarmMessageContract.(*_S7DataAlarmMessage)._SubType = m
+	_S7MessageObjectRequestCopy.S7DataAlarmMessageContract.(*_S7DataAlarmMessage)._SubType = m
 	return _S7MessageObjectRequestCopy
 }
 

@@ -344,7 +344,7 @@ func (m *_S7PayloadUserDataItemCpuFunctionAlarmAckResponse) deepCopy() *_S7Paylo
 		m.FunctionId,
 		utils.DeepCopySlice[uint8, uint8](m.MessageObjects),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCpuFunctionAlarmAckResponseCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCpuFunctionAlarmAckResponseCopy
 }
 

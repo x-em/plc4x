@@ -359,7 +359,7 @@ func (m *_ModbusAsciiADU) deepCopy() *_ModbusAsciiADU {
 		m.Address,
 		utils.DeepCopy[ModbusPDU](m.Pdu),
 	}
-	m.ModbusADUContract.(*_ModbusADU)._SubType = m
+	_ModbusAsciiADUCopy.ModbusADUContract.(*_ModbusADU)._SubType = m
 	return _ModbusAsciiADUCopy
 }
 

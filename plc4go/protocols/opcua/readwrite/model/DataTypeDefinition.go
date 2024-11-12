@@ -250,7 +250,7 @@ func (m *_DataTypeDefinition) deepCopy() *_DataTypeDefinition {
 	_DataTypeDefinitionCopy := &_DataTypeDefinition{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataTypeDefinitionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataTypeDefinitionCopy
 }
 

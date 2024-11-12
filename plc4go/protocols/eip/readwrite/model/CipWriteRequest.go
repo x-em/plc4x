@@ -403,7 +403,7 @@ func (m *_CipWriteRequest) deepCopy() *_CipWriteRequest {
 		m.ElementNb,
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_CipWriteRequestCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _CipWriteRequestCopy
 }
 

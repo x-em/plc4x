@@ -340,7 +340,7 @@ func (m *_MediaTransportControlDataShuffleOnOff) deepCopy() *_MediaTransportCont
 		m.MediaTransportControlDataContract.(*_MediaTransportControlData).deepCopy(),
 		m.State,
 	}
-	m.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
+	_MediaTransportControlDataShuffleOnOffCopy.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
 	return _MediaTransportControlDataShuffleOnOffCopy
 }
 

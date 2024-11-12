@@ -320,7 +320,7 @@ func (m *_XVType) deepCopy() *_XVType {
 		m.X,
 		m.Value,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_XVTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _XVTypeCopy
 }
 

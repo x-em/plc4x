@@ -397,7 +397,7 @@ func (m *_UserManagementDataType) deepCopy() *_UserManagementDataType {
 		m.UserConfiguration,
 		utils.DeepCopy[PascalString](m.Description),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UserManagementDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UserManagementDataTypeCopy
 }
 

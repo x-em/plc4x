@@ -250,7 +250,7 @@ func (m *_ApduDataExtWriteRouterMemoryRequest) deepCopy() *_ApduDataExtWriteRout
 	_ApduDataExtWriteRouterMemoryRequestCopy := &_ApduDataExtWriteRouterMemoryRequest{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtWriteRouterMemoryRequestCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtWriteRouterMemoryRequestCopy
 }
 

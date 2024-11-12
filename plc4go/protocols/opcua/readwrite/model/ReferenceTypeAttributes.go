@@ -582,7 +582,7 @@ func (m *_ReferenceTypeAttributes) deepCopy() *_ReferenceTypeAttributes {
 		utils.DeepCopy[LocalizedText](m.InverseName),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReferenceTypeAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReferenceTypeAttributesCopy
 }
 

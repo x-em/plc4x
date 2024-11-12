@@ -291,7 +291,7 @@ func (m *_IdentifyReplyCommandType) deepCopy() *_IdentifyReplyCommandType {
 		m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand).deepCopy(),
 		m.UnitType,
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandTypeCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandTypeCopy
 }
 

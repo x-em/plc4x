@@ -250,7 +250,7 @@ func (m *_ApduDataExtMemoryBitWrite) deepCopy() *_ApduDataExtMemoryBitWrite {
 	_ApduDataExtMemoryBitWriteCopy := &_ApduDataExtMemoryBitWrite{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtMemoryBitWriteCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtMemoryBitWriteCopy
 }
 

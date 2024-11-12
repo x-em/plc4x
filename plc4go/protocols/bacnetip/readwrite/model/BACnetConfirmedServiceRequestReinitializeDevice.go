@@ -366,7 +366,7 @@ func (m *_BACnetConfirmedServiceRequestReinitializeDevice) deepCopy() *_BACnetCo
 		utils.DeepCopy[BACnetConfirmedServiceRequestReinitializeDeviceReinitializedStateOfDeviceTagged](m.ReinitializedStateOfDevice),
 		utils.DeepCopy[BACnetContextTagCharacterString](m.Password),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestReinitializeDeviceCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestReinitializeDeviceCopy
 }
 

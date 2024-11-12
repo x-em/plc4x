@@ -258,7 +258,7 @@ func (m *_SetAttributeListResponse) deepCopy() *_SetAttributeListResponse {
 	_SetAttributeListResponseCopy := &_SetAttributeListResponse{
 		m.CipServiceContract.(*_CipService).deepCopy(),
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_SetAttributeListResponseCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _SetAttributeListResponseCopy
 }
 

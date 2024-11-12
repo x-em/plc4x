@@ -311,7 +311,7 @@ func (m *_BACnetScaleIntegerScale) deepCopy() *_BACnetScaleIntegerScale {
 		m.BACnetScaleContract.(*_BACnetScale).deepCopy(),
 		utils.DeepCopy[BACnetContextTagSignedInteger](m.IntegerScale),
 	}
-	m.BACnetScaleContract.(*_BACnetScale)._SubType = m
+	_BACnetScaleIntegerScaleCopy.BACnetScaleContract.(*_BACnetScale)._SubType = m
 	return _BACnetScaleIntegerScaleCopy
 }
 

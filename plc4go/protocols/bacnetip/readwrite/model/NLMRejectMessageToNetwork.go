@@ -320,7 +320,7 @@ func (m *_NLMRejectMessageToNetwork) deepCopy() *_NLMRejectMessageToNetwork {
 		m.RejectReason,
 		m.DestinationNetworkAddress,
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMRejectMessageToNetworkCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMRejectMessageToNetworkCopy
 }
 

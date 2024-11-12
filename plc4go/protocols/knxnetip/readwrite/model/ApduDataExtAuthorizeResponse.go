@@ -291,7 +291,7 @@ func (m *_ApduDataExtAuthorizeResponse) deepCopy() *_ApduDataExtAuthorizeRespons
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 		m.Level,
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtAuthorizeResponseCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtAuthorizeResponseCopy
 }
 

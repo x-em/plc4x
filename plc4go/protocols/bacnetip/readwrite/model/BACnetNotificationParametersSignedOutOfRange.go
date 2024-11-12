@@ -577,7 +577,7 @@ func (m *_BACnetNotificationParametersSignedOutOfRange) deepCopy() *_BACnetNotif
 		utils.DeepCopy[BACnetContextTagSignedInteger](m.ExceededLimit),
 		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
-	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
+	_BACnetNotificationParametersSignedOutOfRangeCopy.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersSignedOutOfRangeCopy
 }
 

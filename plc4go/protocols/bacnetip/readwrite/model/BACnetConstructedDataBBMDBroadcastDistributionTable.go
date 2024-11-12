@@ -300,7 +300,7 @@ func (m *_BACnetConstructedDataBBMDBroadcastDistributionTable) deepCopy() *_BACn
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopySlice[BACnetBDTEntry, BACnetBDTEntry](m.BbmdBroadcastDistributionTable),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataBBMDBroadcastDistributionTableCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBBMDBroadcastDistributionTableCopy
 }
 

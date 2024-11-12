@@ -331,7 +331,7 @@ func (m *_APDUUnconfirmedRequest) deepCopy() *_APDUUnconfirmedRequest {
 		utils.DeepCopy[BACnetUnconfirmedServiceRequest](m.ServiceRequest),
 		m.reservedField0,
 	}
-	m.APDUContract.(*_APDU)._SubType = m
+	_APDUUnconfirmedRequestCopy.APDUContract.(*_APDU)._SubType = m
 	return _APDUUnconfirmedRequestCopy
 }
 

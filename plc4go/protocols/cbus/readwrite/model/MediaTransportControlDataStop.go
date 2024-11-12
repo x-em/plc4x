@@ -246,7 +246,7 @@ func (m *_MediaTransportControlDataStop) deepCopy() *_MediaTransportControlDataS
 	_MediaTransportControlDataStopCopy := &_MediaTransportControlDataStop{
 		m.MediaTransportControlDataContract.(*_MediaTransportControlData).deepCopy(),
 	}
-	m.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
+	_MediaTransportControlDataStopCopy.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
 	return _MediaTransportControlDataStopCopy
 }
 

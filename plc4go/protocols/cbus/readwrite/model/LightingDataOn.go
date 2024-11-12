@@ -287,7 +287,7 @@ func (m *_LightingDataOn) deepCopy() *_LightingDataOn {
 		m.LightingDataContract.(*_LightingData).deepCopy(),
 		m.Group,
 	}
-	m.LightingDataContract.(*_LightingData)._SubType = m
+	_LightingDataOnCopy.LightingDataContract.(*_LightingData)._SubType = m
 	return _LightingDataOnCopy
 }
 

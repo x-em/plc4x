@@ -519,7 +519,7 @@ func (m *_PublishedDataSetDataType) deepCopy() *_PublishedDataSetDataType {
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.ExtensionFields),
 		utils.DeepCopy[ExtensionObject](m.DataSetSource),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PublishedDataSetDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedDataSetDataTypeCopy
 }
 

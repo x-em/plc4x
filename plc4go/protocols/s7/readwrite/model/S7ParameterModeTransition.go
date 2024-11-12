@@ -440,7 +440,7 @@ func (m *_S7ParameterModeTransition) deepCopy() *_S7ParameterModeTransition {
 		m.SequenceNumber,
 		m.reservedField0,
 	}
-	m.S7ParameterContract.(*_S7Parameter)._SubType = m
+	_S7ParameterModeTransitionCopy.S7ParameterContract.(*_S7Parameter)._SubType = m
 	return _S7ParameterModeTransitionCopy
 }
 

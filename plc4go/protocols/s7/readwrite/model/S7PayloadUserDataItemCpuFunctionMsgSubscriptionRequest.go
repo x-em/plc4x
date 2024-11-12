@@ -409,7 +409,7 @@ func (m *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequest) deepCopy() *_S
 		utils.CopyPtr[uint8](m.Reserve),
 		m.reservedField0,
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequestCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCpuFunctionMsgSubscriptionRequestCopy
 }
 

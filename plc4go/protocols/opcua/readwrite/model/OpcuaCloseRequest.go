@@ -372,7 +372,7 @@ func (m *_OpcuaCloseRequest) deepCopy() *_OpcuaCloseRequest {
 		utils.DeepCopy[SecurityHeader](m.SecurityHeader),
 		utils.DeepCopy[Payload](m.Message),
 	}
-	m.MessagePDUContract.(*_MessagePDU)._SubType = m
+	_OpcuaCloseRequestCopy.MessagePDUContract.(*_MessagePDU)._SubType = m
 	return _OpcuaCloseRequestCopy
 }
 

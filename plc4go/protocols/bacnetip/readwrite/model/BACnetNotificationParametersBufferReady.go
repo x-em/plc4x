@@ -523,7 +523,7 @@ func (m *_BACnetNotificationParametersBufferReady) deepCopy() *_BACnetNotificati
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.CurrentNotification),
 		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
-	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
+	_BACnetNotificationParametersBufferReadyCopy.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersBufferReadyCopy
 }
 

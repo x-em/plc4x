@@ -344,7 +344,7 @@ func (m *_NodeIdTwoByte) deepCopy() *_NodeIdTwoByte {
 		m.NodeIdTypeDefinitionContract.(*_NodeIdTypeDefinition).deepCopy(),
 		m.Id,
 	}
-	m.NodeIdTypeDefinitionContract.(*_NodeIdTypeDefinition)._SubType = m
+	_NodeIdTwoByteCopy.NodeIdTypeDefinitionContract.(*_NodeIdTypeDefinition)._SubType = m
 	return _NodeIdTwoByteCopy
 }
 

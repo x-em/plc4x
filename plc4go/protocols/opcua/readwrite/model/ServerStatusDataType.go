@@ -484,7 +484,7 @@ func (m *_ServerStatusDataType) deepCopy() *_ServerStatusDataType {
 		m.SecondsTillShutdown,
 		utils.DeepCopy[LocalizedText](m.ShutdownReason),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ServerStatusDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ServerStatusDataTypeCopy
 }
 

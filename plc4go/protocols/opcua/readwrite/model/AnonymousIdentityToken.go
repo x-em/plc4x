@@ -315,7 +315,7 @@ func (m *_AnonymousIdentityToken) deepCopy() *_AnonymousIdentityToken {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopy[PascalString](m.PolicyId),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AnonymousIdentityTokenCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AnonymousIdentityTokenCopy
 }
 

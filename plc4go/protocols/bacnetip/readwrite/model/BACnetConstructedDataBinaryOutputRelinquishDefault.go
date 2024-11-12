@@ -351,7 +351,7 @@ func (m *_BACnetConstructedDataBinaryOutputRelinquishDefault) deepCopy() *_BACne
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetBinaryPVTagged](m.RelinquishDefault),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataBinaryOutputRelinquishDefaultCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBinaryOutputRelinquishDefaultCopy
 }
 

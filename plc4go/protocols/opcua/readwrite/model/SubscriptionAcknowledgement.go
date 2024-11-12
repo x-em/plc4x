@@ -320,7 +320,7 @@ func (m *_SubscriptionAcknowledgement) deepCopy() *_SubscriptionAcknowledgement 
 		m.SubscriptionId,
 		m.SequenceNumber,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SubscriptionAcknowledgementCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SubscriptionAcknowledgementCopy
 }
 

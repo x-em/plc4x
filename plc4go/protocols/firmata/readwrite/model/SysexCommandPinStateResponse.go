@@ -353,7 +353,7 @@ func (m *_SysexCommandPinStateResponse) deepCopy() *_SysexCommandPinStateRespons
 		m.PinMode,
 		m.PinState,
 	}
-	m.SysexCommandContract.(*_SysexCommand)._SubType = m
+	_SysexCommandPinStateResponseCopy.SysexCommandContract.(*_SysexCommand)._SubType = m
 	return _SysexCommandPinStateResponseCopy
 }
 

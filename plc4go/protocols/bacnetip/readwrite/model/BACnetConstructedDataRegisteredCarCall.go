@@ -382,7 +382,7 @@ func (m *_BACnetConstructedDataRegisteredCarCall) deepCopy() *_BACnetConstructed
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetLiftCarCallList, BACnetLiftCarCallList](m.RegisteredCarCall),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataRegisteredCarCallCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataRegisteredCarCallCopy
 }
 

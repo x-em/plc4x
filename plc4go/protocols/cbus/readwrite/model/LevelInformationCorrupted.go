@@ -374,7 +374,7 @@ func (m *_LevelInformationCorrupted) deepCopy() *_LevelInformationCorrupted {
 		m.CorruptedNibble3,
 		m.CorruptedNibble4,
 	}
-	m.LevelInformationContract.(*_LevelInformation)._SubType = m
+	_LevelInformationCorruptedCopy.LevelInformationContract.(*_LevelInformation)._SubType = m
 	return _LevelInformationCorruptedCopy
 }
 

@@ -250,7 +250,7 @@ func (m *_TDataConnectedReq) deepCopy() *_TDataConnectedReq {
 	_TDataConnectedReqCopy := &_TDataConnectedReq{
 		m.CEMIContract.(*_CEMI).deepCopy(),
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_TDataConnectedReqCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _TDataConnectedReqCopy
 }
 

@@ -405,7 +405,7 @@ func (m *_PubSubConfigurationDataType) deepCopy() *_PubSubConfigurationDataType 
 		m.Enabled,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PubSubConfigurationDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PubSubConfigurationDataTypeCopy
 }
 

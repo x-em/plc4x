@@ -300,7 +300,7 @@ func (m *_BACnetConstructedDataEscalatorFaultSignals) deepCopy() *_BACnetConstru
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopySlice[BACnetEscalatorFaultTagged, BACnetEscalatorFaultTagged](m.FaultSignals),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataEscalatorFaultSignalsCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataEscalatorFaultSignalsCopy
 }
 

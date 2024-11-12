@@ -259,7 +259,7 @@ func (m *_BACnetConstructedDataProgramAll) deepCopy() *_BACnetConstructedDataPro
 	_BACnetConstructedDataProgramAllCopy := &_BACnetConstructedDataProgramAll{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataProgramAllCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataProgramAllCopy
 }
 

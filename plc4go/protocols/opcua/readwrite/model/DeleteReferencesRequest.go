@@ -364,7 +364,7 @@ func (m *_DeleteReferencesRequest) deepCopy() *_DeleteReferencesRequest {
 		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[DeleteReferencesItem, DeleteReferencesItem](m.ReferencesToDelete),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteReferencesRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteReferencesRequestCopy
 }
 

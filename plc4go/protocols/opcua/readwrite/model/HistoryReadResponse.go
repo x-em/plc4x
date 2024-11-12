@@ -413,7 +413,7 @@ func (m *_HistoryReadResponse) deepCopy() *_HistoryReadResponse {
 		utils.DeepCopySlice[HistoryReadResult, HistoryReadResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_HistoryReadResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _HistoryReadResponseCopy
 }
 

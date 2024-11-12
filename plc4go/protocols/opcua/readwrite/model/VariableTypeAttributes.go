@@ -679,7 +679,7 @@ func (m *_VariableTypeAttributes) deepCopy() *_VariableTypeAttributes {
 		m.IsAbstract,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_VariableTypeAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _VariableTypeAttributesCopy
 }
 

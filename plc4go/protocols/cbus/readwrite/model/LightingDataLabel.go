@@ -403,7 +403,7 @@ func (m *_LightingDataLabel) deepCopy() *_LightingDataLabel {
 		utils.CopyPtr[Language](m.Language),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.LightingDataContract.(*_LightingData)._SubType = m
+	_LightingDataLabelCopy.LightingDataContract.(*_LightingData)._SubType = m
 	return _LightingDataLabelCopy
 }
 

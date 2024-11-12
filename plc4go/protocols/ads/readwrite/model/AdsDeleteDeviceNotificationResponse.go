@@ -295,7 +295,7 @@ func (m *_AdsDeleteDeviceNotificationResponse) deepCopy() *_AdsDeleteDeviceNotif
 		m.AmsPacketContract.(*_AmsPacket).deepCopy(),
 		m.Result,
 	}
-	m.AmsPacketContract.(*_AmsPacket)._SubType = m
+	_AdsDeleteDeviceNotificationResponseCopy.AmsPacketContract.(*_AmsPacket)._SubType = m
 	return _AdsDeleteDeviceNotificationResponseCopy
 }
 

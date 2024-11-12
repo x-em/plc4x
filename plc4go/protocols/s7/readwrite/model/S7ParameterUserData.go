@@ -315,7 +315,7 @@ func (m *_S7ParameterUserData) deepCopy() *_S7ParameterUserData {
 		m.S7ParameterContract.(*_S7Parameter).deepCopy(),
 		utils.DeepCopySlice[S7ParameterUserDataItem, S7ParameterUserDataItem](m.Items),
 	}
-	m.S7ParameterContract.(*_S7Parameter)._SubType = m
+	_S7ParameterUserDataCopy.S7ParameterContract.(*_S7Parameter)._SubType = m
 	return _S7ParameterUserDataCopy
 }
 

@@ -336,7 +336,7 @@ func (m *_NLMNetworkNumberIs) deepCopy() *_NLMNetworkNumberIs {
 		m.NetworkNumberConfigured,
 		m.reservedField0,
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMNetworkNumberIsCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMNetworkNumberIsCopy
 }
 

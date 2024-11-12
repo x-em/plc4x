@@ -335,7 +335,7 @@ func (m *_ApduDataMemoryResponse) deepCopy() *_ApduDataMemoryResponse {
 		m.Address,
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.ApduDataContract.(*_ApduData)._SubType = m
+	_ApduDataMemoryResponseCopy.ApduDataContract.(*_ApduData)._SubType = m
 	return _ApduDataMemoryResponseCopy
 }
 

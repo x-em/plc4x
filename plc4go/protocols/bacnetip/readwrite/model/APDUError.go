@@ -389,7 +389,7 @@ func (m *_APDUError) deepCopy() *_APDUError {
 		utils.DeepCopy[BACnetError](m.Error),
 		m.reservedField0,
 	}
-	m.APDUContract.(*_APDU)._SubType = m
+	_APDUErrorCopy.APDUContract.(*_APDU)._SubType = m
 	return _APDUErrorCopy
 }
 

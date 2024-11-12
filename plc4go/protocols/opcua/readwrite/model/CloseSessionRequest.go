@@ -360,7 +360,7 @@ func (m *_CloseSessionRequest) deepCopy() *_CloseSessionRequest {
 		m.DeleteSubscriptions,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CloseSessionRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CloseSessionRequestCopy
 }
 

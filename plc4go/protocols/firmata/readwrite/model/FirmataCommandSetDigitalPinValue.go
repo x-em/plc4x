@@ -336,7 +336,7 @@ func (m *_FirmataCommandSetDigitalPinValue) deepCopy() *_FirmataCommandSetDigita
 		m.On,
 		m.reservedField0,
 	}
-	m.FirmataCommandContract.(*_FirmataCommand)._SubType = m
+	_FirmataCommandSetDigitalPinValueCopy.FirmataCommandContract.(*_FirmataCommand)._SubType = m
 	return _FirmataCommandSetDigitalPinValueCopy
 }
 

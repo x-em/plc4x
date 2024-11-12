@@ -311,7 +311,7 @@ func (m *_BACnetClientCOVNone) deepCopy() *_BACnetClientCOVNone {
 		m.BACnetClientCOVContract.(*_BACnetClientCOV).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagNull](m.DefaultIncrement),
 	}
-	m.BACnetClientCOVContract.(*_BACnetClientCOV)._SubType = m
+	_BACnetClientCOVNoneCopy.BACnetClientCOVContract.(*_BACnetClientCOV)._SubType = m
 	return _BACnetClientCOVNoneCopy
 }
 

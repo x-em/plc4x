@@ -389,7 +389,7 @@ func (m *_SessionlessInvokeResponseType) deepCopy() *_SessionlessInvokeResponseT
 		utils.DeepCopySlice[PascalString, PascalString](m.ServerUris),
 		m.ServiceId,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SessionlessInvokeResponseTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SessionlessInvokeResponseTypeCopy
 }
 

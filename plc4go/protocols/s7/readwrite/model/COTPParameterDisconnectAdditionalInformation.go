@@ -294,7 +294,7 @@ func (m *_COTPParameterDisconnectAdditionalInformation) deepCopy() *_COTPParamet
 		m.COTPParameterContract.(*_COTPParameter).deepCopy(),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.COTPParameterContract.(*_COTPParameter)._SubType = m
+	_COTPParameterDisconnectAdditionalInformationCopy.COTPParameterContract.(*_COTPParameter)._SubType = m
 	return _COTPParameterDisconnectAdditionalInformationCopy
 }
 

@@ -287,7 +287,7 @@ func (m *_SecurityDataRequestZoneName) deepCopy() *_SecurityDataRequestZoneName 
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 		m.ZoneNumber,
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataRequestZoneNameCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataRequestZoneNameCopy
 }
 

@@ -420,7 +420,7 @@ func (m *_RequestDirectCommandAccess) deepCopy() *_RequestDirectCommandAccess {
 		utils.DeepCopy[CALData](m.CalData),
 		utils.DeepCopy[Alpha](m.Alpha),
 	}
-	m.RequestContract.(*_Request)._SubType = m
+	_RequestDirectCommandAccessCopy.RequestContract.(*_Request)._SubType = m
 	return _RequestDirectCommandAccessCopy
 }
 

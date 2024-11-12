@@ -450,7 +450,7 @@ func (m *_EnumField) deepCopy() *_EnumField {
 		utils.DeepCopy[LocalizedText](m.Description),
 		utils.DeepCopy[PascalString](m.Name),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EnumFieldCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EnumFieldCopy
 }
 

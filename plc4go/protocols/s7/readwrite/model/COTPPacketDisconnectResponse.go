@@ -320,7 +320,7 @@ func (m *_COTPPacketDisconnectResponse) deepCopy() *_COTPPacketDisconnectRespons
 		m.DestinationReference,
 		m.SourceReference,
 	}
-	m.COTPPacketContract.(*_COTPPacket)._SubType = m
+	_COTPPacketDisconnectResponseCopy.COTPPacketContract.(*_COTPPacket)._SubType = m
 	return _COTPPacketDisconnectResponseCopy
 }
 

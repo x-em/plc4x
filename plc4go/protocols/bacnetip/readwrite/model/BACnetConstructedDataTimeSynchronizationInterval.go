@@ -351,7 +351,7 @@ func (m *_BACnetConstructedDataTimeSynchronizationInterval) deepCopy() *_BACnetC
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.TimeSynchronization),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataTimeSynchronizationIntervalCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTimeSynchronizationIntervalCopy
 }
 

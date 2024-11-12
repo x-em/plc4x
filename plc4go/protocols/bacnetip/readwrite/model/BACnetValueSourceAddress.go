@@ -311,7 +311,7 @@ func (m *_BACnetValueSourceAddress) deepCopy() *_BACnetValueSourceAddress {
 		m.BACnetValueSourceContract.(*_BACnetValueSource).deepCopy(),
 		utils.DeepCopy[BACnetAddressEnclosed](m.Address),
 	}
-	m.BACnetValueSourceContract.(*_BACnetValueSource)._SubType = m
+	_BACnetValueSourceAddressCopy.BACnetValueSourceContract.(*_BACnetValueSource)._SubType = m
 	return _BACnetValueSourceAddressCopy
 }
 

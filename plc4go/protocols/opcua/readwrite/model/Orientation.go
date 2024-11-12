@@ -250,7 +250,7 @@ func (m *_Orientation) deepCopy() *_Orientation {
 	_OrientationCopy := &_Orientation{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_OrientationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _OrientationCopy
 }
 

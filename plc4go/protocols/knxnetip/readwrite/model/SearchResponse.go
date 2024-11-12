@@ -423,7 +423,7 @@ func (m *_SearchResponse) deepCopy() *_SearchResponse {
 		utils.DeepCopy[DIBDeviceInfo](m.DibDeviceInfo),
 		utils.DeepCopy[DIBSuppSvcFamilies](m.DibSuppSvcFamilies),
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_SearchResponseCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _SearchResponseCopy
 }
 

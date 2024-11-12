@@ -413,7 +413,7 @@ func (m *_TranslateBrowsePathsToNodeIdsResponse) deepCopy() *_TranslateBrowsePat
 		utils.DeepCopySlice[BrowsePathResult, BrowsePathResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_TranslateBrowsePathsToNodeIdsResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _TranslateBrowsePathsToNodeIdsResponseCopy
 }
 

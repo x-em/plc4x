@@ -297,7 +297,7 @@ func (m *_SysexCommandExtendedId) deepCopy() *_SysexCommandExtendedId {
 		m.SysexCommandContract.(*_SysexCommand).deepCopy(),
 		utils.DeepCopySlice[int8, int8](m.Id),
 	}
-	m.SysexCommandContract.(*_SysexCommand)._SubType = m
+	_SysexCommandExtendedIdCopy.SysexCommandContract.(*_SysexCommand)._SubType = m
 	return _SysexCommandExtendedIdCopy
 }
 

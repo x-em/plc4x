@@ -331,7 +331,7 @@ func (m *_BVLCDistributeBroadcastToNetwork) deepCopy() *_BVLCDistributeBroadcast
 		utils.DeepCopy[NPDU](m.Npdu),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCDistributeBroadcastToNetworkCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCDistributeBroadcastToNetworkCopy
 }
 

@@ -328,7 +328,7 @@ func (m *_ModbusPDUWriteSingleCoilResponse) deepCopy() *_ModbusPDUWriteSingleCoi
 		m.Address,
 		m.Value,
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUWriteSingleCoilResponseCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUWriteSingleCoilResponseCopy
 }
 

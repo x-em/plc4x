@@ -657,7 +657,7 @@ func (m *_CipConnectionManagerCloseRequest) deepCopy() *_CipConnectionManagerClo
 		utils.DeepCopySlice[PathSegment, PathSegment](m.ConnectionPaths),
 		m.reservedField0,
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_CipConnectionManagerCloseRequestCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _CipConnectionManagerCloseRequestCopy
 }
 

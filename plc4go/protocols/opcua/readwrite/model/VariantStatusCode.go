@@ -330,7 +330,7 @@ func (m *_VariantStatusCode) deepCopy() *_VariantStatusCode {
 		utils.CopyPtr[int32](m.ArrayLength),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.Value),
 	}
-	m.VariantContract.(*_Variant)._SubType = m
+	_VariantStatusCodeCopy.VariantContract.(*_Variant)._SubType = m
 	return _VariantStatusCodeCopy
 }
 

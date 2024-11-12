@@ -421,7 +421,7 @@ func (m *_BACnetServiceAckGetAlarmSummary) deepCopy() *_BACnetServiceAckGetAlarm
 		utils.DeepCopy[BACnetEventStateTagged](m.EventState),
 		utils.DeepCopy[BACnetEventTransitionBitsTagged](m.AcknowledgedTransitions),
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckGetAlarmSummaryCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckGetAlarmSummaryCopy
 }
 

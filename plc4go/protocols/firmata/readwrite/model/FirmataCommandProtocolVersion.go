@@ -320,7 +320,7 @@ func (m *_FirmataCommandProtocolVersion) deepCopy() *_FirmataCommandProtocolVers
 		m.MajorVersion,
 		m.MinorVersion,
 	}
-	m.FirmataCommandContract.(*_FirmataCommand)._SubType = m
+	_FirmataCommandProtocolVersionCopy.FirmataCommandContract.(*_FirmataCommand)._SubType = m
 	return _FirmataCommandProtocolVersionCopy
 }
 

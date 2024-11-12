@@ -691,7 +691,7 @@ func (m *_CreateSessionRequest) deepCopy() *_CreateSessionRequest {
 		m.RequestedSessionTimeout,
 		m.MaxResponseMessageSize,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CreateSessionRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CreateSessionRequestCopy
 }
 

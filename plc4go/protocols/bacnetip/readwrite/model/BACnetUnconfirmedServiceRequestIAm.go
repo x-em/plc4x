@@ -474,7 +474,7 @@ func (m *_BACnetUnconfirmedServiceRequestIAm) deepCopy() *_BACnetUnconfirmedServ
 		utils.DeepCopy[BACnetSegmentationTagged](m.SegmentationSupported),
 		utils.DeepCopy[BACnetVendorIdTagged](m.VendorId),
 	}
-	m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
+	_BACnetUnconfirmedServiceRequestIAmCopy.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
 	return _BACnetUnconfirmedServiceRequestIAmCopy
 }
 

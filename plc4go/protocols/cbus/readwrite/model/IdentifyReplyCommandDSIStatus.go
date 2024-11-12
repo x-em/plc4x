@@ -552,7 +552,7 @@ func (m *_IdentifyReplyCommandDSIStatus) deepCopy() *_IdentifyReplyCommandDSISta
 		m.UnitStatus,
 		m.DimmingUCRevisionNumber,
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandDSIStatusCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandDSIStatusCopy
 }
 

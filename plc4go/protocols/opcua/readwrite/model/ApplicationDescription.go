@@ -605,7 +605,7 @@ func (m *_ApplicationDescription) deepCopy() *_ApplicationDescription {
 		utils.DeepCopy[PascalString](m.DiscoveryProfileUri),
 		utils.DeepCopySlice[PascalString, PascalString](m.DiscoveryUrls),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ApplicationDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ApplicationDescriptionCopy
 }
 

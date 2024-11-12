@@ -336,7 +336,7 @@ func (m *_APDUSimpleAck) deepCopy() *_APDUSimpleAck {
 		m.ServiceChoice,
 		m.reservedField0,
 	}
-	m.APDUContract.(*_APDU)._SubType = m
+	_APDUSimpleAckCopy.APDUContract.(*_APDU)._SubType = m
 	return _APDUSimpleAckCopy
 }
 

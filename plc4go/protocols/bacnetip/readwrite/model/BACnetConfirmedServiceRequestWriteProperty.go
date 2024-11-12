@@ -522,7 +522,7 @@ func (m *_BACnetConfirmedServiceRequestWriteProperty) deepCopy() *_BACnetConfirm
 		utils.DeepCopy[BACnetConstructedData](m.PropertyValue),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Priority),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestWritePropertyCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestWritePropertyCopy
 }
 

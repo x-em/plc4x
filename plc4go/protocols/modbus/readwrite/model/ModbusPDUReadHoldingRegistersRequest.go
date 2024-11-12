@@ -328,7 +328,7 @@ func (m *_ModbusPDUReadHoldingRegistersRequest) deepCopy() *_ModbusPDUReadHoldin
 		m.StartingAddress,
 		m.Quantity,
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUReadHoldingRegistersRequestCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUReadHoldingRegistersRequestCopy
 }
 

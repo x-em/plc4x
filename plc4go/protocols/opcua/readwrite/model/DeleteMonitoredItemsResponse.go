@@ -413,7 +413,7 @@ func (m *_DeleteMonitoredItemsResponse) deepCopy() *_DeleteMonitoredItemsRespons
 		utils.DeepCopySlice[StatusCode, StatusCode](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteMonitoredItemsResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteMonitoredItemsResponseCopy
 }
 

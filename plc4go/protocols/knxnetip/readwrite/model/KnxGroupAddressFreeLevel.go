@@ -291,7 +291,7 @@ func (m *_KnxGroupAddressFreeLevel) deepCopy() *_KnxGroupAddressFreeLevel {
 		m.KnxGroupAddressContract.(*_KnxGroupAddress).deepCopy(),
 		m.SubGroup,
 	}
-	m.KnxGroupAddressContract.(*_KnxGroupAddress)._SubType = m
+	_KnxGroupAddressFreeLevelCopy.KnxGroupAddressContract.(*_KnxGroupAddress)._SubType = m
 	return _KnxGroupAddressFreeLevelCopy
 }
 

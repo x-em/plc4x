@@ -311,7 +311,7 @@ func (m *_PublishedDataItemsDataType) deepCopy() *_PublishedDataItemsDataType {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopySlice[PublishedVariableDataType, PublishedVariableDataType](m.PublishedData),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PublishedDataItemsDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedDataItemsDataTypeCopy
 }
 

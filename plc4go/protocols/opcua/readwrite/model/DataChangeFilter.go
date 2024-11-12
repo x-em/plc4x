@@ -349,7 +349,7 @@ func (m *_DataChangeFilter) deepCopy() *_DataChangeFilter {
 		m.DeadbandType,
 		m.DeadbandValue,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataChangeFilterCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataChangeFilterCopy
 }
 

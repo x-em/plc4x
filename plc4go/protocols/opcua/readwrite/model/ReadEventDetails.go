@@ -402,7 +402,7 @@ func (m *_ReadEventDetails) deepCopy() *_ReadEventDetails {
 		m.EndTime,
 		utils.DeepCopy[EventFilter](m.Filter),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadEventDetailsCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadEventDetailsCopy
 }
 

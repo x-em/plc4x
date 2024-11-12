@@ -524,7 +524,7 @@ func (m *_BACnetServiceAckGetEnrollmentSummary) deepCopy() *_BACnetServiceAckGet
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.Priority),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NotificationClass),
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckGetEnrollmentSummaryCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckGetEnrollmentSummaryCopy
 }
 

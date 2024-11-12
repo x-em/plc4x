@@ -618,7 +618,7 @@ func (m *_APDUComplexAck) deepCopy() *_APDUComplexAck {
 		utils.DeepCopySlice[byte, byte](m.Segment),
 		m.reservedField0,
 	}
-	m.APDUContract.(*_APDU)._SubType = m
+	_APDUComplexAckCopy.APDUContract.(*_APDU)._SubType = m
 	return _APDUComplexAckCopy
 }
 

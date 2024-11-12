@@ -259,7 +259,7 @@ func (m *_BACnetConstructedDataTrendLogAll) deepCopy() *_BACnetConstructedDataTr
 	_BACnetConstructedDataTrendLogAllCopy := &_BACnetConstructedDataTrendLogAll{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataTrendLogAllCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTrendLogAllCopy
 }
 

@@ -471,7 +471,7 @@ func (m *_ConfirmedPrivateTransferError) deepCopy() *_ConfirmedPrivateTransferEr
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ServiceNumber),
 		utils.DeepCopy[BACnetConstructedData](m.ErrorParameters),
 	}
-	m.BACnetErrorContract.(*_BACnetError)._SubType = m
+	_ConfirmedPrivateTransferErrorCopy.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _ConfirmedPrivateTransferErrorCopy
 }
 

@@ -311,7 +311,7 @@ func (m *_BVLCReadForeignDeviceTableAck) deepCopy() *_BVLCReadForeignDeviceTable
 		utils.DeepCopySlice[BVLCForeignDeviceTableEntry, BVLCForeignDeviceTableEntry](m.Table),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCReadForeignDeviceTableAckCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCReadForeignDeviceTableAckCopy
 }
 

@@ -320,7 +320,7 @@ func (m *_InstanceID) deepCopy() *_InstanceID {
 		m.Format,
 		m.Instance,
 	}
-	m.LogicalSegmentTypeContract.(*_LogicalSegmentType)._SubType = m
+	_InstanceIDCopy.LogicalSegmentTypeContract.(*_LogicalSegmentType)._SubType = m
 	return _InstanceIDCopy
 }
 

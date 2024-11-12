@@ -414,7 +414,7 @@ func (m *_MediaTransportControlDataEnumerateCategoriesSelectionTracks) deepCopy(
 		m.EnumerateType,
 		m.Start,
 	}
-	m.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
+	_MediaTransportControlDataEnumerateCategoriesSelectionTracksCopy.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
 	return _MediaTransportControlDataEnumerateCategoriesSelectionTracksCopy
 }
 

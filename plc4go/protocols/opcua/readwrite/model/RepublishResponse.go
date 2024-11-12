@@ -368,7 +368,7 @@ func (m *_RepublishResponse) deepCopy() *_RepublishResponse {
 		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopy[NotificationMessage](m.NotificationMessage),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RepublishResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RepublishResponseCopy
 }
 

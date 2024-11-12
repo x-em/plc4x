@@ -523,7 +523,7 @@ func (m *_BACnetEventParameterUnsignedRange) deepCopy() *_BACnetEventParameterUn
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.HighLimit),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterUnsignedRangeCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterUnsignedRangeCopy
 }
 

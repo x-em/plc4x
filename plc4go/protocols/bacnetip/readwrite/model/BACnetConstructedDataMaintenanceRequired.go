@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataMaintenanceRequired) deepCopy() *_BACnetConstruct
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetMaintenanceTagged](m.MaintenanceRequired),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataMaintenanceRequiredCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMaintenanceRequiredCopy
 }
 

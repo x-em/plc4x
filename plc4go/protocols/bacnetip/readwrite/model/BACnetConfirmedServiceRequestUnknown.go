@@ -307,7 +307,7 @@ func (m *_BACnetConfirmedServiceRequestUnknown) deepCopy() *_BACnetConfirmedServ
 		utils.DeepCopySlice[byte, byte](m.UnknownBytes),
 		m.ServiceRequestPayloadLength,
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestUnknownCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestUnknownCopy
 }
 

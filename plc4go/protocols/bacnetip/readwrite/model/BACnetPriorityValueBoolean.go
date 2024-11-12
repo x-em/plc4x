@@ -311,7 +311,7 @@ func (m *_BACnetPriorityValueBoolean) deepCopy() *_BACnetPriorityValueBoolean {
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagBoolean](m.BooleanValue),
 	}
-	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
+	_BACnetPriorityValueBooleanCopy.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueBooleanCopy
 }
 

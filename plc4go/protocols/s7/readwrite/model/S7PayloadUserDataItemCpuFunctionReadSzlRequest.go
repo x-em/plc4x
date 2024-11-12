@@ -353,7 +353,7 @@ func (m *_S7PayloadUserDataItemCpuFunctionReadSzlRequest) deepCopy() *_S7Payload
 		utils.DeepCopy[SzlId](m.SzlId),
 		m.SzlIndex,
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCpuFunctionReadSzlRequestCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCpuFunctionReadSzlRequestCopy
 }
 

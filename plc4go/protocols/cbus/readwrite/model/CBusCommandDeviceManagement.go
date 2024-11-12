@@ -345,7 +345,7 @@ func (m *_CBusCommandDeviceManagement) deepCopy() *_CBusCommandDeviceManagement 
 		m.ParamNo,
 		m.ParameterValue,
 	}
-	m.CBusCommandContract.(*_CBusCommand)._SubType = m
+	_CBusCommandDeviceManagementCopy.CBusCommandContract.(*_CBusCommand)._SubType = m
 	return _CBusCommandDeviceManagementCopy
 }
 

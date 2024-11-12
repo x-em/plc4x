@@ -447,7 +447,7 @@ func (m *_MonitoringParameters) deepCopy() *_MonitoringParameters {
 		m.DiscardOldest,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_MonitoringParametersCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _MonitoringParametersCopy
 }
 

@@ -341,7 +341,7 @@ func (m *_MediaTransportControlDataSourcePowerControl) deepCopy() *_MediaTranspo
 		m.MediaTransportControlDataContract.(*_MediaTransportControlData).deepCopy(),
 		m.State,
 	}
-	m.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
+	_MediaTransportControlDataSourcePowerControlCopy.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
 	return _MediaTransportControlDataSourcePowerControlCopy
 }
 

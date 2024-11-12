@@ -311,7 +311,7 @@ func (m *_AdditionalParametersType) deepCopy() *_AdditionalParametersType {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.Parameters),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AdditionalParametersTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AdditionalParametersTypeCopy
 }
 

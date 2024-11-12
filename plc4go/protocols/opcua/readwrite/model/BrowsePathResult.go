@@ -364,7 +364,7 @@ func (m *_BrowsePathResult) deepCopy() *_BrowsePathResult {
 		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopySlice[BrowsePathTarget, BrowsePathTarget](m.Targets),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrowsePathResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrowsePathResultCopy
 }
 

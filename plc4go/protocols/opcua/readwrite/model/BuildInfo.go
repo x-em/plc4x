@@ -556,7 +556,7 @@ func (m *_BuildInfo) deepCopy() *_BuildInfo {
 		utils.DeepCopy[PascalString](m.BuildNumber),
 		m.BuildDate,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BuildInfoCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BuildInfoCopy
 }
 

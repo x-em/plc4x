@@ -291,7 +291,7 @@ func (m *_ApduDataDeviceDescriptorRead) deepCopy() *_ApduDataDeviceDescriptorRea
 		m.ApduDataContract.(*_ApduData).deepCopy(),
 		m.DescriptorType,
 	}
-	m.ApduDataContract.(*_ApduData)._SubType = m
+	_ApduDataDeviceDescriptorReadCopy.ApduDataContract.(*_ApduData)._SubType = m
 	return _ApduDataDeviceDescriptorReadCopy
 }
 

@@ -1902,7 +1902,7 @@ func (m *_${type.name}) deepCopy() *_${type.name} {
 </#if>
 	}
 <#if type.isDiscriminatedChildTypeDefinition()>
-	m.${type.parentType.orElseThrow().name}Contract.(*_${type.parentType.orElseThrow().name})._SubType = m
+	_${type.name}Copy.${type.parentType.orElseThrow().name}Contract.(*_${type.parentType.orElseThrow().name})._SubType = m
 </#if>
 	return _${type.name}Copy
 }

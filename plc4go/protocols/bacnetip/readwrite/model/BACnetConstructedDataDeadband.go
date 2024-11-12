@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataDeadband) deepCopy() *_BACnetConstructedDataDeadb
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.Deadband),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataDeadbandCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDeadbandCopy
 }
 

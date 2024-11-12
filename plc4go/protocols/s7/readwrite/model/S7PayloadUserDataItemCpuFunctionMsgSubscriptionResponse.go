@@ -259,7 +259,7 @@ func (m *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionResponse) deepCopy() *_
 	_S7PayloadUserDataItemCpuFunctionMsgSubscriptionResponseCopy := &_S7PayloadUserDataItemCpuFunctionMsgSubscriptionResponse{
 		m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem).deepCopy(),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCpuFunctionMsgSubscriptionResponseCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCpuFunctionMsgSubscriptionResponseCopy
 }
 

@@ -450,7 +450,7 @@ func (m *_BrokerWriterGroupTransportDataType) deepCopy() *_BrokerWriterGroupTran
 		utils.DeepCopy[PascalString](m.AuthenticationProfileUri),
 		m.RequestedDeliveryGuarantee,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrokerWriterGroupTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrokerWriterGroupTransportDataTypeCopy
 }
 

@@ -568,7 +568,7 @@ func (m *_QueryFirstResponse) deepCopy() *_QueryFirstResponse {
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 		utils.DeepCopy[ContentFilterResult](m.FilterResult),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_QueryFirstResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _QueryFirstResponseCopy
 }
 

@@ -539,7 +539,7 @@ func (m *_EndpointConfiguration) deepCopy() *_EndpointConfiguration {
 		m.SecurityTokenLifetime,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EndpointConfigurationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EndpointConfigurationCopy
 }
 

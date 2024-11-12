@@ -377,7 +377,7 @@ func (m *_SendUnitData) deepCopy() *_SendUnitData {
 		m.Timeout,
 		utils.DeepCopySlice[TypeId, TypeId](m.TypeIds),
 	}
-	m.EipPacketContract.(*_EipPacket)._SubType = m
+	_SendUnitDataCopy.EipPacketContract.(*_EipPacket)._SubType = m
 	return _SendUnitDataCopy
 }
 

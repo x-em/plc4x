@@ -320,7 +320,7 @@ func (m *_ComplexNumberType) deepCopy() *_ComplexNumberType {
 		m.Real,
 		m.Imaginary,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ComplexNumberTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ComplexNumberTypeCopy
 }
 

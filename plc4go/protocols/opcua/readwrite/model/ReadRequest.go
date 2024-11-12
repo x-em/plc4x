@@ -422,7 +422,7 @@ func (m *_ReadRequest) deepCopy() *_ReadRequest {
 		m.TimestampsToReturn,
 		utils.DeepCopySlice[ReadValueId, ReadValueId](m.NodesToRead),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadRequestCopy
 }
 

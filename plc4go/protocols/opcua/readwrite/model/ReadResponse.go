@@ -413,7 +413,7 @@ func (m *_ReadResponse) deepCopy() *_ReadResponse {
 		utils.DeepCopySlice[DataValue, DataValue](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadResponseCopy
 }
 

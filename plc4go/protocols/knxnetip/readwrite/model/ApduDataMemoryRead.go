@@ -320,7 +320,7 @@ func (m *_ApduDataMemoryRead) deepCopy() *_ApduDataMemoryRead {
 		m.NumBytes,
 		m.Address,
 	}
-	m.ApduDataContract.(*_ApduData)._SubType = m
+	_ApduDataMemoryReadCopy.ApduDataContract.(*_ApduData)._SubType = m
 	return _ApduDataMemoryReadCopy
 }
 

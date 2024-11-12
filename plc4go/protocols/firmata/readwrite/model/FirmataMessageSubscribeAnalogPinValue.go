@@ -338,7 +338,7 @@ func (m *_FirmataMessageSubscribeAnalogPinValue) deepCopy() *_FirmataMessageSubs
 		m.Enable,
 		m.reservedField0,
 	}
-	m.FirmataMessageContract.(*_FirmataMessage)._SubType = m
+	_FirmataMessageSubscribeAnalogPinValueCopy.FirmataMessageContract.(*_FirmataMessage)._SubType = m
 	return _FirmataMessageSubscribeAnalogPinValueCopy
 }
 

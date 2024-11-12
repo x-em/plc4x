@@ -250,7 +250,7 @@ func (m *_MPropWriteCon) deepCopy() *_MPropWriteCon {
 	_MPropWriteConCopy := &_MPropWriteCon{
 		m.CEMIContract.(*_CEMI).deepCopy(),
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_MPropWriteConCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _MPropWriteConCopy
 }
 

@@ -325,7 +325,7 @@ func (m *_VariantUInt32) deepCopy() *_VariantUInt32 {
 		utils.CopyPtr[int32](m.ArrayLength),
 		utils.DeepCopySlice[uint32, uint32](m.Value),
 	}
-	m.VariantContract.(*_Variant)._SubType = m
+	_VariantUInt32Copy.VariantContract.(*_Variant)._SubType = m
 	return _VariantUInt32Copy
 }
 

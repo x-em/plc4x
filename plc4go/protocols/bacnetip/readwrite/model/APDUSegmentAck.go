@@ -423,7 +423,7 @@ func (m *_APDUSegmentAck) deepCopy() *_APDUSegmentAck {
 		m.ActualWindowSize,
 		m.reservedField0,
 	}
-	m.APDUContract.(*_APDU)._SubType = m
+	_APDUSegmentAckCopy.APDUContract.(*_APDU)._SubType = m
 	return _APDUSegmentAckCopy
 }
 

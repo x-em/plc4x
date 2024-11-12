@@ -312,7 +312,7 @@ func (m *_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumeric) 
 		m.BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassContract.(*_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClass).deepCopy(),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.NumericValue),
 	}
-	m.BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassContract.(*_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClass)._SubType = m
+	_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumericCopy.BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassContract.(*_BACnetConfirmedServiceRequestConfirmedTextMessageMessageClass)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedTextMessageMessageClassNumericCopy
 }
 

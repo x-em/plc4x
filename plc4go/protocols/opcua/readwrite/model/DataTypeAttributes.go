@@ -500,7 +500,7 @@ func (m *_DataTypeAttributes) deepCopy() *_DataTypeAttributes {
 		m.IsAbstract,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataTypeAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataTypeAttributesCopy
 }
 

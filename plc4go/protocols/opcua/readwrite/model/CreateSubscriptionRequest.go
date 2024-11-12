@@ -505,7 +505,7 @@ func (m *_CreateSubscriptionRequest) deepCopy() *_CreateSubscriptionRequest {
 		m.Priority,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CreateSubscriptionRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CreateSubscriptionRequestCopy
 }
 

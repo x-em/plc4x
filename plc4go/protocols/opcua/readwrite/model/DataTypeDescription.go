@@ -368,7 +368,7 @@ func (m *_DataTypeDescription) deepCopy() *_DataTypeDescription {
 		utils.DeepCopy[NodeId](m.DataTypeId),
 		utils.DeepCopy[QualifiedName](m.Name),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataTypeDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataTypeDescriptionCopy
 }
 

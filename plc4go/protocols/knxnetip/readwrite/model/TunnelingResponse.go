@@ -317,7 +317,7 @@ func (m *_TunnelingResponse) deepCopy() *_TunnelingResponse {
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
 		utils.DeepCopy[TunnelingResponseDataBlock](m.TunnelingResponseDataBlock),
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_TunnelingResponseCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _TunnelingResponseCopy
 }
 

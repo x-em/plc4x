@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataBACnetIPMode) deepCopy() *_BACnetConstructedDataB
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetIPModeTagged](m.BacnetIpMode),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataBACnetIPModeCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBACnetIPModeCopy
 }
 

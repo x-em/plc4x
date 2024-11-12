@@ -397,7 +397,7 @@ func (m *_ModelChangeStructureDataType) deepCopy() *_ModelChangeStructureDataTyp
 		utils.DeepCopy[NodeId](m.AffectedType),
 		m.Verb,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ModelChangeStructureDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ModelChangeStructureDataTypeCopy
 }
 

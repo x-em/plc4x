@@ -436,7 +436,7 @@ func (m *_MPropReadCon) deepCopy() *_MPropReadCon {
 		m.StartIndex,
 		m.Data,
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_MPropReadConCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _MPropReadConCopy
 }
 

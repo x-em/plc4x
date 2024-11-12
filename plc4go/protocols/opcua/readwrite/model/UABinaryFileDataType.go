@@ -613,7 +613,7 @@ func (m *_UABinaryFileDataType) deepCopy() *_UABinaryFileDataType {
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.FileHeader),
 		utils.DeepCopy[Variant](m.Body),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UABinaryFileDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UABinaryFileDataTypeCopy
 }
 

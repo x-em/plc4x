@@ -525,7 +525,7 @@ func (m *_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultiple) deepCop
 		utils.DeepCopy[BACnetTimeStampEnclosed](m.Timestamp),
 		utils.DeepCopy[ListOfCovNotificationsList](m.ListOfCovNotifications),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleCopy
 }
 

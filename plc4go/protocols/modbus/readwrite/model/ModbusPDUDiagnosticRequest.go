@@ -328,7 +328,7 @@ func (m *_ModbusPDUDiagnosticRequest) deepCopy() *_ModbusPDUDiagnosticRequest {
 		m.SubFunction,
 		m.Data,
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUDiagnosticRequestCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUDiagnosticRequestCopy
 }
 

@@ -255,7 +255,7 @@ func (m *_SALDataRoomControlSystem) deepCopy() *_SALDataRoomControlSystem {
 	_SALDataRoomControlSystemCopy := &_SALDataRoomControlSystem{
 		m.SALDataContract.(*_SALData).deepCopy(),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataRoomControlSystemCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataRoomControlSystemCopy
 }
 

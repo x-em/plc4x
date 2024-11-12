@@ -315,7 +315,7 @@ func (m *_BACnetContextTagDate) deepCopy() *_BACnetContextTagDate {
 		m.BACnetContextTagContract.(*_BACnetContextTag).deepCopy(),
 		utils.DeepCopy[BACnetTagPayloadDate](m.Payload),
 	}
-	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
+	_BACnetContextTagDateCopy.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagDateCopy
 }
 

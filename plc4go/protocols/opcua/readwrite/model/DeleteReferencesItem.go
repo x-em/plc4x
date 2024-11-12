@@ -510,7 +510,7 @@ func (m *_DeleteReferencesItem) deepCopy() *_DeleteReferencesItem {
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteReferencesItemCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteReferencesItemCopy
 }
 

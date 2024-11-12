@@ -426,7 +426,7 @@ func (m *_PriorityMappingEntryType) deepCopy() *_PriorityMappingEntryType {
 		m.PriorityValue_PCP,
 		m.PriorityValue_DSCP,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PriorityMappingEntryTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PriorityMappingEntryTypeCopy
 }
 

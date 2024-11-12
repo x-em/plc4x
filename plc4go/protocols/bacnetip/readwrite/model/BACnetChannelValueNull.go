@@ -311,7 +311,7 @@ func (m *_BACnetChannelValueNull) deepCopy() *_BACnetChannelValueNull {
 		m.BACnetChannelValueContract.(*_BACnetChannelValue).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagNull](m.NullValue),
 	}
-	m.BACnetChannelValueContract.(*_BACnetChannelValue)._SubType = m
+	_BACnetChannelValueNullCopy.BACnetChannelValueContract.(*_BACnetChannelValue)._SubType = m
 	return _BACnetChannelValueNullCopy
 }
 

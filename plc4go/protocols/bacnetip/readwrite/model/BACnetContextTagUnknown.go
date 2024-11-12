@@ -307,7 +307,7 @@ func (m *_BACnetContextTagUnknown) deepCopy() *_BACnetContextTagUnknown {
 		utils.DeepCopySlice[byte, byte](m.UnknownData),
 		m.ActualLength,
 	}
-	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
+	_BACnetContextTagUnknownCopy.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagUnknownCopy
 }
 

@@ -246,7 +246,7 @@ func (m *_AccessControlDataCloseAccessPoint) deepCopy() *_AccessControlDataClose
 	_AccessControlDataCloseAccessPointCopy := &_AccessControlDataCloseAccessPoint{
 		m.AccessControlDataContract.(*_AccessControlData).deepCopy(),
 	}
-	m.AccessControlDataContract.(*_AccessControlData)._SubType = m
+	_AccessControlDataCloseAccessPointCopy.AccessControlDataContract.(*_AccessControlData)._SubType = m
 	return _AccessControlDataCloseAccessPointCopy
 }
 

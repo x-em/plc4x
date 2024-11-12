@@ -716,7 +716,7 @@ func (m *_CipIdentity) deepCopy() *_CipIdentity {
 		m.ProductName,
 		m.State,
 	}
-	m.CommandSpecificDataItemContract.(*_CommandSpecificDataItem)._SubType = m
+	_CipIdentityCopy.CommandSpecificDataItemContract.(*_CommandSpecificDataItem)._SubType = m
 	return _CipIdentityCopy
 }
 

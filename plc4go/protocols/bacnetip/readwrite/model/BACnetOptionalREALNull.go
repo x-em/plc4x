@@ -311,7 +311,7 @@ func (m *_BACnetOptionalREALNull) deepCopy() *_BACnetOptionalREALNull {
 		m.BACnetOptionalREALContract.(*_BACnetOptionalREAL).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagNull](m.NullValue),
 	}
-	m.BACnetOptionalREALContract.(*_BACnetOptionalREAL)._SubType = m
+	_BACnetOptionalREALNullCopy.BACnetOptionalREALContract.(*_BACnetOptionalREAL)._SubType = m
 	return _BACnetOptionalREALNullCopy
 }
 

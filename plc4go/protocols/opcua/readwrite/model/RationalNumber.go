@@ -320,7 +320,7 @@ func (m *_RationalNumber) deepCopy() *_RationalNumber {
 		m.Numerator,
 		m.Denominator,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RationalNumberCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RationalNumberCopy
 }
 

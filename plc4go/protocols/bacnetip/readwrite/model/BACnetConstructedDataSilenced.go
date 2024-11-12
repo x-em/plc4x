@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataSilenced) deepCopy() *_BACnetConstructedDataSilen
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetSilencedStateTagged](m.Silenced),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataSilencedCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSilencedCopy
 }
 

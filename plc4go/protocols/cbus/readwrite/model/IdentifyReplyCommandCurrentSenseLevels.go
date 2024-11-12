@@ -293,7 +293,7 @@ func (m *_IdentifyReplyCommandCurrentSenseLevels) deepCopy() *_IdentifyReplyComm
 		m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand).deepCopy(),
 		utils.DeepCopySlice[byte, byte](m.CurrentSenseLevels),
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandCurrentSenseLevelsCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandCurrentSenseLevelsCopy
 }
 

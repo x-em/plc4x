@@ -610,7 +610,7 @@ func (m *_ServerDiagnosticsSummaryDataType) deepCopy() *_ServerDiagnosticsSummar
 		m.SecurityRejectedRequestsCount,
 		m.RejectedRequestsCount,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ServerDiagnosticsSummaryDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ServerDiagnosticsSummaryDataTypeCopy
 }
 

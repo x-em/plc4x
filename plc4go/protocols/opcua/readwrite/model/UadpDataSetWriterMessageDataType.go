@@ -378,7 +378,7 @@ func (m *_UadpDataSetWriterMessageDataType) deepCopy() *_UadpDataSetWriterMessag
 		m.NetworkMessageNumber,
 		m.DataSetOffset,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UadpDataSetWriterMessageDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UadpDataSetWriterMessageDataTypeCopy
 }
 

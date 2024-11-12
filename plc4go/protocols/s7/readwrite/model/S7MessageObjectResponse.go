@@ -336,7 +336,7 @@ func (m *_S7MessageObjectResponse) deepCopy() *_S7MessageObjectResponse {
 		m.TransportSize,
 		m.reservedField0,
 	}
-	m.S7DataAlarmMessageContract.(*_S7DataAlarmMessage)._SubType = m
+	_S7MessageObjectResponseCopy.S7DataAlarmMessageContract.(*_S7DataAlarmMessage)._SubType = m
 	return _S7MessageObjectResponseCopy
 }
 

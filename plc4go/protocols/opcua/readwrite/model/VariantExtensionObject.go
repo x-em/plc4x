@@ -330,7 +330,7 @@ func (m *_VariantExtensionObject) deepCopy() *_VariantExtensionObject {
 		utils.CopyPtr[int32](m.ArrayLength),
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.Value),
 	}
-	m.VariantContract.(*_Variant)._SubType = m
+	_VariantExtensionObjectCopy.VariantContract.(*_Variant)._SubType = m
 	return _VariantExtensionObjectCopy
 }
 

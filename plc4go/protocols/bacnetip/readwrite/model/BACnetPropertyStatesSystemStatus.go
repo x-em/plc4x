@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesSystemStatus) deepCopy() *_BACnetPropertyStatesSys
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetDeviceStatusTagged](m.SystemStatus),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesSystemStatusCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesSystemStatusCopy
 }
 

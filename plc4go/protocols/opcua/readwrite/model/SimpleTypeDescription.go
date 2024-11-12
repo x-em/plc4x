@@ -450,7 +450,7 @@ func (m *_SimpleTypeDescription) deepCopy() *_SimpleTypeDescription {
 		utils.DeepCopy[NodeId](m.BaseDataType),
 		m.BuiltInType,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SimpleTypeDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SimpleTypeDescriptionCopy
 }
 

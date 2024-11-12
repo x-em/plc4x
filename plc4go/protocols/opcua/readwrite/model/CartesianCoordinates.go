@@ -250,7 +250,7 @@ func (m *_CartesianCoordinates) deepCopy() *_CartesianCoordinates {
 	_CartesianCoordinatesCopy := &_CartesianCoordinates{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CartesianCoordinatesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CartesianCoordinatesCopy
 }
 

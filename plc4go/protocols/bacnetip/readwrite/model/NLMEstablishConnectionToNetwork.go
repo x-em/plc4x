@@ -320,7 +320,7 @@ func (m *_NLMEstablishConnectionToNetwork) deepCopy() *_NLMEstablishConnectionTo
 		m.DestinationNetworkAddress,
 		m.TerminationTime,
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMEstablishConnectionToNetworkCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMEstablishConnectionToNetworkCopy
 }
 

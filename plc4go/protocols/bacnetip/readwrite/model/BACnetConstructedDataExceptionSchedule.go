@@ -382,7 +382,7 @@ func (m *_BACnetConstructedDataExceptionSchedule) deepCopy() *_BACnetConstructed
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetSpecialEvent, BACnetSpecialEvent](m.ExceptionSchedule),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataExceptionScheduleCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataExceptionScheduleCopy
 }
 

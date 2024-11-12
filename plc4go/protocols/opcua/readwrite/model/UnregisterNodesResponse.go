@@ -315,7 +315,7 @@ func (m *_UnregisterNodesResponse) deepCopy() *_UnregisterNodesResponse {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UnregisterNodesResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UnregisterNodesResponseCopy
 }
 

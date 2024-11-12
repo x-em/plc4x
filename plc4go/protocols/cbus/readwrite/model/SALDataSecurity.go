@@ -315,7 +315,7 @@ func (m *_SALDataSecurity) deepCopy() *_SALDataSecurity {
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[SecurityData](m.SecurityData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataSecurityCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataSecurityCopy
 }
 

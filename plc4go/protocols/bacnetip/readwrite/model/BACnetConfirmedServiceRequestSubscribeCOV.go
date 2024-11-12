@@ -468,7 +468,7 @@ func (m *_BACnetConfirmedServiceRequestSubscribeCOV) deepCopy() *_BACnetConfirme
 		utils.DeepCopy[BACnetContextTagBoolean](m.IssueConfirmed),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.LifetimeInSeconds),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestSubscribeCOVCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestSubscribeCOVCopy
 }
 

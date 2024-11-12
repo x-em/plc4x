@@ -417,7 +417,7 @@ func (m *_RegisterServer2Request) deepCopy() *_RegisterServer2Request {
 		utils.DeepCopy[RegisteredServer](m.Server),
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.DiscoveryConfiguration),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RegisterServer2RequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RegisterServer2RequestCopy
 }
 

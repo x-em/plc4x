@@ -450,7 +450,7 @@ func (m *_OpenSecureChannelResponse) deepCopy() *_OpenSecureChannelResponse {
 		utils.DeepCopy[ChannelSecurityToken](m.SecurityToken),
 		utils.DeepCopy[PascalByteString](m.ServerNonce),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_OpenSecureChannelResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _OpenSecureChannelResponseCopy
 }
 

@@ -426,7 +426,7 @@ func (m *_CurrencyUnitType) deepCopy() *_CurrencyUnitType {
 		utils.DeepCopy[PascalString](m.AlphabeticCode),
 		utils.DeepCopy[LocalizedText](m.Currency),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CurrencyUnitTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CurrencyUnitTypeCopy
 }
 

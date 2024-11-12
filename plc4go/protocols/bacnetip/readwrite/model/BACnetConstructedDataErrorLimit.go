@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataErrorLimit) deepCopy() *_BACnetConstructedDataErr
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.ErrorLimit),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataErrorLimitCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataErrorLimitCopy
 }
 

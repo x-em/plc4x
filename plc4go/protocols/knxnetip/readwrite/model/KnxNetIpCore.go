@@ -291,7 +291,7 @@ func (m *_KnxNetIpCore) deepCopy() *_KnxNetIpCore {
 		m.ServiceIdContract.(*_ServiceId).deepCopy(),
 		m.Version,
 	}
-	m.ServiceIdContract.(*_ServiceId)._SubType = m
+	_KnxNetIpCoreCopy.ServiceIdContract.(*_ServiceId)._SubType = m
 	return _KnxNetIpCoreCopy
 }
 

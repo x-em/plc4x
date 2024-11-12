@@ -360,7 +360,7 @@ func (m *_HistoryModifiedEvent) deepCopy() *_HistoryModifiedEvent {
 		utils.DeepCopySlice[HistoryEventFieldList, HistoryEventFieldList](m.Events),
 		utils.DeepCopySlice[ModificationInfo, ModificationInfo](m.ModificationInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_HistoryModifiedEventCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _HistoryModifiedEventCopy
 }
 

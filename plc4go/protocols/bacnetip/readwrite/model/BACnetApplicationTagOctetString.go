@@ -311,7 +311,7 @@ func (m *_BACnetApplicationTagOctetString) deepCopy() *_BACnetApplicationTagOcte
 		m.BACnetApplicationTagContract.(*_BACnetApplicationTag).deepCopy(),
 		utils.DeepCopy[BACnetTagPayloadOctetString](m.Payload),
 	}
-	m.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
+	_BACnetApplicationTagOctetStringCopy.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
 	return _BACnetApplicationTagOctetStringCopy
 }
 

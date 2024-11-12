@@ -246,7 +246,7 @@ func (m *_SecurityDataGasAlarmCleared) deepCopy() *_SecurityDataGasAlarmCleared 
 	_SecurityDataGasAlarmClearedCopy := &_SecurityDataGasAlarmCleared{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataGasAlarmClearedCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataGasAlarmClearedCopy
 }
 

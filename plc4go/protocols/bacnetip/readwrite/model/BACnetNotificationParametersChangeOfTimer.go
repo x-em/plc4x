@@ -673,7 +673,7 @@ func (m *_BACnetNotificationParametersChangeOfTimer) deepCopy() *_BACnetNotifica
 		utils.DeepCopy[BACnetDateTimeEnclosed](m.ExpirationTime),
 		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
-	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
+	_BACnetNotificationParametersChangeOfTimerCopy.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfTimerCopy
 }
 

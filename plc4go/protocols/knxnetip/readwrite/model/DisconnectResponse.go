@@ -322,7 +322,7 @@ func (m *_DisconnectResponse) deepCopy() *_DisconnectResponse {
 		m.CommunicationChannelId,
 		m.Status,
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_DisconnectResponseCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _DisconnectResponseCopy
 }
 

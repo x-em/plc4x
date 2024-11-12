@@ -529,7 +529,7 @@ func (m *_MethodAttributes) deepCopy() *_MethodAttributes {
 		m.Executable,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_MethodAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _MethodAttributesCopy
 }
 

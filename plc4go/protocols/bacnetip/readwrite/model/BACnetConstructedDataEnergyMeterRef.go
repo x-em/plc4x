@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataEnergyMeterRef) deepCopy() *_BACnetConstructedDat
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetDeviceObjectReference](m.EnergyMeterRef),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataEnergyMeterRefCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataEnergyMeterRefCopy
 }
 

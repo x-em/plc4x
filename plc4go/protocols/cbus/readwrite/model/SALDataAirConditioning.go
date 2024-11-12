@@ -315,7 +315,7 @@ func (m *_SALDataAirConditioning) deepCopy() *_SALDataAirConditioning {
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[AirConditioningData](m.AirConditioningData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataAirConditioningCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataAirConditioningCopy
 }
 

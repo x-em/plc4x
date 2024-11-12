@@ -259,7 +259,7 @@ func (m *_S7PayloadUserDataItemCyclicServicesUnsubscribeResponse) deepCopy() *_S
 	_S7PayloadUserDataItemCyclicServicesUnsubscribeResponseCopy := &_S7PayloadUserDataItemCyclicServicesUnsubscribeResponse{
 		m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem).deepCopy(),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCyclicServicesUnsubscribeResponseCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCyclicServicesUnsubscribeResponseCopy
 }
 

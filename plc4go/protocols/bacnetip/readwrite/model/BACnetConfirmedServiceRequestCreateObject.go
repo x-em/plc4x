@@ -365,7 +365,7 @@ func (m *_BACnetConfirmedServiceRequestCreateObject) deepCopy() *_BACnetConfirme
 		utils.DeepCopy[BACnetConfirmedServiceRequestCreateObjectObjectSpecifier](m.ObjectSpecifier),
 		utils.DeepCopy[BACnetPropertyValues](m.ListOfValues),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestCreateObjectCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestCreateObjectCopy
 }
 

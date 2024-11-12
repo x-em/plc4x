@@ -291,7 +291,7 @@ func (m *_KnxNetRemoteLogging) deepCopy() *_KnxNetRemoteLogging {
 		m.ServiceIdContract.(*_ServiceId).deepCopy(),
 		m.Version,
 	}
-	m.ServiceIdContract.(*_ServiceId)._SubType = m
+	_KnxNetRemoteLoggingCopy.ServiceIdContract.(*_ServiceId)._SubType = m
 	return _KnxNetRemoteLoggingCopy
 }
 

@@ -368,7 +368,7 @@ func (m *_EphemeralKeyType) deepCopy() *_EphemeralKeyType {
 		utils.DeepCopy[PascalByteString](m.PublicKey),
 		utils.DeepCopy[PascalByteString](m.Signature),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EphemeralKeyTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EphemeralKeyTypeCopy
 }
 

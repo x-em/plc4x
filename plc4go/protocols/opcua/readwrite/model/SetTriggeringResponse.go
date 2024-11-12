@@ -511,7 +511,7 @@ func (m *_SetTriggeringResponse) deepCopy() *_SetTriggeringResponse {
 		utils.DeepCopySlice[StatusCode, StatusCode](m.RemoveResults),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.RemoveDiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SetTriggeringResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SetTriggeringResponseCopy
 }
 

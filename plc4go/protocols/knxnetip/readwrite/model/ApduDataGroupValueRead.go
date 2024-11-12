@@ -268,7 +268,7 @@ func (m *_ApduDataGroupValueRead) deepCopy() *_ApduDataGroupValueRead {
 		m.ApduDataContract.(*_ApduData).deepCopy(),
 		m.reservedField0,
 	}
-	m.ApduDataContract.(*_ApduData)._SubType = m
+	_ApduDataGroupValueReadCopy.ApduDataContract.(*_ApduData)._SubType = m
 	return _ApduDataGroupValueReadCopy
 }
 

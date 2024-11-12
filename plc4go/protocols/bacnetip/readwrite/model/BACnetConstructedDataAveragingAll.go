@@ -259,7 +259,7 @@ func (m *_BACnetConstructedDataAveragingAll) deepCopy() *_BACnetConstructedDataA
 	_BACnetConstructedDataAveragingAllCopy := &_BACnetConstructedDataAveragingAll{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataAveragingAllCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAveragingAllCopy
 }
 

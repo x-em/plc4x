@@ -299,7 +299,7 @@ func (m *_BACnetConstructedDataActiveVTSessions) deepCopy() *_BACnetConstructedD
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopySlice[BACnetVTSession, BACnetVTSession](m.ActiveVTSession),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataActiveVTSessionsCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataActiveVTSessionsCopy
 }
 

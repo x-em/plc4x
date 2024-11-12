@@ -446,7 +446,7 @@ func (m *_BrowseRequest) deepCopy() *_BrowseRequest {
 		m.RequestedMaxReferencesPerNode,
 		utils.DeepCopySlice[BrowseDescription, BrowseDescription](m.NodesToBrowse),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrowseRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrowseRequestCopy
 }
 

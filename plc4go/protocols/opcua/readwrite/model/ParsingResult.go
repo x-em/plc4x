@@ -413,7 +413,7 @@ func (m *_ParsingResult) deepCopy() *_ParsingResult {
 		utils.DeepCopySlice[StatusCode, StatusCode](m.DataStatusCodes),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DataDiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ParsingResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ParsingResultCopy
 }
 

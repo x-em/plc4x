@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataReadOnly) deepCopy() *_BACnetConstructedDataReadO
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagBoolean](m.ReadOnly),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataReadOnlyCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataReadOnlyCopy
 }
 

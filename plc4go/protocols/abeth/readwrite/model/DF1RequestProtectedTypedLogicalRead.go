@@ -407,7 +407,7 @@ func (m *_DF1RequestProtectedTypedLogicalRead) deepCopy() *_DF1RequestProtectedT
 		m.ElementNumber,
 		m.SubElementNumber,
 	}
-	m.DF1RequestCommandContract.(*_DF1RequestCommand)._SubType = m
+	_DF1RequestProtectedTypedLogicalReadCopy.DF1RequestCommandContract.(*_DF1RequestCommand)._SubType = m
 	return _DF1RequestProtectedTypedLogicalReadCopy
 }
 

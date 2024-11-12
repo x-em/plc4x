@@ -494,7 +494,7 @@ func (m *_Argument) deepCopy() *_Argument {
 		utils.DeepCopySlice[uint32, uint32](m.ArrayDimensions),
 		utils.DeepCopy[LocalizedText](m.Description),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ArgumentCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ArgumentCopy
 }
 

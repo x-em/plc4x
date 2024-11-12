@@ -422,7 +422,7 @@ func (m *_FindServersOnNetworkRequest) deepCopy() *_FindServersOnNetworkRequest 
 		m.MaxRecordsToReturn,
 		utils.DeepCopySlice[PascalString, PascalString](m.ServerCapabilityFilter),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_FindServersOnNetworkRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _FindServersOnNetworkRequestCopy
 }
 

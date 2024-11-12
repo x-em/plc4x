@@ -246,7 +246,7 @@ func (m *_SecurityDataArmFailedCleared) deepCopy() *_SecurityDataArmFailedCleare
 	_SecurityDataArmFailedClearedCopy := &_SecurityDataArmFailedCleared{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataArmFailedClearedCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataArmFailedClearedCopy
 }
 

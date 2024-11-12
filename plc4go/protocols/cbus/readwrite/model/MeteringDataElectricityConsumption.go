@@ -287,7 +287,7 @@ func (m *_MeteringDataElectricityConsumption) deepCopy() *_MeteringDataElectrici
 		m.MeteringDataContract.(*_MeteringData).deepCopy(),
 		m.KWhr,
 	}
-	m.MeteringDataContract.(*_MeteringData)._SubType = m
+	_MeteringDataElectricityConsumptionCopy.MeteringDataContract.(*_MeteringData)._SubType = m
 	return _MeteringDataElectricityConsumptionCopy
 }
 

@@ -322,7 +322,7 @@ func (m *_ApduDataDeviceDescriptorResponse) deepCopy() *_ApduDataDeviceDescripto
 		m.DescriptorType,
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.ApduDataContract.(*_ApduData)._SubType = m
+	_ApduDataDeviceDescriptorResponseCopy.ApduDataContract.(*_ApduData)._SubType = m
 	return _ApduDataDeviceDescriptorResponseCopy
 }
 

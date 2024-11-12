@@ -368,7 +368,7 @@ func (m *_BACnetConfirmedServiceRequestVTOpen) deepCopy() *_BACnetConfirmedServi
 		utils.DeepCopy[BACnetVTClassTagged](m.VtClass),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.LocalVtSessionIdentifier),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestVTOpenCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestVTOpenCopy
 }
 

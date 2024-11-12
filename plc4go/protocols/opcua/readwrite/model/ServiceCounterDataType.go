@@ -320,7 +320,7 @@ func (m *_ServiceCounterDataType) deepCopy() *_ServiceCounterDataType {
 		m.TotalCount,
 		m.ErrorCount,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ServiceCounterDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ServiceCounterDataTypeCopy
 }
 

@@ -336,7 +336,7 @@ func (m *_S7PayloadUserDataItemCyclicServicesChangeDrivenPush) deepCopy() *_S7Pa
 		m.ItemsCount,
 		utils.DeepCopySlice[AssociatedQueryValueType, AssociatedQueryValueType](m.Items),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCyclicServicesChangeDrivenPushCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCyclicServicesChangeDrivenPushCopy
 }
 

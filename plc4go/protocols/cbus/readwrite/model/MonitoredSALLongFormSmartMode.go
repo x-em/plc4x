@@ -603,7 +603,7 @@ func (m *_MonitoredSALLongFormSmartMode) deepCopy() *_MonitoredSALLongFormSmartM
 		utils.DeepCopy[SALData](m.SalData),
 		m.reservedField0,
 	}
-	m.MonitoredSALContract.(*_MonitoredSAL)._SubType = m
+	_MonitoredSALLongFormSmartModeCopy.MonitoredSALContract.(*_MonitoredSAL)._SubType = m
 	return _MonitoredSALLongFormSmartModeCopy
 }
 

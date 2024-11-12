@@ -258,7 +258,7 @@ func (m *_EipListIdentityRequest) deepCopy() *_EipListIdentityRequest {
 	_EipListIdentityRequestCopy := &_EipListIdentityRequest{
 		m.EipPacketContract.(*_EipPacket).deepCopy(),
 	}
-	m.EipPacketContract.(*_EipPacket)._SubType = m
+	_EipListIdentityRequestCopy.EipPacketContract.(*_EipPacket)._SubType = m
 	return _EipListIdentityRequestCopy
 }
 

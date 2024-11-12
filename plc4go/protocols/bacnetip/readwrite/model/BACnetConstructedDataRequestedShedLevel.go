@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataRequestedShedLevel) deepCopy() *_BACnetConstructe
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetShedLevel](m.RequestedShedLevel),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataRequestedShedLevelCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataRequestedShedLevelCopy
 }
 

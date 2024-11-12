@@ -494,7 +494,7 @@ func (m *_AxisInformation) deepCopy() *_AxisInformation {
 		m.AxisScaleType,
 		utils.DeepCopySlice[float64, float64](m.AxisSteps),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AxisInformationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AxisInformationCopy
 }
 

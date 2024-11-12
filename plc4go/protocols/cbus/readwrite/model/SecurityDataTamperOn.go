@@ -246,7 +246,7 @@ func (m *_SecurityDataTamperOn) deepCopy() *_SecurityDataTamperOn {
 	_SecurityDataTamperOnCopy := &_SecurityDataTamperOn{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataTamperOnCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataTamperOnCopy
 }
 

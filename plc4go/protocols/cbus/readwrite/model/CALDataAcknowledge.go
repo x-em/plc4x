@@ -316,7 +316,7 @@ func (m *_CALDataAcknowledge) deepCopy() *_CALDataAcknowledge {
 		m.ParamNo,
 		m.Code,
 	}
-	m.CALDataContract.(*_CALData)._SubType = m
+	_CALDataAcknowledgeCopy.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataAcknowledgeCopy
 }
 

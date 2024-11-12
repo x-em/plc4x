@@ -397,7 +397,7 @@ func (m *_Annotation) deepCopy() *_Annotation {
 		utils.DeepCopy[PascalString](m.UserName),
 		m.AnnotationTime,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AnnotationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AnnotationCopy
 }
 

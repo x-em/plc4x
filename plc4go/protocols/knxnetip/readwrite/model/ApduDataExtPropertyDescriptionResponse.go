@@ -525,7 +525,7 @@ func (m *_ApduDataExtPropertyDescriptionResponse) deepCopy() *_ApduDataExtProper
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtPropertyDescriptionResponseCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtPropertyDescriptionResponseCopy
 }
 

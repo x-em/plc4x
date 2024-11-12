@@ -315,7 +315,7 @@ func (m *_SALDataTelephonyStatusAndControl) deepCopy() *_SALDataTelephonyStatusA
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[TelephonyData](m.TelephonyData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataTelephonyStatusAndControlCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataTelephonyStatusAndControlCopy
 }
 

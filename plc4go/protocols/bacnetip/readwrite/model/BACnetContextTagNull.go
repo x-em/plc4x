@@ -255,7 +255,7 @@ func (m *_BACnetContextTagNull) deepCopy() *_BACnetContextTagNull {
 	_BACnetContextTagNullCopy := &_BACnetContextTagNull{
 		m.BACnetContextTagContract.(*_BACnetContextTag).deepCopy(),
 	}
-	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
+	_BACnetContextTagNullCopy.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagNullCopy
 }
 

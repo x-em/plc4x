@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataRepresents) deepCopy() *_BACnetConstructedDataRep
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetDeviceObjectReference](m.Represents),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataRepresentsCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataRepresentsCopy
 }
 

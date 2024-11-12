@@ -433,7 +433,7 @@ func (m *_AdsReadWriteRequest) deepCopy() *_AdsReadWriteRequest {
 		utils.DeepCopySlice[AdsMultiRequestItem, AdsMultiRequestItem](m.Items),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.AmsPacketContract.(*_AmsPacket)._SubType = m
+	_AdsReadWriteRequestCopy.AmsPacketContract.(*_AmsPacket)._SubType = m
 	return _AdsReadWriteRequestCopy
 }
 

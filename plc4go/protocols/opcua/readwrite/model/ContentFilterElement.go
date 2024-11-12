@@ -340,7 +340,7 @@ func (m *_ContentFilterElement) deepCopy() *_ContentFilterElement {
 		m.FilterOperator,
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.FilterOperands),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ContentFilterElementCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ContentFilterElementCopy
 }
 

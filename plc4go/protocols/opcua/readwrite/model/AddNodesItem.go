@@ -609,7 +609,7 @@ func (m *_AddNodesItem) deepCopy() *_AddNodesItem {
 		utils.DeepCopy[ExtensionObject](m.NodeAttributes),
 		utils.DeepCopy[ExpandedNodeId](m.TypeDefinition),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AddNodesItemCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AddNodesItemCopy
 }
 

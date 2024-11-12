@@ -719,7 +719,7 @@ func (m *_PubSubConnectionDataType) deepCopy() *_PubSubConnectionDataType {
 		utils.DeepCopySlice[ReaderGroupDataType, ReaderGroupDataType](m.ReaderGroups),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PubSubConnectionDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PubSubConnectionDataTypeCopy
 }
 

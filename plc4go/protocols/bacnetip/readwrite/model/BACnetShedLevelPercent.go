@@ -311,7 +311,7 @@ func (m *_BACnetShedLevelPercent) deepCopy() *_BACnetShedLevelPercent {
 		m.BACnetShedLevelContract.(*_BACnetShedLevel).deepCopy(),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Percent),
 	}
-	m.BACnetShedLevelContract.(*_BACnetShedLevel)._SubType = m
+	_BACnetShedLevelPercentCopy.BACnetShedLevelContract.(*_BACnetShedLevel)._SubType = m
 	return _BACnetShedLevelPercentCopy
 }
 

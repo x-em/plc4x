@@ -417,7 +417,7 @@ func (m *_PublishedEventsDataType) deepCopy() *_PublishedEventsDataType {
 		utils.DeepCopySlice[SimpleAttributeOperand, SimpleAttributeOperand](m.SelectedFields),
 		utils.DeepCopy[ContentFilter](m.Filter),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PublishedEventsDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedEventsDataTypeCopy
 }
 

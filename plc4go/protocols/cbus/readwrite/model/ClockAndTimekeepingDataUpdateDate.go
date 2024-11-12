@@ -403,7 +403,7 @@ func (m *_ClockAndTimekeepingDataUpdateDate) deepCopy() *_ClockAndTimekeepingDat
 		m.Day,
 		m.DayOfWeek,
 	}
-	m.ClockAndTimekeepingDataContract.(*_ClockAndTimekeepingData)._SubType = m
+	_ClockAndTimekeepingDataUpdateDateCopy.ClockAndTimekeepingDataContract.(*_ClockAndTimekeepingData)._SubType = m
 	return _ClockAndTimekeepingDataUpdateDateCopy
 }
 

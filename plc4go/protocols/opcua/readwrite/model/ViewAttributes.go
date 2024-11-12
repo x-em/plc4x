@@ -529,7 +529,7 @@ func (m *_ViewAttributes) deepCopy() *_ViewAttributes {
 		m.EventNotifier,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ViewAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ViewAttributesCopy
 }
 

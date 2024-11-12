@@ -471,7 +471,7 @@ func (m *_ClockAndTimekeepingDataUpdateTime) deepCopy() *_ClockAndTimekeepingDat
 		m.Second,
 		m.DaylightSaving,
 	}
-	m.ClockAndTimekeepingDataContract.(*_ClockAndTimekeepingData)._SubType = m
+	_ClockAndTimekeepingDataUpdateTimeCopy.ClockAndTimekeepingDataContract.(*_ClockAndTimekeepingData)._SubType = m
 	return _ClockAndTimekeepingDataUpdateTimeCopy
 }
 

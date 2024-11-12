@@ -724,7 +724,7 @@ func (m *_ReaderGroupDataType) deepCopy() *_ReaderGroupDataType {
 		utils.DeepCopySlice[DataSetReaderDataType, DataSetReaderDataType](m.DataSetReaders),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReaderGroupDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReaderGroupDataTypeCopy
 }
 

@@ -401,7 +401,7 @@ func (m *_ModbusPDUGetComEventLogResponse) deepCopy() *_ModbusPDUGetComEventLogR
 		m.MessageCount,
 		utils.DeepCopySlice[byte, byte](m.Events),
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUGetComEventLogResponseCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUGetComEventLogResponseCopy
 }
 

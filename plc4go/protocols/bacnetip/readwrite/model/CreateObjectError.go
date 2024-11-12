@@ -368,7 +368,7 @@ func (m *_CreateObjectError) deepCopy() *_CreateObjectError {
 		utils.DeepCopy[ErrorEnclosed](m.ErrorType),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.FirstFailedElementNumber),
 	}
-	m.BACnetErrorContract.(*_BACnetError)._SubType = m
+	_CreateObjectErrorCopy.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _CreateObjectErrorCopy
 }
 

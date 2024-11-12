@@ -378,7 +378,7 @@ func (m *_PubSubConfigurationRefDataType) deepCopy() *_PubSubConfigurationRefDat
 		m.ConnectionIndex,
 		m.GroupIndex,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PubSubConfigurationRefDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PubSubConfigurationRefDataTypeCopy
 }
 

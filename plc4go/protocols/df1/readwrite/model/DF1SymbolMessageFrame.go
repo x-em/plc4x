@@ -435,7 +435,7 @@ func (m *_DF1SymbolMessageFrame) deepCopy() *_DF1SymbolMessageFrame {
 		m.SourceAddress,
 		utils.DeepCopy[DF1Command](m.Command),
 	}
-	m.DF1SymbolContract.(*_DF1Symbol)._SubType = m
+	_DF1SymbolMessageFrameCopy.DF1SymbolContract.(*_DF1Symbol)._SubType = m
 	return _DF1SymbolMessageFrameCopy
 }
 

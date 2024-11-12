@@ -258,7 +258,7 @@ func (m *_ModbusPDUGetComEventLogRequest) deepCopy() *_ModbusPDUGetComEventLogRe
 	_ModbusPDUGetComEventLogRequestCopy := &_ModbusPDUGetComEventLogRequest{
 		m.ModbusPDUContract.(*_ModbusPDU).deepCopy(),
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUGetComEventLogRequestCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUGetComEventLogRequestCopy
 }
 

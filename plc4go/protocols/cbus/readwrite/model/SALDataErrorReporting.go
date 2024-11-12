@@ -315,7 +315,7 @@ func (m *_SALDataErrorReporting) deepCopy() *_SALDataErrorReporting {
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[ErrorReportingData](m.ErrorReportingData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataErrorReportingCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataErrorReportingCopy
 }
 

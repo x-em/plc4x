@@ -246,7 +246,7 @@ func (m *_TriggerControlDataIndicatorKill) deepCopy() *_TriggerControlDataIndica
 	_TriggerControlDataIndicatorKillCopy := &_TriggerControlDataIndicatorKill{
 		m.TriggerControlDataContract.(*_TriggerControlData).deepCopy(),
 	}
-	m.TriggerControlDataContract.(*_TriggerControlData)._SubType = m
+	_TriggerControlDataIndicatorKillCopy.TriggerControlDataContract.(*_TriggerControlData)._SubType = m
 	return _TriggerControlDataIndicatorKillCopy
 }
 

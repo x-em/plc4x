@@ -250,7 +250,7 @@ func (m *_ApduDataExtReadRouterStatusResponse) deepCopy() *_ApduDataExtReadRoute
 	_ApduDataExtReadRouterStatusResponseCopy := &_ApduDataExtReadRouterStatusResponse{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtReadRouterStatusResponseCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtReadRouterStatusResponseCopy
 }
 

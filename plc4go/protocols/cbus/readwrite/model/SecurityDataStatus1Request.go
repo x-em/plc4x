@@ -246,7 +246,7 @@ func (m *_SecurityDataStatus1Request) deepCopy() *_SecurityDataStatus1Request {
 	_SecurityDataStatus1RequestCopy := &_SecurityDataStatus1Request{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataStatus1RequestCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataStatus1RequestCopy
 }
 

@@ -250,7 +250,7 @@ func (m *_S7MessageUserData) deepCopy() *_S7MessageUserData {
 	_S7MessageUserDataCopy := &_S7MessageUserData{
 		m.S7MessageContract.(*_S7Message).deepCopy(),
 	}
-	m.S7MessageContract.(*_S7Message)._SubType = m
+	_S7MessageUserDataCopy.S7MessageContract.(*_S7Message)._SubType = m
 	return _S7MessageUserDataCopy
 }
 

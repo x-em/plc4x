@@ -397,7 +397,7 @@ func (m *_EnumValueType) deepCopy() *_EnumValueType {
 		utils.DeepCopy[LocalizedText](m.DisplayName),
 		utils.DeepCopy[LocalizedText](m.Description),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EnumValueTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EnumValueTypeCopy
 }
 

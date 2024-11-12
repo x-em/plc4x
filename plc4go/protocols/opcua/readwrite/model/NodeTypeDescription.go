@@ -409,7 +409,7 @@ func (m *_NodeTypeDescription) deepCopy() *_NodeTypeDescription {
 		utils.DeepCopySlice[QueryDataDescription, QueryDataDescription](m.DataToReturn),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_NodeTypeDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NodeTypeDescriptionCopy
 }
 

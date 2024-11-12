@@ -250,7 +250,7 @@ func (m *_MPropInfoInd) deepCopy() *_MPropInfoInd {
 	_MPropInfoIndCopy := &_MPropInfoInd{
 		m.CEMIContract.(*_CEMI).deepCopy(),
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_MPropInfoIndCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _MPropInfoIndCopy
 }
 

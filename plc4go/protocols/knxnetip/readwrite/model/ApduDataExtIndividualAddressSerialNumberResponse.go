@@ -251,7 +251,7 @@ func (m *_ApduDataExtIndividualAddressSerialNumberResponse) deepCopy() *_ApduDat
 	_ApduDataExtIndividualAddressSerialNumberResponseCopy := &_ApduDataExtIndividualAddressSerialNumberResponse{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtIndividualAddressSerialNumberResponseCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtIndividualAddressSerialNumberResponseCopy
 }
 

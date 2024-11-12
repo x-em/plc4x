@@ -246,7 +246,7 @@ func (m *_CALReplyShort) deepCopy() *_CALReplyShort {
 	_CALReplyShortCopy := &_CALReplyShort{
 		m.CALReplyContract.(*_CALReply).deepCopy(),
 	}
-	m.CALReplyContract.(*_CALReply)._SubType = m
+	_CALReplyShortCopy.CALReplyContract.(*_CALReply)._SubType = m
 	return _CALReplyShortCopy
 }
 

@@ -315,7 +315,7 @@ func (m *_DatagramConnectionTransportDataType) deepCopy() *_DatagramConnectionTr
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopy[ExtensionObject](m.DiscoveryAddress),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DatagramConnectionTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramConnectionTransportDataTypeCopy
 }
 

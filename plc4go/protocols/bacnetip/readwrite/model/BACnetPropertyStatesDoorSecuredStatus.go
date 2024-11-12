@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesDoorSecuredStatus) deepCopy() *_BACnetPropertyStat
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetDoorSecuredStatusTagged](m.DoorSecuredStatus),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesDoorSecuredStatusCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesDoorSecuredStatusCopy
 }
 

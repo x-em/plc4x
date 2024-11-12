@@ -470,7 +470,7 @@ func (m *_BACnetEventParameterChangeOfStatusFlags) deepCopy() *_BACnetEventParam
 		utils.DeepCopy[BACnetStatusFlagsTagged](m.SelectedFlags),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterChangeOfStatusFlagsCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterChangeOfStatusFlagsCopy
 }
 

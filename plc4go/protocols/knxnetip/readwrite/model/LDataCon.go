@@ -377,7 +377,7 @@ func (m *_LDataCon) deepCopy() *_LDataCon {
 		utils.DeepCopySlice[CEMIAdditionalInformation, CEMIAdditionalInformation](m.AdditionalInformation),
 		utils.DeepCopy[LDataFrame](m.DataFrame),
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_LDataConCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _LDataConCopy
 }
 

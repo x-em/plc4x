@@ -504,7 +504,7 @@ func (m *_GenericAttributes) deepCopy() *_GenericAttributes {
 		m.UserWriteMask,
 		utils.DeepCopySlice[GenericAttributeValue, GenericAttributeValue](m.AttributeValues),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_GenericAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _GenericAttributesCopy
 }
 

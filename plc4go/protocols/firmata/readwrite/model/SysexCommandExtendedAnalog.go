@@ -254,7 +254,7 @@ func (m *_SysexCommandExtendedAnalog) deepCopy() *_SysexCommandExtendedAnalog {
 	_SysexCommandExtendedAnalogCopy := &_SysexCommandExtendedAnalog{
 		m.SysexCommandContract.(*_SysexCommand).deepCopy(),
 	}
-	m.SysexCommandContract.(*_SysexCommand)._SubType = m
+	_SysexCommandExtendedAnalogCopy.SysexCommandContract.(*_SysexCommand)._SubType = m
 	return _SysexCommandExtendedAnalogCopy
 }
 

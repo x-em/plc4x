@@ -422,7 +422,7 @@ func (m *_ConnectionResponse) deepCopy() *_ConnectionResponse {
 		utils.DeepCopy[HPAIDataEndpoint](m.HpaiDataEndpoint),
 		utils.DeepCopy[ConnectionResponseDataBlock](m.ConnectionResponseDataBlock),
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_ConnectionResponseCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _ConnectionResponseCopy
 }
 

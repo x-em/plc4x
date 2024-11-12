@@ -300,7 +300,7 @@ func (m *_BACnetConstructedDataBBMDForeignDeviceTable) deepCopy() *_BACnetConstr
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopySlice[BACnetBDTEntry, BACnetBDTEntry](m.BbmdForeignDeviceTable),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataBBMDForeignDeviceTableCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBBMDForeignDeviceTableCopy
 }
 

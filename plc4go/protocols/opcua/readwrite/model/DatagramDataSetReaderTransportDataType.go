@@ -470,7 +470,7 @@ func (m *_DatagramDataSetReaderTransportDataType) deepCopy() *_DatagramDataSetRe
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.DatagramQos),
 		utils.DeepCopy[PascalString](m.Topic),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DatagramDataSetReaderTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramDataSetReaderTransportDataTypeCopy
 }
 

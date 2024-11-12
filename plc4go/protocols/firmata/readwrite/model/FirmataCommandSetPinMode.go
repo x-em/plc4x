@@ -320,7 +320,7 @@ func (m *_FirmataCommandSetPinMode) deepCopy() *_FirmataCommandSetPinMode {
 		m.Pin,
 		m.Mode,
 	}
-	m.FirmataCommandContract.(*_FirmataCommand)._SubType = m
+	_FirmataCommandSetPinModeCopy.FirmataCommandContract.(*_FirmataCommand)._SubType = m
 	return _FirmataCommandSetPinModeCopy
 }
 

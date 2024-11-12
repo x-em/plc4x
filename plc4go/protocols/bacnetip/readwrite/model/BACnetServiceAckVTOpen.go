@@ -315,7 +315,7 @@ func (m *_BACnetServiceAckVTOpen) deepCopy() *_BACnetServiceAckVTOpen {
 		m.BACnetServiceAckContract.(*_BACnetServiceAck).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.RemoteVtSessionIdentifier),
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckVTOpenCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckVTOpenCopy
 }
 

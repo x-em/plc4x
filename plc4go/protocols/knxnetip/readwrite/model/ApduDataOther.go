@@ -315,7 +315,7 @@ func (m *_ApduDataOther) deepCopy() *_ApduDataOther {
 		m.ApduDataContract.(*_ApduData).deepCopy(),
 		utils.DeepCopy[ApduDataExt](m.ExtendedApdu),
 	}
-	m.ApduDataContract.(*_ApduData)._SubType = m
+	_ApduDataOtherCopy.ApduDataContract.(*_ApduData)._SubType = m
 	return _ApduDataOtherCopy
 }
 

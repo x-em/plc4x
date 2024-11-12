@@ -317,7 +317,7 @@ func (m *_CIPEncapsulationReadRequest) deepCopy() *_CIPEncapsulationReadRequest 
 		m.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket).deepCopy(),
 		utils.DeepCopy[DF1RequestMessage](m.Request),
 	}
-	m.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket)._SubType = m
+	_CIPEncapsulationReadRequestCopy.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket)._SubType = m
 	return _CIPEncapsulationReadRequestCopy
 }
 

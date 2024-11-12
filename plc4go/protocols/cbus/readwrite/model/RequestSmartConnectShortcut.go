@@ -341,7 +341,7 @@ func (m *_RequestSmartConnectShortcut) deepCopy() *_RequestSmartConnectShortcut 
 		m.PipePeek,
 		utils.CopyPtr[byte](m.SecondPipe),
 	}
-	m.RequestContract.(*_Request)._SubType = m
+	_RequestSmartConnectShortcutCopy.RequestContract.(*_Request)._SubType = m
 	return _RequestSmartConnectShortcutCopy
 }
 

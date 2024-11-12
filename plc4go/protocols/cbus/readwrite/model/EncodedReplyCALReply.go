@@ -311,7 +311,7 @@ func (m *_EncodedReplyCALReply) deepCopy() *_EncodedReplyCALReply {
 		m.EncodedReplyContract.(*_EncodedReply).deepCopy(),
 		utils.DeepCopy[CALReply](m.CalReply),
 	}
-	m.EncodedReplyContract.(*_EncodedReply)._SubType = m
+	_EncodedReplyCALReplyCopy.EncodedReplyContract.(*_EncodedReply)._SubType = m
 	return _EncodedReplyCALReplyCopy
 }
 

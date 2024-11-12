@@ -250,7 +250,7 @@ func (m *_ReceiveQosDataType) deepCopy() *_ReceiveQosDataType {
 	_ReceiveQosDataTypeCopy := &_ReceiveQosDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReceiveQosDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReceiveQosDataTypeCopy
 }
 

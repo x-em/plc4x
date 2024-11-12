@@ -705,7 +705,7 @@ func (m *_APDUConfirmedRequest) deepCopy() *_APDUConfirmedRequest {
 		utils.DeepCopySlice[byte, byte](m.Segment),
 		m.reservedField0,
 	}
-	m.APDUContract.(*_APDU)._SubType = m
+	_APDUConfirmedRequestCopy.APDUContract.(*_APDU)._SubType = m
 	return _APDUConfirmedRequestCopy
 }
 

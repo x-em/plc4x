@@ -250,7 +250,7 @@ func (m *_LPollDataCon) deepCopy() *_LPollDataCon {
 	_LPollDataConCopy := &_LPollDataCon{
 		m.CEMIContract.(*_CEMI).deepCopy(),
 	}
-	m.CEMIContract.(*_CEMI)._SubType = m
+	_LPollDataConCopy.CEMIContract.(*_CEMI)._SubType = m
 	return _LPollDataConCopy
 }
 

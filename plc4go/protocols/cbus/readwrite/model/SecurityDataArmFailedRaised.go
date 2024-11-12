@@ -246,7 +246,7 @@ func (m *_SecurityDataArmFailedRaised) deepCopy() *_SecurityDataArmFailedRaised 
 	_SecurityDataArmFailedRaisedCopy := &_SecurityDataArmFailedRaised{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataArmFailedRaisedCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataArmFailedRaisedCopy
 }
 

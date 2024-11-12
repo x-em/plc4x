@@ -250,7 +250,7 @@ func (m *_WriterGroupTransportDataType) deepCopy() *_WriterGroupTransportDataTyp
 	_WriterGroupTransportDataTypeCopy := &_WriterGroupTransportDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_WriterGroupTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _WriterGroupTransportDataTypeCopy
 }
 

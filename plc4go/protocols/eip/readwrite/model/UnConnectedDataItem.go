@@ -328,7 +328,7 @@ func (m *_UnConnectedDataItem) deepCopy() *_UnConnectedDataItem {
 		m.TypeIdContract.(*_TypeId).deepCopy(),
 		utils.DeepCopy[CipService](m.Service),
 	}
-	m.TypeIdContract.(*_TypeId)._SubType = m
+	_UnConnectedDataItemCopy.TypeIdContract.(*_TypeId)._SubType = m
 	return _UnConnectedDataItemCopy
 }
 

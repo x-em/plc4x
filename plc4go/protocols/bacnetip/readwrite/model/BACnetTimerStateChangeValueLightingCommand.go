@@ -312,7 +312,7 @@ func (m *_BACnetTimerStateChangeValueLightingCommand) deepCopy() *_BACnetTimerSt
 		m.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue).deepCopy(),
 		utils.DeepCopy[BACnetLightingCommandEnclosed](m.LigthingCommandValue),
 	}
-	m.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue)._SubType = m
+	_BACnetTimerStateChangeValueLightingCommandCopy.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue)._SubType = m
 	return _BACnetTimerStateChangeValueLightingCommandCopy
 }
 

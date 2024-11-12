@@ -378,7 +378,7 @@ func (m *_AdsMultiRequestItemReadWrite) deepCopy() *_AdsMultiRequestItemReadWrit
 		m.ItemReadLength,
 		m.ItemWriteLength,
 	}
-	m.AdsMultiRequestItemContract.(*_AdsMultiRequestItem)._SubType = m
+	_AdsMultiRequestItemReadWriteCopy.AdsMultiRequestItemContract.(*_AdsMultiRequestItem)._SubType = m
 	return _AdsMultiRequestItemReadWriteCopy
 }
 

@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesAuthenticationStatus) deepCopy() *_BACnetPropertyS
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetAuthenticationStatusTagged](m.AuthenticationStatus),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesAuthenticationStatusCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesAuthenticationStatusCopy
 }
 

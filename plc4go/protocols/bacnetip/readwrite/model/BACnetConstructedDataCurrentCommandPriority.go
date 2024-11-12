@@ -351,7 +351,7 @@ func (m *_BACnetConstructedDataCurrentCommandPriority) deepCopy() *_BACnetConstr
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetOptionalUnsigned](m.CurrentCommandPriority),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataCurrentCommandPriorityCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCurrentCommandPriorityCopy
 }
 

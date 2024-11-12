@@ -327,7 +327,7 @@ func (m *_ModbusPDUReadFifoQueueResponse) deepCopy() *_ModbusPDUReadFifoQueueRes
 		m.ModbusPDUContract.(*_ModbusPDU).deepCopy(),
 		utils.DeepCopySlice[uint16, uint16](m.FifoValue),
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUReadFifoQueueResponseCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUReadFifoQueueResponseCopy
 }
 

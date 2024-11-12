@@ -250,7 +250,7 @@ func (m *_ApduDataExtLinkWrite) deepCopy() *_ApduDataExtLinkWrite {
 	_ApduDataExtLinkWriteCopy := &_ApduDataExtLinkWrite{
 		m.ApduDataExtContract.(*_ApduDataExt).deepCopy(),
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtLinkWriteCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtLinkWriteCopy
 }
 

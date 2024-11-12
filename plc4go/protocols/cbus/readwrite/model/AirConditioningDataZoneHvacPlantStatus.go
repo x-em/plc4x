@@ -451,7 +451,7 @@ func (m *_AirConditioningDataZoneHvacPlantStatus) deepCopy() *_AirConditioningDa
 		utils.DeepCopy[HVACStatusFlags](m.HvacStatus),
 		m.HvacErrorCode,
 	}
-	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
+	_AirConditioningDataZoneHvacPlantStatusCopy.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
 	return _AirConditioningDataZoneHvacPlantStatusCopy
 }
 

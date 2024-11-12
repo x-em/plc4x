@@ -391,7 +391,7 @@ func (m *_BVLCForwardedNPDU) deepCopy() *_BVLCForwardedNPDU {
 		utils.DeepCopy[NPDU](m.Npdu),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCForwardedNPDUCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCForwardedNPDUCopy
 }
 

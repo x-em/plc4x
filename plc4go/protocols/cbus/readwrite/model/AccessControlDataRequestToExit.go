@@ -246,7 +246,7 @@ func (m *_AccessControlDataRequestToExit) deepCopy() *_AccessControlDataRequestT
 	_AccessControlDataRequestToExitCopy := &_AccessControlDataRequestToExit{
 		m.AccessControlDataContract.(*_AccessControlData).deepCopy(),
 	}
-	m.AccessControlDataContract.(*_AccessControlData)._SubType = m
+	_AccessControlDataRequestToExitCopy.AccessControlDataContract.(*_AccessControlData)._SubType = m
 	return _AccessControlDataRequestToExitCopy
 }
 

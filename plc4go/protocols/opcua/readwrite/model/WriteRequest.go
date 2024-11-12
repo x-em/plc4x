@@ -364,7 +364,7 @@ func (m *_WriteRequest) deepCopy() *_WriteRequest {
 		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[WriteValue, WriteValue](m.NodesToWrite),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_WriteRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _WriteRequestCopy
 }
 

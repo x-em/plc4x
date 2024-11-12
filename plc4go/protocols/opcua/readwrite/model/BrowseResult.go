@@ -417,7 +417,7 @@ func (m *_BrowseResult) deepCopy() *_BrowseResult {
 		utils.DeepCopy[PascalByteString](m.ContinuationPoint),
 		utils.DeepCopySlice[ReferenceDescription, ReferenceDescription](m.References),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrowseResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrowseResultCopy
 }
 

@@ -418,7 +418,7 @@ func (m *_DeleteRawModifiedDetails) deepCopy() *_DeleteRawModifiedDetails {
 		m.EndTime,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteRawModifiedDetailsCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteRawModifiedDetailsCopy
 }
 

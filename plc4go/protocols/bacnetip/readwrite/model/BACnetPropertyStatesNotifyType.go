@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesNotifyType) deepCopy() *_BACnetPropertyStatesNotif
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetNotifyTypeTagged](m.NotifyType),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesNotifyTypeCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesNotifyTypeCopy
 }
 

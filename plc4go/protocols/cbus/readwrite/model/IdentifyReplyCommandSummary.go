@@ -349,7 +349,7 @@ func (m *_IdentifyReplyCommandSummary) deepCopy() *_IdentifyReplyCommandSummary 
 		m.UnitServiceType,
 		m.Version,
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandSummaryCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandSummaryCopy
 }
 

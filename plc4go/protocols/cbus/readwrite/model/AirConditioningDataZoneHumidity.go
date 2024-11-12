@@ -422,7 +422,7 @@ func (m *_AirConditioningDataZoneHumidity) deepCopy() *_AirConditioningDataZoneH
 		utils.DeepCopy[HVACHumidity](m.Humidity),
 		m.SensorStatus,
 	}
-	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
+	_AirConditioningDataZoneHumidityCopy.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
 	return _AirConditioningDataZoneHumidityCopy
 }
 

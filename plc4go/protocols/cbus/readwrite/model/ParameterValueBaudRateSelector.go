@@ -327,7 +327,7 @@ func (m *_ParameterValueBaudRateSelector) deepCopy() *_ParameterValueBaudRateSel
 		m.Value,
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.ParameterValueContract.(*_ParameterValue)._SubType = m
+	_ParameterValueBaudRateSelectorCopy.ParameterValueContract.(*_ParameterValue)._SubType = m
 	return _ParameterValueBaudRateSelectorCopy
 }
 

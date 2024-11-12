@@ -581,7 +581,7 @@ func (m *_BACnetConfirmedServiceRequestAcknowledgeAlarm) deepCopy() *_BACnetConf
 		utils.DeepCopy[BACnetContextTagCharacterString](m.AcknowledgmentSource),
 		utils.DeepCopy[BACnetTimeStampEnclosed](m.TimeOfAcknowledgment),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestAcknowledgeAlarmCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestAcknowledgeAlarmCopy
 }
 

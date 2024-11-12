@@ -368,7 +368,7 @@ func (m *_BrokerConnectionTransportDataType) deepCopy() *_BrokerConnectionTransp
 		utils.DeepCopy[PascalString](m.ResourceUri),
 		utils.DeepCopy[PascalString](m.AuthenticationProfileUri),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrokerConnectionTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrokerConnectionTransportDataTypeCopy
 }
 

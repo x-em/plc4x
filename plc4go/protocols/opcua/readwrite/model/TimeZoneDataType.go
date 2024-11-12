@@ -336,7 +336,7 @@ func (m *_TimeZoneDataType) deepCopy() *_TimeZoneDataType {
 		m.DaylightSavingInOffset,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_TimeZoneDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _TimeZoneDataTypeCopy
 }
 

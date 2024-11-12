@@ -413,7 +413,7 @@ func (m *_EventFilterResult) deepCopy() *_EventFilterResult {
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.SelectClauseDiagnosticInfos),
 		utils.DeepCopy[ContentFilterResult](m.WhereClauseResult),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EventFilterResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EventFilterResultCopy
 }
 

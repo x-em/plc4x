@@ -250,7 +250,7 @@ func (m *_MonitoringFilter) deepCopy() *_MonitoringFilter {
 	_MonitoringFilterCopy := &_MonitoringFilter{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_MonitoringFilterCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _MonitoringFilterCopy
 }
 

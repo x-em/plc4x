@@ -315,7 +315,7 @@ func (m *_ComObjectTableRealisationType6) deepCopy() *_ComObjectTableRealisation
 		m.ComObjectTableContract.(*_ComObjectTable).deepCopy(),
 		utils.DeepCopy[GroupObjectDescriptorRealisationType6](m.ComObjectDescriptors),
 	}
-	m.ComObjectTableContract.(*_ComObjectTable)._SubType = m
+	_ComObjectTableRealisationType6Copy.ComObjectTableContract.(*_ComObjectTable)._SubType = m
 	return _ComObjectTableRealisationType6Copy
 }
 

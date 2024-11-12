@@ -446,7 +446,7 @@ func (m *_StructureDefinition) deepCopy() *_StructureDefinition {
 		m.StructureType,
 		utils.DeepCopySlice[StructureField, StructureField](m.Fields),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_StructureDefinitionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StructureDefinitionCopy
 }
 

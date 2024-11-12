@@ -313,7 +313,7 @@ func (m *_BACnetConfirmedServiceRequestGetEventInformation) deepCopy() *_BACnetC
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
 		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.LastReceivedObjectIdentifier),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestGetEventInformationCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestGetEventInformationCopy
 }
 

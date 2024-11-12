@@ -438,7 +438,7 @@ func (m *_AggregateConfiguration) deepCopy() *_AggregateConfiguration {
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AggregateConfigurationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AggregateConfigurationCopy
 }
 

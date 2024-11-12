@@ -323,7 +323,7 @@ func (m *_CycServiceItemDbReadType) deepCopy() *_CycServiceItemDbReadType {
 		m.NumberOfAreas,
 		utils.DeepCopySlice[SubItem, SubItem](m.Items),
 	}
-	m.CycServiceItemTypeContract.(*_CycServiceItemType)._SubType = m
+	_CycServiceItemDbReadTypeCopy.CycServiceItemTypeContract.(*_CycServiceItemType)._SubType = m
 	return _CycServiceItemDbReadTypeCopy
 }
 

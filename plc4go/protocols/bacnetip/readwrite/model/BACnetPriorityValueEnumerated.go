@@ -311,7 +311,7 @@ func (m *_BACnetPriorityValueEnumerated) deepCopy() *_BACnetPriorityValueEnumera
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagEnumerated](m.EnumeratedValue),
 	}
-	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
+	_BACnetPriorityValueEnumeratedCopy.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueEnumeratedCopy
 }
 

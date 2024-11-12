@@ -315,7 +315,7 @@ func (m *_PortSegment) deepCopy() *_PortSegment {
 		m.PathSegmentContract.(*_PathSegment).deepCopy(),
 		utils.DeepCopy[PortSegmentType](m.SegmentType),
 	}
-	m.PathSegmentContract.(*_PathSegment)._SubType = m
+	_PortSegmentCopy.PathSegmentContract.(*_PathSegment)._SubType = m
 	return _PortSegmentCopy
 }
 

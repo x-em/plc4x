@@ -320,7 +320,7 @@ func (m *_PortSegmentNormal) deepCopy() *_PortSegmentNormal {
 		m.Port,
 		m.LinkAddress,
 	}
-	m.PortSegmentTypeContract.(*_PortSegmentType)._SubType = m
+	_PortSegmentNormalCopy.PortSegmentTypeContract.(*_PortSegmentType)._SubType = m
 	return _PortSegmentNormalCopy
 }
 

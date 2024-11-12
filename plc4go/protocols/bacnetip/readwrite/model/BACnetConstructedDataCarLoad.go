@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataCarLoad) deepCopy() *_BACnetConstructedDataCarLoa
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagReal](m.CarLoad),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataCarLoadCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCarLoadCopy
 }
 

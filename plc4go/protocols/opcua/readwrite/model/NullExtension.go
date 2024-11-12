@@ -250,7 +250,7 @@ func (m *_NullExtension) deepCopy() *_NullExtension {
 	_NullExtensionCopy := &_NullExtension{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_NullExtensionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NullExtensionCopy
 }
 

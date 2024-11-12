@@ -643,7 +643,7 @@ func (m *_NLMUpdateKeyUpdate) deepCopy() *_NLMUpdateKeyUpdate {
 		utils.CopyPtr[uint8](m.Set2KeyCount),
 		utils.DeepCopySlice[NLMUpdateKeyUpdateKeyEntry, NLMUpdateKeyUpdateKeyEntry](m.Set2Keys),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMUpdateKeyUpdateCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMUpdateKeyUpdateCopy
 }
 

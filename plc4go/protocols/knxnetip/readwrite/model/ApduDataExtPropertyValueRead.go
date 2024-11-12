@@ -378,7 +378,7 @@ func (m *_ApduDataExtPropertyValueRead) deepCopy() *_ApduDataExtPropertyValueRea
 		m.Count,
 		m.Index,
 	}
-	m.ApduDataExtContract.(*_ApduDataExt)._SubType = m
+	_ApduDataExtPropertyValueReadCopy.ApduDataExtContract.(*_ApduDataExt)._SubType = m
 	return _ApduDataExtPropertyValueReadCopy
 }
 

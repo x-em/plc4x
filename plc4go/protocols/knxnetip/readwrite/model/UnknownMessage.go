@@ -309,7 +309,7 @@ func (m *_UnknownMessage) deepCopy() *_UnknownMessage {
 		utils.DeepCopySlice[byte, byte](m.UnknownData),
 		m.TotalLength,
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_UnknownMessageCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _UnknownMessageCopy
 }
 

@@ -601,7 +601,7 @@ func (m *_ReferenceDescription) deepCopy() *_ReferenceDescription {
 		utils.DeepCopy[ExpandedNodeId](m.TypeDefinition),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReferenceDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReferenceDescriptionCopy
 }
 

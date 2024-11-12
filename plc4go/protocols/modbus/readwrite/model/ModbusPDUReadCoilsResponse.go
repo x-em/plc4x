@@ -314,7 +314,7 @@ func (m *_ModbusPDUReadCoilsResponse) deepCopy() *_ModbusPDUReadCoilsResponse {
 		m.ModbusPDUContract.(*_ModbusPDU).deepCopy(),
 		utils.DeepCopySlice[byte, byte](m.Value),
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUReadCoilsResponseCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUReadCoilsResponseCopy
 }
 

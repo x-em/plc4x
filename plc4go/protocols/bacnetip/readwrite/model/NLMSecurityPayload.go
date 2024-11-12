@@ -322,7 +322,7 @@ func (m *_NLMSecurityPayload) deepCopy() *_NLMSecurityPayload {
 		m.PayloadLength,
 		utils.DeepCopySlice[byte, byte](m.Payload),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMSecurityPayloadCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMSecurityPayloadCopy
 }
 

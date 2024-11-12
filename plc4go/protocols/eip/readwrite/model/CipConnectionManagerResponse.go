@@ -517,7 +517,7 @@ func (m *_CipConnectionManagerResponse) deepCopy() *_CipConnectionManagerRespons
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_CipConnectionManagerResponseCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _CipConnectionManagerResponseCopy
 }
 

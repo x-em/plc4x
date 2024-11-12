@@ -310,7 +310,7 @@ func (m *_BACnetConfirmedServiceRequestReadPropertyMultiple) deepCopy() *_BACnet
 		utils.DeepCopySlice[BACnetReadAccessSpecification, BACnetReadAccessSpecification](m.Data),
 		m.ServiceRequestPayloadLength,
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestReadPropertyMultipleCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestReadPropertyMultipleCopy
 }
 

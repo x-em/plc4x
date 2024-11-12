@@ -576,7 +576,7 @@ func (m *_BACnetEventParameterDoubleOutOfRange) deepCopy() *_BACnetEventParamete
 		utils.DeepCopy[BACnetContextTagDouble](m.Deadband),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterDoubleOutOfRangeCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterDoubleOutOfRangeCopy
 }
 

@@ -417,7 +417,7 @@ func (m *_SetMonitoringModeRequest) deepCopy() *_SetMonitoringModeRequest {
 		m.MonitoringMode,
 		utils.DeepCopySlice[uint32, uint32](m.MonitoredItemIds),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SetMonitoringModeRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SetMonitoringModeRequestCopy
 }
 

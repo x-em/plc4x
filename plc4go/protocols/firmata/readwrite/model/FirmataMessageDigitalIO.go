@@ -324,7 +324,7 @@ func (m *_FirmataMessageDigitalIO) deepCopy() *_FirmataMessageDigitalIO {
 		m.PinBlock,
 		utils.DeepCopySlice[int8, int8](m.Data),
 	}
-	m.FirmataMessageContract.(*_FirmataMessage)._SubType = m
+	_FirmataMessageDigitalIOCopy.FirmataMessageContract.(*_FirmataMessage)._SubType = m
 	return _FirmataMessageDigitalIOCopy
 }
 

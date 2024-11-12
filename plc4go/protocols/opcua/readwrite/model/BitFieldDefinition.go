@@ -457,7 +457,7 @@ func (m *_BitFieldDefinition) deepCopy() *_BitFieldDefinition {
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BitFieldDefinitionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BitFieldDefinitionCopy
 }
 

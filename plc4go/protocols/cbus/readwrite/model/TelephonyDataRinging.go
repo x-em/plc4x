@@ -303,7 +303,7 @@ func (m *_TelephonyDataRinging) deepCopy() *_TelephonyDataRinging {
 		m.Number,
 		m.reservedField0,
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataRingingCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataRingingCopy
 }
 

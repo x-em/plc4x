@@ -368,7 +368,7 @@ func (m *_ChangeListRemoveError) deepCopy() *_ChangeListRemoveError {
 		utils.DeepCopy[ErrorEnclosed](m.ErrorType),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.FirstFailedElementNumber),
 	}
-	m.BACnetErrorContract.(*_BACnetError)._SubType = m
+	_ChangeListRemoveErrorCopy.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _ChangeListRemoveErrorCopy
 }
 

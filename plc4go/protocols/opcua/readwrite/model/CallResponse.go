@@ -413,7 +413,7 @@ func (m *_CallResponse) deepCopy() *_CallResponse {
 		utils.DeepCopySlice[CallMethodResult, CallMethodResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CallResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CallResponseCopy
 }
 

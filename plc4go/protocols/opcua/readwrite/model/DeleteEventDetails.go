@@ -364,7 +364,7 @@ func (m *_DeleteEventDetails) deepCopy() *_DeleteEventDetails {
 		utils.DeepCopy[NodeId](m.NodeId),
 		utils.DeepCopySlice[PascalByteString, PascalByteString](m.EventIds),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteEventDetailsCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteEventDetailsCopy
 }
 

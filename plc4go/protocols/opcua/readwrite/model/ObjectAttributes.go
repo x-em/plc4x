@@ -484,7 +484,7 @@ func (m *_ObjectAttributes) deepCopy() *_ObjectAttributes {
 		m.UserWriteMask,
 		m.EventNotifier,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ObjectAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ObjectAttributesCopy
 }
 

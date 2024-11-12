@@ -344,7 +344,7 @@ func (m *_GenericAttributeValue) deepCopy() *_GenericAttributeValue {
 		m.AttributeId,
 		utils.DeepCopy[Variant](m.Value),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_GenericAttributeValueCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _GenericAttributeValueCopy
 }
 

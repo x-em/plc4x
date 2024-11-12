@@ -325,7 +325,7 @@ func (m *_VariantDateTime) deepCopy() *_VariantDateTime {
 		utils.CopyPtr[int32](m.ArrayLength),
 		utils.DeepCopySlice[int64, int64](m.Value),
 	}
-	m.VariantContract.(*_Variant)._SubType = m
+	_VariantDateTimeCopy.VariantContract.(*_Variant)._SubType = m
 	return _VariantDateTimeCopy
 }
 

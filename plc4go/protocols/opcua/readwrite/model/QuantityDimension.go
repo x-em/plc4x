@@ -494,7 +494,7 @@ func (m *_QuantityDimension) deepCopy() *_QuantityDimension {
 		m.AbsoluteTemperatureExponent,
 		m.DimensionlessExponent,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_QuantityDimensionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _QuantityDimensionCopy
 }
 

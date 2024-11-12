@@ -246,7 +246,7 @@ func (m *_SecurityDataExitDelayStarted) deepCopy() *_SecurityDataExitDelayStarte
 	_SecurityDataExitDelayStartedCopy := &_SecurityDataExitDelayStarted{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataExitDelayStartedCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataExitDelayStartedCopy
 }
 

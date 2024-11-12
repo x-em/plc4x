@@ -378,7 +378,7 @@ func (m *_SamplingIntervalDiagnosticsDataType) deepCopy() *_SamplingIntervalDiag
 		m.MaxMonitoredItemCount,
 		m.DisabledMonitoredItemCount,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SamplingIntervalDiagnosticsDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SamplingIntervalDiagnosticsDataTypeCopy
 }
 

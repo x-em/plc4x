@@ -320,7 +320,7 @@ func (m *_COTPPacketData) deepCopy() *_COTPPacketData {
 		m.Eot,
 		m.TpduRef,
 	}
-	m.COTPPacketContract.(*_COTPPacket)._SubType = m
+	_COTPPacketDataCopy.COTPPacketContract.(*_COTPPacket)._SubType = m
 	return _COTPPacketDataCopy
 }
 

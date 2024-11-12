@@ -315,7 +315,7 @@ func (m *_ParameterValueCustomTypes) deepCopy() *_ParameterValueCustomTypes {
 		m.ParameterValueContract.(*_ParameterValue).deepCopy(),
 		utils.DeepCopy[CustomTypes](m.Value),
 	}
-	m.ParameterValueContract.(*_ParameterValue)._SubType = m
+	_ParameterValueCustomTypesCopy.ParameterValueContract.(*_ParameterValue)._SubType = m
 	return _ParameterValueCustomTypesCopy
 }
 

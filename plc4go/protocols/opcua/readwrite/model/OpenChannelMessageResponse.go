@@ -450,7 +450,7 @@ func (m *_OpenChannelMessageResponse) deepCopy() *_OpenChannelMessageResponse {
 		utils.DeepCopy[PascalByteString](m.SenderCertificate),
 		utils.DeepCopy[PascalByteString](m.ReceiverCertificateThumbprint),
 	}
-	m.OpenChannelMessageContract.(*_OpenChannelMessage)._SubType = m
+	_OpenChannelMessageResponseCopy.OpenChannelMessageContract.(*_OpenChannelMessage)._SubType = m
 	return _OpenChannelMessageResponseCopy
 }
 

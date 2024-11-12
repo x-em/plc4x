@@ -364,7 +364,7 @@ func (m *_DeleteNodesRequest) deepCopy() *_DeleteNodesRequest {
 		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[DeleteNodesItem, DeleteNodesItem](m.NodesToDelete),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DeleteNodesRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DeleteNodesRequestCopy
 }
 

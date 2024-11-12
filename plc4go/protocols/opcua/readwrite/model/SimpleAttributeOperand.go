@@ -446,7 +446,7 @@ func (m *_SimpleAttributeOperand) deepCopy() *_SimpleAttributeOperand {
 		m.AttributeId,
 		utils.DeepCopy[PascalString](m.IndexRange),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SimpleAttributeOperandCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SimpleAttributeOperandCopy
 }
 

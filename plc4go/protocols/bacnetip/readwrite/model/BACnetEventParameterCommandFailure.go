@@ -470,7 +470,7 @@ func (m *_BACnetEventParameterCommandFailure) deepCopy() *_BACnetEventParameterC
 		utils.DeepCopy[BACnetDeviceObjectPropertyReferenceEnclosed](m.FeedbackPropertyReference),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterCommandFailureCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterCommandFailureCopy
 }
 

@@ -316,7 +316,7 @@ func (m *_TelephonyDataLineOffHook) deepCopy() *_TelephonyDataLineOffHook {
 		m.Reason,
 		m.Number,
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataLineOffHookCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataLineOffHookCopy
 }
 

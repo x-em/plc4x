@@ -311,7 +311,7 @@ func (m *_BACnetShedLevelLevel) deepCopy() *_BACnetShedLevelLevel {
 		m.BACnetShedLevelContract.(*_BACnetShedLevel).deepCopy(),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Level),
 	}
-	m.BACnetShedLevelContract.(*_BACnetShedLevel)._SubType = m
+	_BACnetShedLevelLevelCopy.BACnetShedLevelContract.(*_BACnetShedLevel)._SubType = m
 	return _BACnetShedLevelLevelCopy
 }
 

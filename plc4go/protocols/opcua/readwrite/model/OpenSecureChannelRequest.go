@@ -484,7 +484,7 @@ func (m *_OpenSecureChannelRequest) deepCopy() *_OpenSecureChannelRequest {
 		utils.DeepCopy[PascalByteString](m.ClientNonce),
 		m.RequestedLifetime,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_OpenSecureChannelRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _OpenSecureChannelRequestCopy
 }
 

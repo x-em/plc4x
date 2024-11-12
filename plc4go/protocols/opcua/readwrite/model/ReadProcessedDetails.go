@@ -451,7 +451,7 @@ func (m *_ReadProcessedDetails) deepCopy() *_ReadProcessedDetails {
 		utils.DeepCopySlice[NodeId, NodeId](m.AggregateType),
 		utils.DeepCopy[AggregateConfiguration](m.AggregateConfiguration),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadProcessedDetailsCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadProcessedDetailsCopy
 }
 

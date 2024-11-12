@@ -287,7 +287,7 @@ func (m *_NullExtensionObjectWithMask) deepCopy() *_NullExtensionObjectWithMask 
 	_NullExtensionObjectWithMaskCopy := &_NullExtensionObjectWithMask{
 		m.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask).deepCopy(),
 	}
-	m.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask)._SubType = m
+	_NullExtensionObjectWithMaskCopy.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask)._SubType = m
 	return _NullExtensionObjectWithMaskCopy
 }
 

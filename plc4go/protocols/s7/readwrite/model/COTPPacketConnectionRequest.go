@@ -349,7 +349,7 @@ func (m *_COTPPacketConnectionRequest) deepCopy() *_COTPPacketConnectionRequest 
 		m.SourceReference,
 		m.ProtocolClass,
 	}
-	m.COTPPacketContract.(*_COTPPacket)._SubType = m
+	_COTPPacketConnectionRequestCopy.COTPPacketContract.(*_COTPPacket)._SubType = m
 	return _COTPPacketConnectionRequestCopy
 }
 

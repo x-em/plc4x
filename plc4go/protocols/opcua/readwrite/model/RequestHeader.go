@@ -537,7 +537,7 @@ func (m *_RequestHeader) deepCopy() *_RequestHeader {
 		m.TimeoutHint,
 		utils.DeepCopy[ExtensionObject](m.AdditionalHeader),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_RequestHeaderCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RequestHeaderCopy
 }
 

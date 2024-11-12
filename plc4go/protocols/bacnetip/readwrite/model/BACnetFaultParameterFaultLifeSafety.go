@@ -470,7 +470,7 @@ func (m *_BACnetFaultParameterFaultLifeSafety) deepCopy() *_BACnetFaultParameter
 		utils.DeepCopy[BACnetDeviceObjectPropertyReferenceEnclosed](m.ModePropertyReference),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetFaultParameterContract.(*_BACnetFaultParameter)._SubType = m
+	_BACnetFaultParameterFaultLifeSafetyCopy.BACnetFaultParameterContract.(*_BACnetFaultParameter)._SubType = m
 	return _BACnetFaultParameterFaultLifeSafetyCopy
 }
 

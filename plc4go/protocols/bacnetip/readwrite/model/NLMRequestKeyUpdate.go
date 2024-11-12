@@ -465,7 +465,7 @@ func (m *_NLMRequestKeyUpdate) deepCopy() *_NLMRequestKeyUpdate {
 		m.Set2ExpirationTime,
 		m.DistributionKeyRevision,
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMRequestKeyUpdateCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMRequestKeyUpdateCopy
 }
 

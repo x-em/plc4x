@@ -576,7 +576,7 @@ func (m *_BACnetEventParameterChangeOfLifeSavety) deepCopy() *_BACnetEventParame
 		utils.DeepCopy[BACnetDeviceObjectPropertyReferenceEnclosed](m.ModePropertyReference),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterChangeOfLifeSavetyCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterChangeOfLifeSavetyCopy
 }
 

@@ -258,7 +258,7 @@ func (m *_NullListServicesResponse) deepCopy() *_NullListServicesResponse {
 	_NullListServicesResponseCopy := &_NullListServicesResponse{
 		m.EipPacketContract.(*_EipPacket).deepCopy(),
 	}
-	m.EipPacketContract.(*_EipPacket)._SubType = m
+	_NullListServicesResponseCopy.EipPacketContract.(*_EipPacket)._SubType = m
 	return _NullListServicesResponseCopy
 }
 

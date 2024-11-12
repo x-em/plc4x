@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataLowDiffLimit) deepCopy() *_BACnetConstructedDataL
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetOptionalREAL](m.LowDiffLimit),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataLowDiffLimitCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLowDiffLimitCopy
 }
 

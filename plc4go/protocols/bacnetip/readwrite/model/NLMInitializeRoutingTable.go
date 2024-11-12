@@ -327,7 +327,7 @@ func (m *_NLMInitializeRoutingTable) deepCopy() *_NLMInitializeRoutingTable {
 		m.NumberOfPorts,
 		utils.DeepCopySlice[NLMInitializeRoutingTablePortMapping, NLMInitializeRoutingTablePortMapping](m.PortMappings),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMInitializeRoutingTableCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMInitializeRoutingTableCopy
 }
 

@@ -419,7 +419,7 @@ func (m *_BACnetUnconfirmedServiceRequestUnconfirmedPrivateTransfer) deepCopy() 
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ServiceNumber),
 		utils.DeepCopy[BACnetConstructedData](m.ServiceParameters),
 	}
-	m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
+	_BACnetUnconfirmedServiceRequestUnconfirmedPrivateTransferCopy.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
 	return _BACnetUnconfirmedServiceRequestUnconfirmedPrivateTransferCopy
 }
 

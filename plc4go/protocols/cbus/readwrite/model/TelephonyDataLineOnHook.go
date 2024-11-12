@@ -246,7 +246,7 @@ func (m *_TelephonyDataLineOnHook) deepCopy() *_TelephonyDataLineOnHook {
 	_TelephonyDataLineOnHookCopy := &_TelephonyDataLineOnHook{
 		m.TelephonyDataContract.(*_TelephonyData).deepCopy(),
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataLineOnHookCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataLineOnHookCopy
 }
 

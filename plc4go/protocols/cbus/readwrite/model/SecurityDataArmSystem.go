@@ -428,7 +428,7 @@ func (m *_SecurityDataArmSystem) deepCopy() *_SecurityDataArmSystem {
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
 		m.ArmMode,
 	}
-	m.SecurityDataContract.(*_SecurityData)._SubType = m
+	_SecurityDataArmSystemCopy.SecurityDataContract.(*_SecurityData)._SubType = m
 	return _SecurityDataArmSystemCopy
 }
 

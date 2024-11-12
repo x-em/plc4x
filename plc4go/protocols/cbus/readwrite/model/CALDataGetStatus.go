@@ -316,7 +316,7 @@ func (m *_CALDataGetStatus) deepCopy() *_CALDataGetStatus {
 		m.ParamNo,
 		m.Count,
 	}
-	m.CALDataContract.(*_CALData)._SubType = m
+	_CALDataGetStatusCopy.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataGetStatusCopy
 }
 

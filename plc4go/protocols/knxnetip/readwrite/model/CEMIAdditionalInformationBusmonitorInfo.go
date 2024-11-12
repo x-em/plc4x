@@ -465,7 +465,7 @@ func (m *_CEMIAdditionalInformationBusmonitorInfo) deepCopy() *_CEMIAdditionalIn
 		m.LostFlag,
 		m.SequenceNumber,
 	}
-	m.CEMIAdditionalInformationContract.(*_CEMIAdditionalInformation)._SubType = m
+	_CEMIAdditionalInformationBusmonitorInfoCopy.CEMIAdditionalInformationContract.(*_CEMIAdditionalInformation)._SubType = m
 	return _CEMIAdditionalInformationBusmonitorInfoCopy
 }
 

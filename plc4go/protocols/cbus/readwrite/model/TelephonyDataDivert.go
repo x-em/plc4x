@@ -287,7 +287,7 @@ func (m *_TelephonyDataDivert) deepCopy() *_TelephonyDataDivert {
 		m.TelephonyDataContract.(*_TelephonyData).deepCopy(),
 		m.Number,
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataDivertCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataDivertCopy
 }
 

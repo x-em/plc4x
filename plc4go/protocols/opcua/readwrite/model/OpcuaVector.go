@@ -250,7 +250,7 @@ func (m *_OpcuaVector) deepCopy() *_OpcuaVector {
 	_OpcuaVectorCopy := &_OpcuaVector{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_OpcuaVectorCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _OpcuaVectorCopy
 }
 

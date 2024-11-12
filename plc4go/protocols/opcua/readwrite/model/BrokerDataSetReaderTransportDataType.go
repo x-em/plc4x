@@ -503,7 +503,7 @@ func (m *_BrokerDataSetReaderTransportDataType) deepCopy() *_BrokerDataSetReader
 		m.RequestedDeliveryGuarantee,
 		utils.DeepCopy[PascalString](m.MetaDataQueueName),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrokerDataSetReaderTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrokerDataSetReaderTransportDataTypeCopy
 }
 

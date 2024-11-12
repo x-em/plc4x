@@ -291,7 +291,7 @@ func (m *_IdentifyReplyCommandFirmwareVersion) deepCopy() *_IdentifyReplyCommand
 		m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand).deepCopy(),
 		m.FirmwareVersion,
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandFirmwareVersionCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandFirmwareVersionCopy
 }
 

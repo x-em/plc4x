@@ -575,7 +575,7 @@ func (m *_CALReplyLong) deepCopy() *_CALReplyLong {
 		utils.DeepCopy[ReplyNetwork](m.ReplyNetwork),
 		m.reservedField0,
 	}
-	m.CALReplyContract.(*_CALReply)._SubType = m
+	_CALReplyLongCopy.CALReplyContract.(*_CALReply)._SubType = m
 	return _CALReplyLongCopy
 }
 

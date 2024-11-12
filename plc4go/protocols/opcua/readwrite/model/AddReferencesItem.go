@@ -548,7 +548,7 @@ func (m *_AddReferencesItem) deepCopy() *_AddReferencesItem {
 		m.TargetNodeClass,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AddReferencesItemCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AddReferencesItemCopy
 }
 

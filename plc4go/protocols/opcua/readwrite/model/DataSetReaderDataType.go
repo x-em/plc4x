@@ -1003,7 +1003,7 @@ func (m *_DataSetReaderDataType) deepCopy() *_DataSetReaderDataType {
 		utils.DeepCopy[ExtensionObject](m.SubscribedDataSet),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataSetReaderDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataSetReaderDataTypeCopy
 }
 

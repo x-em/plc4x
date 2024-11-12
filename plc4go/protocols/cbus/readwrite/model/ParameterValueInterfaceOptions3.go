@@ -351,7 +351,7 @@ func (m *_ParameterValueInterfaceOptions3) deepCopy() *_ParameterValueInterfaceO
 		utils.DeepCopy[InterfaceOptions3](m.Value),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.ParameterValueContract.(*_ParameterValue)._SubType = m
+	_ParameterValueInterfaceOptions3Copy.ParameterValueContract.(*_ParameterValue)._SubType = m
 	return _ParameterValueInterfaceOptions3Copy
 }
 

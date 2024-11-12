@@ -295,7 +295,7 @@ func (m *_S7ParameterWriteVarResponse) deepCopy() *_S7ParameterWriteVarResponse 
 		m.S7ParameterContract.(*_S7Parameter).deepCopy(),
 		m.NumItems,
 	}
-	m.S7ParameterContract.(*_S7Parameter)._SubType = m
+	_S7ParameterWriteVarResponseCopy.S7ParameterContract.(*_S7Parameter)._SubType = m
 	return _S7ParameterWriteVarResponseCopy
 }
 

@@ -422,7 +422,7 @@ func (m *_CreateMonitoredItemsRequest) deepCopy() *_CreateMonitoredItemsRequest 
 		m.TimestampsToReturn,
 		utils.DeepCopySlice[MonitoredItemCreateRequest, MonitoredItemCreateRequest](m.ItemsToCreate),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CreateMonitoredItemsRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CreateMonitoredItemsRequestCopy
 }
 

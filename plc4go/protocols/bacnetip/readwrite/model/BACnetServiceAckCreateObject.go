@@ -315,7 +315,7 @@ func (m *_BACnetServiceAckCreateObject) deepCopy() *_BACnetServiceAckCreateObjec
 		m.BACnetServiceAckContract.(*_BACnetServiceAck).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.ObjectIdentifier),
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckCreateObjectCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckCreateObjectCopy
 }
 

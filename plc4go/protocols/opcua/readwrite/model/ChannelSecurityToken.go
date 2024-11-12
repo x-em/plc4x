@@ -378,7 +378,7 @@ func (m *_ChannelSecurityToken) deepCopy() *_ChannelSecurityToken {
 		m.CreatedAt,
 		m.RevisedLifetime,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ChannelSecurityTokenCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ChannelSecurityTokenCopy
 }
 

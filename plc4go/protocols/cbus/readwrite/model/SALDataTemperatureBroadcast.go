@@ -315,7 +315,7 @@ func (m *_SALDataTemperatureBroadcast) deepCopy() *_SALDataTemperatureBroadcast 
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[TemperatureBroadcastData](m.TemperatureBroadcastData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataTemperatureBroadcastCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataTemperatureBroadcastCopy
 }
 

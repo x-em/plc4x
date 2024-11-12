@@ -320,7 +320,7 @@ func (m *_COTPPacketTpduError) deepCopy() *_COTPPacketTpduError {
 		m.DestinationReference,
 		m.RejectCause,
 	}
-	m.COTPPacketContract.(*_COTPPacket)._SubType = m
+	_COTPPacketTpduErrorCopy.COTPPacketContract.(*_COTPPacket)._SubType = m
 	return _COTPPacketTpduErrorCopy
 }
 

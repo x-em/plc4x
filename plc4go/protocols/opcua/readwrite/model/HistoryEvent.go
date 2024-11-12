@@ -311,7 +311,7 @@ func (m *_HistoryEvent) deepCopy() *_HistoryEvent {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopySlice[HistoryEventFieldList, HistoryEventFieldList](m.Events),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_HistoryEventCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _HistoryEventCopy
 }
 

@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataAlarmValue) deepCopy() *_BACnetConstructedDataAla
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetBinaryPVTagged](m.BinaryPv),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataAlarmValueCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAlarmValueCopy
 }
 

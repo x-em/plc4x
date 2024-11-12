@@ -351,7 +351,7 @@ func (m *_ReadAtTimeDetails) deepCopy() *_ReadAtTimeDetails {
 		m.UseSimpleBounds,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadAtTimeDetailsCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadAtTimeDetailsCopy
 }
 

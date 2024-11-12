@@ -468,7 +468,7 @@ func (m *_BACnetServiceAckReadProperty) deepCopy() *_BACnetServiceAckReadPropert
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ArrayIndex),
 		utils.DeepCopy[BACnetConstructedData](m.Values),
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckReadPropertyCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckReadPropertyCopy
 }
 

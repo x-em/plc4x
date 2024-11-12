@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesBinaryValue) deepCopy() *_BACnetPropertyStatesBina
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetBinaryPVTagged](m.BinaryValue),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesBinaryValueCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesBinaryValueCopy
 }
 

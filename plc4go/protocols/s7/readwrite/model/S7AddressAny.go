@@ -452,7 +452,7 @@ func (m *_S7AddressAny) deepCopy() *_S7AddressAny {
 		m.BitAddress,
 		m.reservedField0,
 	}
-	m.S7AddressContract.(*_S7Address)._SubType = m
+	_S7AddressAnyCopy.S7AddressContract.(*_S7Address)._SubType = m
 	return _S7AddressAnyCopy
 }
 

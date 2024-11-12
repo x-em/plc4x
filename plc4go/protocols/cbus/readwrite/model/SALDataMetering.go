@@ -315,7 +315,7 @@ func (m *_SALDataMetering) deepCopy() *_SALDataMetering {
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[MeteringData](m.MeteringData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataMeteringCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataMeteringCopy
 }
 

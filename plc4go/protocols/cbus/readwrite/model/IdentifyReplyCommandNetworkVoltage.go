@@ -367,7 +367,7 @@ func (m *_IdentifyReplyCommandNetworkVoltage) deepCopy() *_IdentifyReplyCommandN
 		m.Volts,
 		m.VoltsDecimalPlace,
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandNetworkVoltageCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandNetworkVoltageCopy
 }
 

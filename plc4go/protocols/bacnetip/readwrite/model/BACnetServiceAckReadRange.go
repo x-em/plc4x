@@ -624,7 +624,7 @@ func (m *_BACnetServiceAckReadRange) deepCopy() *_BACnetServiceAckReadRange {
 		utils.DeepCopy[BACnetConstructedData](m.ItemData),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.FirstSequenceNumber),
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckReadRangeCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckReadRangeCopy
 }
 

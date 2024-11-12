@@ -369,7 +369,7 @@ func (m *_S7ParameterSetupCommunication) deepCopy() *_S7ParameterSetupCommunicat
 		m.PduLength,
 		m.reservedField0,
 	}
-	m.S7ParameterContract.(*_S7Parameter)._SubType = m
+	_S7ParameterSetupCommunicationCopy.S7ParameterContract.(*_S7Parameter)._SubType = m
 	return _S7ParameterSetupCommunicationCopy
 }
 

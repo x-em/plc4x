@@ -421,7 +421,7 @@ func (m *_PubSubConfigurationValueDataType) deepCopy() *_PubSubConfigurationValu
 		utils.DeepCopy[PascalString](m.Name),
 		utils.DeepCopy[Variant](m.Identifier),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PubSubConfigurationValueDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PubSubConfigurationValueDataTypeCopy
 }
 

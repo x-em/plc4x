@@ -393,7 +393,7 @@ func (m *_FindServersOnNetworkResponse) deepCopy() *_FindServersOnNetworkRespons
 		m.LastCounterResetTime,
 		utils.DeepCopySlice[ServerOnNetwork, ServerOnNetwork](m.Servers),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_FindServersOnNetworkResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _FindServersOnNetworkResponseCopy
 }
 

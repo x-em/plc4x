@@ -344,7 +344,7 @@ func (m *_CancelRequest) deepCopy() *_CancelRequest {
 		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.RequestHandle,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_CancelRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CancelRequestCopy
 }
 

@@ -311,7 +311,7 @@ func (m *_BACnetSpecialEventPeriodCalendarReference) deepCopy() *_BACnetSpecialE
 		m.BACnetSpecialEventPeriodContract.(*_BACnetSpecialEventPeriod).deepCopy(),
 		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.CalendarReference),
 	}
-	m.BACnetSpecialEventPeriodContract.(*_BACnetSpecialEventPeriod)._SubType = m
+	_BACnetSpecialEventPeriodCalendarReferenceCopy.BACnetSpecialEventPeriodContract.(*_BACnetSpecialEventPeriod)._SubType = m
 	return _BACnetSpecialEventPeriodCalendarReferenceCopy
 }
 

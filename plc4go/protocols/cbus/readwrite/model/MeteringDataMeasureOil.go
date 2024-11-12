@@ -246,7 +246,7 @@ func (m *_MeteringDataMeasureOil) deepCopy() *_MeteringDataMeasureOil {
 	_MeteringDataMeasureOilCopy := &_MeteringDataMeasureOil{
 		m.MeteringDataContract.(*_MeteringData).deepCopy(),
 	}
-	m.MeteringDataContract.(*_MeteringData)._SubType = m
+	_MeteringDataMeasureOilCopy.MeteringDataContract.(*_MeteringData)._SubType = m
 	return _MeteringDataMeasureOilCopy
 }
 

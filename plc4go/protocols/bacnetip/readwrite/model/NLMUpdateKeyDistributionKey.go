@@ -344,7 +344,7 @@ func (m *_NLMUpdateKeyDistributionKey) deepCopy() *_NLMUpdateKeyDistributionKey 
 		m.KeyRevision,
 		utils.DeepCopy[NLMUpdateKeyUpdateKeyEntry](m.Key),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMUpdateKeyDistributionKeyCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMUpdateKeyDistributionKeyCopy
 }
 

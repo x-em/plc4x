@@ -503,7 +503,7 @@ func (m *_LDataExtended) deepCopy() *_LDataExtended {
 		utils.DeepCopySlice[byte, byte](m.DestinationAddress),
 		utils.DeepCopy[Apdu](m.Apdu),
 	}
-	m.LDataFrameContract.(*_LDataFrame)._SubType = m
+	_LDataExtendedCopy.LDataFrameContract.(*_LDataFrame)._SubType = m
 	return _LDataExtendedCopy
 }
 

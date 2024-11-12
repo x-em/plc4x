@@ -728,7 +728,7 @@ func (m *_PubSubConfiguration2DataType) deepCopy() *_PubSubConfiguration2DataTyp
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.ConfigurationProperties),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PubSubConfiguration2DataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PubSubConfiguration2DataTypeCopy
 }
 

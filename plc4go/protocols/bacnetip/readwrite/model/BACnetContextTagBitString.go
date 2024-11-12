@@ -315,7 +315,7 @@ func (m *_BACnetContextTagBitString) deepCopy() *_BACnetContextTagBitString {
 		m.BACnetContextTagContract.(*_BACnetContextTag).deepCopy(),
 		utils.DeepCopy[BACnetTagPayloadBitString](m.Payload),
 	}
-	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
+	_BACnetContextTagBitStringCopy.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagBitStringCopy
 }
 

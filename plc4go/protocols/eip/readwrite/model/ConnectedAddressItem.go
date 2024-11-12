@@ -307,7 +307,7 @@ func (m *_ConnectedAddressItem) deepCopy() *_ConnectedAddressItem {
 		m.ConnectionId,
 		m.reservedField0,
 	}
-	m.TypeIdContract.(*_TypeId)._SubType = m
+	_ConnectedAddressItemCopy.TypeIdContract.(*_TypeId)._SubType = m
 	return _ConnectedAddressItemCopy
 }
 

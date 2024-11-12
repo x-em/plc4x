@@ -299,7 +299,7 @@ func (m *_BACnetConstructedDataSubscribedRecipients) deepCopy() *_BACnetConstruc
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopySlice[BACnetEventNotificationSubscription, BACnetEventNotificationSubscription](m.SubscribedRecipients),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataSubscribedRecipientsCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSubscribedRecipientsCopy
 }
 

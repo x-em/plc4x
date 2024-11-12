@@ -291,7 +291,7 @@ func (m *_NLMDisconnectConnectionToNetwork) deepCopy() *_NLMDisconnectConnection
 		m.NLMContract.(*_NLM).deepCopy(),
 		m.DestinationNetworkAddress,
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMDisconnectConnectionToNetworkCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMDisconnectConnectionToNetworkCopy
 }
 

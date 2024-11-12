@@ -246,7 +246,7 @@ func (m *_TelephonyDataClearDiversion) deepCopy() *_TelephonyDataClearDiversion 
 	_TelephonyDataClearDiversionCopy := &_TelephonyDataClearDiversion{
 		m.TelephonyDataContract.(*_TelephonyData).deepCopy(),
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataClearDiversionCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataClearDiversionCopy
 }
 

@@ -368,7 +368,7 @@ func (m *_StatusChangeNotification) deepCopy() *_StatusChangeNotification {
 		utils.DeepCopy[StatusCode](m.Status),
 		utils.DeepCopy[DiagnosticInfo](m.DiagnosticInfo),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_StatusChangeNotificationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StatusChangeNotificationCopy
 }
 

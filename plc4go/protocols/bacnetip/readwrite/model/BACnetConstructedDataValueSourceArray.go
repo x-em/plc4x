@@ -387,7 +387,7 @@ func (m *_BACnetConstructedDataValueSourceArray) deepCopy() *_BACnetConstructedD
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetValueSource, BACnetValueSource](m.VtClassesSupported),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataValueSourceArrayCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataValueSourceArrayCopy
 }
 

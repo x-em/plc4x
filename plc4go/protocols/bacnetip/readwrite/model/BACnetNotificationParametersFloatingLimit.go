@@ -576,7 +576,7 @@ func (m *_BACnetNotificationParametersFloatingLimit) deepCopy() *_BACnetNotifica
 		utils.DeepCopy[BACnetContextTagReal](m.ErrorLimit),
 		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
-	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
+	_BACnetNotificationParametersFloatingLimitCopy.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersFloatingLimitCopy
 }
 

@@ -524,7 +524,7 @@ func (m *_BACnetNotificationParametersChangeOfReliability) deepCopy() *_BACnetNo
 		utils.DeepCopy[BACnetPropertyValues](m.PropertyValues),
 		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
-	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
+	_BACnetNotificationParametersChangeOfReliabilityCopy.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfReliabilityCopy
 }
 

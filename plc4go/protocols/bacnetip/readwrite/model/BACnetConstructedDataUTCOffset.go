@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataUTCOffset) deepCopy() *_BACnetConstructedDataUTCO
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.UtcOffset),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataUTCOffsetCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataUTCOffsetCopy
 }
 

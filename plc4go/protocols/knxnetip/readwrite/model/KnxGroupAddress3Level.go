@@ -349,7 +349,7 @@ func (m *_KnxGroupAddress3Level) deepCopy() *_KnxGroupAddress3Level {
 		m.MiddleGroup,
 		m.SubGroup,
 	}
-	m.KnxGroupAddressContract.(*_KnxGroupAddress)._SubType = m
+	_KnxGroupAddress3LevelCopy.KnxGroupAddressContract.(*_KnxGroupAddress)._SubType = m
 	return _KnxGroupAddress3LevelCopy
 }
 

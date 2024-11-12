@@ -360,7 +360,7 @@ func (m *_HistoryModifiedData) deepCopy() *_HistoryModifiedData {
 		utils.DeepCopySlice[DataValue, DataValue](m.DataValues),
 		utils.DeepCopySlice[ModificationInfo, ModificationInfo](m.ModificationInfos),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_HistoryModifiedDataCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _HistoryModifiedDataCopy
 }
 

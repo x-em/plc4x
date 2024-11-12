@@ -246,7 +246,7 @@ func (m *_TelephonyDataRejectIncomingCall) deepCopy() *_TelephonyDataRejectIncom
 	_TelephonyDataRejectIncomingCallCopy := &_TelephonyDataRejectIncomingCall{
 		m.TelephonyDataContract.(*_TelephonyData).deepCopy(),
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataRejectIncomingCallCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataRejectIncomingCallCopy
 }
 

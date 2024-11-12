@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataDutyWindow) deepCopy() *_BACnetConstructedDataDut
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.DutyWindow),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataDutyWindowCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDutyWindowCopy
 }
 

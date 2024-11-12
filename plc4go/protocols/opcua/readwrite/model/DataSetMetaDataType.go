@@ -719,7 +719,7 @@ func (m *_DataSetMetaDataType) deepCopy() *_DataSetMetaDataType {
 		utils.DeepCopy[GuidValue](m.DataSetClassId),
 		utils.DeepCopy[ConfigurationVersionDataType](m.ConfigurationVersion),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DataSetMetaDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataSetMetaDataTypeCopy
 }
 

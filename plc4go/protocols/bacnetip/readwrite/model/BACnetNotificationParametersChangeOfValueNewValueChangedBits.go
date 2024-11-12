@@ -312,7 +312,7 @@ func (m *_BACnetNotificationParametersChangeOfValueNewValueChangedBits) deepCopy
 		m.BACnetNotificationParametersChangeOfValueNewValueContract.(*_BACnetNotificationParametersChangeOfValueNewValue).deepCopy(),
 		utils.DeepCopy[BACnetContextTagBitString](m.ChangedBits),
 	}
-	m.BACnetNotificationParametersChangeOfValueNewValueContract.(*_BACnetNotificationParametersChangeOfValueNewValue)._SubType = m
+	_BACnetNotificationParametersChangeOfValueNewValueChangedBitsCopy.BACnetNotificationParametersChangeOfValueNewValueContract.(*_BACnetNotificationParametersChangeOfValueNewValue)._SubType = m
 	return _BACnetNotificationParametersChangeOfValueNewValueChangedBitsCopy
 }
 

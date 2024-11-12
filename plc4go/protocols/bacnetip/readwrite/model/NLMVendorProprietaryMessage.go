@@ -322,7 +322,7 @@ func (m *_NLMVendorProprietaryMessage) deepCopy() *_NLMVendorProprietaryMessage 
 		m.VendorId,
 		utils.DeepCopySlice[byte, byte](m.ProprietaryMessage),
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMVendorProprietaryMessageCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMVendorProprietaryMessageCopy
 }
 

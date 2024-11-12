@@ -320,7 +320,7 @@ func (m *_DatagramWriterGroupTransportDataType) deepCopy() *_DatagramWriterGroup
 		m.MessageRepeatCount,
 		m.MessageRepeatDelay,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DatagramWriterGroupTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramWriterGroupTransportDataTypeCopy
 }
 

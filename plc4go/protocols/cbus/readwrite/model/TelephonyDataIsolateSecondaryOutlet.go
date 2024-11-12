@@ -340,7 +340,7 @@ func (m *_TelephonyDataIsolateSecondaryOutlet) deepCopy() *_TelephonyDataIsolate
 		m.TelephonyDataContract.(*_TelephonyData).deepCopy(),
 		m.IsolateStatus,
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataIsolateSecondaryOutletCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataIsolateSecondaryOutletCopy
 }
 

@@ -891,7 +891,7 @@ func (m *_IdentifyReplyCommandExtendedDiagnosticSummary) deepCopy() *_IdentifyRe
 		m.reservedField1,
 		m.reservedField2,
 	}
-	m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
+	_IdentifyReplyCommandExtendedDiagnosticSummaryCopy.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = m
 	return _IdentifyReplyCommandExtendedDiagnosticSummaryCopy
 }
 

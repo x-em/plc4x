@@ -373,7 +373,7 @@ func (m *_NodeIdNumeric) deepCopy() *_NodeIdNumeric {
 		m.NamespaceIndex,
 		m.Id,
 	}
-	m.NodeIdTypeDefinitionContract.(*_NodeIdTypeDefinition)._SubType = m
+	_NodeIdNumericCopy.NodeIdTypeDefinitionContract.(*_NodeIdTypeDefinition)._SubType = m
 	return _NodeIdNumericCopy
 }
 

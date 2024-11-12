@@ -381,7 +381,7 @@ func (m *_S7PayloadUserDataItemClkFResponse) deepCopy() *_S7PayloadUserDataItemC
 		m.Year1,
 		utils.DeepCopy[DateAndTime](m.TimeStamp),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemClkFResponseCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemClkFResponseCopy
 }
 

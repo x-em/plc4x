@@ -462,7 +462,7 @@ func (m *_NodeReference) deepCopy() *_NodeReference {
 		utils.DeepCopySlice[NodeId, NodeId](m.ReferencedNodeIds),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_NodeReferenceCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NodeReferenceCopy
 }
 

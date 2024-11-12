@@ -250,7 +250,7 @@ func (m *_ApduControlNack) deepCopy() *_ApduControlNack {
 	_ApduControlNackCopy := &_ApduControlNack{
 		m.ApduControlContract.(*_ApduControl).deepCopy(),
 	}
-	m.ApduControlContract.(*_ApduControl)._SubType = m
+	_ApduControlNackCopy.ApduControlContract.(*_ApduControl)._SubType = m
 	return _ApduControlNackCopy
 }
 

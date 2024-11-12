@@ -250,7 +250,7 @@ func (m *_ConnectionTransportDataType) deepCopy() *_ConnectionTransportDataType 
 	_ConnectionTransportDataTypeCopy := &_ConnectionTransportDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ConnectionTransportDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ConnectionTransportDataTypeCopy
 }
 

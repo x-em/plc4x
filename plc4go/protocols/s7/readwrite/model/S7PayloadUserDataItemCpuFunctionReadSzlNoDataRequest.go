@@ -259,7 +259,7 @@ func (m *_S7PayloadUserDataItemCpuFunctionReadSzlNoDataRequest) deepCopy() *_S7P
 	_S7PayloadUserDataItemCpuFunctionReadSzlNoDataRequestCopy := &_S7PayloadUserDataItemCpuFunctionReadSzlNoDataRequest{
 		m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem).deepCopy(),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCpuFunctionReadSzlNoDataRequestCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCpuFunctionReadSzlNoDataRequestCopy
 }
 

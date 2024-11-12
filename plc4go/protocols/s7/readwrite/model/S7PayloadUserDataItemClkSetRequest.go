@@ -354,7 +354,7 @@ func (m *_S7PayloadUserDataItemClkSetRequest) deepCopy() *_S7PayloadUserDataItem
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemClkSetRequestCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemClkSetRequestCopy
 }
 

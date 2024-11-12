@@ -311,7 +311,7 @@ func (m *_BACnetPropertyStatesBoolean) deepCopy() *_BACnetPropertyStatesBoolean 
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
 		utils.DeepCopy[BACnetContextTagBoolean](m.BooleanValue),
 	}
-	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
+	_BACnetPropertyStatesBooleanCopy.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesBooleanCopy
 }
 

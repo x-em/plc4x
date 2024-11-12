@@ -373,7 +373,7 @@ func (m *_ViewDescription) deepCopy() *_ViewDescription {
 		m.Timestamp,
 		m.ViewVersion,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ViewDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ViewDescriptionCopy
 }
 

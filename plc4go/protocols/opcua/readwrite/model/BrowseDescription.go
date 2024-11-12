@@ -500,7 +500,7 @@ func (m *_BrowseDescription) deepCopy() *_BrowseDescription {
 		m.ResultMask,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_BrowseDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrowseDescriptionCopy
 }
 

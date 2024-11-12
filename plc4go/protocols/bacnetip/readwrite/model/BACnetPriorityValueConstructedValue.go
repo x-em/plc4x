@@ -311,7 +311,7 @@ func (m *_BACnetPriorityValueConstructedValue) deepCopy() *_BACnetPriorityValueC
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
 		utils.DeepCopy[BACnetConstructedData](m.ConstructedValue),
 	}
-	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
+	_BACnetPriorityValueConstructedValueCopy.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueConstructedValueCopy
 }
 

@@ -393,7 +393,7 @@ func (m *_UpdateDataDetails) deepCopy() *_UpdateDataDetails {
 		m.PerformInsertReplace,
 		utils.DeepCopySlice[DataValue, DataValue](m.UpdateValues),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_UpdateDataDetailsCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UpdateDataDetailsCopy
 }
 

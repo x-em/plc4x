@@ -306,7 +306,7 @@ func (m *_ReadAnnotationDataDetails) deepCopy() *_ReadAnnotationDataDetails {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopySlice[int64, int64](m.ReqTimes),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ReadAnnotationDataDetailsCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadAnnotationDataDetailsCopy
 }
 

@@ -466,7 +466,7 @@ func (m *_FindServersRequest) deepCopy() *_FindServersRequest {
 		utils.DeepCopySlice[PascalString, PascalString](m.LocaleIds),
 		utils.DeepCopySlice[PascalString, PascalString](m.ServerUris),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_FindServersRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _FindServersRequestCopy
 }
 

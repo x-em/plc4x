@@ -311,7 +311,7 @@ func (m *_EventNotificationList) deepCopy() *_EventNotificationList {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopySlice[EventFieldList, EventFieldList](m.Events),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EventNotificationListCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EventNotificationListCopy
 }
 

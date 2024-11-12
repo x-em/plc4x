@@ -254,7 +254,7 @@ func (m *_SysexCommandReportFirmwareRequest) deepCopy() *_SysexCommandReportFirm
 	_SysexCommandReportFirmwareRequestCopy := &_SysexCommandReportFirmwareRequest{
 		m.SysexCommandContract.(*_SysexCommand).deepCopy(),
 	}
-	m.SysexCommandContract.(*_SysexCommand)._SubType = m
+	_SysexCommandReportFirmwareRequestCopy.SysexCommandContract.(*_SysexCommand)._SubType = m
 	return _SysexCommandReportFirmwareRequestCopy
 }
 

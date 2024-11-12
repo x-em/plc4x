@@ -351,7 +351,7 @@ func (m *_ParameterValueApplicationAddress1) deepCopy() *_ParameterValueApplicat
 		utils.DeepCopy[ApplicationAddress1](m.Value),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
-	m.ParameterValueContract.(*_ParameterValue)._SubType = m
+	_ParameterValueApplicationAddress1Copy.ParameterValueContract.(*_ParameterValue)._SubType = m
 	return _ParameterValueApplicationAddress1Copy
 }
 

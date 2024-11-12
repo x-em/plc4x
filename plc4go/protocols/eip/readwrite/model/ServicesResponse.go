@@ -424,7 +424,7 @@ func (m *_ServicesResponse) deepCopy() *_ServicesResponse {
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.TypeIdContract.(*_TypeId)._SubType = m
+	_ServicesResponseCopy.TypeIdContract.(*_TypeId)._SubType = m
 	return _ServicesResponseCopy
 }
 

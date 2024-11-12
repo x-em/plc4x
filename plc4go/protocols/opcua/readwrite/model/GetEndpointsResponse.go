@@ -364,7 +364,7 @@ func (m *_GetEndpointsResponse) deepCopy() *_GetEndpointsResponse {
 		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[EndpointDescription, EndpointDescription](m.Endpoints),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_GetEndpointsResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _GetEndpointsResponseCopy
 }
 

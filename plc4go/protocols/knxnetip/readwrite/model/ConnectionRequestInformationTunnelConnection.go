@@ -308,7 +308,7 @@ func (m *_ConnectionRequestInformationTunnelConnection) deepCopy() *_ConnectionR
 		m.KnxLayer,
 		m.reservedField0,
 	}
-	m.ConnectionRequestInformationContract.(*_ConnectionRequestInformation)._SubType = m
+	_ConnectionRequestInformationTunnelConnectionCopy.ConnectionRequestInformationContract.(*_ConnectionRequestInformation)._SubType = m
 	return _ConnectionRequestInformationTunnelConnectionCopy
 }
 

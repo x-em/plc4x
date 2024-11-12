@@ -386,7 +386,7 @@ func (m *_OpcuaMessageRequest) deepCopy() *_OpcuaMessageRequest {
 		utils.DeepCopy[Payload](m.Message),
 		m.TotalLength,
 	}
-	m.MessagePDUContract.(*_MessagePDU)._SubType = m
+	_OpcuaMessageRequestCopy.MessagePDUContract.(*_MessagePDU)._SubType = m
 	return _OpcuaMessageRequestCopy
 }
 

@@ -413,7 +413,7 @@ func (m *_AdsReadDeviceInfoResponse) deepCopy() *_AdsReadDeviceInfoResponse {
 		m.Version,
 		utils.DeepCopySlice[byte, byte](m.Device),
 	}
-	m.AmsPacketContract.(*_AmsPacket)._SubType = m
+	_AdsReadDeviceInfoResponseCopy.AmsPacketContract.(*_AmsPacket)._SubType = m
 	return _AdsReadDeviceInfoResponseCopy
 }
 

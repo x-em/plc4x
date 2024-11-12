@@ -368,7 +368,7 @@ func (m *_AddNodesResult) deepCopy() *_AddNodesResult {
 		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopy[NodeId](m.AddedNodeId),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AddNodesResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AddNodesResultCopy
 }
 

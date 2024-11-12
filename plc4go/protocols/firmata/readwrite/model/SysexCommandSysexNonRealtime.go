@@ -254,7 +254,7 @@ func (m *_SysexCommandSysexNonRealtime) deepCopy() *_SysexCommandSysexNonRealtim
 	_SysexCommandSysexNonRealtimeCopy := &_SysexCommandSysexNonRealtime{
 		m.SysexCommandContract.(*_SysexCommand).deepCopy(),
 	}
-	m.SysexCommandContract.(*_SysexCommand)._SubType = m
+	_SysexCommandSysexNonRealtimeCopy.SysexCommandContract.(*_SysexCommand)._SubType = m
 	return _SysexCommandSysexNonRealtimeCopy
 }
 

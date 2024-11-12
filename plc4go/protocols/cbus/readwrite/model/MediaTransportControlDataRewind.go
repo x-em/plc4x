@@ -472,7 +472,7 @@ func (m *_MediaTransportControlDataRewind) deepCopy() *_MediaTransportControlDat
 		m.MediaTransportControlDataContract.(*_MediaTransportControlData).deepCopy(),
 		m.Operation,
 	}
-	m.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
+	_MediaTransportControlDataRewindCopy.MediaTransportControlDataContract.(*_MediaTransportControlData)._SubType = m
 	return _MediaTransportControlDataRewindCopy
 }
 

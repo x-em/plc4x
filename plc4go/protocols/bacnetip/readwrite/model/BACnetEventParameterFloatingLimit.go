@@ -629,7 +629,7 @@ func (m *_BACnetEventParameterFloatingLimit) deepCopy() *_BACnetEventParameterFl
 		utils.DeepCopy[BACnetContextTagReal](m.Deadband),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterFloatingLimitCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterFloatingLimitCopy
 }
 

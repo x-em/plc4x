@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataCOVUPeriod) deepCopy() *_BACnetConstructedDataCOV
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.CovuPeriod),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataCOVUPeriodCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCOVUPeriodCopy
 }
 

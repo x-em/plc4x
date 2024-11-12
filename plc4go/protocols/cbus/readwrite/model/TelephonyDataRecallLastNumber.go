@@ -369,7 +369,7 @@ func (m *_TelephonyDataRecallLastNumber) deepCopy() *_TelephonyDataRecallLastNum
 		m.RecallLastNumberType,
 		m.Number,
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataRecallLastNumberCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataRecallLastNumberCopy
 }
 

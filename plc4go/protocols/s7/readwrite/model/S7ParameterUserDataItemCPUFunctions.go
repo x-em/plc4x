@@ -516,7 +516,7 @@ func (m *_S7ParameterUserDataItemCPUFunctions) deepCopy() *_S7ParameterUserDataI
 		utils.CopyPtr[uint8](m.LastDataUnit),
 		utils.CopyPtr[uint16](m.ErrorCode),
 	}
-	m.S7ParameterUserDataItemContract.(*_S7ParameterUserDataItem)._SubType = m
+	_S7ParameterUserDataItemCPUFunctionsCopy.S7ParameterUserDataItemContract.(*_S7ParameterUserDataItem)._SubType = m
 	return _S7ParameterUserDataItemCPUFunctionsCopy
 }
 

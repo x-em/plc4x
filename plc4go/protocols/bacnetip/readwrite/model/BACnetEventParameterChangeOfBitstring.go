@@ -523,7 +523,7 @@ func (m *_BACnetEventParameterChangeOfBitstring) deepCopy() *_BACnetEventParamet
 		utils.DeepCopy[BACnetEventParameterChangeOfBitstringListOfBitstringValues](m.ListOfBitstringValues),
 		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
-	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
+	_BACnetEventParameterChangeOfBitstringCopy.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterChangeOfBitstringCopy
 }
 

@@ -359,7 +359,7 @@ func (m *_TransferResult) deepCopy() *_TransferResult {
 		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopySlice[uint32, uint32](m.AvailableSequenceNumbers),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_TransferResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _TransferResultCopy
 }
 

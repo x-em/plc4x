@@ -528,7 +528,7 @@ func (m *_QueryFirstRequest) deepCopy() *_QueryFirstRequest {
 		m.MaxDataSetsToReturn,
 		m.MaxReferencesToReturn,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_QueryFirstRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _QueryFirstRequestCopy
 }
 

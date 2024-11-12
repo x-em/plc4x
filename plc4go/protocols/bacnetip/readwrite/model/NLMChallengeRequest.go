@@ -349,7 +349,7 @@ func (m *_NLMChallengeRequest) deepCopy() *_NLMChallengeRequest {
 		m.OriginalMessageId,
 		m.OriginalTimestamp,
 	}
-	m.NLMContract.(*_NLM)._SubType = m
+	_NLMChallengeRequestCopy.NLMContract.(*_NLM)._SubType = m
 	return _NLMChallengeRequestCopy
 }
 

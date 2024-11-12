@@ -766,7 +766,7 @@ func (m *_VariableAttributes) deepCopy() *_VariableAttributes {
 		m.Historizing,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_VariableAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _VariableAttributesCopy
 }
 

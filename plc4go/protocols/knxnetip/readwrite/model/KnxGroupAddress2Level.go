@@ -320,7 +320,7 @@ func (m *_KnxGroupAddress2Level) deepCopy() *_KnxGroupAddress2Level {
 		m.MainGroup,
 		m.SubGroup,
 	}
-	m.KnxGroupAddressContract.(*_KnxGroupAddress)._SubType = m
+	_KnxGroupAddress2LevelCopy.KnxGroupAddressContract.(*_KnxGroupAddress)._SubType = m
 	return _KnxGroupAddress2LevelCopy
 }
 

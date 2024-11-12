@@ -683,7 +683,7 @@ func (m *_FieldMetaData) deepCopy() *_FieldMetaData {
 		utils.DeepCopy[GuidValue](m.DataSetFieldId),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.Properties),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_FieldMetaDataCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _FieldMetaDataCopy
 }
 

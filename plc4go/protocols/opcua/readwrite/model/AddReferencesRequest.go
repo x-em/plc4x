@@ -364,7 +364,7 @@ func (m *_AddReferencesRequest) deepCopy() *_AddReferencesRequest {
 		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[AddReferencesItem, AddReferencesItem](m.ReferencesToAdd),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AddReferencesRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AddReferencesRequestCopy
 }
 

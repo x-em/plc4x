@@ -1201,7 +1201,7 @@ func (m *_SubscriptionDiagnosticsDataType) deepCopy() *_SubscriptionDiagnosticsD
 		m.EventQueueOverFlowCount,
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SubscriptionDiagnosticsDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SubscriptionDiagnosticsDataTypeCopy
 }
 

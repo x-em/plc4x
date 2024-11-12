@@ -401,7 +401,7 @@ func (m *_OpcuaHelloRequest) deepCopy() *_OpcuaHelloRequest {
 		utils.DeepCopy[OpcuaProtocolLimits](m.Limits),
 		utils.DeepCopy[PascalString](m.Endpoint),
 	}
-	m.MessagePDUContract.(*_MessagePDU)._SubType = m
+	_OpcuaHelloRequestCopy.MessagePDUContract.(*_MessagePDU)._SubType = m
 	return _OpcuaHelloRequestCopy
 }
 

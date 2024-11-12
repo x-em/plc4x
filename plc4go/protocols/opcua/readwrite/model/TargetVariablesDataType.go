@@ -311,7 +311,7 @@ func (m *_TargetVariablesDataType) deepCopy() *_TargetVariablesDataType {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		utils.DeepCopySlice[FieldTargetDataType, FieldTargetDataType](m.TargetVariables),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_TargetVariablesDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _TargetVariablesDataTypeCopy
 }
 

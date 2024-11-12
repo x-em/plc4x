@@ -350,7 +350,7 @@ func (m *_BACnetConstructedDataPolarity) deepCopy() *_BACnetConstructedDataPolar
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
 		utils.DeepCopy[BACnetPolarityTagged](m.Polarity),
 	}
-	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
+	_BACnetConstructedDataPolarityCopy.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPolarityCopy
 }
 

@@ -519,7 +519,7 @@ func (m *_BACnetConfirmedServiceRequestSubscribeCOVPropertyMultiple) deepCopy() 
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.MaxNotificationDelay),
 		utils.DeepCopy[BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleListOfCovSubscriptionSpecificationsList](m.ListOfCovSubscriptionSpecifications),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestSubscribeCOVPropertyMultipleCopy
 }
 

@@ -291,7 +291,7 @@ func (m *_COTPParameterCalledTsap) deepCopy() *_COTPParameterCalledTsap {
 		m.COTPParameterContract.(*_COTPParameter).deepCopy(),
 		m.TsapId,
 	}
-	m.COTPParameterContract.(*_COTPParameter)._SubType = m
+	_COTPParameterCalledTsapCopy.COTPParameterContract.(*_COTPParameter)._SubType = m
 	return _COTPParameterCalledTsapCopy
 }
 

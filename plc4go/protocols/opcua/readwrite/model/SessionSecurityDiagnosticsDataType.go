@@ -711,7 +711,7 @@ func (m *_SessionSecurityDiagnosticsDataType) deepCopy() *_SessionSecurityDiagno
 		utils.DeepCopy[PascalString](m.SecurityPolicyUri),
 		utils.DeepCopy[PascalByteString](m.ClientCertificate),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_SessionSecurityDiagnosticsDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SessionSecurityDiagnosticsDataTypeCopy
 }
 

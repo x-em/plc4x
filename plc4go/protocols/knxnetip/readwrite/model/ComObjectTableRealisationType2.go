@@ -356,7 +356,7 @@ func (m *_ComObjectTableRealisationType2) deepCopy() *_ComObjectTableRealisation
 		m.RamFlagsTablePointer,
 		utils.DeepCopySlice[GroupObjectDescriptorRealisationType2, GroupObjectDescriptorRealisationType2](m.ComObjectDescriptors),
 	}
-	m.ComObjectTableContract.(*_ComObjectTable)._SubType = m
+	_ComObjectTableRealisationType2Copy.ComObjectTableContract.(*_ComObjectTable)._SubType = m
 	return _ComObjectTableRealisationType2Copy
 }
 

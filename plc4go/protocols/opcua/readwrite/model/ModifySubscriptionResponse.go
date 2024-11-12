@@ -402,7 +402,7 @@ func (m *_ModifySubscriptionResponse) deepCopy() *_ModifySubscriptionResponse {
 		m.RevisedLifetimeCount,
 		m.RevisedMaxKeepAliveCount,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ModifySubscriptionResponseCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ModifySubscriptionResponseCopy
 }
 

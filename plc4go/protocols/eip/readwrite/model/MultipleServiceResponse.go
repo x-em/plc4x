@@ -435,7 +435,7 @@ func (m *_MultipleServiceResponse) deepCopy() *_MultipleServiceResponse {
 		utils.DeepCopySlice[byte, byte](m.ServicesData),
 		m.reservedField0,
 	}
-	m.CipServiceContract.(*_CipService)._SubType = m
+	_MultipleServiceResponseCopy.CipServiceContract.(*_CipService)._SubType = m
 	return _MultipleServiceResponseCopy
 }
 

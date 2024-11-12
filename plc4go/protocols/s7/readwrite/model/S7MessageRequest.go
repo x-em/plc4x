@@ -250,7 +250,7 @@ func (m *_S7MessageRequest) deepCopy() *_S7MessageRequest {
 	_S7MessageRequestCopy := &_S7MessageRequest{
 		m.S7MessageContract.(*_S7Message).deepCopy(),
 	}
-	m.S7MessageContract.(*_S7Message)._SubType = m
+	_S7MessageRequestCopy.S7MessageContract.(*_S7Message)._SubType = m
 	return _S7MessageRequestCopy
 }
 

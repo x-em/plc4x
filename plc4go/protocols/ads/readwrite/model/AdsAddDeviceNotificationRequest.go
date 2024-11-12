@@ -471,7 +471,7 @@ func (m *_AdsAddDeviceNotificationRequest) deepCopy() *_AdsAddDeviceNotification
 		m.reservedField0,
 		m.reservedField1,
 	}
-	m.AmsPacketContract.(*_AmsPacket)._SubType = m
+	_AdsAddDeviceNotificationRequestCopy.AmsPacketContract.(*_AmsPacket)._SubType = m
 	return _AdsAddDeviceNotificationRequestCopy
 }
 

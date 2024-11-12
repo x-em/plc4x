@@ -471,7 +471,7 @@ func (m *_BACnetNotificationParametersChangeOfDiscreteValue) deepCopy() *_BACnet
 		utils.DeepCopy[BACnetStatusFlagsTagged](m.StatusFlags),
 		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
-	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
+	_BACnetNotificationParametersChangeOfDiscreteValueCopy.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfDiscreteValueCopy
 }
 

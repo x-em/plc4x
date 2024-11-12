@@ -369,7 +369,7 @@ func (m *_LevelInformationNormal) deepCopy() *_LevelInformationNormal {
 		m.Pair1,
 		m.Pair2,
 	}
-	m.LevelInformationContract.(*_LevelInformation)._SubType = m
+	_LevelInformationNormalCopy.LevelInformationContract.(*_LevelInformation)._SubType = m
 	return _LevelInformationNormalCopy
 }
 

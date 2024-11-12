@@ -336,7 +336,7 @@ func (m *_AnsiExtendedSymbolSegment) deepCopy() *_AnsiExtendedSymbolSegment {
 		m.Symbol,
 		utils.CopyPtr[uint8](m.Pad),
 	}
-	m.DataSegmentTypeContract.(*_DataSegmentType)._SubType = m
+	_AnsiExtendedSymbolSegmentCopy.DataSegmentTypeContract.(*_DataSegmentType)._SubType = m
 	return _AnsiExtendedSymbolSegmentCopy
 }
 

@@ -306,7 +306,7 @@ func (m *_CipSecurityInformation) deepCopy() *_CipSecurityInformation {
 		m.CommandSpecificDataItemContract.(*_CommandSpecificDataItem).deepCopy(),
 		utils.DeepCopySlice[uint8, uint8](m.TodoImplement),
 	}
-	m.CommandSpecificDataItemContract.(*_CommandSpecificDataItem)._SubType = m
+	_CipSecurityInformationCopy.CommandSpecificDataItemContract.(*_CommandSpecificDataItem)._SubType = m
 	return _CipSecurityInformationCopy
 }
 

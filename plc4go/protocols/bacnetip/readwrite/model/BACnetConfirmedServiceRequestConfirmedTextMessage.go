@@ -472,7 +472,7 @@ func (m *_BACnetConfirmedServiceRequestConfirmedTextMessage) deepCopy() *_BACnet
 		utils.DeepCopy[BACnetConfirmedServiceRequestConfirmedTextMessageMessagePriorityTagged](m.MessagePriority),
 		utils.DeepCopy[BACnetContextTagCharacterString](m.Message),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestConfirmedTextMessageCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedTextMessageCopy
 }
 

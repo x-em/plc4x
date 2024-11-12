@@ -373,7 +373,7 @@ func (m *_AggregateFilterResult) deepCopy() *_AggregateFilterResult {
 		m.RevisedProcessingInterval,
 		utils.DeepCopy[AggregateConfiguration](m.RevisedAggregateConfiguration),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_AggregateFilterResultCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AggregateFilterResultCopy
 }
 

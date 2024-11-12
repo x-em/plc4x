@@ -362,7 +362,7 @@ func (m *_DisconnectRequest) deepCopy() *_DisconnectRequest {
 		utils.DeepCopy[HPAIControlEndpoint](m.HpaiControlEndpoint),
 		m.reservedField0,
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_DisconnectRequestCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _DisconnectRequestCopy
 }
 

@@ -287,7 +287,7 @@ func (m *_TelephonyDataDialOutFailure) deepCopy() *_TelephonyDataDialOutFailure 
 		m.TelephonyDataContract.(*_TelephonyData).deepCopy(),
 		m.Reason,
 	}
-	m.TelephonyDataContract.(*_TelephonyData)._SubType = m
+	_TelephonyDataDialOutFailureCopy.TelephonyDataContract.(*_TelephonyData)._SubType = m
 	return _TelephonyDataDialOutFailureCopy
 }
 

@@ -472,7 +472,7 @@ func (m *_BACnetConfirmedServiceRequestLifeSafetyOperation) deepCopy() *_BACnetC
 		utils.DeepCopy[BACnetLifeSafetyOperationTagged](m.Request),
 		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.ObjectIdentifier),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestLifeSafetyOperationCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestLifeSafetyOperationCopy
 }
 

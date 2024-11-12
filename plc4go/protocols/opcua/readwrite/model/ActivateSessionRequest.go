@@ -572,7 +572,7 @@ func (m *_ActivateSessionRequest) deepCopy() *_ActivateSessionRequest {
 		utils.DeepCopy[ExtensionObject](m.UserIdentityToken),
 		utils.DeepCopy[SignatureData](m.UserTokenSignature),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_ActivateSessionRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ActivateSessionRequestCopy
 }
 

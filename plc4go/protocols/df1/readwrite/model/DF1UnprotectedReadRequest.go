@@ -320,7 +320,7 @@ func (m *_DF1UnprotectedReadRequest) deepCopy() *_DF1UnprotectedReadRequest {
 		m.Address,
 		m.Size,
 	}
-	m.DF1CommandContract.(*_DF1Command)._SubType = m
+	_DF1UnprotectedReadRequestCopy.DF1CommandContract.(*_DF1Command)._SubType = m
 	return _DF1UnprotectedReadRequestCopy
 }
 

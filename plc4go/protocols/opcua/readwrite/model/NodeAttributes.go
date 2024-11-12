@@ -455,7 +455,7 @@ func (m *_NodeAttributes) deepCopy() *_NodeAttributes {
 		m.WriteMask,
 		m.UserWriteMask,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_NodeAttributesCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NodeAttributesCopy
 }
 

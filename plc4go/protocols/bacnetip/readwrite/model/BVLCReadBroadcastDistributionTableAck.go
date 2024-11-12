@@ -311,7 +311,7 @@ func (m *_BVLCReadBroadcastDistributionTableAck) deepCopy() *_BVLCReadBroadcastD
 		utils.DeepCopySlice[BVLCBroadcastDistributionTableEntry, BVLCBroadcastDistributionTableEntry](m.Table),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCReadBroadcastDistributionTableAckCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCReadBroadcastDistributionTableAckCopy
 }
 

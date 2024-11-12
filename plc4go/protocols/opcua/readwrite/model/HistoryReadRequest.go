@@ -491,7 +491,7 @@ func (m *_HistoryReadRequest) deepCopy() *_HistoryReadRequest {
 		utils.DeepCopySlice[HistoryReadValueId, HistoryReadValueId](m.NodesToRead),
 		m.reservedField0,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_HistoryReadRequestCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _HistoryReadRequestCopy
 }
 

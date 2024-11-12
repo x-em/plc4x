@@ -335,7 +335,7 @@ func (m *_S7PayloadUserDataItemCyclicServicesPush) deepCopy() *_S7PayloadUserDat
 		m.ItemsCount,
 		utils.DeepCopySlice[AssociatedValueType, AssociatedValueType](m.Items),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadUserDataItemCyclicServicesPushCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadUserDataItemCyclicServicesPushCopy
 }
 

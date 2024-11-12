@@ -344,7 +344,7 @@ func (m *_MonitoredItemNotification) deepCopy() *_MonitoredItemNotification {
 		m.ClientHandle,
 		utils.DeepCopy[DataValue](m.Value),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_MonitoredItemNotificationCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _MonitoredItemNotificationCopy
 }
 

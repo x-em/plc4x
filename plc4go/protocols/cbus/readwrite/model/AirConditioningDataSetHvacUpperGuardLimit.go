@@ -446,7 +446,7 @@ func (m *_AirConditioningDataSetHvacUpperGuardLimit) deepCopy() *_AirConditionin
 		utils.DeepCopy[HVACTemperature](m.Limit),
 		utils.DeepCopy[HVACModeAndFlags](m.HvacModeAndFlags),
 	}
-	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
+	_AirConditioningDataSetHvacUpperGuardLimitCopy.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
 	return _AirConditioningDataSetHvacUpperGuardLimitCopy
 }
 

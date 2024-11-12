@@ -357,7 +357,7 @@ func (m *_ModbusPDUMaskWriteHoldingRegisterRequest) deepCopy() *_ModbusPDUMaskWr
 		m.AndMask,
 		m.OrMask,
 	}
-	m.ModbusPDUContract.(*_ModbusPDU)._SubType = m
+	_ModbusPDUMaskWriteHoldingRegisterRequestCopy.ModbusPDUContract.(*_ModbusPDU)._SubType = m
 	return _ModbusPDUMaskWriteHoldingRegisterRequestCopy
 }
 

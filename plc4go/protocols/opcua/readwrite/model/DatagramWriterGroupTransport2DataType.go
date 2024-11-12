@@ -557,7 +557,7 @@ func (m *_DatagramWriterGroupTransport2DataType) deepCopy() *_DatagramWriterGrou
 		m.DiscoveryAnnounceRate,
 		utils.DeepCopy[PascalString](m.Topic),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_DatagramWriterGroupTransport2DataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramWriterGroupTransport2DataTypeCopy
 }
 

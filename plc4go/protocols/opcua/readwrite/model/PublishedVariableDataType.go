@@ -586,7 +586,7 @@ func (m *_PublishedVariableDataType) deepCopy() *_PublishedVariableDataType {
 		utils.DeepCopy[Variant](m.SubstituteValue),
 		utils.DeepCopySlice[QualifiedName, QualifiedName](m.MetaDataProperties),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PublishedVariableDataTypeCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedVariableDataTypeCopy
 }
 

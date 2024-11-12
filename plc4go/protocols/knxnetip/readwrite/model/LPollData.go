@@ -395,7 +395,7 @@ func (m *_LPollData) deepCopy() *_LPollData {
 		m.NumberExpectedPollData,
 		m.reservedField0,
 	}
-	m.LDataFrameContract.(*_LDataFrame)._SubType = m
+	_LPollDataCopy.LDataFrameContract.(*_LDataFrame)._SubType = m
 	return _LPollDataCopy
 }
 

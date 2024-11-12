@@ -320,7 +320,7 @@ func (m *_S7MessageResponse) deepCopy() *_S7MessageResponse {
 		m.ErrorClass,
 		m.ErrorCode,
 	}
-	m.S7MessageContract.(*_S7Message)._SubType = m
+	_S7MessageResponseCopy.S7MessageContract.(*_S7Message)._SubType = m
 	return _S7MessageResponseCopy
 }
 

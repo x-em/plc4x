@@ -572,7 +572,7 @@ func (m *_BACnetConfirmedServiceRequestSubscribeCOVProperty) deepCopy() *_BACnet
 		utils.DeepCopy[BACnetPropertyReferenceEnclosed](m.MonitoredPropertyIdentifier),
 		utils.DeepCopy[BACnetContextTagReal](m.CovIncrement),
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestSubscribeCOVPropertyCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestSubscribeCOVPropertyCopy
 }
 

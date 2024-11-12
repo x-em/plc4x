@@ -403,7 +403,7 @@ func (m *_CycServiceItemAnyType) deepCopy() *_CycServiceItemAnyType {
 		m.MemoryArea,
 		m.Address,
 	}
-	m.CycServiceItemTypeContract.(*_CycServiceItemType)._SubType = m
+	_CycServiceItemAnyTypeCopy.CycServiceItemTypeContract.(*_CycServiceItemType)._SubType = m
 	return _CycServiceItemAnyTypeCopy
 }
 

@@ -307,7 +307,7 @@ func (m *_BACnetServiceAckReadPropertyConditional) deepCopy() *_BACnetServiceAck
 		utils.DeepCopySlice[byte, byte](m.BytesOfRemovedService),
 		m.ServiceAckPayloadLength,
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckReadPropertyConditionalCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckReadPropertyConditionalCopy
 }
 

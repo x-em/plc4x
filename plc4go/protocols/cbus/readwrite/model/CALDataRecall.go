@@ -316,7 +316,7 @@ func (m *_CALDataRecall) deepCopy() *_CALDataRecall {
 		m.ParamNo,
 		m.Count,
 	}
-	m.CALDataContract.(*_CALData)._SubType = m
+	_CALDataRecallCopy.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataRecallCopy
 }
 

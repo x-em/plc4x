@@ -315,7 +315,7 @@ func (m *_SALDataHeating) deepCopy() *_SALDataHeating {
 		m.SALDataContract.(*_SALData).deepCopy(),
 		utils.DeepCopy[LightingData](m.HeatingData),
 	}
-	m.SALDataContract.(*_SALData)._SubType = m
+	_SALDataHeatingCopy.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataHeatingCopy
 }
 

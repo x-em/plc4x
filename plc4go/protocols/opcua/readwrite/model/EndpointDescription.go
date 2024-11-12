@@ -634,7 +634,7 @@ func (m *_EndpointDescription) deepCopy() *_EndpointDescription {
 		utils.DeepCopy[PascalString](m.TransportProfileUri),
 		m.SecurityLevel,
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_EndpointDescriptionCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EndpointDescriptionCopy
 }
 

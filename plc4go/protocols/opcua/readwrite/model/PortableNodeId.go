@@ -368,7 +368,7 @@ func (m *_PortableNodeId) deepCopy() *_PortableNodeId {
 		utils.DeepCopy[PascalString](m.NamespaceUri),
 		utils.DeepCopy[NodeId](m.Identifier),
 	}
-	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
+	_PortableNodeIdCopy.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PortableNodeIdCopy
 }
 

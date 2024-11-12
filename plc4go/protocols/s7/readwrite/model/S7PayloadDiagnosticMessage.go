@@ -497,7 +497,7 @@ func (m *_S7PayloadDiagnosticMessage) deepCopy() *_S7PayloadDiagnosticMessage {
 		m.Info2,
 		utils.DeepCopy[DateAndTime](m.TimeStamp),
 	}
-	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
+	_S7PayloadDiagnosticMessageCopy.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadDiagnosticMessageCopy
 }
 

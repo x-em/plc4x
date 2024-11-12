@@ -251,7 +251,7 @@ func (m *_ConnectionResponseDataBlockDeviceManagement) deepCopy() *_ConnectionRe
 	_ConnectionResponseDataBlockDeviceManagementCopy := &_ConnectionResponseDataBlockDeviceManagement{
 		m.ConnectionResponseDataBlockContract.(*_ConnectionResponseDataBlock).deepCopy(),
 	}
-	m.ConnectionResponseDataBlockContract.(*_ConnectionResponseDataBlock)._SubType = m
+	_ConnectionResponseDataBlockDeviceManagementCopy.ConnectionResponseDataBlockContract.(*_ConnectionResponseDataBlock)._SubType = m
 	return _ConnectionResponseDataBlockDeviceManagementCopy
 }
 
