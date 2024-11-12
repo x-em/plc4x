@@ -41,7 +41,20 @@
         <a class="navbar-item" href="{{{or site.url siteRootPath}}}/">Home</a>
         <a class="navbar-item" href="{{{or site.url siteRootPath}}}/plc4x/{{page.version}}/users">Users</a>
         <a class="navbar-item" href="{{{or site.url siteRootPath}}}/plc4x/{{page.version}}/developers">Developers</a>
-        <a class="navbar-item" href="{{{or site.url siteRootPath}}}/plc4x/{{page.version}}/apache">Apache</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="https://www.apache.org">Apache</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://www.apache.org">Apache Homepage</a>
+            <a class="navbar-item" href="https://www.apache.org/licenses/">License</a>
+            <a class="navbar-item" href="https://www.apache.org/foundation/sponsorship.html">Sponsorship</a>
+            <a class="navbar-item" href="https://www.apache.org/foundation/thanks.html">Thanks</a>
+            <a class="navbar-item" href="https://www.apache.org/security/">Security</a>
+            <a class="navbar-item" href="https://privacy.apache.org/policies/privacy-policy-public.html">Privacy</a>
+            <a class="navbar-item" href="https://www.apache.org/foundation/policies/conduct">Code of Conduct</a>
+            <a class="navbar-item" href="https://events.apache.org/">Upcoming Events</a>
+          </div>
+        </div>
+
         <div class="navbar-item">
           <span class="control">
             <a class="button is-primary" href="{{{or site.url siteRootPath}}}/plc4x/{{page.version}}/users/download">Download</a>

@@ -19,7 +19,7 @@
 
 = Users
 
-include::partial$pom.adoc[]
+
 
 This part of the PLC4X website is dedicated to people wanting to use Apache PLC4X.
 

@@ -19,7 +19,7 @@
 
 = Firmata
 
-include::partial$pom.adoc[]
+
 
 The Firmata protocol is based on the MIDI protocol used for communicating with musical equipment.
 

@@ -172,6 +172,78 @@
               </resources>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-site-resources</id>
+            <!-- Only execute this for the parent module -->
+            <phase>pre-site</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/supplemental</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/supplemental</directory>
+                  <filtering>false</filtering>
+                  <targetPath>${project.build.directory}/supplemental</targetPath>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-resources-dir</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/site</outputDirectory>
+              <resources>
+                <!-- Copy the resources for the test-suites -->
+                <resource>
+                  <directory>${project.basedir}/resources</directory>
+                  <targetPath>${project.build.directory}/site</targetPath>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-schemas</id>
+            <!-- Only execute this for the parent module -->
+            <phase>pre-site</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/site</outputDirectory>
+              <resources>
+                <!-- Copy the resources for the test-suites -->
+                <resource>
+                  <directory>${project.basedir}/../plc4j/utils/test-utils/src/main/resources/schemas</directory>
+                  <targetPath>${project.build.directory}/site/schemas</targetPath>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-all-site-resources</id>
+            <!-- Only execute this for the parent module -->
+            <inherited>false</inherited>
+            <phase>site</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${pom.basedir}/../target/site</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/site</directory>
+                  <filtering>false</filtering>
+                  <targetPath>${pom.basedir}/../target/site</targetPath>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
         </executions>
         <!--configuration>
           <delimiters>
@@ -206,120 +278,6 @@
                   <value>../fonts/</value>
                 </replacement>
               </replacements>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-site-resources</id>
-            <!-- Only execute this for the parent module -->
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/supplemental</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.basedir}/supplemental</directory>
-                  <filtering>false</filtering>
-                  <targetPath>${project.build.directory}/supplemental</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <!--
-            Copy the schemas that might be distributed throughout the codebase to a central "schemas"
-            directory so IDEs can automatically pull them in.
-          -->
-          <execution>
-            <id>copy-asciidoc</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/asciidoc</outputDirectory>
-              <resources>
-                <!-- Copy the resources for the test-suites -->
-                <resource>
-                  <directory>${project.basedir}/asciidoc</directory>
-                  <targetPath>${project.build.directory}/asciidoc</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>copy-asciidoc-keys-apache</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/asciidoc/modules/apache/partials</outputDirectory>
-              <resources>
-                <!-- Copy the resources for the test-suites -->
-                <resource>
-                  <directory>${project.build.directory}/keys</directory>
-                  <targetPath>${project.build.directory}/asciidoc/modules/apache/partials</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-asciidoc-keys-users</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/asciidoc/modules/users/partials</outputDirectory>
-              <resources>
-                <!-- Copy the resources for the test-suites -->
-                <resource>
-                  <directory>${project.build.directory}/keys</directory>
-                  <targetPath>${project.build.directory}/asciidoc/modules/users/partials</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-asciidoc-keys-developers</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/asciidoc/modules/developers/partials</outputDirectory>
-              <resources>
-                <!-- Copy the resources for the test-suites -->
-                <resource>
-                  <directory>${project.build.directory}/keys</directory>
-                  <targetPath>${project.build.directory}/asciidoc/modules/developers/partials</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-resources-dir</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/site</outputDirectory>
-              <resources>
-                <!-- Copy the resources for the test-suites -->
-                <resource>
-                  <directory>${project.basedir}/resources</directory>
-                  <targetPath>${project.build.directory}/site</targetPath>
-                </resource>
-              </resources>
             </configuration>
           </execution>
         </executions>
@@ -375,62 +333,6 @@
           <installDirectory>${pom.basedir}/target</installDirectory>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <!--
-            Copy the schemas that might be distributed throughout the codebase to a central "schemas"
-            directory so IDEs can automatically pull them in.
-          -->
-          <execution>
-            <id>copy-schemas</id>
-            <!-- Only execute this for the parent module -->
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/site</outputDirectory>
-              <resources>
-                <!-- Copy the resources for the test-suites -->
-                <resource>
-                  <directory>${project.basedir}/../plc4j/utils/test-utils/src/main/resources/schemas</directory>
-                  <targetPath>${project.build.directory}/site/schemas</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-all-site-resources</id>
-            <!-- Only execute this for the parent module -->
-            <inherited>false</inherited>
-            <phase>site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${pom.basedir}/../target/site</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/site</directory>
-                  <filtering>false</filtering>
-                  <targetPath>${pom.basedir}/../target/site</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <configuration>

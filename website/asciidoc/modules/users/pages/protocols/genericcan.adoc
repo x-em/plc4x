@@ -19,7 +19,7 @@
 
 = Generic CAN
 
-include::partial$pom.adoc[]
+
 
 == CAN Bus semantics
 

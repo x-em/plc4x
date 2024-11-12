@@ -19,7 +19,7 @@
 
 = Releasing PLC4X
 
-include::partial$pom.adoc[]
+
 
 == TL/DR
 

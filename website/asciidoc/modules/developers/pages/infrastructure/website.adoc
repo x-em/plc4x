@@ -17,7 +17,7 @@
 
 = Generating the Website
 
-include::partial$pom.adoc[]
+
 
 We are currently using the normal `Maven` build to not only generate the project artifacts, but also the projects website.
 

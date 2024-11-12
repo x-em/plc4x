@@ -19,7 +19,7 @@
 
 = Eclipse Ditto
 
-include::partial$pom.adoc[]
+
 
 … where IoT devices and their digital twins get together
 

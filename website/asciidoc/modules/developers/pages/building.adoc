@@ -17,8 +17,6 @@
 
 = Building PLC4X
 
-include::partial$pom.adoc[]
-
 PLC4X is built with `Apache Maven` and we have tried to make the build as simple as possible.
 
 However PLC4X aims at providing means to communicate with PLCs of multiple vendors using a shared API but also in a variety of different languages.
@@ -158,8 +156,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.apache.plc4x', name: 'plc4j-api', version: '{current-last-released-version}'
-    implementation group: 'org.apache.plc4x', name: 'plc4j-driver-s7', version: '{current-last-released-version}'
-    implementation group: 'org.apache.plc4x', name: 'plc4j-connection-pool', version: '{current-last-released-version}'
+    implementation group: 'org.apache.plc4x', name: 'plc4j-api', version: '{page-component-version}'
+    implementation group: 'org.apache.plc4x', name: 'plc4j-driver-s7', version: '{page-component-version}'
+    implementation group: 'org.apache.plc4x', name: 'plc4j-connection-pool', version: '{page-component-version}'
 }
 ----

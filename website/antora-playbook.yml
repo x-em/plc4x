@@ -22,7 +22,7 @@ content:
   sources:   
   - url: ../..
     branches: HEAD
-    start_path: website/target/asciidoc
+    start_path: website/asciidoc
 ui: 
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable

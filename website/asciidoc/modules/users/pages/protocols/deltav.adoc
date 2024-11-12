@@ -19,4 +19,4 @@
 
 = DeltaV
 
-include::partial$pom.adoc[]
+

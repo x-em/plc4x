@@ -17,7 +17,7 @@
 
 = Usage of protocols
 
-include::partial$pom.adoc[]
+
 
 == Currently documented are:
 

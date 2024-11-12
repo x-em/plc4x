@@ -19,4 +19,4 @@
 
 = Apache Edgent (Retired)
 
-include::partial$pom.adoc[]
+

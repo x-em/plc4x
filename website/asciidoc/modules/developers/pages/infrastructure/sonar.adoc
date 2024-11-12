@@ -17,7 +17,7 @@
 
 = Code Analysis
 
-include::partial$pom.adoc[]
+
 
 We are using `SonarCloud` as the service for static code analysis.
 

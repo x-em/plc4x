@@ -19,7 +19,7 @@
 
 = Scraper
 
-include::partial$pom.adoc[]
+
 
 While the Apache PLC4X API allows simple access to PLC resources, if you want to continuously monitor some values and have them retrieved in a pre-defined interval, the core PLC4X API method is a little bit uncomfortable.
 
@@ -39,7 +39,7 @@ The Scraper can be found in the Maven module:
     <dependency>
       <groupId>org.apache.plc4x</groupId>
       <artifactId>plc4j-scraper</artifactId>
-      <version>{current-last-released-version}</version>
+      <version>{page-component-version}</version>
     </dependency>
 ----
 

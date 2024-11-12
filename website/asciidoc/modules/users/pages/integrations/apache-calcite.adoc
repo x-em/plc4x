@@ -19,7 +19,7 @@
 
 = Apache Calcite
 
-include::partial$pom.adoc[]
+
 
 https://calcite.apache.org/[Apache Calcite]
 Standard SQL

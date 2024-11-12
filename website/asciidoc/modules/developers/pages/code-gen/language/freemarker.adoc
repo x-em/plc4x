@@ -18,7 +18,7 @@
 
 = Apache Freemarker
 
-include::partial$pom.adoc[]
+
 
 For the Freemarker language output we are using an unmodified version of https://freemarker.apache.org[Apache Freemarker] to generate output.
 

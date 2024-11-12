@@ -19,7 +19,7 @@
 
 = Apache NiFi
 
-include::partial$pom.adoc[]
+
 
 Apache NiFi allows creating systems that process data around the concept of data-streams.
 

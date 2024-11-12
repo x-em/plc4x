@@ -19,7 +19,7 @@
 
 = CAN
 
-include::partial$pom.adoc[]
+
 
 A CAN transport is a special category of transport which can bring CAN frame data to various drivers.
 All of these transports are meant to follow basic CAN frame data semantics.
@@ -48,7 +48,7 @@ Note this API is available since Apache PLC4X 0.9.
 <dependency>
   <groupId>org.apache.plc4x</groupId>
   <artifactId>plc4j-transport-can</artifactId>
-  <version>{current-last-released-version}</version>
+  <version>{page-component-version}</version>
 </dependency>
 ----
 

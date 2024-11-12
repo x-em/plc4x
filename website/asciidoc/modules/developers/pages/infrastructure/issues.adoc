@@ -17,7 +17,7 @@
 
 = Bug & Issue Tracker
 
-include::partial$pom.adoc[]
+
 
 Our bug & issue tracker is Github-Issues.
 

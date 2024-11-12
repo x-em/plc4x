@@ -19,7 +19,7 @@
 
 = Companies using Apache PLC4X
 
-include::partial$pom.adoc[]
+
 
 image::users/toddy-loves-apache.png[width=200,float=left]
 

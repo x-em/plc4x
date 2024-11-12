@@ -17,7 +17,7 @@
 
 = Getting Started with Go
 
-include::partial$pom.adoc[]
+
 
 == Initializing a dummy project
 

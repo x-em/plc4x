@@ -19,4 +19,4 @@
 
 = DF1
 
-include::partial$pom.adoc[]
+

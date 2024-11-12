@@ -17,11 +17,10 @@
 # under the License.
 #
 name: plc4x
-version: 'latest'
+version: '0.13.0-SNAPSHOT'
 prerelease: True
 title: PLC4X
 nav:
 - modules/ROOT/nav.adoc
 - modules/users/nav.adoc
 - modules/developers/nav.adoc
-- modules/apache/nav.adoc

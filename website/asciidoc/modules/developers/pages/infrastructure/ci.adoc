@@ -18,7 +18,7 @@
 
 = Continuous Integration
 
-include::partial$pom.adoc[]
+
 
 We are currently using the following CI systems.
 

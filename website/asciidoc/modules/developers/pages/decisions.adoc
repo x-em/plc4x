@@ -18,7 +18,7 @@
 
 = Decision Making
 
-include::partial$pom.adoc[]
+
 
 == Introduction
 

@@ -17,7 +17,7 @@
 
 = Security Vulnerabilities
 
-include::partial$pom.adoc[]
+
 
 Please note that binary patches are not produced for individual vulnerabilities. To obtain the binary fix for a particular vulnerability you should upgrade to an Apache PLC4X version where that vulnerability has been fixed.
 

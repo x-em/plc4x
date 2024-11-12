@@ -17,7 +17,7 @@
 
 = WIKI
 
-include::partial$pom.adoc[]
+
 
 We use Apache's Confluence instance as Wiki, however most information is generally managed on this website.
 

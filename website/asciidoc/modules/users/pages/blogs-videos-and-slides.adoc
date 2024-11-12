@@ -17,7 +17,7 @@
 
 = Blogs, Videos and Slides on Apache PLC4X
 
-include::partial$pom.adoc[]
+
 
 == Blog posts
 

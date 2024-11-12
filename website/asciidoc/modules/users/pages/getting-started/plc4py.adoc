@@ -17,7 +17,7 @@
 
 = Getting Started with Python
 
-include::partial$pom.adoc[]
+
 
 == Using the PLC4PY API directly
 

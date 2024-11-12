@@ -17,7 +17,7 @@
 
 = Using SNAPSHOT versions
 
-include::partial$pom.adoc[]
+
 
 Especially when it comes to trying to verify if an issue you are facing has already been fixed in the development version, you might want to or be asked to try out the absolute latest version of PLC4X. You can generally do this by adding "-SNAPSHOT" to the version number of PLC4X.
 

@@ -19,7 +19,7 @@
 
 = OPC UA : Client certificate creation
 
-include::partial$pom.adoc[]
+
 
 Below tutorial will teach you how to create client certificate for use within production environments.
 This tutorial focuses on preparation of configuration.

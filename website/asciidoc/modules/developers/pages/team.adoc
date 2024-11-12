@@ -19,7 +19,7 @@
 
 = Team
 
-include::partial$pom.adoc[]
+
 
 Sorted by first name:
 

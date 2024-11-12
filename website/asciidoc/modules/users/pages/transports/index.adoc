@@ -19,7 +19,7 @@
 
 = Transports
 
-include::partial$pom.adoc[]
+
 
 - link:tcp.html[TCP]
 - link:udp.html[UDP]

@@ -19,7 +19,7 @@
 
 = PCAP Replay
 
-include::partial$pom.adoc[]
+
 
 [cols="2,2a,5a"]
 |===
@@ -38,7 +38,7 @@ include::partial$pom.adoc[]
 <dependency>
   <groupId>org.apache.plc4x</groupId>
   <artifactId>plc4j-transport-pcap-replay</artifactId>
-  <version>{current-last-released-version}</version>
+  <version>{page-component-version}</version>
 </dependency>
 ----
 

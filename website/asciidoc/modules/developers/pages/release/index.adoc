@@ -19,4 +19,3 @@
 
 = Releasing and Validating Releases
 
-include::partial$pom.adoc[]

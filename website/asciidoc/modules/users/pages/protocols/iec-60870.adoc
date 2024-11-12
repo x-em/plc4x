@@ -19,7 +19,7 @@
 
 = IEC-60870
 
-include::partial$pom.adoc[]
+
 
 == Connection String Options
 

@@ -19,7 +19,7 @@
 
 = CtlrX
 
-include::partial$pom.adoc[]
+
 
 == Connection String Options
 

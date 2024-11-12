@@ -18,7 +18,7 @@
 
 = Testing Serializers and Parsers
 
-include::partial$pom.adoc[]
+
 
 Currently, the build generates the serializers and parsers from a provided `mspec` specification.
 

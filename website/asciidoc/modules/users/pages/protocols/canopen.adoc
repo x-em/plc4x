@@ -21,7 +21,7 @@
 
 image::users/protocols/can_banner.png[banner,512,167]
 
-include::partial$pom.adoc[]
+
 
 
 

@@ -102,7 +102,7 @@ for (final def protocolCode in plcDriverManager.getProtocolCodes()) {
         "<dependency>\n" +
         "  <groupId>org.apache.plc4x</groupId>\n" +
         "  <artifactId>" + moduleName + "</artifactId>\n" +
-        "  <version>{current-last-released-version}</version>\n" +
+        "  <version>{page-component-version}</version>\n" +
         "</dependency>\n" +
         "----"
     if(driver.metadata.defaultTransportCode.isPresent()) {
