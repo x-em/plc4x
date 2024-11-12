@@ -667,15 +667,15 @@ func (m *_FieldMetaData) deepCopy() *_FieldMetaData {
 	}
 	_FieldMetaDataCopy := &_FieldMetaData{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[PascalString](m.Name),
+		utils.DeepCopy[LocalizedText](m.Description),
 		m.FieldFlags,
 		m.BuiltInType,
-		m.DataType.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.DataType),
 		m.ValueRank,
 		utils.DeepCopySlice[uint32, uint32](m.ArrayDimensions),
 		m.MaxStringLength,
-		m.DataSetFieldId.DeepCopy().(GuidValue),
+		utils.DeepCopy[GuidValue](m.DataSetFieldId),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.Properties),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

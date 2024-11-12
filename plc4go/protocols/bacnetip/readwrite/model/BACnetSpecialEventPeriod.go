@@ -438,7 +438,7 @@ func (m *_BACnetSpecialEventPeriod) deepCopy() *_BACnetSpecialEventPeriod {
 	}
 	_BACnetSpecialEventPeriodCopy := &_BACnetSpecialEventPeriod{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetSpecialEventPeriodCopy
 }

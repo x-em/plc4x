@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataPowerMode) deepCopy() *_BACnetConstructedDataPowe
 	}
 	_BACnetConstructedDataPowerModeCopy := &_BACnetConstructedDataPowerMode{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PowerMode.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.PowerMode),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPowerModeCopy

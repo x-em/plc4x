@@ -518,10 +518,10 @@ func (m *_ResponseHeader) deepCopy() *_ResponseHeader {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.Timestamp,
 		m.RequestHandle,
-		m.ServiceResult.DeepCopy().(StatusCode),
-		m.ServiceDiagnostics.DeepCopy().(DiagnosticInfo),
+		utils.DeepCopy[StatusCode](m.ServiceResult),
+		utils.DeepCopy[DiagnosticInfo](m.ServiceDiagnostics),
 		utils.DeepCopySlice[PascalString, PascalString](m.StringTable),
-		m.AdditionalHeader.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.AdditionalHeader),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ResponseHeaderCopy

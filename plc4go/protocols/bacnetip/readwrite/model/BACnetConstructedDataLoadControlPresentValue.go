@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataLoadControlPresentValue) deepCopy() *_BACnetConst
 	}
 	_BACnetConstructedDataLoadControlPresentValueCopy := &_BACnetConstructedDataLoadControlPresentValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PresentValue.DeepCopy().(BACnetShedStateTagged),
+		utils.DeepCopy[BACnetShedStateTagged](m.PresentValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLoadControlPresentValueCopy

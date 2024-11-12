@@ -351,7 +351,7 @@ func (m *_CloseSessionRequest) deepCopy() *_CloseSessionRequest {
 	}
 	_CloseSessionRequestCopy := &_CloseSessionRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.DeleteSubscriptions,
 		m.reservedField0,
 	}

@@ -404,7 +404,7 @@ func (m *_HistoryUpdateResult) deepCopy() *_HistoryUpdateResult {
 	}
 	_HistoryUpdateResultCopy := &_HistoryUpdateResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
+		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.OperationResults),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

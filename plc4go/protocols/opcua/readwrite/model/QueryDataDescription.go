@@ -388,9 +388,9 @@ func (m *_QueryDataDescription) deepCopy() *_QueryDataDescription {
 	}
 	_QueryDataDescriptionCopy := &_QueryDataDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RelativePath.DeepCopy().(RelativePath),
+		utils.DeepCopy[RelativePath](m.RelativePath),
 		m.AttributeId,
-		m.IndexRange.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.IndexRange),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _QueryDataDescriptionCopy

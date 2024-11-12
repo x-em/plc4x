@@ -437,7 +437,7 @@ func (m *_MonitoringParameters) deepCopy() *_MonitoringParameters {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.ClientHandle,
 		m.SamplingInterval,
-		m.Filter.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.Filter),
 		m.QueueSize,
 		m.DiscardOldest,
 		m.reservedField0,

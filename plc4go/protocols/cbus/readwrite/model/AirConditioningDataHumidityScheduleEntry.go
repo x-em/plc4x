@@ -591,13 +591,13 @@ func (m *_AirConditioningDataHumidityScheduleEntry) deepCopy() *_AirConditioning
 	_AirConditioningDataHumidityScheduleEntryCopy := &_AirConditioningDataHumidityScheduleEntry{
 		m.AirConditioningDataContract.(*_AirConditioningData).deepCopy(),
 		m.ZoneGroup,
-		m.ZoneList.DeepCopy().(HVACZoneList),
+		utils.DeepCopy[HVACZoneList](m.ZoneList),
 		m.Entry,
 		m.Format,
-		m.HumidityModeAndFlags.DeepCopy().(HVACHumidityModeAndFlags),
-		m.StartTime.DeepCopy().(HVACStartTime),
-		m.Level.DeepCopy().(HVACHumidity),
-		m.RawLevel.DeepCopy().(HVACRawLevels),
+		utils.DeepCopy[HVACHumidityModeAndFlags](m.HumidityModeAndFlags),
+		utils.DeepCopy[HVACStartTime](m.StartTime),
+		utils.DeepCopy[HVACHumidity](m.Level),
+		utils.DeepCopy[HVACRawLevels](m.RawLevel),
 	}
 	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
 	return _AirConditioningDataHumidityScheduleEntryCopy

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataNotifyType) deepCopy() *_BACnetConstructedDataNot
 	}
 	_BACnetConstructedDataNotifyTypeCopy := &_BACnetConstructedDataNotifyType{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NotifyType.DeepCopy().(BACnetNotifyTypeTagged),
+		utils.DeepCopy[BACnetNotifyTypeTagged](m.NotifyType),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataNotifyTypeCopy

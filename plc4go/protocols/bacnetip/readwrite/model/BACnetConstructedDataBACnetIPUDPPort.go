@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataBACnetIPUDPPort) deepCopy() *_BACnetConstructedDa
 	}
 	_BACnetConstructedDataBACnetIPUDPPortCopy := &_BACnetConstructedDataBACnetIPUDPPort{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.IpUdpPort.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.IpUdpPort),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBACnetIPUDPPortCopy

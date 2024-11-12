@@ -412,7 +412,7 @@ func (m *_FindServersOnNetworkRequest) deepCopy() *_FindServersOnNetworkRequest 
 	}
 	_FindServersOnNetworkRequestCopy := &_FindServersOnNetworkRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.StartingRecordId,
 		m.MaxRecordsToReturn,
 		utils.DeepCopySlice[PascalString, PascalString](m.ServerCapabilityFilter),

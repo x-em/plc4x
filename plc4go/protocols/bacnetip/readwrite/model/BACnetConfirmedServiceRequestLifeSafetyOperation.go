@@ -462,10 +462,10 @@ func (m *_BACnetConfirmedServiceRequestLifeSafetyOperation) deepCopy() *_BACnetC
 	}
 	_BACnetConfirmedServiceRequestLifeSafetyOperationCopy := &_BACnetConfirmedServiceRequestLifeSafetyOperation{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.RequestingProcessIdentifier.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.RequestingSource.DeepCopy().(BACnetContextTagCharacterString),
-		m.Request.DeepCopy().(BACnetLifeSafetyOperationTagged),
-		m.ObjectIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.RequestingProcessIdentifier),
+		utils.DeepCopy[BACnetContextTagCharacterString](m.RequestingSource),
+		utils.DeepCopy[BACnetLifeSafetyOperationTagged](m.Request),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.ObjectIdentifier),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestLifeSafetyOperationCopy

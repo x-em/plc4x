@@ -304,7 +304,7 @@ func (m *_BACnetLandingCallStatusCommandDestination) deepCopy() *_BACnetLandingC
 	}
 	_BACnetLandingCallStatusCommandDestinationCopy := &_BACnetLandingCallStatusCommandDestination{
 		m.BACnetLandingCallStatusCommandContract.(*_BACnetLandingCallStatusCommand).deepCopy(),
-		m.Destination.DeepCopy().(BACnetContextTagUnsignedInteger),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Destination),
 	}
 	m.BACnetLandingCallStatusCommandContract.(*_BACnetLandingCallStatusCommand)._SubType = m
 	return _BACnetLandingCallStatusCommandDestinationCopy

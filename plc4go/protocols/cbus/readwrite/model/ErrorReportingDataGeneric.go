@@ -580,7 +580,7 @@ func (m *_ErrorReportingDataGeneric) deepCopy() *_ErrorReportingDataGeneric {
 	}
 	_ErrorReportingDataGenericCopy := &_ErrorReportingDataGeneric{
 		m.ErrorReportingDataContract.(*_ErrorReportingData).deepCopy(),
-		m.SystemCategory.DeepCopy().(ErrorReportingSystemCategory),
+		utils.DeepCopy[ErrorReportingSystemCategory](m.SystemCategory),
 		m.MostRecent,
 		m.Acknowledge,
 		m.MostSevere,

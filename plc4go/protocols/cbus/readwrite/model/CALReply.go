@@ -450,7 +450,7 @@ func (m *_CALReply) deepCopy() *_CALReply {
 	_CALReplyCopy := &_CALReply{
 		nil, // will be set by child
 		m.CalType,
-		m.CalData.DeepCopy().(CALData),
+		utils.DeepCopy[CALData](m.CalData),
 		m.CBusOptions,
 		m.RequestContext,
 	}

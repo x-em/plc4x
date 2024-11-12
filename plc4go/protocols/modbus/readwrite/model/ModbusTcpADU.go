@@ -410,7 +410,7 @@ func (m *_ModbusTcpADU) deepCopy() *_ModbusTcpADU {
 		m.ModbusADUContract.(*_ModbusADU).deepCopy(),
 		m.TransactionIdentifier,
 		m.UnitIdentifier,
-		m.Pdu.DeepCopy().(ModbusPDU),
+		utils.DeepCopy[ModbusPDU](m.Pdu),
 	}
 	m.ModbusADUContract.(*_ModbusADU)._SubType = m
 	return _ModbusTcpADUCopy

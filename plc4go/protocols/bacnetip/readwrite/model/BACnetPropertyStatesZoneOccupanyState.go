@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesZoneOccupanyState) deepCopy() *_BACnetPropertyStat
 	}
 	_BACnetPropertyStatesZoneOccupanyStateCopy := &_BACnetPropertyStatesZoneOccupanyState{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.ZoneOccupanyState.DeepCopy().(BACnetAccessZoneOccupancyStateTagged),
+		utils.DeepCopy[BACnetAccessZoneOccupancyStateTagged](m.ZoneOccupanyState),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesZoneOccupanyStateCopy

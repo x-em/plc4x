@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAlignIntervals) deepCopy() *_BACnetConstructedDat
 	}
 	_BACnetConstructedDataAlignIntervalsCopy := &_BACnetConstructedDataAlignIntervals{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AlignIntervals.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.AlignIntervals),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAlignIntervalsCopy

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLastPriority) deepCopy() *_BACnetConstructedDataL
 	}
 	_BACnetConstructedDataLastPriorityCopy := &_BACnetConstructedDataLastPriority{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LastPriority.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.LastPriority),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLastPriorityCopy

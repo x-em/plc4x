@@ -404,7 +404,7 @@ func (m *_AddNodesResponse) deepCopy() *_AddNodesResponse {
 	}
 	_AddNodesResponseCopy := &_AddNodesResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[AddNodesResult, AddNodesResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

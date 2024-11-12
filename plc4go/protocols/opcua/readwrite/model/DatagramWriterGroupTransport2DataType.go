@@ -546,11 +546,11 @@ func (m *_DatagramWriterGroupTransport2DataType) deepCopy() *_DatagramWriterGrou
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.MessageRepeatCount,
 		m.MessageRepeatDelay,
-		m.Address.DeepCopy().(ExtensionObject),
-		m.QosCategory.DeepCopy().(PascalString),
+		utils.DeepCopy[ExtensionObject](m.Address),
+		utils.DeepCopy[PascalString](m.QosCategory),
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.DatagramQos),
 		m.DiscoveryAnnounceRate,
-		m.Topic.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Topic),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramWriterGroupTransport2DataTypeCopy

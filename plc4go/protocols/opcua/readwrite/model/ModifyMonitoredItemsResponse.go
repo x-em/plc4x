@@ -404,7 +404,7 @@ func (m *_ModifyMonitoredItemsResponse) deepCopy() *_ModifyMonitoredItemsRespons
 	}
 	_ModifyMonitoredItemsResponseCopy := &_ModifyMonitoredItemsResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[MonitoredItemModifyResult, MonitoredItemModifyResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

@@ -612,8 +612,8 @@ func (m *_S7Message) deepCopy() *_S7Message {
 	_S7MessageCopy := &_S7Message{
 		nil, // will be set by child
 		m.TpduReference,
-		m.Parameter.DeepCopy().(S7Parameter),
-		m.Payload.DeepCopy().(S7Payload),
+		utils.DeepCopy[S7Parameter](m.Parameter),
+		utils.DeepCopy[S7Payload](m.Payload),
 		m.reservedField0,
 	}
 	return _S7MessageCopy

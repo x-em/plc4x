@@ -360,8 +360,8 @@ func (m *_ChangeListAddError) deepCopy() *_ChangeListAddError {
 	}
 	_ChangeListAddErrorCopy := &_ChangeListAddError{
 		m.BACnetErrorContract.(*_BACnetError).deepCopy(),
-		m.ErrorType.DeepCopy().(ErrorEnclosed),
-		m.FirstFailedElementNumber.DeepCopy().(BACnetContextTagUnsignedInteger),
+		utils.DeepCopy[ErrorEnclosed](m.ErrorType),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.FirstFailedElementNumber),
 	}
 	m.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _ChangeListAddErrorCopy

@@ -360,8 +360,8 @@ func (m *_BrowsePath) deepCopy() *_BrowsePath {
 	}
 	_BrowsePathCopy := &_BrowsePath{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StartingNode.DeepCopy().(NodeId),
-		m.RelativePath.DeepCopy().(RelativePath),
+		utils.DeepCopy[NodeId](m.StartingNode),
+		utils.DeepCopy[RelativePath](m.RelativePath),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _BrowsePathCopy

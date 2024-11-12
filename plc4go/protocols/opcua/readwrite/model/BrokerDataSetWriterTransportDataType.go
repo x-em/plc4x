@@ -520,11 +520,11 @@ func (m *_BrokerDataSetWriterTransportDataType) deepCopy() *_BrokerDataSetWriter
 	}
 	_BrokerDataSetWriterTransportDataTypeCopy := &_BrokerDataSetWriterTransportDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.QueueName.DeepCopy().(PascalString),
-		m.ResourceUri.DeepCopy().(PascalString),
-		m.AuthenticationProfileUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.QueueName),
+		utils.DeepCopy[PascalString](m.ResourceUri),
+		utils.DeepCopy[PascalString](m.AuthenticationProfileUri),
 		m.RequestedDeliveryGuarantee,
-		m.MetaDataQueueName.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.MetaDataQueueName),
 		m.MetaDataUpdateTime,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

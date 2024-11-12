@@ -392,7 +392,7 @@ func (m *_ModifySubscriptionResponse) deepCopy() *_ModifySubscriptionResponse {
 	}
 	_ModifySubscriptionResponseCopy := &_ModifySubscriptionResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		m.RevisedPublishingInterval,
 		m.RevisedLifetimeCount,
 		m.RevisedMaxKeepAliveCount,

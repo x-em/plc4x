@@ -304,7 +304,7 @@ func (m *_BACnetChannelValueDate) deepCopy() *_BACnetChannelValueDate {
 	}
 	_BACnetChannelValueDateCopy := &_BACnetChannelValueDate{
 		m.BACnetChannelValueContract.(*_BACnetChannelValue).deepCopy(),
-		m.DateValue.DeepCopy().(BACnetApplicationTagDate),
+		utils.DeepCopy[BACnetApplicationTagDate](m.DateValue),
 	}
 	m.BACnetChannelValueContract.(*_BACnetChannelValue)._SubType = m
 	return _BACnetChannelValueDateCopy

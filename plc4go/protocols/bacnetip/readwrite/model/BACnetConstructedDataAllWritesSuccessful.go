@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAllWritesSuccessful) deepCopy() *_BACnetConstruct
 	}
 	_BACnetConstructedDataAllWritesSuccessfulCopy := &_BACnetConstructedDataAllWritesSuccessful{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AllWritesSuccessful.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.AllWritesSuccessful),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAllWritesSuccessfulCopy

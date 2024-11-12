@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataMinimumValueTimestamp) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataMinimumValueTimestampCopy := &_BACnetConstructedDataMinimumValueTimestamp{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MinimumValueTimestamp.DeepCopy().(BACnetDateTime),
+		utils.DeepCopy[BACnetDateTime](m.MinimumValueTimestamp),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMinimumValueTimestampCopy

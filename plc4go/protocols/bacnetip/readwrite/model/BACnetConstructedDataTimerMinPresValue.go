@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataTimerMinPresValue) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataTimerMinPresValueCopy := &_BACnetConstructedDataTimerMinPresValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MinPresValue.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MinPresValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTimerMinPresValueCopy

@@ -639,15 +639,15 @@ func (m *_DataSetWriterDataType) deepCopy() *_DataSetWriterDataType {
 	}
 	_DataSetWriterDataTypeCopy := &_DataSetWriterDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Name),
 		m.Enabled,
 		m.DataSetWriterId,
 		m.DataSetFieldContentMask,
 		m.KeyFrameCount,
-		m.DataSetName.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.DataSetName),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.DataSetWriterProperties),
-		m.TransportSettings.DeepCopy().(ExtensionObject),
-		m.MessageSettings.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.TransportSettings),
+		utils.DeepCopy[ExtensionObject](m.MessageSettings),
 		m.reservedField0,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

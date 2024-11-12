@@ -616,13 +616,13 @@ func (m *_BACnetEventParameterFloatingLimit) deepCopy() *_BACnetEventParameterFl
 	}
 	_BACnetEventParameterFloatingLimitCopy := &_BACnetEventParameterFloatingLimit{
 		m.BACnetEventParameterContract.(*_BACnetEventParameter).deepCopy(),
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.TimeDelay.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.SetpointReference.DeepCopy().(BACnetDeviceObjectPropertyReferenceEnclosed),
-		m.LowDiffLimit.DeepCopy().(BACnetContextTagReal),
-		m.HighDiffLimit.DeepCopy().(BACnetContextTagReal),
-		m.Deadband.DeepCopy().(BACnetContextTagReal),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.TimeDelay),
+		utils.DeepCopy[BACnetDeviceObjectPropertyReferenceEnclosed](m.SetpointReference),
+		utils.DeepCopy[BACnetContextTagReal](m.LowDiffLimit),
+		utils.DeepCopy[BACnetContextTagReal](m.HighDiffLimit),
+		utils.DeepCopy[BACnetContextTagReal](m.Deadband),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
 	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterFloatingLimitCopy

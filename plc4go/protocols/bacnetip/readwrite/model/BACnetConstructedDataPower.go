@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataPower) deepCopy() *_BACnetConstructedDataPower {
 	}
 	_BACnetConstructedDataPowerCopy := &_BACnetConstructedDataPower{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Power.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.Power),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPowerCopy

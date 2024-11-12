@@ -676,13 +676,13 @@ func (m *_CreateSessionRequest) deepCopy() *_CreateSessionRequest {
 	}
 	_CreateSessionRequestCopy := &_CreateSessionRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
-		m.ClientDescription.DeepCopy().(ApplicationDescription),
-		m.ServerUri.DeepCopy().(PascalString),
-		m.EndpointUrl.DeepCopy().(PascalString),
-		m.SessionName.DeepCopy().(PascalString),
-		m.ClientNonce.DeepCopy().(PascalByteString),
-		m.ClientCertificate.DeepCopy().(PascalByteString),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
+		utils.DeepCopy[ApplicationDescription](m.ClientDescription),
+		utils.DeepCopy[PascalString](m.ServerUri),
+		utils.DeepCopy[PascalString](m.EndpointUrl),
+		utils.DeepCopy[PascalString](m.SessionName),
+		utils.DeepCopy[PascalByteString](m.ClientNonce),
+		utils.DeepCopy[PascalByteString](m.ClientCertificate),
 		m.RequestedSessionTimeout,
 		m.MaxResponseMessageSize,
 	}

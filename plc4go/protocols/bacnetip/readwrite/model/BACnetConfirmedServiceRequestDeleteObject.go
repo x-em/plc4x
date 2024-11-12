@@ -308,7 +308,7 @@ func (m *_BACnetConfirmedServiceRequestDeleteObject) deepCopy() *_BACnetConfirme
 	}
 	_BACnetConfirmedServiceRequestDeleteObjectCopy := &_BACnetConfirmedServiceRequestDeleteObject{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.ObjectIdentifier.DeepCopy().(BACnetApplicationTagObjectIdentifier),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.ObjectIdentifier),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestDeleteObjectCopy

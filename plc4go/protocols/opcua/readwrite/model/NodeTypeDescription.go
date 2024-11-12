@@ -399,7 +399,7 @@ func (m *_NodeTypeDescription) deepCopy() *_NodeTypeDescription {
 	}
 	_NodeTypeDescriptionCopy := &_NodeTypeDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.TypeDefinitionNode.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExpandedNodeId](m.TypeDefinitionNode),
 		m.IncludeSubTypes,
 		utils.DeepCopySlice[QueryDataDescription, QueryDataDescription](m.DataToReturn),
 		m.reservedField0,

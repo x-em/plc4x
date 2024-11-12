@@ -308,7 +308,7 @@ func (m *_NLMSetMasterKey) deepCopy() *_NLMSetMasterKey {
 	}
 	_NLMSetMasterKeyCopy := &_NLMSetMasterKey{
 		m.NLMContract.(*_NLM).deepCopy(),
-		m.Key.DeepCopy().(NLMUpdateKeyUpdateKeyEntry),
+		utils.DeepCopy[NLMUpdateKeyUpdateKeyEntry](m.Key),
 	}
 	m.NLMContract.(*_NLM)._SubType = m
 	return _NLMSetMasterKeyCopy

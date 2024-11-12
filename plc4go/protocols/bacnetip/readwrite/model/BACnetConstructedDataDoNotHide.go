@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataDoNotHide) deepCopy() *_BACnetConstructedDataDoNo
 	}
 	_BACnetConstructedDataDoNotHideCopy := &_BACnetConstructedDataDoNotHide{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DoNotHide.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.DoNotHide),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDoNotHideCopy

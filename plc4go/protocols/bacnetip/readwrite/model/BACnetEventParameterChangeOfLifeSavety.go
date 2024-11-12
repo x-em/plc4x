@@ -564,12 +564,12 @@ func (m *_BACnetEventParameterChangeOfLifeSavety) deepCopy() *_BACnetEventParame
 	}
 	_BACnetEventParameterChangeOfLifeSavetyCopy := &_BACnetEventParameterChangeOfLifeSavety{
 		m.BACnetEventParameterContract.(*_BACnetEventParameter).deepCopy(),
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.TimeDelay.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ListOfLifeSavetyAlarmValues.DeepCopy().(BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValues),
-		m.ListOfAlarmValues.DeepCopy().(BACnetEventParameterChangeOfLifeSavetyListOfAlarmValues),
-		m.ModePropertyReference.DeepCopy().(BACnetDeviceObjectPropertyReferenceEnclosed),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.TimeDelay),
+		utils.DeepCopy[BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValues](m.ListOfLifeSavetyAlarmValues),
+		utils.DeepCopy[BACnetEventParameterChangeOfLifeSavetyListOfAlarmValues](m.ListOfAlarmValues),
+		utils.DeepCopy[BACnetDeviceObjectPropertyReferenceEnclosed](m.ModePropertyReference),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
 	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterChangeOfLifeSavetyCopy

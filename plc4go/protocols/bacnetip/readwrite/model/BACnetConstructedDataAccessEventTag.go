@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAccessEventTag) deepCopy() *_BACnetConstructedDat
 	}
 	_BACnetConstructedDataAccessEventTagCopy := &_BACnetConstructedDataAccessEventTag{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AccessEventTag.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.AccessEventTag),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccessEventTagCopy

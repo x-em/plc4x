@@ -583,7 +583,7 @@ func (m *_BACnetFaultParameter) deepCopy() *_BACnetFaultParameter {
 	}
 	_BACnetFaultParameterCopy := &_BACnetFaultParameter{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetFaultParameterCopy
 }

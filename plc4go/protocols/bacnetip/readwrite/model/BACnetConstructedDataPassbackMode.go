@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataPassbackMode) deepCopy() *_BACnetConstructedDataP
 	}
 	_BACnetConstructedDataPassbackModeCopy := &_BACnetConstructedDataPassbackMode{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PassbackMode.DeepCopy().(BACnetAccessPassbackModeTagged),
+		utils.DeepCopy[BACnetAccessPassbackModeTagged](m.PassbackMode),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPassbackModeCopy

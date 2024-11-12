@@ -423,7 +423,7 @@ func (m *_Payload) deepCopy() *_Payload {
 	}
 	_PayloadCopy := &_Payload{
 		nil, // will be set by child
-		m.SequenceHeader.DeepCopy().(SequenceHeader),
+		utils.DeepCopy[SequenceHeader](m.SequenceHeader),
 		m.ByteCount,
 	}
 	return _PayloadCopy

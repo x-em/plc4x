@@ -572,13 +572,13 @@ func (m *_PublishedVariableDataType) deepCopy() *_PublishedVariableDataType {
 	}
 	_PublishedVariableDataTypeCopy := &_PublishedVariableDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.PublishedVariable.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.PublishedVariable),
 		m.AttributeId,
 		m.SamplingIntervalHint,
 		m.DeadbandType,
 		m.DeadbandValue,
-		m.IndexRange.DeepCopy().(PascalString),
-		m.SubstituteValue.DeepCopy().(Variant),
+		utils.DeepCopy[PascalString](m.IndexRange),
+		utils.DeepCopy[Variant](m.SubstituteValue),
 		utils.DeepCopySlice[QualifiedName, QualifiedName](m.MetaDataProperties),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

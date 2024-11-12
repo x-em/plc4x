@@ -341,7 +341,7 @@ func (m *_OpcuaAcknowledgeResponse) deepCopy() *_OpcuaAcknowledgeResponse {
 	_OpcuaAcknowledgeResponseCopy := &_OpcuaAcknowledgeResponse{
 		m.MessagePDUContract.(*_MessagePDU).deepCopy(),
 		m.Version,
-		m.Limits.DeepCopy().(OpcuaProtocolLimits),
+		utils.DeepCopy[OpcuaProtocolLimits](m.Limits),
 	}
 	m.MessagePDUContract.(*_MessagePDU)._SubType = m
 	return _OpcuaAcknowledgeResponseCopy

@@ -792,18 +792,18 @@ func (m *_ProgramDiagnostic2DataType) deepCopy() *_ProgramDiagnostic2DataType {
 	}
 	_ProgramDiagnostic2DataTypeCopy := &_ProgramDiagnostic2DataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.CreateSessionId.DeepCopy().(NodeId),
-		m.CreateClientName.DeepCopy().(PascalString),
+		utils.DeepCopy[NodeId](m.CreateSessionId),
+		utils.DeepCopy[PascalString](m.CreateClientName),
 		m.InvocationCreationTime,
 		m.LastTransitionTime,
-		m.LastMethodCall.DeepCopy().(PascalString),
-		m.LastMethodSessionId.DeepCopy().(NodeId),
+		utils.DeepCopy[PascalString](m.LastMethodCall),
+		utils.DeepCopy[NodeId](m.LastMethodSessionId),
 		utils.DeepCopySlice[Argument, Argument](m.LastMethodInputArguments),
 		utils.DeepCopySlice[Argument, Argument](m.LastMethodOutputArguments),
 		utils.DeepCopySlice[Variant, Variant](m.LastMethodInputValues),
 		utils.DeepCopySlice[Variant, Variant](m.LastMethodOutputValues),
 		m.LastMethodCallTime,
-		m.LastMethodReturnStatus.DeepCopy().(StatusCode),
+		utils.DeepCopy[StatusCode](m.LastMethodReturnStatus),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ProgramDiagnostic2DataTypeCopy

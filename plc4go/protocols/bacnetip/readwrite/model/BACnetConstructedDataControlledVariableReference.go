@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataControlledVariableReference) deepCopy() *_BACnetC
 	}
 	_BACnetConstructedDataControlledVariableReferenceCopy := &_BACnetConstructedDataControlledVariableReference{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ControlledVariableReference.DeepCopy().(BACnetObjectPropertyReference),
+		utils.DeepCopy[BACnetObjectPropertyReference](m.ControlledVariableReference),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataControlledVariableReferenceCopy

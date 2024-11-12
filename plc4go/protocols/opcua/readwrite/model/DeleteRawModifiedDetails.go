@@ -407,7 +407,7 @@ func (m *_DeleteRawModifiedDetails) deepCopy() *_DeleteRawModifiedDetails {
 	}
 	_DeleteRawModifiedDetailsCopy := &_DeleteRawModifiedDetails{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.NodeId),
 		m.IsDeleteModified,
 		m.StartTime,
 		m.EndTime,

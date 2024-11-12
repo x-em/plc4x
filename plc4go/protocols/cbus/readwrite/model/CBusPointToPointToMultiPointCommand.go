@@ -494,8 +494,8 @@ func (m *_CBusPointToPointToMultiPointCommand) deepCopy() *_CBusPointToPointToMu
 	}
 	_CBusPointToPointToMultiPointCommandCopy := &_CBusPointToPointToMultiPointCommand{
 		nil, // will be set by child
-		m.BridgeAddress.DeepCopy().(BridgeAddress),
-		m.NetworkRoute.DeepCopy().(NetworkRoute),
+		utils.DeepCopy[BridgeAddress](m.BridgeAddress),
+		utils.DeepCopy[NetworkRoute](m.NetworkRoute),
 		m.PeekedApplication,
 		m.CBusOptions,
 	}

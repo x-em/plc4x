@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataAccessEventAuthenticationFactor) deepCopy() *_BAC
 	}
 	_BACnetConstructedDataAccessEventAuthenticationFactorCopy := &_BACnetConstructedDataAccessEventAuthenticationFactor{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AccessEventAuthenticationFactor.DeepCopy().(BACnetAuthenticationFactor),
+		utils.DeepCopy[BACnetAuthenticationFactor](m.AccessEventAuthenticationFactor),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccessEventAuthenticationFactorCopy

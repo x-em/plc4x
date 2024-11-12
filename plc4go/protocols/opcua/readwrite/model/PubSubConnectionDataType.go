@@ -703,13 +703,13 @@ func (m *_PubSubConnectionDataType) deepCopy() *_PubSubConnectionDataType {
 	}
 	_PubSubConnectionDataTypeCopy := &_PubSubConnectionDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Name),
 		m.Enabled,
-		m.PublisherId.DeepCopy().(Variant),
-		m.TransportProfileUri.DeepCopy().(PascalString),
-		m.Address.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[Variant](m.PublisherId),
+		utils.DeepCopy[PascalString](m.TransportProfileUri),
+		utils.DeepCopy[ExtensionObject](m.Address),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.ConnectionProperties),
-		m.TransportSettings.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.TransportSettings),
 		utils.DeepCopySlice[WriterGroupDataType, WriterGroupDataType](m.WriterGroups),
 		utils.DeepCopySlice[ReaderGroupDataType, ReaderGroupDataType](m.ReaderGroups),
 		m.reservedField0,

@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataIPDNSServer) deepCopy() *_BACnetConstructedDataIP
 	}
 	_BACnetConstructedDataIPDNSServerCopy := &_BACnetConstructedDataIPDNSServer{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetApplicationTagOctetString, BACnetApplicationTagOctetString](m.IpDnsServer),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataStopWhenFull) deepCopy() *_BACnetConstructedDataS
 	}
 	_BACnetConstructedDataStopWhenFullCopy := &_BACnetConstructedDataStopWhenFull{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.StopWhenFull.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.StopWhenFull),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataStopWhenFullCopy

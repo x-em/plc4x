@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataChangeOfStateTime) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataChangeOfStateTimeCopy := &_BACnetConstructedDataChangeOfStateTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ChangeOfStateTime.DeepCopy().(BACnetDateTime),
+		utils.DeepCopy[BACnetDateTime](m.ChangeOfStateTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataChangeOfStateTimeCopy

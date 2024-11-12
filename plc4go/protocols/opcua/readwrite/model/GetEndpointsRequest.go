@@ -456,8 +456,8 @@ func (m *_GetEndpointsRequest) deepCopy() *_GetEndpointsRequest {
 	}
 	_GetEndpointsRequestCopy := &_GetEndpointsRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
-		m.EndpointUrl.DeepCopy().(PascalString),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
+		utils.DeepCopy[PascalString](m.EndpointUrl),
 		utils.DeepCopySlice[PascalString, PascalString](m.LocaleIds),
 		utils.DeepCopySlice[PascalString, PascalString](m.ProfileUris),
 	}

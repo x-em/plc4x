@@ -803,7 +803,7 @@ func (m *_BACnetPriorityValue) deepCopy() *_BACnetPriorityValue {
 	}
 	_BACnetPriorityValueCopy := &_BACnetPriorityValue{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 		m.ObjectTypeArgument,
 	}
 	return _BACnetPriorityValueCopy

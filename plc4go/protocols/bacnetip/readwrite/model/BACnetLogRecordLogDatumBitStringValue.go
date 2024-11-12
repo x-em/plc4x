@@ -304,7 +304,7 @@ func (m *_BACnetLogRecordLogDatumBitStringValue) deepCopy() *_BACnetLogRecordLog
 	}
 	_BACnetLogRecordLogDatumBitStringValueCopy := &_BACnetLogRecordLogDatumBitStringValue{
 		m.BACnetLogRecordLogDatumContract.(*_BACnetLogRecordLogDatum).deepCopy(),
-		m.BitStringValue.DeepCopy().(BACnetContextTagBitString),
+		utils.DeepCopy[BACnetContextTagBitString](m.BitStringValue),
 	}
 	m.BACnetLogRecordLogDatumContract.(*_BACnetLogRecordLogDatum)._SubType = m
 	return _BACnetLogRecordLogDatumBitStringValueCopy

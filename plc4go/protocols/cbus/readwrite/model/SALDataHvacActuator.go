@@ -308,7 +308,7 @@ func (m *_SALDataHvacActuator) deepCopy() *_SALDataHvacActuator {
 	}
 	_SALDataHvacActuatorCopy := &_SALDataHvacActuator{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.HvacActuatorData.DeepCopy().(LightingData),
+		utils.DeepCopy[LightingData](m.HvacActuatorData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataHvacActuatorCopy

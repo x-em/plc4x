@@ -308,7 +308,7 @@ func (m *_AdsDiscoveryBlockRouteName) deepCopy() *_AdsDiscoveryBlockRouteName {
 	}
 	_AdsDiscoveryBlockRouteNameCopy := &_AdsDiscoveryBlockRouteName{
 		m.AdsDiscoveryBlockContract.(*_AdsDiscoveryBlock).deepCopy(),
-		m.RouteName.DeepCopy().(AmsString),
+		utils.DeepCopy[AmsString](m.RouteName),
 	}
 	m.AdsDiscoveryBlockContract.(*_AdsDiscoveryBlock)._SubType = m
 	return _AdsDiscoveryBlockRouteNameCopy

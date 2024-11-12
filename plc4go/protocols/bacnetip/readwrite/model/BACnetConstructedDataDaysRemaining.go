@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataDaysRemaining) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataDaysRemainingCopy := &_BACnetConstructedDataDaysRemaining{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DaysRemaining.DeepCopy().(BACnetApplicationTagSignedInteger),
+		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.DaysRemaining),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDaysRemainingCopy

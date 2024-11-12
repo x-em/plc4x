@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataCarPosition) deepCopy() *_BACnetConstructedDataCa
 	}
 	_BACnetConstructedDataCarPositionCopy := &_BACnetConstructedDataCarPosition{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.CarPosition.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.CarPosition),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCarPositionCopy

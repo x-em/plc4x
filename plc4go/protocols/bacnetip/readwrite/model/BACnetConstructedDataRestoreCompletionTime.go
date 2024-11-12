@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataRestoreCompletionTime) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataRestoreCompletionTimeCopy := &_BACnetConstructedDataRestoreCompletionTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.CompletionTime.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.CompletionTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataRestoreCompletionTimeCopy

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAccompaniment) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataAccompanimentCopy := &_BACnetConstructedDataAccompaniment{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Accompaniment.DeepCopy().(BACnetDeviceObjectReference),
+		utils.DeepCopy[BACnetDeviceObjectReference](m.Accompaniment),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccompanimentCopy

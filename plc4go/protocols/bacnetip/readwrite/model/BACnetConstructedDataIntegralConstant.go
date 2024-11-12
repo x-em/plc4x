@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataIntegralConstant) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataIntegralConstantCopy := &_BACnetConstructedDataIntegralConstant{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.IntegralConstant.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.IntegralConstant),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataIntegralConstantCopy

@@ -305,7 +305,7 @@ func (m *_BACnetFaultParameterFaultExtendedParametersEntryObjectidentifier) deep
 	}
 	_BACnetFaultParameterFaultExtendedParametersEntryObjectidentifierCopy := &_BACnetFaultParameterFaultExtendedParametersEntryObjectidentifier{
 		m.BACnetFaultParameterFaultExtendedParametersEntryContract.(*_BACnetFaultParameterFaultExtendedParametersEntry).deepCopy(),
-		m.ObjectidentifierValue.DeepCopy().(BACnetApplicationTagObjectIdentifier),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.ObjectidentifierValue),
 	}
 	m.BACnetFaultParameterFaultExtendedParametersEntryContract.(*_BACnetFaultParameterFaultExtendedParametersEntry)._SubType = m
 	return _BACnetFaultParameterFaultExtendedParametersEntryObjectidentifierCopy

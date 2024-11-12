@@ -360,8 +360,8 @@ func (m *_PortableNodeId) deepCopy() *_PortableNodeId {
 	}
 	_PortableNodeIdCopy := &_PortableNodeId{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NamespaceUri.DeepCopy().(PascalString),
-		m.Identifier.DeepCopy().(NodeId),
+		utils.DeepCopy[PascalString](m.NamespaceUri),
+		utils.DeepCopy[NodeId](m.Identifier),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PortableNodeIdCopy

@@ -436,8 +436,8 @@ func (m *_StructureDefinition) deepCopy() *_StructureDefinition {
 	}
 	_StructureDefinitionCopy := &_StructureDefinition{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.DefaultEncodingId.DeepCopy().(NodeId),
-		m.BaseDataType.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.DefaultEncodingId),
+		utils.DeepCopy[NodeId](m.BaseDataType),
 		m.StructureType,
 		utils.DeepCopySlice[StructureField, StructureField](m.Fields),
 	}

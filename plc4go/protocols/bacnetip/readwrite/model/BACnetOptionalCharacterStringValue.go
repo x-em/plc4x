@@ -304,7 +304,7 @@ func (m *_BACnetOptionalCharacterStringValue) deepCopy() *_BACnetOptionalCharact
 	}
 	_BACnetOptionalCharacterStringValueCopy := &_BACnetOptionalCharacterStringValue{
 		m.BACnetOptionalCharacterStringContract.(*_BACnetOptionalCharacterString).deepCopy(),
-		m.Characterstring.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.Characterstring),
 	}
 	m.BACnetOptionalCharacterStringContract.(*_BACnetOptionalCharacterString)._SubType = m
 	return _BACnetOptionalCharacterStringValueCopy

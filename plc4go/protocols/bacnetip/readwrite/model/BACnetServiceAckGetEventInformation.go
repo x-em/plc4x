@@ -360,8 +360,8 @@ func (m *_BACnetServiceAckGetEventInformation) deepCopy() *_BACnetServiceAckGetE
 	}
 	_BACnetServiceAckGetEventInformationCopy := &_BACnetServiceAckGetEventInformation{
 		m.BACnetServiceAckContract.(*_BACnetServiceAck).deepCopy(),
-		m.ListOfEventSummaries.DeepCopy().(BACnetEventSummariesList),
-		m.MoreEvents.DeepCopy().(BACnetContextTagBoolean),
+		utils.DeepCopy[BACnetEventSummariesList](m.ListOfEventSummaries),
+		utils.DeepCopy[BACnetContextTagBoolean](m.MoreEvents),
 	}
 	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckGetEventInformationCopy

@@ -361,8 +361,8 @@ func (m *_BACnetUnconfirmedServiceRequestUTCTimeSynchronization) deepCopy() *_BA
 	}
 	_BACnetUnconfirmedServiceRequestUTCTimeSynchronizationCopy := &_BACnetUnconfirmedServiceRequestUTCTimeSynchronization{
 		m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest).deepCopy(),
-		m.SynchronizedDate.DeepCopy().(BACnetApplicationTagDate),
-		m.SynchronizedTime.DeepCopy().(BACnetApplicationTagTime),
+		utils.DeepCopy[BACnetApplicationTagDate](m.SynchronizedDate),
+		utils.DeepCopy[BACnetApplicationTagTime](m.SynchronizedTime),
 	}
 	m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
 	return _BACnetUnconfirmedServiceRequestUTCTimeSynchronizationCopy

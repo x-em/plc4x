@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataDaylightSavingsStatus) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataDaylightSavingsStatusCopy := &_BACnetConstructedDataDaylightSavingsStatus{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DaylightSavingsStatus.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.DaylightSavingsStatus),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDaylightSavingsStatusCopy

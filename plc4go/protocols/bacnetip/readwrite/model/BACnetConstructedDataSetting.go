@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataSetting) deepCopy() *_BACnetConstructedDataSettin
 	}
 	_BACnetConstructedDataSettingCopy := &_BACnetConstructedDataSetting{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Setting.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.Setting),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSettingCopy

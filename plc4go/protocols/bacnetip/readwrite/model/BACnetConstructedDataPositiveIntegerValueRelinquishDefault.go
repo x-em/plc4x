@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataPositiveIntegerValueRelinquishDefault) deepCopy()
 	}
 	_BACnetConstructedDataPositiveIntegerValueRelinquishDefaultCopy := &_BACnetConstructedDataPositiveIntegerValueRelinquishDefault{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.RelinquishDefault.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.RelinquishDefault),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPositiveIntegerValueRelinquishDefaultCopy

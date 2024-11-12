@@ -375,7 +375,7 @@ func (m *_BACnetConstructedDataShedLevelDescriptions) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataShedLevelDescriptionsCopy := &_BACnetConstructedDataShedLevelDescriptions{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetApplicationTagCharacterString, BACnetApplicationTagCharacterString](m.ShedLevelDescriptions),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

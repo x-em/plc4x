@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAbsenteeLimit) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataAbsenteeLimitCopy := &_BACnetConstructedDataAbsenteeLimit{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AbsenteeLimit.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.AbsenteeLimit),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAbsenteeLimitCopy

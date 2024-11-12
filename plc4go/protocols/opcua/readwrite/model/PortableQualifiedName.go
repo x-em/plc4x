@@ -360,8 +360,8 @@ func (m *_PortableQualifiedName) deepCopy() *_PortableQualifiedName {
 	}
 	_PortableQualifiedNameCopy := &_PortableQualifiedName{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NamespaceUri.DeepCopy().(PascalString),
-		m.Name.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.NamespaceUri),
+		utils.DeepCopy[PascalString](m.Name),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PortableQualifiedNameCopy

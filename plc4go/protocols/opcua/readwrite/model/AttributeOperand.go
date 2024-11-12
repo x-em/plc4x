@@ -492,11 +492,11 @@ func (m *_AttributeOperand) deepCopy() *_AttributeOperand {
 	}
 	_AttributeOperandCopy := &_AttributeOperand{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(NodeId),
-		m.Alias.DeepCopy().(PascalString),
-		m.BrowsePath.DeepCopy().(RelativePath),
+		utils.DeepCopy[NodeId](m.NodeId),
+		utils.DeepCopy[PascalString](m.Alias),
+		utils.DeepCopy[RelativePath](m.BrowsePath),
 		m.AttributeId,
-		m.IndexRange.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.IndexRange),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AttributeOperandCopy

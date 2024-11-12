@@ -308,7 +308,7 @@ func (m *_SALDataLighting) deepCopy() *_SALDataLighting {
 	}
 	_SALDataLightingCopy := &_SALDataLighting{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.LightingData.DeepCopy().(LightingData),
+		utils.DeepCopy[LightingData](m.LightingData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataLightingCopy

@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataPositiveIntegerValueDeadband) deepCopy() *_BACnet
 	}
 	_BACnetConstructedDataPositiveIntegerValueDeadbandCopy := &_BACnetConstructedDataPositiveIntegerValueDeadband{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Deadband.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.Deadband),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPositiveIntegerValueDeadbandCopy

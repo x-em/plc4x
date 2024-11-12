@@ -356,7 +356,7 @@ func (m *_HistoryUpdateRequest) deepCopy() *_HistoryUpdateRequest {
 	}
 	_HistoryUpdateRequestCopy := &_HistoryUpdateRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.HistoryUpdateDetails),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataAccessZoneAdjustValue) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataAccessZoneAdjustValueCopy := &_BACnetConstructedDataAccessZoneAdjustValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AdjustValue.DeepCopy().(BACnetApplicationTagSignedInteger),
+		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.AdjustValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccessZoneAdjustValueCopy

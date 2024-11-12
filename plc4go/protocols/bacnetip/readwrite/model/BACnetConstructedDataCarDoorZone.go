@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataCarDoorZone) deepCopy() *_BACnetConstructedDataCa
 	}
 	_BACnetConstructedDataCarDoorZoneCopy := &_BACnetConstructedDataCarDoorZone{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.CarDoorZone.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.CarDoorZone),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCarDoorZoneCopy

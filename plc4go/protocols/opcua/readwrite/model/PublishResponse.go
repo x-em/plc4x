@@ -570,11 +570,11 @@ func (m *_PublishResponse) deepCopy() *_PublishResponse {
 	}
 	_PublishResponseCopy := &_PublishResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		m.SubscriptionId,
 		utils.DeepCopySlice[uint32, uint32](m.AvailableSequenceNumbers),
 		m.MoreNotifications,
-		m.NotificationMessage.DeepCopy().(NotificationMessage),
+		utils.DeepCopy[NotificationMessage](m.NotificationMessage),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 		m.reservedField0,

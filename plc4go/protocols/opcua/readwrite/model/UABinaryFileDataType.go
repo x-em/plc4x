@@ -604,9 +604,9 @@ func (m *_UABinaryFileDataType) deepCopy() *_UABinaryFileDataType {
 		utils.DeepCopySlice[StructureDescription, StructureDescription](m.StructureDataTypes),
 		utils.DeepCopySlice[EnumDescription, EnumDescription](m.EnumDataTypes),
 		utils.DeepCopySlice[SimpleTypeDescription, SimpleTypeDescription](m.SimpleDataTypes),
-		m.SchemaLocation.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SchemaLocation),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.FileHeader),
-		m.Body.DeepCopy().(Variant),
+		utils.DeepCopy[Variant](m.Body),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UABinaryFileDataTypeCopy

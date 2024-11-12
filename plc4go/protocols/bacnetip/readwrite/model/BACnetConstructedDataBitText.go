@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataBitText) deepCopy() *_BACnetConstructedDataBitTex
 	}
 	_BACnetConstructedDataBitTextCopy := &_BACnetConstructedDataBitText{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetApplicationTagCharacterString, BACnetApplicationTagCharacterString](m.BitText),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

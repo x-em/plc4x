@@ -305,7 +305,7 @@ func (m *_BACnetTimerStateChangeValueCharacterString) deepCopy() *_BACnetTimerSt
 	}
 	_BACnetTimerStateChangeValueCharacterStringCopy := &_BACnetTimerStateChangeValueCharacterString{
 		m.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue).deepCopy(),
-		m.CharacterStringValue.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.CharacterStringValue),
 	}
 	m.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue)._SubType = m
 	return _BACnetTimerStateChangeValueCharacterStringCopy

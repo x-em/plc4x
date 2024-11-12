@@ -356,7 +356,7 @@ func (m *_NetworkGroupDataType) deepCopy() *_NetworkGroupDataType {
 	}
 	_NetworkGroupDataTypeCopy := &_NetworkGroupDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ServerUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.ServerUri),
 		utils.DeepCopySlice[EndpointUrlListDataType, EndpointUrlListDataType](m.NetworkPaths),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLoggingRecord) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataLoggingRecordCopy := &_BACnetConstructedDataLoggingRecord{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LoggingRecord.DeepCopy().(BACnetAccumulatorRecord),
+		utils.DeepCopy[BACnetAccumulatorRecord](m.LoggingRecord),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLoggingRecordCopy

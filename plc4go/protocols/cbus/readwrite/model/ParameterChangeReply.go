@@ -304,7 +304,7 @@ func (m *_ParameterChangeReply) deepCopy() *_ParameterChangeReply {
 	}
 	_ParameterChangeReplyCopy := &_ParameterChangeReply{
 		m.ReplyContract.(*_Reply).deepCopy(),
-		m.ParameterChange.DeepCopy().(ParameterChange),
+		utils.DeepCopy[ParameterChange](m.ParameterChange),
 	}
 	m.ReplyContract.(*_Reply)._SubType = m
 	return _ParameterChangeReplyCopy

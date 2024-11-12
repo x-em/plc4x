@@ -357,8 +357,8 @@ func (m *_BACnetConfirmedServiceRequestReadRangeRangeByPosition) deepCopy() *_BA
 	}
 	_BACnetConfirmedServiceRequestReadRangeRangeByPositionCopy := &_BACnetConfirmedServiceRequestReadRangeRangeByPosition{
 		m.BACnetConfirmedServiceRequestReadRangeRangeContract.(*_BACnetConfirmedServiceRequestReadRangeRange).deepCopy(),
-		m.ReferenceIndex.DeepCopy().(BACnetApplicationTagUnsignedInteger),
-		m.Count.DeepCopy().(BACnetApplicationTagSignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.ReferenceIndex),
+		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.Count),
 	}
 	m.BACnetConfirmedServiceRequestReadRangeRangeContract.(*_BACnetConfirmedServiceRequestReadRangeRange)._SubType = m
 	return _BACnetConfirmedServiceRequestReadRangeRangeByPositionCopy

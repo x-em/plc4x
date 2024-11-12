@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAutoSlaveDiscovery) deepCopy() *_BACnetConstructe
 	}
 	_BACnetConstructedDataAutoSlaveDiscoveryCopy := &_BACnetConstructedDataAutoSlaveDiscovery{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AutoSlaveDiscovery.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.AutoSlaveDiscovery),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAutoSlaveDiscoveryCopy

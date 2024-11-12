@@ -407,7 +407,7 @@ func (m *_SetMonitoringModeRequest) deepCopy() *_SetMonitoringModeRequest {
 	}
 	_SetMonitoringModeRequestCopy := &_SetMonitoringModeRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.SubscriptionId,
 		m.MonitoringMode,
 		utils.DeepCopySlice[uint32, uint32](m.MonitoredItemIds),

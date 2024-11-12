@@ -379,7 +379,7 @@ func (m *_DeleteMonitoredItemsRequest) deepCopy() *_DeleteMonitoredItemsRequest 
 	}
 	_DeleteMonitoredItemsRequestCopy := &_DeleteMonitoredItemsRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.SubscriptionId,
 		utils.DeepCopySlice[uint32, uint32](m.MonitoredItemIds),
 	}

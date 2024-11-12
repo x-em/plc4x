@@ -308,7 +308,7 @@ func (m *_SALDataPoolsSpasPondsFountainsControl) deepCopy() *_SALDataPoolsSpasPo
 	}
 	_SALDataPoolsSpasPondsFountainsControlCopy := &_SALDataPoolsSpasPondsFountainsControl{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.PoolsSpaPondsFountainsData.DeepCopy().(LightingData),
+		utils.DeepCopy[LightingData](m.PoolsSpaPondsFountainsData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataPoolsSpasPondsFountainsControlCopy

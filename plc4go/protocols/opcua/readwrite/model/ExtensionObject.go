@@ -457,7 +457,7 @@ func (m *_ExtensionObject) deepCopy() *_ExtensionObject {
 	}
 	_ExtensionObjectCopy := &_ExtensionObject{
 		nil, // will be set by child
-		m.TypeId.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExpandedNodeId](m.TypeId),
 	}
 	return _ExtensionObjectCopy
 }

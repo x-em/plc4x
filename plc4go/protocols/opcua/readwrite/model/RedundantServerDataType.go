@@ -364,7 +364,7 @@ func (m *_RedundantServerDataType) deepCopy() *_RedundantServerDataType {
 	}
 	_RedundantServerDataTypeCopy := &_RedundantServerDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ServerId.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.ServerId),
 		m.ServiceLevel,
 		m.ServerState,
 	}

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAccompanimentTime) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataAccompanimentTimeCopy := &_BACnetConstructedDataAccompanimentTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AccompanimentTime.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.AccompanimentTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccompanimentTimeCopy

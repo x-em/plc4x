@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataBaseDeviceSecurityPolicy) deepCopy() *_BACnetCons
 	}
 	_BACnetConstructedDataBaseDeviceSecurityPolicyCopy := &_BACnetConstructedDataBaseDeviceSecurityPolicy{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.BaseDeviceSecurityPolicy.DeepCopy().(BACnetSecurityLevelTagged),
+		utils.DeepCopy[BACnetSecurityLevelTagged](m.BaseDeviceSecurityPolicy),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBaseDeviceSecurityPolicyCopy

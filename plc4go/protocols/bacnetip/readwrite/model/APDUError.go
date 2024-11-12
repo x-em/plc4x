@@ -381,7 +381,7 @@ func (m *_APDUError) deepCopy() *_APDUError {
 		m.APDUContract.(*_APDU).deepCopy(),
 		m.OriginalInvokeId,
 		m.ErrorChoice,
-		m.Error.DeepCopy().(BACnetError),
+		utils.DeepCopy[BACnetError](m.Error),
 		m.reservedField0,
 	}
 	m.APDUContract.(*_APDU)._SubType = m

@@ -356,7 +356,7 @@ func (m *_FindServersResponse) deepCopy() *_FindServersResponse {
 	}
 	_FindServersResponseCopy := &_FindServersResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[ApplicationDescription, ApplicationDescription](m.Servers),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

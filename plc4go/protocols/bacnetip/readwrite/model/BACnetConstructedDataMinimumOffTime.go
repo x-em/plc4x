@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataMinimumOffTime) deepCopy() *_BACnetConstructedDat
 	}
 	_BACnetConstructedDataMinimumOffTimeCopy := &_BACnetConstructedDataMinimumOffTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MinimumOffTime.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MinimumOffTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMinimumOffTimeCopy

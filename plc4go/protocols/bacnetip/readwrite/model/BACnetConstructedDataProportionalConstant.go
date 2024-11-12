@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataProportionalConstant) deepCopy() *_BACnetConstruc
 	}
 	_BACnetConstructedDataProportionalConstantCopy := &_BACnetConstructedDataProportionalConstant{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ProportionalConstant.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.ProportionalConstant),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataProportionalConstantCopy

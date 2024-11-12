@@ -325,7 +325,7 @@ func (m *_BinaryExtensionObjectWithMask) deepCopy() *_BinaryExtensionObjectWithM
 	}
 	_BinaryExtensionObjectWithMaskCopy := &_BinaryExtensionObjectWithMask{
 		m.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask).deepCopy(),
-		m.Body.DeepCopy().(ExtensionObjectDefinition),
+		utils.DeepCopy[ExtensionObjectDefinition](m.Body),
 	}
 	m.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask)._SubType = m
 	return _BinaryExtensionObjectWithMaskCopy

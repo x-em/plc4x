@@ -393,7 +393,7 @@ func (m *_TriggerControlDataLabel) deepCopy() *_TriggerControlDataLabel {
 	}
 	_TriggerControlDataLabelCopy := &_TriggerControlDataLabel{
 		m.TriggerControlDataContract.(*_TriggerControlData).deepCopy(),
-		m.TriggerControlOptions.DeepCopy().(TriggerControlLabelOptions),
+		utils.DeepCopy[TriggerControlLabelOptions](m.TriggerControlOptions),
 		m.ActionSelector,
 		utils.CopyPtr[Language](m.Language),
 		utils.DeepCopySlice[byte, byte](m.Data),

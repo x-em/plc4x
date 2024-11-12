@@ -370,7 +370,7 @@ func (m *_LDataInd) deepCopy() *_LDataInd {
 		m.CEMIContract.(*_CEMI).deepCopy(),
 		m.AdditionalInformationLength,
 		utils.DeepCopySlice[CEMIAdditionalInformation, CEMIAdditionalInformation](m.AdditionalInformation),
-		m.DataFrame.DeepCopy().(LDataFrame),
+		utils.DeepCopy[LDataFrame](m.DataFrame),
 	}
 	m.CEMIContract.(*_CEMI)._SubType = m
 	return _LDataIndCopy

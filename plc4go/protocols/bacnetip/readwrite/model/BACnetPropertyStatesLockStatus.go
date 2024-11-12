@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesLockStatus) deepCopy() *_BACnetPropertyStatesLockS
 	}
 	_BACnetPropertyStatesLockStatusCopy := &_BACnetPropertyStatesLockStatus{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.LockStatus.DeepCopy().(BACnetLockStatusTagged),
+		utils.DeepCopy[BACnetLockStatusTagged](m.LockStatus),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesLockStatusCopy

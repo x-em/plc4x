@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataBitStringValuePresentValue) deepCopy() *_BACnetCo
 	}
 	_BACnetConstructedDataBitStringValuePresentValueCopy := &_BACnetConstructedDataBitStringValuePresentValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PresentValue.DeepCopy().(BACnetApplicationTagBitString),
+		utils.DeepCopy[BACnetApplicationTagBitString](m.PresentValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBitStringValuePresentValueCopy

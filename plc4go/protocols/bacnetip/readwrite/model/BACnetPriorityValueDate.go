@@ -304,7 +304,7 @@ func (m *_BACnetPriorityValueDate) deepCopy() *_BACnetPriorityValueDate {
 	}
 	_BACnetPriorityValueDateCopy := &_BACnetPriorityValueDate{
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
-		m.DateValue.DeepCopy().(BACnetApplicationTagDate),
+		utils.DeepCopy[BACnetApplicationTagDate](m.DateValue),
 	}
 	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueDateCopy

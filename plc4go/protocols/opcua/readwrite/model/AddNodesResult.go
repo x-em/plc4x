@@ -360,8 +360,8 @@ func (m *_AddNodesResult) deepCopy() *_AddNodesResult {
 	}
 	_AddNodesResultCopy := &_AddNodesResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
-		m.AddedNodeId.DeepCopy().(NodeId),
+		utils.DeepCopy[StatusCode](m.StatusCode),
+		utils.DeepCopy[NodeId](m.AddedNodeId),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AddNodesResultCopy

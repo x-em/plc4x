@@ -433,7 +433,7 @@ func (m *_BACnetOptionalREAL) deepCopy() *_BACnetOptionalREAL {
 	}
 	_BACnetOptionalREALCopy := &_BACnetOptionalREAL{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetOptionalREALCopy
 }

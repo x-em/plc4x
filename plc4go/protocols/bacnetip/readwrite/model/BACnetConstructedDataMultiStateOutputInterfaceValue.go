@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataMultiStateOutputInterfaceValue) deepCopy() *_BACn
 	}
 	_BACnetConstructedDataMultiStateOutputInterfaceValueCopy := &_BACnetConstructedDataMultiStateOutputInterfaceValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.InterfaceValue.DeepCopy().(BACnetOptionalBinaryPV),
+		utils.DeepCopy[BACnetOptionalBinaryPV](m.InterfaceValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMultiStateOutputInterfaceValueCopy

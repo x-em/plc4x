@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataBelongsTo) deepCopy() *_BACnetConstructedDataBelo
 	}
 	_BACnetConstructedDataBelongsToCopy := &_BACnetConstructedDataBelongsTo{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.BelongsTo.DeepCopy().(BACnetDeviceObjectReference),
+		utils.DeepCopy[BACnetDeviceObjectReference](m.BelongsTo),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBelongsToCopy

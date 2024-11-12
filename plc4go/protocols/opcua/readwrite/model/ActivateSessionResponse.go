@@ -456,8 +456,8 @@ func (m *_ActivateSessionResponse) deepCopy() *_ActivateSessionResponse {
 	}
 	_ActivateSessionResponseCopy := &_ActivateSessionResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
-		m.ServerNonce.DeepCopy().(PascalByteString),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
+		utils.DeepCopy[PascalByteString](m.ServerNonce),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

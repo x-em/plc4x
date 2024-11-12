@@ -308,7 +308,7 @@ func (m *_SALDataClockAndTimekeeping) deepCopy() *_SALDataClockAndTimekeeping {
 	}
 	_SALDataClockAndTimekeepingCopy := &_SALDataClockAndTimekeeping{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.ClockAndTimekeepingData.DeepCopy().(ClockAndTimekeepingData),
+		utils.DeepCopy[ClockAndTimekeepingData](m.ClockAndTimekeepingData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataClockAndTimekeepingCopy

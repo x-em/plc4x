@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataFDBBMDAddress) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataFDBBMDAddressCopy := &_BACnetConstructedDataFDBBMDAddress{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.FDBBMDAddress.DeepCopy().(BACnetHostNPort),
+		utils.DeepCopy[BACnetHostNPort](m.FDBBMDAddress),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataFDBBMDAddressCopy

@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataStructuredObjectList) deepCopy() *_BACnetConstruc
 	}
 	_BACnetConstructedDataStructuredObjectListCopy := &_BACnetConstructedDataStructuredObjectList{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetApplicationTagObjectIdentifier, BACnetApplicationTagObjectIdentifier](m.StructuredObjectList),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

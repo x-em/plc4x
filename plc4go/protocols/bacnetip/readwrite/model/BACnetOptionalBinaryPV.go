@@ -433,7 +433,7 @@ func (m *_BACnetOptionalBinaryPV) deepCopy() *_BACnetOptionalBinaryPV {
 	}
 	_BACnetOptionalBinaryPVCopy := &_BACnetOptionalBinaryPV{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetOptionalBinaryPVCopy
 }

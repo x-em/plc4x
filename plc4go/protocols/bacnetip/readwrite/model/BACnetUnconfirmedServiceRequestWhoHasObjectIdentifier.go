@@ -305,7 +305,7 @@ func (m *_BACnetUnconfirmedServiceRequestWhoHasObjectIdentifier) deepCopy() *_BA
 	}
 	_BACnetUnconfirmedServiceRequestWhoHasObjectIdentifierCopy := &_BACnetUnconfirmedServiceRequestWhoHasObjectIdentifier{
 		m.BACnetUnconfirmedServiceRequestWhoHasObjectContract.(*_BACnetUnconfirmedServiceRequestWhoHasObject).deepCopy(),
-		m.ObjectIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.ObjectIdentifier),
 	}
 	m.BACnetUnconfirmedServiceRequestWhoHasObjectContract.(*_BACnetUnconfirmedServiceRequestWhoHasObject)._SubType = m
 	return _BACnetUnconfirmedServiceRequestWhoHasObjectIdentifierCopy

@@ -414,9 +414,9 @@ func (m *_SearchResponse) deepCopy() *_SearchResponse {
 	}
 	_SearchResponseCopy := &_SearchResponse{
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
-		m.HpaiControlEndpoint.DeepCopy().(HPAIControlEndpoint),
-		m.DibDeviceInfo.DeepCopy().(DIBDeviceInfo),
-		m.DibSuppSvcFamilies.DeepCopy().(DIBSuppSvcFamilies),
+		utils.DeepCopy[HPAIControlEndpoint](m.HpaiControlEndpoint),
+		utils.DeepCopy[DIBDeviceInfo](m.DibDeviceInfo),
+		utils.DeepCopy[DIBSuppSvcFamilies](m.DibSuppSvcFamilies),
 	}
 	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _SearchResponseCopy

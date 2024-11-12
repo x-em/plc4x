@@ -360,8 +360,8 @@ func (m *_WritePropertyMultipleError) deepCopy() *_WritePropertyMultipleError {
 	}
 	_WritePropertyMultipleErrorCopy := &_WritePropertyMultipleError{
 		m.BACnetErrorContract.(*_BACnetError).deepCopy(),
-		m.ErrorType.DeepCopy().(ErrorEnclosed),
-		m.FirstFailedWriteAttempt.DeepCopy().(BACnetObjectPropertyReferenceEnclosed),
+		utils.DeepCopy[ErrorEnclosed](m.ErrorType),
+		utils.DeepCopy[BACnetObjectPropertyReferenceEnclosed](m.FirstFailedWriteAttempt),
 	}
 	m.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _WritePropertyMultipleErrorCopy

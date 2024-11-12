@@ -408,9 +408,9 @@ func (m *_QueryNextResponse) deepCopy() *_QueryNextResponse {
 	}
 	_QueryNextResponseCopy := &_QueryNextResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[QueryDataSet, QueryDataSet](m.QueryDataSets),
-		m.RevisedContinuationPoint.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalByteString](m.RevisedContinuationPoint),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _QueryNextResponseCopy

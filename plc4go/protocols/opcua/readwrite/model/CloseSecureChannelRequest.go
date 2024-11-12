@@ -308,7 +308,7 @@ func (m *_CloseSecureChannelRequest) deepCopy() *_CloseSecureChannelRequest {
 	}
 	_CloseSecureChannelRequestCopy := &_CloseSecureChannelRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CloseSecureChannelRequestCopy

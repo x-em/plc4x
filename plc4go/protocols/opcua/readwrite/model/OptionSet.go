@@ -360,8 +360,8 @@ func (m *_OptionSet) deepCopy() *_OptionSet {
 	}
 	_OptionSetCopy := &_OptionSet{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Value.DeepCopy().(PascalByteString),
-		m.ValidBits.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalByteString](m.Value),
+		utils.DeepCopy[PascalByteString](m.ValidBits),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _OptionSetCopy

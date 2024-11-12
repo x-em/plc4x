@@ -492,11 +492,11 @@ func (m *_UserTokenPolicy) deepCopy() *_UserTokenPolicy {
 	}
 	_UserTokenPolicyCopy := &_UserTokenPolicy{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.PolicyId.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.PolicyId),
 		m.TokenType,
-		m.IssuedTokenType.DeepCopy().(PascalString),
-		m.IssuerEndpointUrl.DeepCopy().(PascalString),
-		m.SecurityPolicyUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.IssuedTokenType),
+		utils.DeepCopy[PascalString](m.IssuerEndpointUrl),
+		utils.DeepCopy[PascalString](m.SecurityPolicyUri),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _UserTokenPolicyCopy

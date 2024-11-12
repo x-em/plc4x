@@ -345,7 +345,7 @@ func (m *_S7PayloadUserDataItemClkSetRequest) deepCopy() *_S7PayloadUserDataItem
 	}
 	_S7PayloadUserDataItemClkSetRequestCopy := &_S7PayloadUserDataItemClkSetRequest{
 		m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem).deepCopy(),
-		m.TimeStamp.DeepCopy().(DateAndTime),
+		utils.DeepCopy[DateAndTime](m.TimeStamp),
 		m.reservedField0,
 		m.reservedField1,
 	}

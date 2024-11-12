@@ -445,8 +445,8 @@ func (m *_BitFieldDefinition) deepCopy() *_BitFieldDefinition {
 	}
 	_BitFieldDefinitionCopy := &_BitFieldDefinition{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[PascalString](m.Name),
+		utils.DeepCopy[LocalizedText](m.Description),
 		m.StartingBitPosition,
 		m.EndingBitPosition,
 		m.reservedField0,

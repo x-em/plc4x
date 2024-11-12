@@ -321,7 +321,7 @@ func (m *_RootExtensionObject) deepCopy() *_RootExtensionObject {
 	}
 	_RootExtensionObjectCopy := &_RootExtensionObject{
 		m.ExtensionObjectContract.(*_ExtensionObject).deepCopy(),
-		m.Body.DeepCopy().(ExtensionObjectDefinition),
+		utils.DeepCopy[ExtensionObjectDefinition](m.Body),
 		m.ExtensionId,
 	}
 	m.ExtensionObjectContract.(*_ExtensionObject)._SubType = m

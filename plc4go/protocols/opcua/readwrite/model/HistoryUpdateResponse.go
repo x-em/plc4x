@@ -404,7 +404,7 @@ func (m *_HistoryUpdateResponse) deepCopy() *_HistoryUpdateResponse {
 	}
 	_HistoryUpdateResponseCopy := &_HistoryUpdateResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[HistoryUpdateResult, HistoryUpdateResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

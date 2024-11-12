@@ -323,7 +323,7 @@ func (m *_FirmataCommandSysex) deepCopy() *_FirmataCommandSysex {
 	}
 	_FirmataCommandSysexCopy := &_FirmataCommandSysex{
 		m.FirmataCommandContract.(*_FirmataCommand).deepCopy(),
-		m.Command.DeepCopy().(SysexCommand),
+		utils.DeepCopy[SysexCommand](m.Command),
 		m.reservedField0,
 	}
 	m.FirmataCommandContract.(*_FirmataCommand)._SubType = m

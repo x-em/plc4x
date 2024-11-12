@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataMaxAPDULengthAccepted) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataMaxAPDULengthAcceptedCopy := &_BACnetConstructedDataMaxAPDULengthAccepted{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MaxApduLengthAccepted.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MaxApduLengthAccepted),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMaxAPDULengthAcceptedCopy

@@ -587,13 +587,13 @@ func (m *_ReferenceDescription) deepCopy() *_ReferenceDescription {
 	}
 	_ReferenceDescriptionCopy := &_ReferenceDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ReferenceTypeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.ReferenceTypeId),
 		m.IsForward,
-		m.NodeId.DeepCopy().(ExpandedNodeId),
-		m.BrowseName.DeepCopy().(QualifiedName),
-		m.DisplayName.DeepCopy().(LocalizedText),
+		utils.DeepCopy[ExpandedNodeId](m.NodeId),
+		utils.DeepCopy[QualifiedName](m.BrowseName),
+		utils.DeepCopy[LocalizedText](m.DisplayName),
 		m.NodeClass,
-		m.TypeDefinition.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExpandedNodeId](m.TypeDefinition),
 		m.reservedField0,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

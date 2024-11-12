@@ -304,7 +304,7 @@ func (m *_BACnetLogDataLogDataEntryFailure) deepCopy() *_BACnetLogDataLogDataEnt
 	}
 	_BACnetLogDataLogDataEntryFailureCopy := &_BACnetLogDataLogDataEntryFailure{
 		m.BACnetLogDataLogDataEntryContract.(*_BACnetLogDataLogDataEntry).deepCopy(),
-		m.Failure.DeepCopy().(ErrorEnclosed),
+		utils.DeepCopy[ErrorEnclosed](m.Failure),
 	}
 	m.BACnetLogDataLogDataEntryContract.(*_BACnetLogDataLogDataEntry)._SubType = m
 	return _BACnetLogDataLogDataEntryFailureCopy

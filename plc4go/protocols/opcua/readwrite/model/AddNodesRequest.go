@@ -356,7 +356,7 @@ func (m *_AddNodesRequest) deepCopy() *_AddNodesRequest {
 	}
 	_AddNodesRequestCopy := &_AddNodesRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[AddNodesItem, AddNodesItem](m.NodesToAdd),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

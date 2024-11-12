@@ -360,8 +360,8 @@ func (m *_RepublishResponse) deepCopy() *_RepublishResponse {
 	}
 	_RepublishResponseCopy := &_RepublishResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
-		m.NotificationMessage.DeepCopy().(NotificationMessage),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
+		utils.DeepCopy[NotificationMessage](m.NotificationMessage),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RepublishResponseCopy

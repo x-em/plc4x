@@ -304,7 +304,7 @@ func (m *_BACnetLogRecordLogDatumRealValue) deepCopy() *_BACnetLogRecordLogDatum
 	}
 	_BACnetLogRecordLogDatumRealValueCopy := &_BACnetLogRecordLogDatumRealValue{
 		m.BACnetLogRecordLogDatumContract.(*_BACnetLogRecordLogDatum).deepCopy(),
-		m.RealValue.DeepCopy().(BACnetContextTagReal),
+		utils.DeepCopy[BACnetContextTagReal](m.RealValue),
 	}
 	m.BACnetLogRecordLogDatumContract.(*_BACnetLogRecordLogDatum)._SubType = m
 	return _BACnetLogRecordLogDatumRealValueCopy

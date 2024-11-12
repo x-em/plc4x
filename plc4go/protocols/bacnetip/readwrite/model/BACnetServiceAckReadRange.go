@@ -611,13 +611,13 @@ func (m *_BACnetServiceAckReadRange) deepCopy() *_BACnetServiceAckReadRange {
 	}
 	_BACnetServiceAckReadRangeCopy := &_BACnetServiceAckReadRange{
 		m.BACnetServiceAckContract.(*_BACnetServiceAck).deepCopy(),
-		m.ObjectIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
-		m.PropertyIdentifier.DeepCopy().(BACnetPropertyIdentifierTagged),
-		m.PropertyArrayIndex.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ResultFlags.DeepCopy().(BACnetResultFlagsTagged),
-		m.ItemCount.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ItemData.DeepCopy().(BACnetConstructedData),
-		m.FirstSequenceNumber.DeepCopy().(BACnetContextTagUnsignedInteger),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.ObjectIdentifier),
+		utils.DeepCopy[BACnetPropertyIdentifierTagged](m.PropertyIdentifier),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.PropertyArrayIndex),
+		utils.DeepCopy[BACnetResultFlagsTagged](m.ResultFlags),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ItemCount),
+		utils.DeepCopy[BACnetConstructedData](m.ItemData),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.FirstSequenceNumber),
 	}
 	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckReadRangeCopy

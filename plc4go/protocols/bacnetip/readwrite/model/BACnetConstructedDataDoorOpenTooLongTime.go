@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataDoorOpenTooLongTime) deepCopy() *_BACnetConstruct
 	}
 	_BACnetConstructedDataDoorOpenTooLongTimeCopy := &_BACnetConstructedDataDoorOpenTooLongTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DoorOpenTooLongTime.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.DoorOpenTooLongTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDoorOpenTooLongTimeCopy

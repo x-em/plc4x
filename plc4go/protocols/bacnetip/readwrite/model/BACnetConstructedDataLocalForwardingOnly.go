@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLocalForwardingOnly) deepCopy() *_BACnetConstruct
 	}
 	_BACnetConstructedDataLocalForwardingOnlyCopy := &_BACnetConstructedDataLocalForwardingOnly{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LocalForwardingOnly.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.LocalForwardingOnly),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLocalForwardingOnlyCopy

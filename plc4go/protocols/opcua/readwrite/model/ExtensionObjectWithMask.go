@@ -436,7 +436,7 @@ func (m *_ExtensionObjectWithMask) deepCopy() *_ExtensionObjectWithMask {
 	_ExtensionObjectWithMaskCopy := &_ExtensionObjectWithMask{
 		m.ExtensionObjectContract.(*_ExtensionObject).deepCopy(),
 		nil, // will be set by child
-		m.EncodingMask.DeepCopy().(ExtensionObjectEncodingMask),
+		utils.DeepCopy[ExtensionObjectEncodingMask](m.EncodingMask),
 		m.ExtensionId,
 	}
 	m.ExtensionObjectContract.(*_ExtensionObject)._SubType = m

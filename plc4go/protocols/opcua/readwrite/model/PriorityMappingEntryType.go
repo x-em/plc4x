@@ -416,8 +416,8 @@ func (m *_PriorityMappingEntryType) deepCopy() *_PriorityMappingEntryType {
 	}
 	_PriorityMappingEntryTypeCopy := &_PriorityMappingEntryType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.MappingUri.DeepCopy().(PascalString),
-		m.PriorityLabel.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.MappingUri),
+		utils.DeepCopy[PascalString](m.PriorityLabel),
 		m.PriorityValue_PCP,
 		m.PriorityValue_DSCP,
 	}

@@ -308,7 +308,7 @@ func (m *_AdsDiscoveryBlockPassword) deepCopy() *_AdsDiscoveryBlockPassword {
 	}
 	_AdsDiscoveryBlockPasswordCopy := &_AdsDiscoveryBlockPassword{
 		m.AdsDiscoveryBlockContract.(*_AdsDiscoveryBlock).deepCopy(),
-		m.Password.DeepCopy().(AmsString),
+		utils.DeepCopy[AmsString](m.Password),
 	}
 	m.AdsDiscoveryBlockContract.(*_AdsDiscoveryBlock)._SubType = m
 	return _AdsDiscoveryBlockPasswordCopy

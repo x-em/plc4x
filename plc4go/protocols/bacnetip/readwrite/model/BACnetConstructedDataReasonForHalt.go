@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataReasonForHalt) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataReasonForHaltCopy := &_BACnetConstructedDataReasonForHalt{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ProgramError.DeepCopy().(BACnetProgramErrorTagged),
+		utils.DeepCopy[BACnetProgramErrorTagged](m.ProgramError),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataReasonForHaltCopy

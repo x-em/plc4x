@@ -493,8 +493,8 @@ func (m *_GenericAttributes) deepCopy() *_GenericAttributes {
 	_GenericAttributesCopy := &_GenericAttributes{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.SpecifiedAttributes,
-		m.DisplayName.DeepCopy().(LocalizedText),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[LocalizedText](m.DisplayName),
+		utils.DeepCopy[LocalizedText](m.Description),
 		m.WriteMask,
 		m.UserWriteMask,
 		utils.DeepCopySlice[GenericAttributeValue, GenericAttributeValue](m.AttributeValues),

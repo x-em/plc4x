@@ -305,7 +305,7 @@ func (m *_BACnetPropertyAccessResultAccessResultPropertyValue) deepCopy() *_BACn
 	}
 	_BACnetPropertyAccessResultAccessResultPropertyValueCopy := &_BACnetPropertyAccessResultAccessResultPropertyValue{
 		m.BACnetPropertyAccessResultAccessResultContract.(*_BACnetPropertyAccessResultAccessResult).deepCopy(),
-		m.PropertyValue.DeepCopy().(BACnetConstructedData),
+		utils.DeepCopy[BACnetConstructedData](m.PropertyValue),
 	}
 	m.BACnetPropertyAccessResultAccessResultContract.(*_BACnetPropertyAccessResultAccessResult)._SubType = m
 	return _BACnetPropertyAccessResultAccessResultPropertyValueCopy

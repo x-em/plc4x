@@ -513,11 +513,11 @@ func (m *_BACnetNotificationParametersChangeOfCharacterString) deepCopy() *_BACn
 	}
 	_BACnetNotificationParametersChangeOfCharacterStringCopy := &_BACnetNotificationParametersChangeOfCharacterString{
 		m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters).deepCopy(),
-		m.InnerOpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.ChangedValue.DeepCopy().(BACnetContextTagCharacterString),
-		m.StatusFlags.DeepCopy().(BACnetStatusFlagsTagged),
-		m.AlarmValue.DeepCopy().(BACnetContextTagCharacterString),
-		m.InnerClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.InnerOpeningTag),
+		utils.DeepCopy[BACnetContextTagCharacterString](m.ChangedValue),
+		utils.DeepCopy[BACnetStatusFlagsTagged](m.StatusFlags),
+		utils.DeepCopy[BACnetContextTagCharacterString](m.AlarmValue),
+		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
 	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfCharacterStringCopy

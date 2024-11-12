@@ -513,11 +513,11 @@ func (m *_BACnetNotificationParametersChangeOfReliability) deepCopy() *_BACnetNo
 	}
 	_BACnetNotificationParametersChangeOfReliabilityCopy := &_BACnetNotificationParametersChangeOfReliability{
 		m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters).deepCopy(),
-		m.InnerOpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.Reliability.DeepCopy().(BACnetReliabilityTagged),
-		m.StatusFlags.DeepCopy().(BACnetStatusFlagsTagged),
-		m.PropertyValues.DeepCopy().(BACnetPropertyValues),
-		m.InnerClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.InnerOpeningTag),
+		utils.DeepCopy[BACnetReliabilityTagged](m.Reliability),
+		utils.DeepCopy[BACnetStatusFlagsTagged](m.StatusFlags),
+		utils.DeepCopy[BACnetPropertyValues](m.PropertyValues),
+		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
 	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfReliabilityCopy

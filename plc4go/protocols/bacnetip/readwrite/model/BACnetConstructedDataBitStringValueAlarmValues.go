@@ -375,7 +375,7 @@ func (m *_BACnetConstructedDataBitStringValueAlarmValues) deepCopy() *_BACnetCon
 	}
 	_BACnetConstructedDataBitStringValueAlarmValuesCopy := &_BACnetConstructedDataBitStringValueAlarmValues{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetApplicationTagBitString, BACnetApplicationTagBitString](m.AlarmValues),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

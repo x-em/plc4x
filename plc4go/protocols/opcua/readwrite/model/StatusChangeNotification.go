@@ -360,8 +360,8 @@ func (m *_StatusChangeNotification) deepCopy() *_StatusChangeNotification {
 	}
 	_StatusChangeNotificationCopy := &_StatusChangeNotification{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Status.DeepCopy().(StatusCode),
-		m.DiagnosticInfo.DeepCopy().(DiagnosticInfo),
+		utils.DeepCopy[StatusCode](m.Status),
+		utils.DeepCopy[DiagnosticInfo](m.DiagnosticInfo),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StatusChangeNotificationCopy

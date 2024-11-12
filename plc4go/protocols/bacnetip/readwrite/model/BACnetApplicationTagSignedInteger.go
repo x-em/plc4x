@@ -335,7 +335,7 @@ func (m *_BACnetApplicationTagSignedInteger) deepCopy() *_BACnetApplicationTagSi
 	}
 	_BACnetApplicationTagSignedIntegerCopy := &_BACnetApplicationTagSignedInteger{
 		m.BACnetApplicationTagContract.(*_BACnetApplicationTag).deepCopy(),
-		m.Payload.DeepCopy().(BACnetTagPayloadSignedInteger),
+		utils.DeepCopy[BACnetTagPayloadSignedInteger](m.Payload),
 	}
 	m.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
 	return _BACnetApplicationTagSignedIntegerCopy

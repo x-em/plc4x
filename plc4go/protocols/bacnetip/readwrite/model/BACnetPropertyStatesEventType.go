@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesEventType) deepCopy() *_BACnetPropertyStatesEventT
 	}
 	_BACnetPropertyStatesEventTypeCopy := &_BACnetPropertyStatesEventType{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.EventType.DeepCopy().(BACnetEventTypeTagged),
+		utils.DeepCopy[BACnetEventTypeTagged](m.EventType),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesEventTypeCopy

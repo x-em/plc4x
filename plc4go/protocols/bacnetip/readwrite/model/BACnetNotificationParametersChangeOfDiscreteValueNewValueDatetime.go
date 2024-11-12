@@ -305,7 +305,7 @@ func (m *_BACnetNotificationParametersChangeOfDiscreteValueNewValueDatetime) dee
 	}
 	_BACnetNotificationParametersChangeOfDiscreteValueNewValueDatetimeCopy := &_BACnetNotificationParametersChangeOfDiscreteValueNewValueDatetime{
 		m.BACnetNotificationParametersChangeOfDiscreteValueNewValueContract.(*_BACnetNotificationParametersChangeOfDiscreteValueNewValue).deepCopy(),
-		m.DateTimeValue.DeepCopy().(BACnetDateTimeEnclosed),
+		utils.DeepCopy[BACnetDateTimeEnclosed](m.DateTimeValue),
 	}
 	m.BACnetNotificationParametersChangeOfDiscreteValueNewValueContract.(*_BACnetNotificationParametersChangeOfDiscreteValueNewValue)._SubType = m
 	return _BACnetNotificationParametersChangeOfDiscreteValueNewValueDatetimeCopy

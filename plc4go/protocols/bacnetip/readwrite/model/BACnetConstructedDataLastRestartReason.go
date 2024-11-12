@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLastRestartReason) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataLastRestartReasonCopy := &_BACnetConstructedDataLastRestartReason{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LastRestartReason.DeepCopy().(BACnetRestartReasonTagged),
+		utils.DeepCopy[BACnetRestartReasonTagged](m.LastRestartReason),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLastRestartReasonCopy

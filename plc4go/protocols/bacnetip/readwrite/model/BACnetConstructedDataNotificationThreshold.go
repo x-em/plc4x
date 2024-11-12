@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataNotificationThreshold) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataNotificationThresholdCopy := &_BACnetConstructedDataNotificationThreshold{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NotificationThreshold.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NotificationThreshold),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataNotificationThresholdCopy

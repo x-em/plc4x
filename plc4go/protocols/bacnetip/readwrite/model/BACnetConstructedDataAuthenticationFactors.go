@@ -375,7 +375,7 @@ func (m *_BACnetConstructedDataAuthenticationFactors) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataAuthenticationFactorsCopy := &_BACnetConstructedDataAuthenticationFactors{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetCredentialAuthenticationFactor, BACnetCredentialAuthenticationFactor](m.AuthenticationFactors),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

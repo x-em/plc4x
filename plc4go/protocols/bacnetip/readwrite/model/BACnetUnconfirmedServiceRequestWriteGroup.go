@@ -461,10 +461,10 @@ func (m *_BACnetUnconfirmedServiceRequestWriteGroup) deepCopy() *_BACnetUnconfir
 	}
 	_BACnetUnconfirmedServiceRequestWriteGroupCopy := &_BACnetUnconfirmedServiceRequestWriteGroup{
 		m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest).deepCopy(),
-		m.GroupNumber.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.WritePriority.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ChangeList.DeepCopy().(BACnetGroupChannelValueList),
-		m.InhibitDelay.DeepCopy().(BACnetContextTagUnsignedInteger),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.GroupNumber),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.WritePriority),
+		utils.DeepCopy[BACnetGroupChannelValueList](m.ChangeList),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.InhibitDelay),
 	}
 	m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
 	return _BACnetUnconfirmedServiceRequestWriteGroupCopy

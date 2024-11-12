@@ -443,9 +443,9 @@ func (m *_SecurityDataStatusReport1) deepCopy() *_SecurityDataStatusReport1 {
 	}
 	_SecurityDataStatusReport1Copy := &_SecurityDataStatusReport1{
 		m.SecurityDataContract.(*_SecurityData).deepCopy(),
-		m.ArmCodeType.DeepCopy().(SecurityArmCode),
-		m.TamperStatus.DeepCopy().(TamperStatus),
-		m.PanicStatus.DeepCopy().(PanicStatus),
+		utils.DeepCopy[SecurityArmCode](m.ArmCodeType),
+		utils.DeepCopy[TamperStatus](m.TamperStatus),
+		utils.DeepCopy[PanicStatus](m.PanicStatus),
 		utils.DeepCopySlice[ZoneStatus, ZoneStatus](m.ZoneStatus),
 	}
 	m.SecurityDataContract.(*_SecurityData)._SubType = m

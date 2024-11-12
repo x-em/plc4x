@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesNodeType) deepCopy() *_BACnetPropertyStatesNodeTyp
 	}
 	_BACnetPropertyStatesNodeTypeCopy := &_BACnetPropertyStatesNodeType{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.NodeType.DeepCopy().(BACnetNodeTypeTagged),
+		utils.DeepCopy[BACnetNodeTypeTagged](m.NodeType),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesNodeTypeCopy

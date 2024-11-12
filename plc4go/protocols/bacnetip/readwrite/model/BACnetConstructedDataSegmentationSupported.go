@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataSegmentationSupported) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataSegmentationSupportedCopy := &_BACnetConstructedDataSegmentationSupported{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.SegmentationSupported.DeepCopy().(BACnetSegmentationTagged),
+		utils.DeepCopy[BACnetSegmentationTagged](m.SegmentationSupported),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSegmentationSupportedCopy

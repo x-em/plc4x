@@ -356,7 +356,7 @@ func (m *_AliasNameDataType) deepCopy() *_AliasNameDataType {
 	}
 	_AliasNameDataTypeCopy := &_AliasNameDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.AliasName.DeepCopy().(QualifiedName),
+		utils.DeepCopy[QualifiedName](m.AliasName),
 		utils.DeepCopySlice[ExpandedNodeId, ExpandedNodeId](m.ReferencedNodes),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

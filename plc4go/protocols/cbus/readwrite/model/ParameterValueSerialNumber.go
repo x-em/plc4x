@@ -343,7 +343,7 @@ func (m *_ParameterValueSerialNumber) deepCopy() *_ParameterValueSerialNumber {
 	}
 	_ParameterValueSerialNumberCopy := &_ParameterValueSerialNumber{
 		m.ParameterValueContract.(*_ParameterValue).deepCopy(),
-		m.Value.DeepCopy().(SerialNumber),
+		utils.DeepCopy[SerialNumber](m.Value),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
 	m.ParameterValueContract.(*_ParameterValue)._SubType = m

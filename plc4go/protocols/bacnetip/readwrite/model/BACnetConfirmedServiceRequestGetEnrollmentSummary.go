@@ -554,12 +554,12 @@ func (m *_BACnetConfirmedServiceRequestGetEnrollmentSummary) deepCopy() *_BACnet
 	}
 	_BACnetConfirmedServiceRequestGetEnrollmentSummaryCopy := &_BACnetConfirmedServiceRequestGetEnrollmentSummary{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.AcknowledgmentFilter.DeepCopy().(BACnetConfirmedServiceRequestGetEnrollmentSummaryAcknowledgementFilterTagged),
-		m.EnrollmentFilter.DeepCopy().(BACnetRecipientProcessEnclosed),
-		m.EventStateFilter.DeepCopy().(BACnetConfirmedServiceRequestGetEnrollmentSummaryEventStateFilterTagged),
-		m.EventTypeFilter.DeepCopy().(BACnetEventTypeTagged),
-		m.PriorityFilter.DeepCopy().(BACnetConfirmedServiceRequestGetEnrollmentSummaryPriorityFilter),
-		m.NotificationClassFilter.DeepCopy().(BACnetContextTagUnsignedInteger),
+		utils.DeepCopy[BACnetConfirmedServiceRequestGetEnrollmentSummaryAcknowledgementFilterTagged](m.AcknowledgmentFilter),
+		utils.DeepCopy[BACnetRecipientProcessEnclosed](m.EnrollmentFilter),
+		utils.DeepCopy[BACnetConfirmedServiceRequestGetEnrollmentSummaryEventStateFilterTagged](m.EventStateFilter),
+		utils.DeepCopy[BACnetEventTypeTagged](m.EventTypeFilter),
+		utils.DeepCopy[BACnetConfirmedServiceRequestGetEnrollmentSummaryPriorityFilter](m.PriorityFilter),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.NotificationClassFilter),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestGetEnrollmentSummaryCopy

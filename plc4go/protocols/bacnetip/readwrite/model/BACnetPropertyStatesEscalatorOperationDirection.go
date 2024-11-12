@@ -305,7 +305,7 @@ func (m *_BACnetPropertyStatesEscalatorOperationDirection) deepCopy() *_BACnetPr
 	}
 	_BACnetPropertyStatesEscalatorOperationDirectionCopy := &_BACnetPropertyStatesEscalatorOperationDirection{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.EscalatorOperationDirection.DeepCopy().(BACnetEscalatorOperationDirectionTagged),
+		utils.DeepCopy[BACnetEscalatorOperationDirectionTagged](m.EscalatorOperationDirection),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesEscalatorOperationDirectionCopy

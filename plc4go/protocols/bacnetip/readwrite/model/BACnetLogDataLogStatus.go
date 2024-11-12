@@ -304,7 +304,7 @@ func (m *_BACnetLogDataLogStatus) deepCopy() *_BACnetLogDataLogStatus {
 	}
 	_BACnetLogDataLogStatusCopy := &_BACnetLogDataLogStatus{
 		m.BACnetLogDataContract.(*_BACnetLogData).deepCopy(),
-		m.LogStatus.DeepCopy().(BACnetLogStatusTagged),
+		utils.DeepCopy[BACnetLogStatusTagged](m.LogStatus),
 	}
 	m.BACnetLogDataContract.(*_BACnetLogData)._SubType = m
 	return _BACnetLogDataLogStatusCopy

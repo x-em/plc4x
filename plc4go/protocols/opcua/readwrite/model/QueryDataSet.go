@@ -408,8 +408,8 @@ func (m *_QueryDataSet) deepCopy() *_QueryDataSet {
 	}
 	_QueryDataSetCopy := &_QueryDataSet{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(ExpandedNodeId),
-		m.TypeDefinitionNode.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExpandedNodeId](m.NodeId),
+		utils.DeepCopy[ExpandedNodeId](m.TypeDefinitionNode),
 		utils.DeepCopySlice[Variant, Variant](m.Values),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

@@ -308,7 +308,7 @@ func (m *_SALDataAccessControl) deepCopy() *_SALDataAccessControl {
 	}
 	_SALDataAccessControlCopy := &_SALDataAccessControl{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.AccessControlData.DeepCopy().(AccessControlData),
+		utils.DeepCopy[AccessControlData](m.AccessControlData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataAccessControlCopy

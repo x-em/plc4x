@@ -516,10 +516,10 @@ func (m *_QueryFirstRequest) deepCopy() *_QueryFirstRequest {
 	}
 	_QueryFirstRequestCopy := &_QueryFirstRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
-		m.View.DeepCopy().(ViewDescription),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
+		utils.DeepCopy[ViewDescription](m.View),
 		utils.DeepCopySlice[NodeTypeDescription, NodeTypeDescription](m.NodeTypes),
-		m.Filter.DeepCopy().(ContentFilter),
+		utils.DeepCopy[ContentFilter](m.Filter),
 		m.MaxDataSetsToReturn,
 		m.MaxReferencesToReturn,
 	}

@@ -487,9 +487,9 @@ func (m *_RequestCommand) deepCopy() *_RequestCommand {
 	}
 	_RequestCommandCopy := &_RequestCommand{
 		m.RequestContract.(*_Request).deepCopy(),
-		m.CbusCommand.DeepCopy().(CBusCommand),
-		m.Chksum.DeepCopy().(Checksum),
-		m.Alpha.DeepCopy().(Alpha),
+		utils.DeepCopy[CBusCommand](m.CbusCommand),
+		utils.DeepCopy[Checksum](m.Chksum),
+		utils.DeepCopy[Alpha](m.Alpha),
 	}
 	m.RequestContract.(*_Request)._SubType = m
 	return _RequestCommandCopy

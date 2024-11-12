@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataLimitMonitoringInterval) deepCopy() *_BACnetConst
 	}
 	_BACnetConstructedDataLimitMonitoringIntervalCopy := &_BACnetConstructedDataLimitMonitoringInterval{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LimitMonitoringInterval.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.LimitMonitoringInterval),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLimitMonitoringIntervalCopy

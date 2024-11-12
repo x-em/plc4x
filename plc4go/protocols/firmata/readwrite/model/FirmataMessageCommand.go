@@ -310,7 +310,7 @@ func (m *_FirmataMessageCommand) deepCopy() *_FirmataMessageCommand {
 	}
 	_FirmataMessageCommandCopy := &_FirmataMessageCommand{
 		m.FirmataMessageContract.(*_FirmataMessage).deepCopy(),
-		m.Command.DeepCopy().(FirmataCommand),
+		utils.DeepCopy[FirmataCommand](m.Command),
 	}
 	m.FirmataMessageContract.(*_FirmataMessage)._SubType = m
 	return _FirmataMessageCommandCopy

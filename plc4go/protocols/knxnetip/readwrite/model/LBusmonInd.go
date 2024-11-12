@@ -401,7 +401,7 @@ func (m *_LBusmonInd) deepCopy() *_LBusmonInd {
 		m.CEMIContract.(*_CEMI).deepCopy(),
 		m.AdditionalInformationLength,
 		utils.DeepCopySlice[CEMIAdditionalInformation, CEMIAdditionalInformation](m.AdditionalInformation),
-		m.DataFrame.DeepCopy().(LDataFrame),
+		utils.DeepCopy[LDataFrame](m.DataFrame),
 		utils.CopyPtr[uint8](m.Crc),
 	}
 	m.CEMIContract.(*_CEMI)._SubType = m

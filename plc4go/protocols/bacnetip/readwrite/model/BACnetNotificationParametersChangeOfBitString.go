@@ -461,10 +461,10 @@ func (m *_BACnetNotificationParametersChangeOfBitString) deepCopy() *_BACnetNoti
 	}
 	_BACnetNotificationParametersChangeOfBitStringCopy := &_BACnetNotificationParametersChangeOfBitString{
 		m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters).deepCopy(),
-		m.InnerOpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.ChangeOfBitString.DeepCopy().(BACnetContextTagBitString),
-		m.StatusFlags.DeepCopy().(BACnetStatusFlagsTagged),
-		m.InnerClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.InnerOpeningTag),
+		utils.DeepCopy[BACnetContextTagBitString](m.ChangeOfBitString),
+		utils.DeepCopy[BACnetStatusFlagsTagged](m.StatusFlags),
+		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
 	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfBitStringCopy

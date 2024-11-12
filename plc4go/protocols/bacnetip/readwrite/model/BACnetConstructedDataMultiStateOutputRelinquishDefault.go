@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataMultiStateOutputRelinquishDefault) deepCopy() *_B
 	}
 	_BACnetConstructedDataMultiStateOutputRelinquishDefaultCopy := &_BACnetConstructedDataMultiStateOutputRelinquishDefault{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.RelinquishDefault.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.RelinquishDefault),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMultiStateOutputRelinquishDefaultCopy

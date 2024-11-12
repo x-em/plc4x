@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataProcessIdentifier) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataProcessIdentifierCopy := &_BACnetConstructedDataProcessIdentifier{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ProcessIdentifier.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.ProcessIdentifier),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataProcessIdentifierCopy

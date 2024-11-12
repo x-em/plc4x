@@ -383,8 +383,8 @@ func (m *_RequestObsolete) deepCopy() *_RequestObsolete {
 	}
 	_RequestObsoleteCopy := &_RequestObsolete{
 		m.RequestContract.(*_Request).deepCopy(),
-		m.CalData.DeepCopy().(CALData),
-		m.Alpha.DeepCopy().(Alpha),
+		utils.DeepCopy[CALData](m.CalData),
+		utils.DeepCopy[Alpha](m.Alpha),
 	}
 	m.RequestContract.(*_Request)._SubType = m
 	return _RequestObsoleteCopy

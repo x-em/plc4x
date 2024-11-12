@@ -441,9 +441,9 @@ func (m *_AirConditioningDataZoneHvacPlantStatus) deepCopy() *_AirConditioningDa
 	_AirConditioningDataZoneHvacPlantStatusCopy := &_AirConditioningDataZoneHvacPlantStatus{
 		m.AirConditioningDataContract.(*_AirConditioningData).deepCopy(),
 		m.ZoneGroup,
-		m.ZoneList.DeepCopy().(HVACZoneList),
+		utils.DeepCopy[HVACZoneList](m.ZoneList),
 		m.HvacType,
-		m.HvacStatus.DeepCopy().(HVACStatusFlags),
+		utils.DeepCopy[HVACStatusFlags](m.HvacStatus),
 		m.HvacErrorCode,
 	}
 	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m

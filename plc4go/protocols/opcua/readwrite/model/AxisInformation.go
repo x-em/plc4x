@@ -483,9 +483,9 @@ func (m *_AxisInformation) deepCopy() *_AxisInformation {
 	}
 	_AxisInformationCopy := &_AxisInformation{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.EngineeringUnits.DeepCopy().(EUInformation),
-		m.EURange.DeepCopy().(Range),
-		m.Title.DeepCopy().(LocalizedText),
+		utils.DeepCopy[EUInformation](m.EngineeringUnits),
+		utils.DeepCopy[Range](m.EURange),
+		utils.DeepCopy[LocalizedText](m.Title),
 		m.AxisScaleType,
 		utils.DeepCopySlice[float64, float64](m.AxisSteps),
 	}

@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesBacnetIpMode) deepCopy() *_BACnetPropertyStatesBac
 	}
 	_BACnetPropertyStatesBacnetIpModeCopy := &_BACnetPropertyStatesBacnetIpMode{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.BacnetIpMode.DeepCopy().(BACnetIPModeTagged),
+		utils.DeepCopy[BACnetIPModeTagged](m.BacnetIpMode),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesBacnetIpModeCopy

@@ -356,7 +356,7 @@ func (m *_GetEndpointsResponse) deepCopy() *_GetEndpointsResponse {
 	}
 	_GetEndpointsResponseCopy := &_GetEndpointsResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[EndpointDescription, EndpointDescription](m.Endpoints),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

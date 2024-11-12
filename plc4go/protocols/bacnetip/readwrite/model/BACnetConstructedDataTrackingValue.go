@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataTrackingValue) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataTrackingValueCopy := &_BACnetConstructedDataTrackingValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.TrackingValue.DeepCopy().(BACnetLifeSafetyStateTagged),
+		utils.DeepCopy[BACnetLifeSafetyStateTagged](m.TrackingValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTrackingValueCopy

@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesUnsignedValue) deepCopy() *_BACnetPropertyStatesUn
 	}
 	_BACnetPropertyStatesUnsignedValueCopy := &_BACnetPropertyStatesUnsignedValue{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.UnsignedValue.DeepCopy().(BACnetContextTagUnsignedInteger),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.UnsignedValue),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesUnsignedValueCopy

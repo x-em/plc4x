@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataLargeAnalogValueDeadband) deepCopy() *_BACnetCons
 	}
 	_BACnetConstructedDataLargeAnalogValueDeadbandCopy := &_BACnetConstructedDataLargeAnalogValueDeadband{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Deadband.DeepCopy().(BACnetApplicationTagDouble),
+		utils.DeepCopy[BACnetApplicationTagDouble](m.Deadband),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLargeAnalogValueDeadbandCopy

@@ -606,9 +606,9 @@ func (m *_BACnetFaultParameterFaultOutOfRangeMinNormalValue) deepCopy() *_BACnet
 	}
 	_BACnetFaultParameterFaultOutOfRangeMinNormalValueCopy := &_BACnetFaultParameterFaultOutOfRangeMinNormalValue{
 		nil, // will be set by child
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetFaultParameterFaultOutOfRangeMinNormalValueCopy

@@ -514,11 +514,11 @@ func (m *_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultiple) deepCop
 	}
 	_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleCopy := &_BACnetConfirmedServiceRequestConfirmedCOVNotificationMultiple{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.SubscriberProcessIdentifier.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.InitiatingDeviceIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
-		m.TimeRemaining.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.Timestamp.DeepCopy().(BACnetTimeStampEnclosed),
-		m.ListOfCovNotifications.DeepCopy().(ListOfCovNotificationsList),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.SubscriberProcessIdentifier),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.InitiatingDeviceIdentifier),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.TimeRemaining),
+		utils.DeepCopy[BACnetTimeStampEnclosed](m.Timestamp),
+		utils.DeepCopy[ListOfCovNotificationsList](m.ListOfCovNotifications),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedCOVNotificationMultipleCopy

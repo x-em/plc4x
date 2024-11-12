@@ -410,9 +410,9 @@ func (m *_BACnetConfirmedServiceRequestConfirmedPrivateTransfer) deepCopy() *_BA
 	}
 	_BACnetConfirmedServiceRequestConfirmedPrivateTransferCopy := &_BACnetConfirmedServiceRequestConfirmedPrivateTransfer{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.VendorId.DeepCopy().(BACnetVendorIdTagged),
-		m.ServiceNumber.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ServiceParameters.DeepCopy().(BACnetConstructedData),
+		utils.DeepCopy[BACnetVendorIdTagged](m.VendorId),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ServiceNumber),
+		utils.DeepCopy[BACnetConstructedData](m.ServiceParameters),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedPrivateTransferCopy

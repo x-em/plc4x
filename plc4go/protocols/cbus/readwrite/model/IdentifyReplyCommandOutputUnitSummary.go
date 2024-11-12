@@ -398,7 +398,7 @@ func (m *_IdentifyReplyCommandOutputUnitSummary) deepCopy() *_IdentifyReplyComma
 	}
 	_IdentifyReplyCommandOutputUnitSummaryCopy := &_IdentifyReplyCommandOutputUnitSummary{
 		m.IdentifyReplyCommandContract.(*_IdentifyReplyCommand).deepCopy(),
-		m.UnitFlags.DeepCopy().(IdentifyReplyCommandUnitSummary),
+		utils.DeepCopy[IdentifyReplyCommandUnitSummary](m.UnitFlags),
 		utils.CopyPtr[byte](m.GavStoreEnabledByte1),
 		utils.CopyPtr[byte](m.GavStoreEnabledByte2),
 		m.TimeFromLastRecoverOfMainsInSeconds,

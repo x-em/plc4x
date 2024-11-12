@@ -460,10 +460,10 @@ func (m *_BACnetEventParameterChangeOfValue) deepCopy() *_BACnetEventParameterCh
 	}
 	_BACnetEventParameterChangeOfValueCopy := &_BACnetEventParameterChangeOfValue{
 		m.BACnetEventParameterContract.(*_BACnetEventParameter).deepCopy(),
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.TimeDelay.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.CovCriteria.DeepCopy().(BACnetEventParameterChangeOfValueCivCriteria),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.TimeDelay),
+		utils.DeepCopy[BACnetEventParameterChangeOfValueCivCriteria](m.CovCriteria),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
 	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterChangeOfValueCopy

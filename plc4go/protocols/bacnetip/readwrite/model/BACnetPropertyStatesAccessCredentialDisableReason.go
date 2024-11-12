@@ -305,7 +305,7 @@ func (m *_BACnetPropertyStatesAccessCredentialDisableReason) deepCopy() *_BACnet
 	}
 	_BACnetPropertyStatesAccessCredentialDisableReasonCopy := &_BACnetPropertyStatesAccessCredentialDisableReason{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.AccessCredentialDisableReason.DeepCopy().(BACnetAccessCredentialDisableReasonTagged),
+		utils.DeepCopy[BACnetAccessCredentialDisableReasonTagged](m.AccessCredentialDisableReason),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesAccessCredentialDisableReasonCopy

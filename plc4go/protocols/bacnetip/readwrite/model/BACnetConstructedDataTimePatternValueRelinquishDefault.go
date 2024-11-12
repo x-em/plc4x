@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataTimePatternValueRelinquishDefault) deepCopy() *_B
 	}
 	_BACnetConstructedDataTimePatternValueRelinquishDefaultCopy := &_BACnetConstructedDataTimePatternValueRelinquishDefault{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.RelinquishDefault.DeepCopy().(BACnetApplicationTagTime),
+		utils.DeepCopy[BACnetApplicationTagTime](m.RelinquishDefault),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTimePatternValueRelinquishDefaultCopy

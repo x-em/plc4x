@@ -304,7 +304,7 @@ func (m *_MonitoredSALReply) deepCopy() *_MonitoredSALReply {
 	}
 	_MonitoredSALReplyCopy := &_MonitoredSALReply{
 		m.EncodedReplyContract.(*_EncodedReply).deepCopy(),
-		m.MonitoredSAL.DeepCopy().(MonitoredSAL),
+		utils.DeepCopy[MonitoredSAL](m.MonitoredSAL),
 	}
 	m.EncodedReplyContract.(*_EncodedReply)._SubType = m
 	return _MonitoredSALReplyCopy

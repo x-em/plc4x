@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataCredentialDataInputUpdateTime) deepCopy() *_BACne
 	}
 	_BACnetConstructedDataCredentialDataInputUpdateTimeCopy := &_BACnetConstructedDataCredentialDataInputUpdateTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.UpdateTime.DeepCopy().(BACnetTimeStamp),
+		utils.DeepCopy[BACnetTimeStamp](m.UpdateTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCredentialDataInputUpdateTimeCopy

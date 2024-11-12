@@ -335,7 +335,7 @@ func (m *_BACnetApplicationTagBoolean) deepCopy() *_BACnetApplicationTagBoolean 
 	}
 	_BACnetApplicationTagBooleanCopy := &_BACnetApplicationTagBoolean{
 		m.BACnetApplicationTagContract.(*_BACnetApplicationTag).deepCopy(),
-		m.Payload.DeepCopy().(BACnetTagPayloadBoolean),
+		utils.DeepCopy[BACnetTagPayloadBoolean](m.Payload),
 	}
 	m.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
 	return _BACnetApplicationTagBooleanCopy

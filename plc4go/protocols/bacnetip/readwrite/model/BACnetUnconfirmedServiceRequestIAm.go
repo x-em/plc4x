@@ -464,10 +464,10 @@ func (m *_BACnetUnconfirmedServiceRequestIAm) deepCopy() *_BACnetUnconfirmedServ
 	}
 	_BACnetUnconfirmedServiceRequestIAmCopy := &_BACnetUnconfirmedServiceRequestIAm{
 		m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest).deepCopy(),
-		m.DeviceIdentifier.DeepCopy().(BACnetApplicationTagObjectIdentifier),
-		m.MaximumApduLengthAcceptedLength.DeepCopy().(BACnetApplicationTagUnsignedInteger),
-		m.SegmentationSupported.DeepCopy().(BACnetSegmentationTagged),
-		m.VendorId.DeepCopy().(BACnetVendorIdTagged),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.DeviceIdentifier),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MaximumApduLengthAcceptedLength),
+		utils.DeepCopy[BACnetSegmentationTagged](m.SegmentationSupported),
+		utils.DeepCopy[BACnetVendorIdTagged](m.VendorId),
 	}
 	m.BACnetUnconfirmedServiceRequestContract.(*_BACnetUnconfirmedServiceRequest)._SubType = m
 	return _BACnetUnconfirmedServiceRequestIAmCopy

@@ -487,9 +487,9 @@ func (m *_BrowseDescription) deepCopy() *_BrowseDescription {
 	}
 	_BrowseDescriptionCopy := &_BrowseDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.NodeId),
 		m.BrowseDirection,
-		m.ReferenceTypeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.ReferenceTypeId),
 		m.IncludeSubtypes,
 		m.NodeClassMask,
 		m.ResultMask,

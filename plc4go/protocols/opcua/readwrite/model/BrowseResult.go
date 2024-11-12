@@ -408,8 +408,8 @@ func (m *_BrowseResult) deepCopy() *_BrowseResult {
 	}
 	_BrowseResultCopy := &_BrowseResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
-		m.ContinuationPoint.DeepCopy().(PascalByteString),
+		utils.DeepCopy[StatusCode](m.StatusCode),
+		utils.DeepCopy[PascalByteString](m.ContinuationPoint),
 		utils.DeepCopySlice[ReferenceDescription, ReferenceDescription](m.References),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

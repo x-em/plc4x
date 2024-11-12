@@ -688,7 +688,7 @@ func (m *_Request) deepCopy() *_Request {
 		utils.CopyPtr[RequestType](m.StartingCR),
 		utils.CopyPtr[RequestType](m.ResetMode),
 		m.SecondPeek,
-		m.Termination.DeepCopy().(RequestTermination),
+		utils.DeepCopy[RequestTermination](m.Termination),
 		m.CBusOptions,
 	}
 	return _RequestCopy

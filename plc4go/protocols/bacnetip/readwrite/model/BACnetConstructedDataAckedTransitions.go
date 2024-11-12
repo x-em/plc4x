@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAckedTransitions) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataAckedTransitionsCopy := &_BACnetConstructedDataAckedTransitions{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AckedTransitions.DeepCopy().(BACnetEventTransitionBitsTagged),
+		utils.DeepCopy[BACnetEventTransitionBitsTagged](m.AckedTransitions),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAckedTransitionsCopy

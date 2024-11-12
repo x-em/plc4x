@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataIPSubnetMask) deepCopy() *_BACnetConstructedDataI
 	}
 	_BACnetConstructedDataIPSubnetMaskCopy := &_BACnetConstructedDataIPSubnetMask{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.IpSubnetMask.DeepCopy().(BACnetApplicationTagOctetString),
+		utils.DeepCopy[BACnetApplicationTagOctetString](m.IpSubnetMask),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataIPSubnetMaskCopy

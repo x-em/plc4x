@@ -451,7 +451,7 @@ func (m *_BACnetConstructedDataEventTimeStamps) deepCopy() *_BACnetConstructedDa
 	}
 	_BACnetConstructedDataEventTimeStampsCopy := &_BACnetConstructedDataEventTimeStamps{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetTimeStamp, BACnetTimeStamp](m.EventTimeStamps),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

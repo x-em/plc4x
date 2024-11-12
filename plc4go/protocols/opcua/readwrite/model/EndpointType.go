@@ -440,10 +440,10 @@ func (m *_EndpointType) deepCopy() *_EndpointType {
 	}
 	_EndpointTypeCopy := &_EndpointType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.EndpointUrl.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.EndpointUrl),
 		m.SecurityMode,
-		m.SecurityPolicyUri.DeepCopy().(PascalString),
-		m.TransportProfileUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SecurityPolicyUri),
+		utils.DeepCopy[PascalString](m.TransportProfileUri),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EndpointTypeCopy

@@ -417,9 +417,9 @@ func (m *_AggregateFilter) deepCopy() *_AggregateFilter {
 	_AggregateFilterCopy := &_AggregateFilter{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.StartTime,
-		m.AggregateType.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.AggregateType),
 		m.ProcessingInterval,
-		m.AggregateConfiguration.DeepCopy().(AggregateConfiguration),
+		utils.DeepCopy[AggregateConfiguration](m.AggregateConfiguration),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AggregateFilterCopy

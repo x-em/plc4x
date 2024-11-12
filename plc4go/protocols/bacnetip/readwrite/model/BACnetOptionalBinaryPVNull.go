@@ -304,7 +304,7 @@ func (m *_BACnetOptionalBinaryPVNull) deepCopy() *_BACnetOptionalBinaryPVNull {
 	}
 	_BACnetOptionalBinaryPVNullCopy := &_BACnetOptionalBinaryPVNull{
 		m.BACnetOptionalBinaryPVContract.(*_BACnetOptionalBinaryPV).deepCopy(),
-		m.NullValue.DeepCopy().(BACnetApplicationTagNull),
+		utils.DeepCopy[BACnetApplicationTagNull](m.NullValue),
 	}
 	m.BACnetOptionalBinaryPVContract.(*_BACnetOptionalBinaryPV)._SubType = m
 	return _BACnetOptionalBinaryPVNullCopy

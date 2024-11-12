@@ -337,7 +337,7 @@ func (m *_MonitoredItemModifyRequest) deepCopy() *_MonitoredItemModifyRequest {
 	_MonitoredItemModifyRequestCopy := &_MonitoredItemModifyRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.MonitoredItemId,
-		m.RequestedParameters.DeepCopy().(MonitoringParameters),
+		utils.DeepCopy[MonitoringParameters](m.RequestedParameters),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _MonitoredItemModifyRequestCopy

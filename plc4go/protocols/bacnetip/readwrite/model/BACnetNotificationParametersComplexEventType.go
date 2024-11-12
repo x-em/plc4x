@@ -305,7 +305,7 @@ func (m *_BACnetNotificationParametersComplexEventType) deepCopy() *_BACnetNotif
 	}
 	_BACnetNotificationParametersComplexEventTypeCopy := &_BACnetNotificationParametersComplexEventType{
 		m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters).deepCopy(),
-		m.ListOfValues.DeepCopy().(BACnetPropertyValues),
+		utils.DeepCopy[BACnetPropertyValues](m.ListOfValues),
 	}
 	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersComplexEventTypeCopy

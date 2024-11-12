@@ -304,7 +304,7 @@ func (m *_BACnetChannelValueTime) deepCopy() *_BACnetChannelValueTime {
 	}
 	_BACnetChannelValueTimeCopy := &_BACnetChannelValueTime{
 		m.BACnetChannelValueContract.(*_BACnetChannelValue).deepCopy(),
-		m.TimeValue.DeepCopy().(BACnetApplicationTagTime),
+		utils.DeepCopy[BACnetApplicationTagTime](m.TimeValue),
 	}
 	m.BACnetChannelValueContract.(*_BACnetChannelValue)._SubType = m
 	return _BACnetChannelValueTimeCopy

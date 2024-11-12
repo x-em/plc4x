@@ -404,7 +404,7 @@ func (m *_SetPublishingModeResponse) deepCopy() *_SetPublishingModeResponse {
 	}
 	_SetPublishingModeResponseCopy := &_SetPublishingModeResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

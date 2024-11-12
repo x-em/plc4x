@@ -544,11 +544,11 @@ func (m *_BuildInfo) deepCopy() *_BuildInfo {
 	}
 	_BuildInfoCopy := &_BuildInfo{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ProductUri.DeepCopy().(PascalString),
-		m.ManufacturerName.DeepCopy().(PascalString),
-		m.ProductName.DeepCopy().(PascalString),
-		m.SoftwareVersion.DeepCopy().(PascalString),
-		m.BuildNumber.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.ProductUri),
+		utils.DeepCopy[PascalString](m.ManufacturerName),
+		utils.DeepCopy[PascalString](m.ProductName),
+		utils.DeepCopy[PascalString](m.SoftwareVersion),
+		utils.DeepCopy[PascalString](m.BuildNumber),
 		m.BuildDate,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

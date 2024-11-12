@@ -310,7 +310,7 @@ func (m *_SearchRequest) deepCopy() *_SearchRequest {
 	}
 	_SearchRequestCopy := &_SearchRequest{
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
-		m.HpaiIDiscoveryEndpoint.DeepCopy().(HPAIDiscoveryEndpoint),
+		utils.DeepCopy[HPAIDiscoveryEndpoint](m.HpaiIDiscoveryEndpoint),
 	}
 	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _SearchRequestCopy

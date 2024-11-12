@@ -357,8 +357,8 @@ func (m *_BACnetConfirmedServiceRequestAtomicReadFileStream) deepCopy() *_BACnet
 	}
 	_BACnetConfirmedServiceRequestAtomicReadFileStreamCopy := &_BACnetConfirmedServiceRequestAtomicReadFileStream{
 		m.BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordContract.(*_BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecord).deepCopy(),
-		m.FileStartPosition.DeepCopy().(BACnetApplicationTagSignedInteger),
-		m.RequestOctetCount.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.FileStartPosition),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.RequestOctetCount),
 	}
 	m.BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecordContract.(*_BACnetConfirmedServiceRequestAtomicReadFileStreamOrRecord)._SubType = m
 	return _BACnetConfirmedServiceRequestAtomicReadFileStreamCopy

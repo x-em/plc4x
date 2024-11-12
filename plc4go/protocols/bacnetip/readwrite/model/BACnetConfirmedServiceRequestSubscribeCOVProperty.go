@@ -560,12 +560,12 @@ func (m *_BACnetConfirmedServiceRequestSubscribeCOVProperty) deepCopy() *_BACnet
 	}
 	_BACnetConfirmedServiceRequestSubscribeCOVPropertyCopy := &_BACnetConfirmedServiceRequestSubscribeCOVProperty{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.SubscriberProcessIdentifier.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.MonitoredObjectIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
-		m.IssueConfirmedNotifications.DeepCopy().(BACnetContextTagBoolean),
-		m.Lifetime.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.MonitoredPropertyIdentifier.DeepCopy().(BACnetPropertyReferenceEnclosed),
-		m.CovIncrement.DeepCopy().(BACnetContextTagReal),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.SubscriberProcessIdentifier),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.MonitoredObjectIdentifier),
+		utils.DeepCopy[BACnetContextTagBoolean](m.IssueConfirmedNotifications),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Lifetime),
+		utils.DeepCopy[BACnetPropertyReferenceEnclosed](m.MonitoredPropertyIdentifier),
+		utils.DeepCopy[BACnetContextTagReal](m.CovIncrement),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestSubscribeCOVPropertyCopy

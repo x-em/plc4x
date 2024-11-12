@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataFDSubscriptionLifetime) deepCopy() *_BACnetConstr
 	}
 	_BACnetConstructedDataFDSubscriptionLifetimeCopy := &_BACnetConstructedDataFDSubscriptionLifetime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.FdSubscriptionLifetime.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.FdSubscriptionLifetime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataFDSubscriptionLifetimeCopy

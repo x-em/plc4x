@@ -433,7 +433,7 @@ func (m *_BACnetScale) deepCopy() *_BACnetScale {
 	}
 	_BACnetScaleCopy := &_BACnetScale{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetScaleCopy
 }

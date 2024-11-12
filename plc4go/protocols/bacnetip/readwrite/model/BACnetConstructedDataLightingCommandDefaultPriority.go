@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataLightingCommandDefaultPriority) deepCopy() *_BACn
 	}
 	_BACnetConstructedDataLightingCommandDefaultPriorityCopy := &_BACnetConstructedDataLightingCommandDefaultPriority{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LightingCommandDefaultPriority.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.LightingCommandDefaultPriority),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLightingCommandDefaultPriorityCopy

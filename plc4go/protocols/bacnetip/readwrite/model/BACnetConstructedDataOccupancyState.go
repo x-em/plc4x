@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataOccupancyState) deepCopy() *_BACnetConstructedDat
 	}
 	_BACnetConstructedDataOccupancyStateCopy := &_BACnetConstructedDataOccupancyState{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.OccupancyState.DeepCopy().(BACnetAccessZoneOccupancyStateTagged),
+		utils.DeepCopy[BACnetAccessZoneOccupancyStateTagged](m.OccupancyState),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataOccupancyStateCopy

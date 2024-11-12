@@ -381,8 +381,8 @@ func (m *_GetAttributeAllRequest) deepCopy() *_GetAttributeAllRequest {
 	}
 	_GetAttributeAllRequestCopy := &_GetAttributeAllRequest{
 		m.CipServiceContract.(*_CipService).deepCopy(),
-		m.ClassSegment.DeepCopy().(PathSegment),
-		m.InstanceSegment.DeepCopy().(PathSegment),
+		utils.DeepCopy[PathSegment](m.ClassSegment),
+		utils.DeepCopy[PathSegment](m.InstanceSegment),
 	}
 	m.CipServiceContract.(*_CipService)._SubType = m
 	return _GetAttributeAllRequestCopy

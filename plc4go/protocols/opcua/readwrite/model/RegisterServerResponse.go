@@ -308,7 +308,7 @@ func (m *_RegisterServerResponse) deepCopy() *_RegisterServerResponse {
 	}
 	_RegisterServerResponseCopy := &_RegisterServerResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RegisterServerResponseCopy

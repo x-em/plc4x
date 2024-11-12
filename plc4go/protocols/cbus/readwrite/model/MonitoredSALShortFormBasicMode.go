@@ -448,7 +448,7 @@ func (m *_MonitoredSALShortFormBasicMode) deepCopy() *_MonitoredSALShortFormBasi
 		utils.CopyPtr[uint8](m.NetworkNumber),
 		utils.CopyPtr[byte](m.NoCounts),
 		m.Application,
-		m.SalData.DeepCopy().(SALData),
+		utils.DeepCopy[SALData](m.SalData),
 	}
 	m.MonitoredSALContract.(*_MonitoredSAL)._SubType = m
 	return _MonitoredSALShortFormBasicModeCopy

@@ -304,7 +304,7 @@ func (m *_BACnetTimeStampTime) deepCopy() *_BACnetTimeStampTime {
 	}
 	_BACnetTimeStampTimeCopy := &_BACnetTimeStampTime{
 		m.BACnetTimeStampContract.(*_BACnetTimeStamp).deepCopy(),
-		m.TimeValue.DeepCopy().(BACnetContextTagTime),
+		utils.DeepCopy[BACnetContextTagTime](m.TimeValue),
 	}
 	m.BACnetTimeStampContract.(*_BACnetTimeStamp)._SubType = m
 	return _BACnetTimeStampTimeCopy

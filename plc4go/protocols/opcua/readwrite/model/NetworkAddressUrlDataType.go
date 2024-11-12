@@ -360,8 +360,8 @@ func (m *_NetworkAddressUrlDataType) deepCopy() *_NetworkAddressUrlDataType {
 	}
 	_NetworkAddressUrlDataTypeCopy := &_NetworkAddressUrlDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NetworkInterface.DeepCopy().(PascalString),
-		m.Url.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.NetworkInterface),
+		utils.DeepCopy[PascalString](m.Url),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _NetworkAddressUrlDataTypeCopy

@@ -388,9 +388,9 @@ func (m *_BACnetLogDataLogData) deepCopy() *_BACnetLogDataLogData {
 	}
 	_BACnetLogDataLogDataCopy := &_BACnetLogDataLogData{
 		m.BACnetLogDataContract.(*_BACnetLogData).deepCopy(),
-		m.InnerOpeningTag.DeepCopy().(BACnetOpeningTag),
+		utils.DeepCopy[BACnetOpeningTag](m.InnerOpeningTag),
 		utils.DeepCopySlice[BACnetLogDataLogDataEntry, BACnetLogDataLogDataEntry](m.LogData),
-		m.InnerClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
 	m.BACnetLogDataContract.(*_BACnetLogData)._SubType = m
 	return _BACnetLogDataLogDataCopy

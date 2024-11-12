@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataPortFilter) deepCopy() *_BACnetConstructedDataPor
 	}
 	_BACnetConstructedDataPortFilterCopy := &_BACnetConstructedDataPortFilter{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetPortPermission, BACnetPortPermission](m.PortFilter),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

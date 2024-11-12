@@ -640,13 +640,13 @@ func (m *_SecurityGroupDataType) deepCopy() *_SecurityGroupDataType {
 	}
 	_SecurityGroupDataTypeCopy := &_SecurityGroupDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Name),
 		utils.DeepCopySlice[PascalString, PascalString](m.SecurityGroupFolder),
 		m.KeyLifetime,
-		m.SecurityPolicyUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SecurityPolicyUri),
 		m.MaxFutureKeyCount,
 		m.MaxPastKeyCount,
-		m.SecurityGroupId.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SecurityGroupId),
 		utils.DeepCopySlice[RolePermissionType, RolePermissionType](m.RolePermissions),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.GroupProperties),
 	}

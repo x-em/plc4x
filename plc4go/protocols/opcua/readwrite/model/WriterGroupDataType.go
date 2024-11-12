@@ -919,10 +919,10 @@ func (m *_WriterGroupDataType) deepCopy() *_WriterGroupDataType {
 	}
 	_WriterGroupDataTypeCopy := &_WriterGroupDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Name),
 		m.Enabled,
 		m.SecurityMode,
-		m.SecurityGroupId.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SecurityGroupId),
 		utils.DeepCopySlice[EndpointDescription, EndpointDescription](m.SecurityKeyServices),
 		m.MaxNetworkMessageSize,
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.GroupProperties),
@@ -931,9 +931,9 @@ func (m *_WriterGroupDataType) deepCopy() *_WriterGroupDataType {
 		m.KeepAliveTime,
 		m.Priority,
 		utils.DeepCopySlice[PascalString, PascalString](m.LocaleIds),
-		m.HeaderLayoutUri.DeepCopy().(PascalString),
-		m.TransportSettings.DeepCopy().(ExtensionObject),
-		m.MessageSettings.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[PascalString](m.HeaderLayoutUri),
+		utils.DeepCopy[ExtensionObject](m.TransportSettings),
+		utils.DeepCopy[ExtensionObject](m.MessageSettings),
 		utils.DeepCopySlice[DataSetWriterDataType, DataSetWriterDataType](m.DataSetWriters),
 		m.reservedField0,
 	}

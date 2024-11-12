@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesReliability) deepCopy() *_BACnetPropertyStatesReli
 	}
 	_BACnetPropertyStatesReliabilityCopy := &_BACnetPropertyStatesReliability{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.Reliability.DeepCopy().(BACnetReliabilityTagged),
+		utils.DeepCopy[BACnetReliabilityTagged](m.Reliability),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesReliabilityCopy

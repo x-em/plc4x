@@ -305,7 +305,7 @@ func (m *_BACnetFaultParameterFaultExtendedParametersEntryBitString) deepCopy() 
 	}
 	_BACnetFaultParameterFaultExtendedParametersEntryBitStringCopy := &_BACnetFaultParameterFaultExtendedParametersEntryBitString{
 		m.BACnetFaultParameterFaultExtendedParametersEntryContract.(*_BACnetFaultParameterFaultExtendedParametersEntry).deepCopy(),
-		m.BitStringValue.DeepCopy().(BACnetApplicationTagBitString),
+		utils.DeepCopy[BACnetApplicationTagBitString](m.BitStringValue),
 	}
 	m.BACnetFaultParameterFaultExtendedParametersEntryContract.(*_BACnetFaultParameterFaultExtendedParametersEntry)._SubType = m
 	return _BACnetFaultParameterFaultExtendedParametersEntryBitStringCopy

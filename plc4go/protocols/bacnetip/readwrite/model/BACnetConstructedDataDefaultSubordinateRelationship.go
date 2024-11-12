@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataDefaultSubordinateRelationship) deepCopy() *_BACn
 	}
 	_BACnetConstructedDataDefaultSubordinateRelationshipCopy := &_BACnetConstructedDataDefaultSubordinateRelationship{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DefaultSubordinateRelationship.DeepCopy().(BACnetRelationshipTagged),
+		utils.DeepCopy[BACnetRelationshipTagged](m.DefaultSubordinateRelationship),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDefaultSubordinateRelationshipCopy

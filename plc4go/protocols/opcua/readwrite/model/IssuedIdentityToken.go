@@ -412,9 +412,9 @@ func (m *_IssuedIdentityToken) deepCopy() *_IssuedIdentityToken {
 	}
 	_IssuedIdentityTokenCopy := &_IssuedIdentityToken{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.PolicyId.DeepCopy().(PascalString),
-		m.TokenData.DeepCopy().(PascalByteString),
-		m.EncryptionAlgorithm.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.PolicyId),
+		utils.DeepCopy[PascalByteString](m.TokenData),
+		utils.DeepCopy[PascalString](m.EncryptionAlgorithm),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _IssuedIdentityTokenCopy

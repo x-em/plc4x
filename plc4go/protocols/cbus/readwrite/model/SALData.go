@@ -930,7 +930,7 @@ func (m *_SALData) deepCopy() *_SALData {
 	}
 	_SALDataCopy := &_SALData{
 		nil, // will be set by child
-		m.SalData.DeepCopy().(SALData),
+		utils.DeepCopy[SALData](m.SalData),
 	}
 	return _SALDataCopy
 }

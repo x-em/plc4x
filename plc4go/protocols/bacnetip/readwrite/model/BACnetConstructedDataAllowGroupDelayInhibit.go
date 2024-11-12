@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataAllowGroupDelayInhibit) deepCopy() *_BACnetConstr
 	}
 	_BACnetConstructedDataAllowGroupDelayInhibitCopy := &_BACnetConstructedDataAllowGroupDelayInhibit{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AllowGroupDelayInhibit.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.AllowGroupDelayInhibit),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAllowGroupDelayInhibitCopy

@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataApplicationSoftwareVersion) deepCopy() *_BACnetCo
 	}
 	_BACnetConstructedDataApplicationSoftwareVersionCopy := &_BACnetConstructedDataApplicationSoftwareVersion{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ApplicationSoftwareVersion.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.ApplicationSoftwareVersion),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataApplicationSoftwareVersionCopy

@@ -408,8 +408,8 @@ func (m *_CallMethodRequest) deepCopy() *_CallMethodRequest {
 	}
 	_CallMethodRequestCopy := &_CallMethodRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ObjectId.DeepCopy().(NodeId),
-		m.MethodId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.ObjectId),
+		utils.DeepCopy[NodeId](m.MethodId),
 		utils.DeepCopySlice[Variant, Variant](m.InputArguments),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

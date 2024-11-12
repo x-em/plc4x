@@ -720,15 +720,15 @@ func (m *_CreateSessionResponse) deepCopy() *_CreateSessionResponse {
 	}
 	_CreateSessionResponseCopy := &_CreateSessionResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
-		m.SessionId.DeepCopy().(NodeId),
-		m.AuthenticationToken.DeepCopy().(NodeId),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
+		utils.DeepCopy[NodeId](m.SessionId),
+		utils.DeepCopy[NodeId](m.AuthenticationToken),
 		m.RevisedSessionTimeout,
-		m.ServerNonce.DeepCopy().(PascalByteString),
-		m.ServerCertificate.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalByteString](m.ServerNonce),
+		utils.DeepCopy[PascalByteString](m.ServerCertificate),
 		utils.DeepCopySlice[EndpointDescription, EndpointDescription](m.ServerEndpoints),
 		utils.DeepCopySlice[SignedSoftwareCertificate, SignedSoftwareCertificate](m.ServerSoftwareCertificates),
-		m.ServerSignature.DeepCopy().(SignatureData),
+		utils.DeepCopy[SignatureData](m.ServerSignature),
 		m.MaxRequestMessageSize,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

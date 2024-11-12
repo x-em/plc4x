@@ -304,7 +304,7 @@ func (m *_BACnetLogRecordLogDatumEnumeratedValue) deepCopy() *_BACnetLogRecordLo
 	}
 	_BACnetLogRecordLogDatumEnumeratedValueCopy := &_BACnetLogRecordLogDatumEnumeratedValue{
 		m.BACnetLogRecordLogDatumContract.(*_BACnetLogRecordLogDatum).deepCopy(),
-		m.EnumeratedValue.DeepCopy().(BACnetContextTagEnumerated),
+		utils.DeepCopy[BACnetContextTagEnumerated](m.EnumeratedValue),
 	}
 	m.BACnetLogRecordLogDatumContract.(*_BACnetLogRecordLogDatum)._SubType = m
 	return _BACnetLogRecordLogDatumEnumeratedValueCopy

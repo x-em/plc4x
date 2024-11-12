@@ -304,7 +304,7 @@ func (m *_BACnetOptionalUnsignedValue) deepCopy() *_BACnetOptionalUnsignedValue 
 	}
 	_BACnetOptionalUnsignedValueCopy := &_BACnetOptionalUnsignedValue{
 		m.BACnetOptionalUnsignedContract.(*_BACnetOptionalUnsigned).deepCopy(),
-		m.UnsignedValue.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.UnsignedValue),
 	}
 	m.BACnetOptionalUnsignedContract.(*_BACnetOptionalUnsigned)._SubType = m
 	return _BACnetOptionalUnsignedValueCopy

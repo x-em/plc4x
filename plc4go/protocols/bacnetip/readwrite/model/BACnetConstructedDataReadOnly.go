@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataReadOnly) deepCopy() *_BACnetConstructedDataReadO
 	}
 	_BACnetConstructedDataReadOnlyCopy := &_BACnetConstructedDataReadOnly{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ReadOnly.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.ReadOnly),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataReadOnlyCopy

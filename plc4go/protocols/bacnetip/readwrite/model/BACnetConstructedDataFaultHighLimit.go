@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataFaultHighLimit) deepCopy() *_BACnetConstructedDat
 	}
 	_BACnetConstructedDataFaultHighLimitCopy := &_BACnetConstructedDataFaultHighLimit{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.FaultHighLimit.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.FaultHighLimit),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataFaultHighLimitCopy

@@ -308,7 +308,7 @@ func (m *_StandaloneSubscribedDataSetRefDataType) deepCopy() *_StandaloneSubscri
 	}
 	_StandaloneSubscribedDataSetRefDataTypeCopy := &_StandaloneSubscribedDataSetRefDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.DataSetName.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.DataSetName),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StandaloneSubscribedDataSetRefDataTypeCopy

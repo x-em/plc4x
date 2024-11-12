@@ -596,13 +596,13 @@ func (m *_AddNodesItem) deepCopy() *_AddNodesItem {
 	}
 	_AddNodesItemCopy := &_AddNodesItem{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ParentNodeId.DeepCopy().(ExpandedNodeId),
-		m.ReferenceTypeId.DeepCopy().(NodeId),
-		m.RequestedNewNodeId.DeepCopy().(ExpandedNodeId),
-		m.BrowseName.DeepCopy().(QualifiedName),
+		utils.DeepCopy[ExpandedNodeId](m.ParentNodeId),
+		utils.DeepCopy[NodeId](m.ReferenceTypeId),
+		utils.DeepCopy[ExpandedNodeId](m.RequestedNewNodeId),
+		utils.DeepCopy[QualifiedName](m.BrowseName),
 		m.NodeClass,
-		m.NodeAttributes.DeepCopy().(ExtensionObject),
-		m.TypeDefinition.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExtensionObject](m.NodeAttributes),
+		utils.DeepCopy[ExpandedNodeId](m.TypeDefinition),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _AddNodesItemCopy

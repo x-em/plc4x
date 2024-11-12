@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataIPv6ZoneIndex) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataIPv6ZoneIndexCopy := &_BACnetConstructedDataIPv6ZoneIndex{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Ipv6ZoneIndex.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.Ipv6ZoneIndex),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataIPv6ZoneIndexCopy

@@ -375,8 +375,8 @@ func (m *_TunnelingRequest) deepCopy() *_TunnelingRequest {
 	}
 	_TunnelingRequestCopy := &_TunnelingRequest{
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
-		m.TunnelingRequestDataBlock.DeepCopy().(TunnelingRequestDataBlock),
-		m.Cemi.DeepCopy().(CEMI),
+		utils.DeepCopy[TunnelingRequestDataBlock](m.TunnelingRequestDataBlock),
+		utils.DeepCopy[CEMI](m.Cemi),
 		m.TotalLength,
 	}
 	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m

@@ -304,7 +304,7 @@ func (m *_BACnetHostAddressName) deepCopy() *_BACnetHostAddressName {
 	}
 	_BACnetHostAddressNameCopy := &_BACnetHostAddressName{
 		m.BACnetHostAddressContract.(*_BACnetHostAddress).deepCopy(),
-		m.Name.DeepCopy().(BACnetContextTagCharacterString),
+		utils.DeepCopy[BACnetContextTagCharacterString](m.Name),
 	}
 	m.BACnetHostAddressContract.(*_BACnetHostAddress)._SubType = m
 	return _BACnetHostAddressNameCopy

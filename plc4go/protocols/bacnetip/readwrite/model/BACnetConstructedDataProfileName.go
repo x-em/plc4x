@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataProfileName) deepCopy() *_BACnetConstructedDataPr
 	}
 	_BACnetConstructedDataProfileNameCopy := &_BACnetConstructedDataProfileName{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ProfileName.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.ProfileName),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataProfileNameCopy

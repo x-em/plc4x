@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataNetworkPortMaxInfoFrames) deepCopy() *_BACnetCons
 	}
 	_BACnetConstructedDataNetworkPortMaxInfoFramesCopy := &_BACnetConstructedDataNetworkPortMaxInfoFrames{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MaxInfoFrames.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MaxInfoFrames),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataNetworkPortMaxInfoFramesCopy

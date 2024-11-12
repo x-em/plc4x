@@ -375,8 +375,8 @@ func (m *_DeviceConfigurationRequest) deepCopy() *_DeviceConfigurationRequest {
 	}
 	_DeviceConfigurationRequestCopy := &_DeviceConfigurationRequest{
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
-		m.DeviceConfigurationRequestDataBlock.DeepCopy().(DeviceConfigurationRequestDataBlock),
-		m.Cemi.DeepCopy().(CEMI),
+		utils.DeepCopy[DeviceConfigurationRequestDataBlock](m.DeviceConfigurationRequestDataBlock),
+		utils.DeepCopy[CEMI](m.Cemi),
 		m.TotalLength,
 	}
 	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m

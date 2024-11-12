@@ -500,7 +500,7 @@ func (m *_SetTriggeringResponse) deepCopy() *_SetTriggeringResponse {
 	}
 	_SetTriggeringResponseCopy := &_SetTriggeringResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.AddResults),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.AddDiagnosticInfos),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.RemoveResults),

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataSilenced) deepCopy() *_BACnetConstructedDataSilen
 	}
 	_BACnetConstructedDataSilencedCopy := &_BACnetConstructedDataSilenced{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Silenced.DeepCopy().(BACnetSilencedStateTagged),
+		utils.DeepCopy[BACnetSilencedStateTagged](m.Silenced),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSilencedCopy

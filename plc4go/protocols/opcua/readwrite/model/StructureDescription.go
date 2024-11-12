@@ -412,9 +412,9 @@ func (m *_StructureDescription) deepCopy() *_StructureDescription {
 	}
 	_StructureDescriptionCopy := &_StructureDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.DataTypeId.DeepCopy().(NodeId),
-		m.Name.DeepCopy().(QualifiedName),
-		m.StructureDefinition.DeepCopy().(StructureDefinition),
+		utils.DeepCopy[NodeId](m.DataTypeId),
+		utils.DeepCopy[QualifiedName](m.Name),
+		utils.DeepCopy[StructureDefinition](m.StructureDefinition),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StructureDescriptionCopy

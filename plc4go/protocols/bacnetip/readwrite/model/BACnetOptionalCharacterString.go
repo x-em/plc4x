@@ -433,7 +433,7 @@ func (m *_BACnetOptionalCharacterString) deepCopy() *_BACnetOptionalCharacterStr
 	}
 	_BACnetOptionalCharacterStringCopy := &_BACnetOptionalCharacterString{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetOptionalCharacterStringCopy
 }

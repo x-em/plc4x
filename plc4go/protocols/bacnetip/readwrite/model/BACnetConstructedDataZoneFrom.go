@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataZoneFrom) deepCopy() *_BACnetConstructedDataZoneF
 	}
 	_BACnetConstructedDataZoneFromCopy := &_BACnetConstructedDataZoneFrom{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ZoneFrom.DeepCopy().(BACnetDeviceObjectReference),
+		utils.DeepCopy[BACnetDeviceObjectReference](m.ZoneFrom),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataZoneFromCopy

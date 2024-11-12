@@ -476,7 +476,7 @@ func (m *_ModifySubscriptionRequest) deepCopy() *_ModifySubscriptionRequest {
 	}
 	_ModifySubscriptionRequestCopy := &_ModifySubscriptionRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.SubscriptionId,
 		m.RequestedPublishingInterval,
 		m.RequestedLifetimeCount,

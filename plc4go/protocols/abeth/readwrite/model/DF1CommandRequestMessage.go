@@ -308,7 +308,7 @@ func (m *_DF1CommandRequestMessage) deepCopy() *_DF1CommandRequestMessage {
 	}
 	_DF1CommandRequestMessageCopy := &_DF1CommandRequestMessage{
 		m.DF1RequestMessageContract.(*_DF1RequestMessage).deepCopy(),
-		m.Command.DeepCopy().(DF1RequestCommand),
+		utils.DeepCopy[DF1RequestCommand](m.Command),
 	}
 	m.DF1RequestMessageContract.(*_DF1RequestMessage)._SubType = m
 	return _DF1CommandRequestMessageCopy

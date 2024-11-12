@@ -304,7 +304,7 @@ func (m *_BACnetProcessIdSelectionValue) deepCopy() *_BACnetProcessIdSelectionVa
 	}
 	_BACnetProcessIdSelectionValueCopy := &_BACnetProcessIdSelectionValue{
 		m.BACnetProcessIdSelectionContract.(*_BACnetProcessIdSelection).deepCopy(),
-		m.ProcessIdentifier.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.ProcessIdentifier),
 	}
 	m.BACnetProcessIdSelectionContract.(*_BACnetProcessIdSelection)._SubType = m
 	return _BACnetProcessIdSelectionValueCopy

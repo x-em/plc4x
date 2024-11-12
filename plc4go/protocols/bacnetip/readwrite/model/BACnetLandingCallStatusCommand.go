@@ -433,7 +433,7 @@ func (m *_BACnetLandingCallStatusCommand) deepCopy() *_BACnetLandingCallStatusCo
 	}
 	_BACnetLandingCallStatusCommandCopy := &_BACnetLandingCallStatusCommand{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetLandingCallStatusCommandCopy
 }

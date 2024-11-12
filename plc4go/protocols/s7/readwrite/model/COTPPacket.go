@@ -578,7 +578,7 @@ func (m *_COTPPacket) deepCopy() *_COTPPacket {
 	_COTPPacketCopy := &_COTPPacket{
 		nil, // will be set by child
 		utils.DeepCopySlice[COTPParameter, COTPParameter](m.Parameters),
-		m.Payload.DeepCopy().(S7Message),
+		utils.DeepCopy[S7Message](m.Payload),
 		m.CotpLen,
 	}
 	return _COTPPacketCopy

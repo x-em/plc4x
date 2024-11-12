@@ -305,7 +305,7 @@ func (m *_BACnetFaultParameterFaultOutOfRangeMaxNormalValueReal) deepCopy() *_BA
 	}
 	_BACnetFaultParameterFaultOutOfRangeMaxNormalValueRealCopy := &_BACnetFaultParameterFaultOutOfRangeMaxNormalValueReal{
 		m.BACnetFaultParameterFaultOutOfRangeMaxNormalValueContract.(*_BACnetFaultParameterFaultOutOfRangeMaxNormalValue).deepCopy(),
-		m.RealValue.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.RealValue),
 	}
 	m.BACnetFaultParameterFaultOutOfRangeMaxNormalValueContract.(*_BACnetFaultParameterFaultOutOfRangeMaxNormalValue)._SubType = m
 	return _BACnetFaultParameterFaultOutOfRangeMaxNormalValueRealCopy

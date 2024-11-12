@@ -590,12 +590,12 @@ func (m *_MonitoredSALLongFormSmartMode) deepCopy() *_MonitoredSALLongFormSmartM
 	_MonitoredSALLongFormSmartModeCopy := &_MonitoredSALLongFormSmartMode{
 		m.MonitoredSALContract.(*_MonitoredSAL).deepCopy(),
 		m.TerminatingByte,
-		m.UnitAddress.DeepCopy().(UnitAddress),
-		m.BridgeAddress.DeepCopy().(BridgeAddress),
+		utils.DeepCopy[UnitAddress](m.UnitAddress),
+		utils.DeepCopy[BridgeAddress](m.BridgeAddress),
 		m.Application,
 		utils.CopyPtr[byte](m.ReservedByte),
-		m.ReplyNetwork.DeepCopy().(ReplyNetwork),
-		m.SalData.DeepCopy().(SALData),
+		utils.DeepCopy[ReplyNetwork](m.ReplyNetwork),
+		utils.DeepCopy[SALData](m.SalData),
 		m.reservedField0,
 	}
 	m.MonitoredSALContract.(*_MonitoredSAL)._SubType = m

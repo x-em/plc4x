@@ -360,8 +360,8 @@ func (m *_SemanticChangeStructureDataType) deepCopy() *_SemanticChangeStructureD
 	}
 	_SemanticChangeStructureDataTypeCopy := &_SemanticChangeStructureDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Affected.DeepCopy().(NodeId),
-		m.AffectedType.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.Affected),
+		utils.DeepCopy[NodeId](m.AffectedType),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SemanticChangeStructureDataTypeCopy

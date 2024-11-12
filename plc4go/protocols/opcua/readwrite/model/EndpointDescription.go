@@ -620,13 +620,13 @@ func (m *_EndpointDescription) deepCopy() *_EndpointDescription {
 	}
 	_EndpointDescriptionCopy := &_EndpointDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.EndpointUrl.DeepCopy().(PascalString),
-		m.Server.DeepCopy().(ApplicationDescription),
-		m.ServerCertificate.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalString](m.EndpointUrl),
+		utils.DeepCopy[ApplicationDescription](m.Server),
+		utils.DeepCopy[PascalByteString](m.ServerCertificate),
 		m.SecurityMode,
-		m.SecurityPolicyUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SecurityPolicyUri),
 		utils.DeepCopySlice[UserTokenPolicy, UserTokenPolicy](m.UserIdentityTokens),
-		m.TransportProfileUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.TransportProfileUri),
 		m.SecurityLevel,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

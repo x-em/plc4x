@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataPulseRate) deepCopy() *_BACnetConstructedDataPuls
 	}
 	_BACnetConstructedDataPulseRateCopy := &_BACnetConstructedDataPulseRate{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PulseRate.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.PulseRate),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPulseRateCopy

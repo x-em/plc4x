@@ -412,9 +412,9 @@ func (m *_HistoryReadResult) deepCopy() *_HistoryReadResult {
 	}
 	_HistoryReadResultCopy := &_HistoryReadResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
-		m.ContinuationPoint.DeepCopy().(PascalByteString),
-		m.HistoryData.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[StatusCode](m.StatusCode),
+		utils.DeepCopy[PascalByteString](m.ContinuationPoint),
+		utils.DeepCopy[ExtensionObject](m.HistoryData),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _HistoryReadResultCopy

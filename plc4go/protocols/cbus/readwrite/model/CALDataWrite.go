@@ -362,7 +362,7 @@ func (m *_CALDataWrite) deepCopy() *_CALDataWrite {
 		m.CALDataContract.(*_CALData).deepCopy(),
 		m.ParamNo,
 		m.Code,
-		m.ParameterValue.DeepCopy().(ParameterValue),
+		utils.DeepCopy[ParameterValue](m.ParameterValue),
 	}
 	m.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataWriteCopy

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataTransition) deepCopy() *_BACnetConstructedDataTra
 	}
 	_BACnetConstructedDataTransitionCopy := &_BACnetConstructedDataTransition{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Transition.DeepCopy().(BACnetLightingTransitionTagged),
+		utils.DeepCopy[BACnetLightingTransitionTagged](m.Transition),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTransitionCopy

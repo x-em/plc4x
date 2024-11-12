@@ -404,7 +404,7 @@ func (m *_ContentFilterElementResult) deepCopy() *_ContentFilterElementResult {
 	}
 	_ContentFilterElementResultCopy := &_ContentFilterElementResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
+		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.OperandStatusCodes),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.OperandDiagnosticInfos),
 	}

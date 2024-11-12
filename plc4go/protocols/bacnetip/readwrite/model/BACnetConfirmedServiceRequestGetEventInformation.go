@@ -306,7 +306,7 @@ func (m *_BACnetConfirmedServiceRequestGetEventInformation) deepCopy() *_BACnetC
 	}
 	_BACnetConfirmedServiceRequestGetEventInformationCopy := &_BACnetConfirmedServiceRequestGetEventInformation{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.LastReceivedObjectIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.LastReceivedObjectIdentifier),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestGetEventInformationCopy

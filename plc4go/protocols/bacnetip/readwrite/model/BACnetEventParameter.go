@@ -858,7 +858,7 @@ func (m *_BACnetEventParameter) deepCopy() *_BACnetEventParameter {
 	}
 	_BACnetEventParameterCopy := &_BACnetEventParameter{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetEventParameterCopy
 }

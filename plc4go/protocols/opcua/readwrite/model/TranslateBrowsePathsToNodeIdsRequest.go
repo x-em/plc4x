@@ -356,7 +356,7 @@ func (m *_TranslateBrowsePathsToNodeIdsRequest) deepCopy() *_TranslateBrowsePath
 	}
 	_TranslateBrowsePathsToNodeIdsRequestCopy := &_TranslateBrowsePathsToNodeIdsRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[BrowsePath, BrowsePath](m.BrowsePaths),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

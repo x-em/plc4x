@@ -440,9 +440,9 @@ func (m *_EnumDescription) deepCopy() *_EnumDescription {
 	}
 	_EnumDescriptionCopy := &_EnumDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.DataTypeId.DeepCopy().(NodeId),
-		m.Name.DeepCopy().(QualifiedName),
-		m.EnumDefinition.DeepCopy().(EnumDefinition),
+		utils.DeepCopy[NodeId](m.DataTypeId),
+		utils.DeepCopy[QualifiedName](m.Name),
+		utils.DeepCopy[EnumDefinition](m.EnumDefinition),
 		m.BuiltInType,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

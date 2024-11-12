@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataSystemStatus) deepCopy() *_BACnetConstructedDataS
 	}
 	_BACnetConstructedDataSystemStatusCopy := &_BACnetConstructedDataSystemStatus{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.SystemStatus.DeepCopy().(BACnetDeviceStatusTagged),
+		utils.DeepCopy[BACnetDeviceStatusTagged](m.SystemStatus),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSystemStatusCopy

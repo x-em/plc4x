@@ -554,9 +554,9 @@ func (m *_StructureField) deepCopy() *_StructureField {
 	}
 	_StructureFieldCopy := &_StructureField{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
-		m.Description.DeepCopy().(LocalizedText),
-		m.DataType.DeepCopy().(NodeId),
+		utils.DeepCopy[PascalString](m.Name),
+		utils.DeepCopy[LocalizedText](m.Description),
+		utils.DeepCopy[NodeId](m.DataType),
 		m.ValueRank,
 		utils.DeepCopySlice[uint32, uint32](m.ArrayDimensions),
 		m.MaxStringLength,

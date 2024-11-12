@@ -416,10 +416,10 @@ func (m *_MonitoredItemModifyResult) deepCopy() *_MonitoredItemModifyResult {
 	}
 	_MonitoredItemModifyResultCopy := &_MonitoredItemModifyResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
+		utils.DeepCopy[StatusCode](m.StatusCode),
 		m.RevisedSamplingInterval,
 		m.RevisedQueueSize,
-		m.FilterResult.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.FilterResult),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _MonitoredItemModifyResultCopy

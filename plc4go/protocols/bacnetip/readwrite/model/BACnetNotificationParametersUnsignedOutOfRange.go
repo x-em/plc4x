@@ -565,12 +565,12 @@ func (m *_BACnetNotificationParametersUnsignedOutOfRange) deepCopy() *_BACnetNot
 	}
 	_BACnetNotificationParametersUnsignedOutOfRangeCopy := &_BACnetNotificationParametersUnsignedOutOfRange{
 		m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters).deepCopy(),
-		m.InnerOpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.ExceedingValue.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.StatusFlags.DeepCopy().(BACnetStatusFlagsTagged),
-		m.Deadband.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ExceededLimit.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.InnerClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.InnerOpeningTag),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ExceedingValue),
+		utils.DeepCopy[BACnetStatusFlagsTagged](m.StatusFlags),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Deadband),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ExceededLimit),
+		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
 	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersUnsignedOutOfRangeCopy

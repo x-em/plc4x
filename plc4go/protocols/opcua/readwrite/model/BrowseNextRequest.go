@@ -399,7 +399,7 @@ func (m *_BrowseNextRequest) deepCopy() *_BrowseNextRequest {
 	}
 	_BrowseNextRequestCopy := &_BrowseNextRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.ReleaseContinuationPoints,
 		utils.DeepCopySlice[PascalByteString, PascalByteString](m.ContinuationPoints),
 		m.reservedField0,

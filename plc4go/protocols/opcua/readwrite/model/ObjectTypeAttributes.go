@@ -488,8 +488,8 @@ func (m *_ObjectTypeAttributes) deepCopy() *_ObjectTypeAttributes {
 	_ObjectTypeAttributesCopy := &_ObjectTypeAttributes{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.SpecifiedAttributes,
-		m.DisplayName.DeepCopy().(LocalizedText),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[LocalizedText](m.DisplayName),
+		utils.DeepCopy[LocalizedText](m.Description),
 		m.WriteMask,
 		m.UserWriteMask,
 		m.IsAbstract,

@@ -308,7 +308,7 @@ func (m *_CBusMessageToServer) deepCopy() *_CBusMessageToServer {
 	}
 	_CBusMessageToServerCopy := &_CBusMessageToServer{
 		m.CBusMessageContract.(*_CBusMessage).deepCopy(),
-		m.Request.DeepCopy().(Request),
+		utils.DeepCopy[Request](m.Request),
 	}
 	m.CBusMessageContract.(*_CBusMessage)._SubType = m
 	return _CBusMessageToServerCopy

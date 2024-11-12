@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataOperationExpected) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataOperationExpectedCopy := &_BACnetConstructedDataOperationExpected{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LifeSafetyOperations.DeepCopy().(BACnetLifeSafetyOperationTagged),
+		utils.DeepCopy[BACnetLifeSafetyOperationTagged](m.LifeSafetyOperations),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataOperationExpectedCopy

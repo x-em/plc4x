@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataEventAlgorithmInhibit) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataEventAlgorithmInhibitCopy := &_BACnetConstructedDataEventAlgorithmInhibit{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.EventAlgorithmInhibit.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.EventAlgorithmInhibit),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataEventAlgorithmInhibitCopy

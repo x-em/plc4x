@@ -403,9 +403,9 @@ func (m *_QueryNextRequest) deepCopy() *_QueryNextRequest {
 	}
 	_QueryNextRequestCopy := &_QueryNextRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.ReleaseContinuationPoint,
-		m.ContinuationPoint.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalByteString](m.ContinuationPoint),
 		m.reservedField0,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

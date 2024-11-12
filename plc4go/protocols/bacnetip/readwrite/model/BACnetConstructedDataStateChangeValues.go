@@ -379,7 +379,7 @@ func (m *_BACnetConstructedDataStateChangeValues) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataStateChangeValuesCopy := &_BACnetConstructedDataStateChangeValues{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetTimerStateChangeValue, BACnetTimerStateChangeValue](m.StateChangeValues),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

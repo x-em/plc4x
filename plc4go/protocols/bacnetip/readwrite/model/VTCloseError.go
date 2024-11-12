@@ -357,8 +357,8 @@ func (m *_VTCloseError) deepCopy() *_VTCloseError {
 	}
 	_VTCloseErrorCopy := &_VTCloseError{
 		m.BACnetErrorContract.(*_BACnetError).deepCopy(),
-		m.ErrorType.DeepCopy().(ErrorEnclosed),
-		m.ListOfVtSessionIdentifiers.DeepCopy().(VTCloseErrorListOfVTSessionIdentifiers),
+		utils.DeepCopy[ErrorEnclosed](m.ErrorType),
+		utils.DeepCopy[VTCloseErrorListOfVTSessionIdentifiers](m.ListOfVtSessionIdentifiers),
 	}
 	m.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _VTCloseErrorCopy

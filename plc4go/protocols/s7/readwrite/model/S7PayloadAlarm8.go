@@ -316,7 +316,7 @@ func (m *_S7PayloadAlarm8) deepCopy() *_S7PayloadAlarm8 {
 	}
 	_S7PayloadAlarm8Copy := &_S7PayloadAlarm8{
 		m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem).deepCopy(),
-		m.AlarmMessage.DeepCopy().(AlarmMessagePushType),
+		utils.DeepCopy[AlarmMessagePushType](m.AlarmMessage),
 	}
 	m.S7PayloadUserDataItemContract.(*_S7PayloadUserDataItem)._SubType = m
 	return _S7PayloadAlarm8Copy

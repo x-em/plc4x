@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataProgramLocation) deepCopy() *_BACnetConstructedDa
 	}
 	_BACnetConstructedDataProgramLocationCopy := &_BACnetConstructedDataProgramLocation{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ProgramLocation.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.ProgramLocation),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataProgramLocationCopy

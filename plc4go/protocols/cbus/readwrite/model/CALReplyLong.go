@@ -563,11 +563,11 @@ func (m *_CALReplyLong) deepCopy() *_CALReplyLong {
 	_CALReplyLongCopy := &_CALReplyLong{
 		m.CALReplyContract.(*_CALReply).deepCopy(),
 		m.TerminatingByte,
-		m.UnitAddress.DeepCopy().(UnitAddress),
-		m.BridgeAddress.DeepCopy().(BridgeAddress),
-		m.SerialInterfaceAddress.DeepCopy().(SerialInterfaceAddress),
+		utils.DeepCopy[UnitAddress](m.UnitAddress),
+		utils.DeepCopy[BridgeAddress](m.BridgeAddress),
+		utils.DeepCopy[SerialInterfaceAddress](m.SerialInterfaceAddress),
 		utils.CopyPtr[byte](m.ReservedByte),
-		m.ReplyNetwork.DeepCopy().(ReplyNetwork),
+		utils.DeepCopy[ReplyNetwork](m.ReplyNetwork),
 		m.reservedField0,
 	}
 	m.CALReplyContract.(*_CALReply)._SubType = m

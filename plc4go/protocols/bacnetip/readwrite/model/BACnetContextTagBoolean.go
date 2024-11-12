@@ -373,7 +373,7 @@ func (m *_BACnetContextTagBoolean) deepCopy() *_BACnetContextTagBoolean {
 	_BACnetContextTagBooleanCopy := &_BACnetContextTagBoolean{
 		m.BACnetContextTagContract.(*_BACnetContextTag).deepCopy(),
 		m.Value,
-		m.Payload.DeepCopy().(BACnetTagPayloadBoolean),
+		utils.DeepCopy[BACnetTagPayloadBoolean](m.Payload),
 	}
 	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagBooleanCopy

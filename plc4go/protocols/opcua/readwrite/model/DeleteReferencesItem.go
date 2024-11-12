@@ -497,10 +497,10 @@ func (m *_DeleteReferencesItem) deepCopy() *_DeleteReferencesItem {
 	}
 	_DeleteReferencesItemCopy := &_DeleteReferencesItem{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.SourceNodeId.DeepCopy().(NodeId),
-		m.ReferenceTypeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.SourceNodeId),
+		utils.DeepCopy[NodeId](m.ReferenceTypeId),
 		m.IsForward,
-		m.TargetNodeId.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExpandedNodeId](m.TargetNodeId),
 		m.DeleteBidirectional,
 		m.reservedField0,
 		m.reservedField1,

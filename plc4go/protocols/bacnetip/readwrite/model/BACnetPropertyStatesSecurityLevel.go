@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesSecurityLevel) deepCopy() *_BACnetPropertyStatesSe
 	}
 	_BACnetPropertyStatesSecurityLevelCopy := &_BACnetPropertyStatesSecurityLevel{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.SecurityLevel.DeepCopy().(BACnetSecurityLevelTagged),
+		utils.DeepCopy[BACnetSecurityLevelTagged](m.SecurityLevel),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesSecurityLevelCopy

@@ -441,9 +441,9 @@ func (m *_OpenChannelMessageResponse) deepCopy() *_OpenChannelMessageResponse {
 	_OpenChannelMessageResponseCopy := &_OpenChannelMessageResponse{
 		m.OpenChannelMessageContract.(*_OpenChannelMessage).deepCopy(),
 		m.SecureChannelId,
-		m.SecurityPolicyUri.DeepCopy().(PascalString),
-		m.SenderCertificate.DeepCopy().(PascalByteString),
-		m.ReceiverCertificateThumbprint.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalString](m.SecurityPolicyUri),
+		utils.DeepCopy[PascalByteString](m.SenderCertificate),
+		utils.DeepCopy[PascalByteString](m.ReceiverCertificateThumbprint),
 	}
 	m.OpenChannelMessageContract.(*_OpenChannelMessage)._SubType = m
 	return _OpenChannelMessageResponseCopy

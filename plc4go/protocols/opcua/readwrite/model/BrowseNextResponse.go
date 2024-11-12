@@ -404,7 +404,7 @@ func (m *_BrowseNextResponse) deepCopy() *_BrowseNextResponse {
 	}
 	_BrowseNextResponseCopy := &_BrowseNextResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[BrowseResult, BrowseResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

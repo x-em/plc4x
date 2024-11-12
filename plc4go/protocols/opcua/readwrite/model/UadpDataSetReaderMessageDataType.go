@@ -535,7 +535,7 @@ func (m *_UadpDataSetReaderMessageDataType) deepCopy() *_UadpDataSetReaderMessag
 		m.GroupVersion,
 		m.NetworkMessageNumber,
 		m.DataSetOffset,
-		m.DataSetClassId.DeepCopy().(GuidValue),
+		utils.DeepCopy[GuidValue](m.DataSetClassId),
 		m.NetworkMessageContentMask,
 		m.DataSetMessageContentMask,
 		m.PublishingInterval,

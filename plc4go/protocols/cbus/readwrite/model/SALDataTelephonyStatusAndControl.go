@@ -308,7 +308,7 @@ func (m *_SALDataTelephonyStatusAndControl) deepCopy() *_SALDataTelephonyStatusA
 	}
 	_SALDataTelephonyStatusAndControlCopy := &_SALDataTelephonyStatusAndControl{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.TelephonyData.DeepCopy().(TelephonyData),
+		utils.DeepCopy[TelephonyData](m.TelephonyData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataTelephonyStatusAndControlCopy

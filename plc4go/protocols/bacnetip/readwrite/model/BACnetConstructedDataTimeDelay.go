@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataTimeDelay) deepCopy() *_BACnetConstructedDataTime
 	}
 	_BACnetConstructedDataTimeDelayCopy := &_BACnetConstructedDataTimeDelay{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.TimeDelay.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.TimeDelay),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTimeDelayCopy

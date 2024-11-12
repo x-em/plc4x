@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAuthorizationMode) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataAuthorizationModeCopy := &_BACnetConstructedDataAuthorizationMode{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AuthorizationMode.DeepCopy().(BACnetAuthorizationModeTagged),
+		utils.DeepCopy[BACnetAuthorizationModeTagged](m.AuthorizationMode),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAuthorizationModeCopy

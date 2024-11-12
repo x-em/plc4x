@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesLiftCarDriveStatus) deepCopy() *_BACnetPropertySta
 	}
 	_BACnetPropertyStatesLiftCarDriveStatusCopy := &_BACnetPropertyStatesLiftCarDriveStatus{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.LiftCarDriveStatus.DeepCopy().(BACnetLiftCarDriveStatusTagged),
+		utils.DeepCopy[BACnetLiftCarDriveStatusTagged](m.LiftCarDriveStatus),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesLiftCarDriveStatusCopy

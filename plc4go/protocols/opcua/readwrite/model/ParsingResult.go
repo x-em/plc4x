@@ -404,7 +404,7 @@ func (m *_ParsingResult) deepCopy() *_ParsingResult {
 	}
 	_ParsingResultCopy := &_ParsingResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
+		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.DataStatusCodes),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DataDiagnosticInfos),
 	}

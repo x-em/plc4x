@@ -384,7 +384,7 @@ func (m *_UpdateStructureDataDetails) deepCopy() *_UpdateStructureDataDetails {
 	}
 	_UpdateStructureDataDetailsCopy := &_UpdateStructureDataDetails{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.NodeId),
 		m.PerformInsertReplace,
 		utils.DeepCopySlice[DataValue, DataValue](m.UpdateValues),
 	}

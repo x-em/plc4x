@@ -476,7 +476,7 @@ func (m *_CBusPointToPointCommand) deepCopy() *_CBusPointToPointCommand {
 	_CBusPointToPointCommandCopy := &_CBusPointToPointCommand{
 		nil, // will be set by child
 		m.BridgeAddressCountPeek,
-		m.CalData.DeepCopy().(CALData),
+		utils.DeepCopy[CALData](m.CalData),
 		m.CBusOptions,
 	}
 	return _CBusPointToPointCommandCopy

@@ -458,7 +458,7 @@ func (m *_BACnetHostAddress) deepCopy() *_BACnetHostAddress {
 	}
 	_BACnetHostAddressCopy := &_BACnetHostAddress{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetHostAddressCopy
 }

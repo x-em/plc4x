@@ -360,8 +360,8 @@ func (m *_StatusResult) deepCopy() *_StatusResult {
 	}
 	_StatusResultCopy := &_StatusResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
-		m.DiagnosticInfo.DeepCopy().(DiagnosticInfo),
+		utils.DeepCopy[StatusCode](m.StatusCode),
+		utils.DeepCopy[DiagnosticInfo](m.DiagnosticInfo),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _StatusResultCopy

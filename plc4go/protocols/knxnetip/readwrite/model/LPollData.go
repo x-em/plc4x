@@ -385,7 +385,7 @@ func (m *_LPollData) deepCopy() *_LPollData {
 	}
 	_LPollDataCopy := &_LPollData{
 		m.LDataFrameContract.(*_LDataFrame).deepCopy(),
-		m.SourceAddress.DeepCopy().(KnxAddress),
+		utils.DeepCopy[KnxAddress](m.SourceAddress),
 		utils.DeepCopySlice[byte, byte](m.TargetAddress),
 		m.NumberExpectedPollData,
 		m.reservedField0,

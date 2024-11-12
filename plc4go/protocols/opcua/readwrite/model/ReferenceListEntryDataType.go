@@ -403,9 +403,9 @@ func (m *_ReferenceListEntryDataType) deepCopy() *_ReferenceListEntryDataType {
 	}
 	_ReferenceListEntryDataTypeCopy := &_ReferenceListEntryDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ReferenceType.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.ReferenceType),
 		m.IsForward,
-		m.TargetNode.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExpandedNodeId](m.TargetNode),
 		m.reservedField0,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

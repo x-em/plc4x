@@ -375,7 +375,7 @@ func (m *_BACnetConstructedDataCharacterStringValueAlarmValues) deepCopy() *_BAC
 	}
 	_BACnetConstructedDataCharacterStringValueAlarmValuesCopy := &_BACnetConstructedDataCharacterStringValueAlarmValues{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetOptionalCharacterString, BACnetOptionalCharacterString](m.AlarmValues),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

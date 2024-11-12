@@ -524,13 +524,13 @@ func (m *_RequestHeader) deepCopy() *_RequestHeader {
 	}
 	_RequestHeaderCopy := &_RequestHeader{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.AuthenticationToken.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.AuthenticationToken),
 		m.Timestamp,
 		m.RequestHandle,
 		m.ReturnDiagnostics,
-		m.AuditEntryId.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.AuditEntryId),
 		m.TimeoutHint,
-		m.AdditionalHeader.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.AdditionalHeader),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _RequestHeaderCopy

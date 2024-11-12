@@ -351,7 +351,7 @@ func (m *_DeleteAtTimeDetails) deepCopy() *_DeleteAtTimeDetails {
 	}
 	_DeleteAtTimeDetailsCopy := &_DeleteAtTimeDetails{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.NodeId),
 		utils.DeepCopySlice[int64, int64](m.ReqTimes),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

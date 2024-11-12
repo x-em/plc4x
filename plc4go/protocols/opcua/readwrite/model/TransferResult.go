@@ -351,7 +351,7 @@ func (m *_TransferResult) deepCopy() *_TransferResult {
 	}
 	_TransferResultCopy := &_TransferResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
+		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopySlice[uint32, uint32](m.AvailableSequenceNumbers),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

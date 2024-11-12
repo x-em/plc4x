@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataDistributionKeyRevision) deepCopy() *_BACnetConst
 	}
 	_BACnetConstructedDataDistributionKeyRevisionCopy := &_BACnetConstructedDataDistributionKeyRevision{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DistributionKeyRevision.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.DistributionKeyRevision),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDistributionKeyRevisionCopy

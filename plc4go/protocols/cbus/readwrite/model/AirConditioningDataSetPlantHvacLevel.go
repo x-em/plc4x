@@ -560,12 +560,12 @@ func (m *_AirConditioningDataSetPlantHvacLevel) deepCopy() *_AirConditioningData
 	_AirConditioningDataSetPlantHvacLevelCopy := &_AirConditioningDataSetPlantHvacLevel{
 		m.AirConditioningDataContract.(*_AirConditioningData).deepCopy(),
 		m.ZoneGroup,
-		m.ZoneList.DeepCopy().(HVACZoneList),
-		m.HvacModeAndFlags.DeepCopy().(HVACModeAndFlags),
+		utils.DeepCopy[HVACZoneList](m.ZoneList),
+		utils.DeepCopy[HVACModeAndFlags](m.HvacModeAndFlags),
 		m.HvacType,
-		m.Level.DeepCopy().(HVACTemperature),
-		m.RawLevel.DeepCopy().(HVACRawLevels),
-		m.AuxLevel.DeepCopy().(HVACAuxiliaryLevel),
+		utils.DeepCopy[HVACTemperature](m.Level),
+		utils.DeepCopy[HVACRawLevels](m.RawLevel),
+		utils.DeepCopy[HVACAuxiliaryLevel](m.AuxLevel),
 	}
 	m.AirConditioningDataContract.(*_AirConditioningData)._SubType = m
 	return _AirConditioningDataSetPlantHvacLevelCopy

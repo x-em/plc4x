@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataCarMode) deepCopy() *_BACnetConstructedDataCarMod
 	}
 	_BACnetConstructedDataCarModeCopy := &_BACnetConstructedDataCarMode{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.CarMode.DeepCopy().(BACnetLiftCarModeTagged),
+		utils.DeepCopy[BACnetLiftCarModeTagged](m.CarMode),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCarModeCopy

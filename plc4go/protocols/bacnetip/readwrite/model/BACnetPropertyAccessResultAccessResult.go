@@ -460,7 +460,7 @@ func (m *_BACnetPropertyAccessResultAccessResult) deepCopy() *_BACnetPropertyAcc
 	}
 	_BACnetPropertyAccessResultAccessResultCopy := &_BACnetPropertyAccessResultAccessResult{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 		m.ObjectTypeArgument,
 		m.PropertyIdentifierArgument,
 		m.PropertyArrayIndexArgument,

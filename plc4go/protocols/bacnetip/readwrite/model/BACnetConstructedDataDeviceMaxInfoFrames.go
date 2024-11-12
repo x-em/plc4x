@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataDeviceMaxInfoFrames) deepCopy() *_BACnetConstruct
 	}
 	_BACnetConstructedDataDeviceMaxInfoFramesCopy := &_BACnetConstructedDataDeviceMaxInfoFrames{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MaxInfoFrames.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MaxInfoFrames),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDeviceMaxInfoFramesCopy

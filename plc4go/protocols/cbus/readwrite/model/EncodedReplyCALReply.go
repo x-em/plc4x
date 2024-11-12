@@ -304,7 +304,7 @@ func (m *_EncodedReplyCALReply) deepCopy() *_EncodedReplyCALReply {
 	}
 	_EncodedReplyCALReplyCopy := &_EncodedReplyCALReply{
 		m.EncodedReplyContract.(*_EncodedReply).deepCopy(),
-		m.CalReply.DeepCopy().(CALReply),
+		utils.DeepCopy[CALReply](m.CalReply),
 	}
 	m.EncodedReplyContract.(*_EncodedReply)._SubType = m
 	return _EncodedReplyCALReplyCopy

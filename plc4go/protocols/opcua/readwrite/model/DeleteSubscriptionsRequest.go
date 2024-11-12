@@ -351,7 +351,7 @@ func (m *_DeleteSubscriptionsRequest) deepCopy() *_DeleteSubscriptionsRequest {
 	}
 	_DeleteSubscriptionsRequestCopy := &_DeleteSubscriptionsRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[uint32, uint32](m.SubscriptionIds),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

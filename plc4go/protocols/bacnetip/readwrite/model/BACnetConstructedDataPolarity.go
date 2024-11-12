@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataPolarity) deepCopy() *_BACnetConstructedDataPolar
 	}
 	_BACnetConstructedDataPolarityCopy := &_BACnetConstructedDataPolarity{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Polarity.DeepCopy().(BACnetPolarityTagged),
+		utils.DeepCopy[BACnetPolarityTagged](m.Polarity),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPolarityCopy

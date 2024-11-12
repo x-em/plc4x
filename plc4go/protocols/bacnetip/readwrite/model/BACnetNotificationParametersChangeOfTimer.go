@@ -659,14 +659,14 @@ func (m *_BACnetNotificationParametersChangeOfTimer) deepCopy() *_BACnetNotifica
 	}
 	_BACnetNotificationParametersChangeOfTimerCopy := &_BACnetNotificationParametersChangeOfTimer{
 		m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters).deepCopy(),
-		m.InnerOpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.NewValue.DeepCopy().(BACnetTimerStateTagged),
-		m.StatusFlags.DeepCopy().(BACnetStatusFlagsTagged),
-		m.UpdateTime.DeepCopy().(BACnetDateTimeEnclosed),
-		m.LastStateChange.DeepCopy().(BACnetTimerTransitionTagged),
-		m.InitialTimeout.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ExpirationTime.DeepCopy().(BACnetDateTimeEnclosed),
-		m.InnerClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.InnerOpeningTag),
+		utils.DeepCopy[BACnetTimerStateTagged](m.NewValue),
+		utils.DeepCopy[BACnetStatusFlagsTagged](m.StatusFlags),
+		utils.DeepCopy[BACnetDateTimeEnclosed](m.UpdateTime),
+		utils.DeepCopy[BACnetTimerTransitionTagged](m.LastStateChange),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.InitialTimeout),
+		utils.DeepCopy[BACnetDateTimeEnclosed](m.ExpirationTime),
+		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
 	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfTimerCopy

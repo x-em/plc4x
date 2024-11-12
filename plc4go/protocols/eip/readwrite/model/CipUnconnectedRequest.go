@@ -546,9 +546,9 @@ func (m *_CipUnconnectedRequest) deepCopy() *_CipUnconnectedRequest {
 	}
 	_CipUnconnectedRequestCopy := &_CipUnconnectedRequest{
 		m.CipServiceContract.(*_CipService).deepCopy(),
-		m.ClassSegment.DeepCopy().(PathSegment),
-		m.InstanceSegment.DeepCopy().(PathSegment),
-		m.UnconnectedService.DeepCopy().(CipService),
+		utils.DeepCopy[PathSegment](m.ClassSegment),
+		utils.DeepCopy[PathSegment](m.InstanceSegment),
+		utils.DeepCopy[CipService](m.UnconnectedService),
 		m.BackPlane,
 		m.Slot,
 		m.reservedField0,

@@ -708,11 +708,11 @@ func (m *_DataSetMetaDataType) deepCopy() *_DataSetMetaDataType {
 		utils.DeepCopySlice[StructureDescription, StructureDescription](m.StructureDataTypes),
 		utils.DeepCopySlice[EnumDescription, EnumDescription](m.EnumDataTypes),
 		utils.DeepCopySlice[SimpleTypeDescription, SimpleTypeDescription](m.SimpleDataTypes),
-		m.Name.DeepCopy().(PascalString),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[PascalString](m.Name),
+		utils.DeepCopy[LocalizedText](m.Description),
 		utils.DeepCopySlice[FieldMetaData, FieldMetaData](m.Fields),
-		m.DataSetClassId.DeepCopy().(GuidValue),
-		m.ConfigurationVersion.DeepCopy().(ConfigurationVersionDataType),
+		utils.DeepCopy[GuidValue](m.DataSetClassId),
+		utils.DeepCopy[ConfigurationVersionDataType](m.ConfigurationVersion),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DataSetMetaDataTypeCopy

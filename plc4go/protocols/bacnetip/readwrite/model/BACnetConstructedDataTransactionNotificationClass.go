@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataTransactionNotificationClass) deepCopy() *_BACnet
 	}
 	_BACnetConstructedDataTransactionNotificationClassCopy := &_BACnetConstructedDataTransactionNotificationClass{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.TransactionNotificationClass.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.TransactionNotificationClass),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTransactionNotificationClassCopy

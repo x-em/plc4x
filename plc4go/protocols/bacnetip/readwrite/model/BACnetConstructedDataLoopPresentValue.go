@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLoopPresentValue) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataLoopPresentValueCopy := &_BACnetConstructedDataLoopPresentValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PresentValue.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.PresentValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLoopPresentValueCopy

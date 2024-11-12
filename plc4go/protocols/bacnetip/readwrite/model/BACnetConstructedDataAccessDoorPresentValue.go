@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataAccessDoorPresentValue) deepCopy() *_BACnetConstr
 	}
 	_BACnetConstructedDataAccessDoorPresentValueCopy := &_BACnetConstructedDataAccessDoorPresentValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PresentValue.DeepCopy().(BACnetDoorValueTagged),
+		utils.DeepCopy[BACnetDoorValueTagged](m.PresentValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccessDoorPresentValueCopy

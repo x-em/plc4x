@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataElevatorGroup) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataElevatorGroupCopy := &_BACnetConstructedDataElevatorGroup{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ElevatorGroup.DeepCopy().(BACnetApplicationTagObjectIdentifier),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.ElevatorGroup),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataElevatorGroupCopy

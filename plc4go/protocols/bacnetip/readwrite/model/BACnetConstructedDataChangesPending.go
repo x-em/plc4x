@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataChangesPending) deepCopy() *_BACnetConstructedDat
 	}
 	_BACnetConstructedDataChangesPendingCopy := &_BACnetConstructedDataChangesPending{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ChangesPending.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.ChangesPending),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataChangesPendingCopy

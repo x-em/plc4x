@@ -360,8 +360,8 @@ func (m *_SignedSoftwareCertificate) deepCopy() *_SignedSoftwareCertificate {
 	}
 	_SignedSoftwareCertificateCopy := &_SignedSoftwareCertificate{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.CertificateData.DeepCopy().(PascalByteString),
-		m.Signature.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalByteString](m.CertificateData),
+		utils.DeepCopy[PascalByteString](m.Signature),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SignedSoftwareCertificateCopy

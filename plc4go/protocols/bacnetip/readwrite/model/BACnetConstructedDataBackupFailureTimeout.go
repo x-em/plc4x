@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataBackupFailureTimeout) deepCopy() *_BACnetConstruc
 	}
 	_BACnetConstructedDataBackupFailureTimeoutCopy := &_BACnetConstructedDataBackupFailureTimeout{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.BackupFailureTimeout.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.BackupFailureTimeout),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBackupFailureTimeoutCopy

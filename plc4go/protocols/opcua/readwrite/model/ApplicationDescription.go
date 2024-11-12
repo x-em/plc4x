@@ -592,12 +592,12 @@ func (m *_ApplicationDescription) deepCopy() *_ApplicationDescription {
 	}
 	_ApplicationDescriptionCopy := &_ApplicationDescription{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ApplicationUri.DeepCopy().(PascalString),
-		m.ProductUri.DeepCopy().(PascalString),
-		m.ApplicationName.DeepCopy().(LocalizedText),
+		utils.DeepCopy[PascalString](m.ApplicationUri),
+		utils.DeepCopy[PascalString](m.ProductUri),
+		utils.DeepCopy[LocalizedText](m.ApplicationName),
 		m.ApplicationType,
-		m.GatewayServerUri.DeepCopy().(PascalString),
-		m.DiscoveryProfileUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.GatewayServerUri),
+		utils.DeepCopy[PascalString](m.DiscoveryProfileUri),
 		utils.DeepCopySlice[PascalString, PascalString](m.DiscoveryUrls),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

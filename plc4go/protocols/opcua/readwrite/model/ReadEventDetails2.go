@@ -438,7 +438,7 @@ func (m *_ReadEventDetails2) deepCopy() *_ReadEventDetails2 {
 		m.NumValuesPerNode,
 		m.StartTime,
 		m.EndTime,
-		m.Filter.DeepCopy().(EventFilter),
+		utils.DeepCopy[EventFilter](m.Filter),
 		m.ReadModified,
 		m.reservedField0,
 	}

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataDirectReading) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataDirectReadingCopy := &_BACnetConstructedDataDirectReading{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DirectReading.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.DirectReading),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDirectReadingCopy

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataActualShedLevel) deepCopy() *_BACnetConstructedDa
 	}
 	_BACnetConstructedDataActualShedLevelCopy := &_BACnetConstructedDataActualShedLevel{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ActualShedLevel.DeepCopy().(BACnetShedLevel),
+		utils.DeepCopy[BACnetShedLevel](m.ActualShedLevel),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataActualShedLevelCopy

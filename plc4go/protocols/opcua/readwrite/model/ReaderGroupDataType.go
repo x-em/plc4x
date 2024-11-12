@@ -707,15 +707,15 @@ func (m *_ReaderGroupDataType) deepCopy() *_ReaderGroupDataType {
 	}
 	_ReaderGroupDataTypeCopy := &_ReaderGroupDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Name),
 		m.Enabled,
 		m.SecurityMode,
-		m.SecurityGroupId.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SecurityGroupId),
 		utils.DeepCopySlice[EndpointDescription, EndpointDescription](m.SecurityKeyServices),
 		m.MaxNetworkMessageSize,
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.GroupProperties),
-		m.TransportSettings.DeepCopy().(ExtensionObject),
-		m.MessageSettings.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.TransportSettings),
+		utils.DeepCopy[ExtensionObject](m.MessageSettings),
 		utils.DeepCopySlice[DataSetReaderDataType, DataSetReaderDataType](m.DataSetReaders),
 		m.reservedField0,
 	}

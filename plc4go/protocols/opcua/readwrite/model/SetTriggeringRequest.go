@@ -450,7 +450,7 @@ func (m *_SetTriggeringRequest) deepCopy() *_SetTriggeringRequest {
 	}
 	_SetTriggeringRequestCopy := &_SetTriggeringRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.SubscriptionId,
 		m.TriggeringItemId,
 		utils.DeepCopySlice[uint32, uint32](m.LinksToAdd),

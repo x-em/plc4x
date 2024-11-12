@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataLargeAnalogValueFaultHighLimit) deepCopy() *_BACn
 	}
 	_BACnetConstructedDataLargeAnalogValueFaultHighLimitCopy := &_BACnetConstructedDataLargeAnalogValueFaultHighLimit{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.FaultHighLimit.DeepCopy().(BACnetApplicationTagDouble),
+		utils.DeepCopy[BACnetApplicationTagDouble](m.FaultHighLimit),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLargeAnalogValueFaultHighLimitCopy

@@ -308,7 +308,7 @@ func (m *_DatagramConnectionTransportDataType) deepCopy() *_DatagramConnectionTr
 	}
 	_DatagramConnectionTransportDataTypeCopy := &_DatagramConnectionTransportDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.DiscoveryAddress.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.DiscoveryAddress),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramConnectionTransportDataTypeCopy

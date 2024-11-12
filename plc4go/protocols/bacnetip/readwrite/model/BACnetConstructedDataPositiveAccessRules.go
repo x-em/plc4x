@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataPositiveAccessRules) deepCopy() *_BACnetConstruct
 	}
 	_BACnetConstructedDataPositiveAccessRulesCopy := &_BACnetConstructedDataPositiveAccessRules{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetAccessRule, BACnetAccessRule](m.PositiveAccessRules),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

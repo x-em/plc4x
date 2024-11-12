@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataSupportedFormats) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataSupportedFormatsCopy := &_BACnetConstructedDataSupportedFormats{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetAuthenticationFactorFormat, BACnetAuthenticationFactorFormat](m.SupportedFormats),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

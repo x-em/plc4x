@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesLiftGroupMode) deepCopy() *_BACnetPropertyStatesLi
 	}
 	_BACnetPropertyStatesLiftGroupModeCopy := &_BACnetPropertyStatesLiftGroupMode{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.LiftGroupMode.DeepCopy().(BACnetLiftGroupModeTagged),
+		utils.DeepCopy[BACnetLiftGroupModeTagged](m.LiftGroupMode),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesLiftGroupModeCopy

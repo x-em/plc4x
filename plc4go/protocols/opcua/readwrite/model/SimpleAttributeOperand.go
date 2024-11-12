@@ -436,10 +436,10 @@ func (m *_SimpleAttributeOperand) deepCopy() *_SimpleAttributeOperand {
 	}
 	_SimpleAttributeOperandCopy := &_SimpleAttributeOperand{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.TypeDefinitionId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.TypeDefinitionId),
 		utils.DeepCopySlice[QualifiedName, QualifiedName](m.BrowsePath),
 		m.AttributeId,
-		m.IndexRange.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.IndexRange),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SimpleAttributeOperandCopy

@@ -366,7 +366,7 @@ func (m *_ModificationInfo) deepCopy() *_ModificationInfo {
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.ModificationTime,
 		m.UpdateType,
-		m.UserName.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.UserName),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ModificationInfoCopy

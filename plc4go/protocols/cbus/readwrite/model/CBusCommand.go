@@ -530,7 +530,7 @@ func (m *_CBusCommand) deepCopy() *_CBusCommand {
 	}
 	_CBusCommandCopy := &_CBusCommand{
 		nil, // will be set by child
-		m.Header.DeepCopy().(CBusHeader),
+		utils.DeepCopy[CBusHeader](m.Header),
 		m.CBusOptions,
 	}
 	return _CBusCommandCopy

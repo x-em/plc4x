@@ -763,7 +763,7 @@ func (m *_BACnetChannelValue) deepCopy() *_BACnetChannelValue {
 	}
 	_BACnetChannelValueCopy := &_BACnetChannelValue{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetChannelValueCopy
 }

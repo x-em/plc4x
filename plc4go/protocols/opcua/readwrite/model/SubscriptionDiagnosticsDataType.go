@@ -1163,7 +1163,7 @@ func (m *_SubscriptionDiagnosticsDataType) deepCopy() *_SubscriptionDiagnosticsD
 	}
 	_SubscriptionDiagnosticsDataTypeCopy := &_SubscriptionDiagnosticsDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.SessionId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.SessionId),
 		m.SubscriptionId,
 		m.Priority,
 		m.PublishingInterval,

@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataOccupancyUpperLimitEnforced) deepCopy() *_BACnetC
 	}
 	_BACnetConstructedDataOccupancyUpperLimitEnforcedCopy := &_BACnetConstructedDataOccupancyUpperLimitEnforced{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.OccupancyUpperLimitEnforced.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.OccupancyUpperLimitEnforced),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataOccupancyUpperLimitEnforcedCopy

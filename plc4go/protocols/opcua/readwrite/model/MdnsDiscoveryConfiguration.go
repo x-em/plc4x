@@ -356,7 +356,7 @@ func (m *_MdnsDiscoveryConfiguration) deepCopy() *_MdnsDiscoveryConfiguration {
 	}
 	_MdnsDiscoveryConfigurationCopy := &_MdnsDiscoveryConfiguration{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.MdnsServerName.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.MdnsServerName),
 		utils.DeepCopySlice[PascalString, PascalString](m.ServerCapabilities),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

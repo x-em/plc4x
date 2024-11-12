@@ -440,10 +440,10 @@ func (m *_EUInformation) deepCopy() *_EUInformation {
 	}
 	_EUInformationCopy := &_EUInformation{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NamespaceUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.NamespaceUri),
 		m.UnitId,
-		m.DisplayName.DeepCopy().(LocalizedText),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[LocalizedText](m.DisplayName),
+		utils.DeepCopy[LocalizedText](m.Description),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _EUInformationCopy

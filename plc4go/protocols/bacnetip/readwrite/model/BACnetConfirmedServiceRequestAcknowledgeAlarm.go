@@ -569,12 +569,12 @@ func (m *_BACnetConfirmedServiceRequestAcknowledgeAlarm) deepCopy() *_BACnetConf
 	}
 	_BACnetConfirmedServiceRequestAcknowledgeAlarmCopy := &_BACnetConfirmedServiceRequestAcknowledgeAlarm{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.AcknowledgingProcessIdentifier.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.EventObjectIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
-		m.EventStateAcknowledged.DeepCopy().(BACnetEventStateTagged),
-		m.Timestamp.DeepCopy().(BACnetTimeStampEnclosed),
-		m.AcknowledgmentSource.DeepCopy().(BACnetContextTagCharacterString),
-		m.TimeOfAcknowledgment.DeepCopy().(BACnetTimeStampEnclosed),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.AcknowledgingProcessIdentifier),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.EventObjectIdentifier),
+		utils.DeepCopy[BACnetEventStateTagged](m.EventStateAcknowledged),
+		utils.DeepCopy[BACnetTimeStampEnclosed](m.Timestamp),
+		utils.DeepCopy[BACnetContextTagCharacterString](m.AcknowledgmentSource),
+		utils.DeepCopy[BACnetTimeStampEnclosed](m.TimeOfAcknowledgment),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestAcknowledgeAlarmCopy

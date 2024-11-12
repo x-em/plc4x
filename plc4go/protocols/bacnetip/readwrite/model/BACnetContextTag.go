@@ -793,7 +793,7 @@ func (m *_BACnetContextTag) deepCopy() *_BACnetContextTag {
 	}
 	_BACnetContextTagCopy := &_BACnetContextTag{
 		nil, // will be set by child
-		m.Header.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.Header),
 		m.TagNumberArgument,
 	}
 	return _BACnetContextTagCopy

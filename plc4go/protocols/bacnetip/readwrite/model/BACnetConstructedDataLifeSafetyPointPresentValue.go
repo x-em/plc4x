@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataLifeSafetyPointPresentValue) deepCopy() *_BACnetC
 	}
 	_BACnetConstructedDataLifeSafetyPointPresentValueCopy := &_BACnetConstructedDataLifeSafetyPointPresentValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PresentValue.DeepCopy().(BACnetLifeSafetyStateTagged),
+		utils.DeepCopy[BACnetLifeSafetyStateTagged](m.PresentValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLifeSafetyPointPresentValueCopy

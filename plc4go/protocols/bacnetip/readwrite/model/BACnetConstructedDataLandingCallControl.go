@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLandingCallControl) deepCopy() *_BACnetConstructe
 	}
 	_BACnetConstructedDataLandingCallControlCopy := &_BACnetConstructedDataLandingCallControl{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LandingCallControl.DeepCopy().(BACnetLandingCallStatus),
+		utils.DeepCopy[BACnetLandingCallStatus](m.LandingCallControl),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLandingCallControlCopy

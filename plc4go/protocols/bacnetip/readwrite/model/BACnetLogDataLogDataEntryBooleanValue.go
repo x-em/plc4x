@@ -304,7 +304,7 @@ func (m *_BACnetLogDataLogDataEntryBooleanValue) deepCopy() *_BACnetLogDataLogDa
 	}
 	_BACnetLogDataLogDataEntryBooleanValueCopy := &_BACnetLogDataLogDataEntryBooleanValue{
 		m.BACnetLogDataLogDataEntryContract.(*_BACnetLogDataLogDataEntry).deepCopy(),
-		m.BooleanValue.DeepCopy().(BACnetContextTagBoolean),
+		utils.DeepCopy[BACnetContextTagBoolean](m.BooleanValue),
 	}
 	m.BACnetLogDataLogDataEntryContract.(*_BACnetLogDataLogDataEntry)._SubType = m
 	return _BACnetLogDataLogDataEntryBooleanValueCopy

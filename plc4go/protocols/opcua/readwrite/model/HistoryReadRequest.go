@@ -479,8 +479,8 @@ func (m *_HistoryReadRequest) deepCopy() *_HistoryReadRequest {
 	}
 	_HistoryReadRequestCopy := &_HistoryReadRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
-		m.HistoryReadDetails.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
+		utils.DeepCopy[ExtensionObject](m.HistoryReadDetails),
 		m.TimestampsToReturn,
 		m.ReleaseContinuationPoints,
 		utils.DeepCopySlice[HistoryReadValueId, HistoryReadValueId](m.NodesToRead),

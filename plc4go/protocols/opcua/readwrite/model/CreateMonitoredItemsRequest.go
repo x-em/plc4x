@@ -412,7 +412,7 @@ func (m *_CreateMonitoredItemsRequest) deepCopy() *_CreateMonitoredItemsRequest 
 	}
 	_CreateMonitoredItemsRequestCopy := &_CreateMonitoredItemsRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.SubscriptionId,
 		m.TimestampsToReturn,
 		utils.DeepCopySlice[MonitoredItemCreateRequest, MonitoredItemCreateRequest](m.ItemsToCreate),

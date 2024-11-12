@@ -308,7 +308,7 @@ func (m *_LiteralOperand) deepCopy() *_LiteralOperand {
 	}
 	_LiteralOperandCopy := &_LiteralOperand{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Value.DeepCopy().(Variant),
+		utils.DeepCopy[Variant](m.Value),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _LiteralOperandCopy

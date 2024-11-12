@@ -513,11 +513,11 @@ func (m *_BACnetServiceAckGetEnrollmentSummary) deepCopy() *_BACnetServiceAckGet
 	}
 	_BACnetServiceAckGetEnrollmentSummaryCopy := &_BACnetServiceAckGetEnrollmentSummary{
 		m.BACnetServiceAckContract.(*_BACnetServiceAck).deepCopy(),
-		m.ObjectIdentifier.DeepCopy().(BACnetApplicationTagObjectIdentifier),
-		m.EventType.DeepCopy().(BACnetEventTypeTagged),
-		m.EventState.DeepCopy().(BACnetEventStateTagged),
-		m.Priority.DeepCopy().(BACnetApplicationTagUnsignedInteger),
-		m.NotificationClass.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.ObjectIdentifier),
+		utils.DeepCopy[BACnetEventTypeTagged](m.EventType),
+		utils.DeepCopy[BACnetEventStateTagged](m.EventState),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.Priority),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NotificationClass),
 	}
 	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckGetEnrollmentSummaryCopy

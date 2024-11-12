@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataWindowSamples) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataWindowSamplesCopy := &_BACnetConstructedDataWindowSamples{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.WindowSamples.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.WindowSamples),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataWindowSamplesCopy

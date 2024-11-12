@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLastKeyServer) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataLastKeyServerCopy := &_BACnetConstructedDataLastKeyServer{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LastKeyServer.DeepCopy().(BACnetAddressBinding),
+		utils.DeepCopy[BACnetAddressBinding](m.LastKeyServer),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLastKeyServerCopy

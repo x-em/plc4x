@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataAssignedLandingCalls) deepCopy() *_BACnetConstruc
 	}
 	_BACnetConstructedDataAssignedLandingCallsCopy := &_BACnetConstructedDataAssignedLandingCalls{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetAssignedLandingCalls, BACnetAssignedLandingCalls](m.AssignedLandingCalls),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

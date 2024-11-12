@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAverageValue) deepCopy() *_BACnetConstructedDataA
 	}
 	_BACnetConstructedDataAverageValueCopy := &_BACnetConstructedDataAverageValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AverageValue.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.AverageValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAverageValueCopy

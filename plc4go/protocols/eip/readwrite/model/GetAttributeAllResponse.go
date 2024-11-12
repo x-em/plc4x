@@ -386,7 +386,7 @@ func (m *_GetAttributeAllResponse) deepCopy() *_GetAttributeAllResponse {
 		m.CipServiceContract.(*_CipService).deepCopy(),
 		m.Status,
 		m.ExtStatus,
-		m.Attributes.DeepCopy().(CIPAttributes),
+		utils.DeepCopy[CIPAttributes](m.Attributes),
 		m.reservedField0,
 	}
 	m.CipServiceContract.(*_CipService)._SubType = m

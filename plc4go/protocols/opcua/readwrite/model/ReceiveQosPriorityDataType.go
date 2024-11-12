@@ -308,7 +308,7 @@ func (m *_ReceiveQosPriorityDataType) deepCopy() *_ReceiveQosPriorityDataType {
 	}
 	_ReceiveQosPriorityDataTypeCopy := &_ReceiveQosPriorityDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.PriorityLabel.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.PriorityLabel),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReceiveQosPriorityDataTypeCopy

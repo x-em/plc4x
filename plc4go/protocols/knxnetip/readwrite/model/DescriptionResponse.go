@@ -362,8 +362,8 @@ func (m *_DescriptionResponse) deepCopy() *_DescriptionResponse {
 	}
 	_DescriptionResponseCopy := &_DescriptionResponse{
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
-		m.DibDeviceInfo.DeepCopy().(DIBDeviceInfo),
-		m.DibSuppSvcFamilies.DeepCopy().(DIBSuppSvcFamilies),
+		utils.DeepCopy[DIBDeviceInfo](m.DibDeviceInfo),
+		utils.DeepCopy[DIBSuppSvcFamilies](m.DibSuppSvcFamilies),
 	}
 	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _DescriptionResponseCopy

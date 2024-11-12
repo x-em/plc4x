@@ -631,13 +631,13 @@ func (m *_RegisteredServer) deepCopy() *_RegisteredServer {
 	}
 	_RegisteredServerCopy := &_RegisteredServer{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ServerUri.DeepCopy().(PascalString),
-		m.ProductUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.ServerUri),
+		utils.DeepCopy[PascalString](m.ProductUri),
 		utils.DeepCopySlice[LocalizedText, LocalizedText](m.ServerNames),
 		m.ServerType,
-		m.GatewayServerUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.GatewayServerUri),
 		utils.DeepCopySlice[PascalString, PascalString](m.DiscoveryUrls),
-		m.SemaphoreFilePath.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.SemaphoreFilePath),
 		m.IsOnline,
 		m.reservedField0,
 	}

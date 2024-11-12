@@ -304,7 +304,7 @@ func (m *_BACnetPriorityValueOctetString) deepCopy() *_BACnetPriorityValueOctetS
 	}
 	_BACnetPriorityValueOctetStringCopy := &_BACnetPriorityValueOctetString{
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
-		m.OctetStringValue.DeepCopy().(BACnetApplicationTagOctetString),
+		utils.DeepCopy[BACnetApplicationTagOctetString](m.OctetStringValue),
 	}
 	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueOctetStringCopy

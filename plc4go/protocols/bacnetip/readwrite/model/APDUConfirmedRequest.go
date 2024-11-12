@@ -695,7 +695,7 @@ func (m *_APDUConfirmedRequest) deepCopy() *_APDUConfirmedRequest {
 		m.InvokeId,
 		utils.CopyPtr[uint8](m.SequenceNumber),
 		utils.CopyPtr[uint8](m.ProposedWindowSize),
-		m.ServiceRequest.DeepCopy().(BACnetConfirmedServiceRequest),
+		utils.DeepCopy[BACnetConfirmedServiceRequest](m.ServiceRequest),
 		utils.CopyPtr[BACnetConfirmedServiceChoice](m.SegmentServiceChoice),
 		utils.DeepCopySlice[byte, byte](m.Segment),
 		m.reservedField0,

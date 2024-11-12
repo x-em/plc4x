@@ -452,7 +452,7 @@ func (m *_CallMethodResult) deepCopy() *_CallMethodResult {
 	}
 	_CallMethodResultCopy := &_CallMethodResult{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.StatusCode.DeepCopy().(StatusCode),
+		utils.DeepCopy[StatusCode](m.StatusCode),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.InputArgumentResults),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.InputArgumentDiagnosticInfos),
 		utils.DeepCopySlice[Variant, Variant](m.OutputArguments),

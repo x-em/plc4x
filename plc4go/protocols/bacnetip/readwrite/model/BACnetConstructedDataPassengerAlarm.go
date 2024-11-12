@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataPassengerAlarm) deepCopy() *_BACnetConstructedDat
 	}
 	_BACnetConstructedDataPassengerAlarmCopy := &_BACnetConstructedDataPassengerAlarm{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PassengerAlarm.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.PassengerAlarm),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPassengerAlarmCopy

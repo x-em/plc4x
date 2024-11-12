@@ -404,7 +404,7 @@ func (m *_CreateMonitoredItemsResponse) deepCopy() *_CreateMonitoredItemsRespons
 	}
 	_CreateMonitoredItemsResponseCopy := &_CreateMonitoredItemsResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[MonitoredItemCreateResult, MonitoredItemCreateResult](m.Results),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

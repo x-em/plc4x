@@ -304,7 +304,7 @@ func (m *_BACnetOptionalREALValue) deepCopy() *_BACnetOptionalREALValue {
 	}
 	_BACnetOptionalREALValueCopy := &_BACnetOptionalREALValue{
 		m.BACnetOptionalREALContract.(*_BACnetOptionalREAL).deepCopy(),
-		m.RealValue.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.RealValue),
 	}
 	m.BACnetOptionalREALContract.(*_BACnetOptionalREAL)._SubType = m
 	return _BACnetOptionalREALValueCopy

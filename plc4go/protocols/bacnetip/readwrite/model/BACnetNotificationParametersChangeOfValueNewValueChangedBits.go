@@ -305,7 +305,7 @@ func (m *_BACnetNotificationParametersChangeOfValueNewValueChangedBits) deepCopy
 	}
 	_BACnetNotificationParametersChangeOfValueNewValueChangedBitsCopy := &_BACnetNotificationParametersChangeOfValueNewValueChangedBits{
 		m.BACnetNotificationParametersChangeOfValueNewValueContract.(*_BACnetNotificationParametersChangeOfValueNewValue).deepCopy(),
-		m.ChangedBits.DeepCopy().(BACnetContextTagBitString),
+		utils.DeepCopy[BACnetContextTagBitString](m.ChangedBits),
 	}
 	m.BACnetNotificationParametersChangeOfValueNewValueContract.(*_BACnetNotificationParametersChangeOfValueNewValue)._SubType = m
 	return _BACnetNotificationParametersChangeOfValueNewValueChangedBitsCopy

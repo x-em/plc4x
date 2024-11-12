@@ -608,7 +608,7 @@ func (m *_BACnetLogDataLogDataEntry) deepCopy() *_BACnetLogDataLogDataEntry {
 	}
 	_BACnetLogDataLogDataEntryCopy := &_BACnetLogDataLogDataEntry{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetLogDataLogDataEntryCopy
 }

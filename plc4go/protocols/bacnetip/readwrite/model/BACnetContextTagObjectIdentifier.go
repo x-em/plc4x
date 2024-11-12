@@ -361,7 +361,7 @@ func (m *_BACnetContextTagObjectIdentifier) deepCopy() *_BACnetContextTagObjectI
 	}
 	_BACnetContextTagObjectIdentifierCopy := &_BACnetContextTagObjectIdentifier{
 		m.BACnetContextTagContract.(*_BACnetContextTag).deepCopy(),
-		m.Payload.DeepCopy().(BACnetTagPayloadObjectIdentifier),
+		utils.DeepCopy[BACnetTagPayloadObjectIdentifier](m.Payload),
 	}
 	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagObjectIdentifierCopy

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataFailedAttemptsTime) deepCopy() *_BACnetConstructe
 	}
 	_BACnetConstructedDataFailedAttemptsTimeCopy := &_BACnetConstructedDataFailedAttemptsTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.FailedAttemptsTime.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.FailedAttemptsTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataFailedAttemptsTimeCopy

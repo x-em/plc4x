@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataPrescale) deepCopy() *_BACnetConstructedDataPresc
 	}
 	_BACnetConstructedDataPrescaleCopy := &_BACnetConstructedDataPrescale{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Prescale.DeepCopy().(BACnetPrescale),
+		utils.DeepCopy[BACnetPrescale](m.Prescale),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataPrescaleCopy

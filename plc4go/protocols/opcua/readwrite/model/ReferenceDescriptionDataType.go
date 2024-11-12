@@ -455,10 +455,10 @@ func (m *_ReferenceDescriptionDataType) deepCopy() *_ReferenceDescriptionDataTyp
 	}
 	_ReferenceDescriptionDataTypeCopy := &_ReferenceDescriptionDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.SourceNode.DeepCopy().(NodeId),
-		m.ReferenceType.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.SourceNode),
+		utils.DeepCopy[NodeId](m.ReferenceType),
 		m.IsForward,
-		m.TargetNode.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[ExpandedNodeId](m.TargetNode),
 		m.reservedField0,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

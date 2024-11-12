@@ -304,7 +304,7 @@ func (m *_BACnetClientCOVNone) deepCopy() *_BACnetClientCOVNone {
 	}
 	_BACnetClientCOVNoneCopy := &_BACnetClientCOVNone{
 		m.BACnetClientCOVContract.(*_BACnetClientCOV).deepCopy(),
-		m.DefaultIncrement.DeepCopy().(BACnetApplicationTagNull),
+		utils.DeepCopy[BACnetApplicationTagNull](m.DefaultIncrement),
 	}
 	m.BACnetClientCOVContract.(*_BACnetClientCOV)._SubType = m
 	return _BACnetClientCOVNoneCopy

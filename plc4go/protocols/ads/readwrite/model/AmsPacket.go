@@ -1251,9 +1251,9 @@ func (m *_AmsPacket) deepCopy() *_AmsPacket {
 	}
 	_AmsPacketCopy := &_AmsPacket{
 		nil, // will be set by child
-		m.TargetAmsNetId.DeepCopy().(AmsNetId),
+		utils.DeepCopy[AmsNetId](m.TargetAmsNetId),
 		m.TargetAmsPort,
-		m.SourceAmsNetId.DeepCopy().(AmsNetId),
+		utils.DeepCopy[AmsNetId](m.SourceAmsNetId),
 		m.SourceAmsPort,
 		m.ErrorCode,
 		m.InvokeId,

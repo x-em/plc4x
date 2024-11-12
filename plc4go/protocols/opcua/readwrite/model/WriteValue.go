@@ -440,10 +440,10 @@ func (m *_WriteValue) deepCopy() *_WriteValue {
 	}
 	_WriteValueCopy := &_WriteValue{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.NodeId),
 		m.AttributeId,
-		m.IndexRange.DeepCopy().(PascalString),
-		m.Value.DeepCopy().(DataValue),
+		utils.DeepCopy[PascalString](m.IndexRange),
+		utils.DeepCopy[DataValue](m.Value),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _WriteValueCopy

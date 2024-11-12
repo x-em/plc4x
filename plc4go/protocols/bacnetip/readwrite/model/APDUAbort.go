@@ -381,7 +381,7 @@ func (m *_APDUAbort) deepCopy() *_APDUAbort {
 		m.APDUContract.(*_APDU).deepCopy(),
 		m.Server,
 		m.OriginalInvokeId,
-		m.AbortReason.DeepCopy().(BACnetAbortReasonTagged),
+		utils.DeepCopy[BACnetAbortReasonTagged](m.AbortReason),
 		m.reservedField0,
 	}
 	m.APDUContract.(*_APDU)._SubType = m

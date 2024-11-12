@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataAccumulatorMaxPresValue) deepCopy() *_BACnetConst
 	}
 	_BACnetConstructedDataAccumulatorMaxPresValueCopy := &_BACnetConstructedDataAccumulatorMaxPresValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MaxPresValue.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.MaxPresValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccumulatorMaxPresValueCopy

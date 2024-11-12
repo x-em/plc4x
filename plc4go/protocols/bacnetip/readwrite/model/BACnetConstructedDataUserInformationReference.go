@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataUserInformationReference) deepCopy() *_BACnetCons
 	}
 	_BACnetConstructedDataUserInformationReferenceCopy := &_BACnetConstructedDataUserInformationReference{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.UserInformationReference.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.UserInformationReference),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataUserInformationReferenceCopy

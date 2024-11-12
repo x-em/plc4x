@@ -308,7 +308,7 @@ func (m *_SALDataTriggerControl) deepCopy() *_SALDataTriggerControl {
 	}
 	_SALDataTriggerControlCopy := &_SALDataTriggerControl{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.TriggerControlData.DeepCopy().(TriggerControlData),
+		utils.DeepCopy[TriggerControlData](m.TriggerControlData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataTriggerControlCopy

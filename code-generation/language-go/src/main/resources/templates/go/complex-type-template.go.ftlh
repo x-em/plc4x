@@ -1873,7 +1873,7 @@ func (m *_${type.name}) deepCopy() *_${type.name} {
 <#if type.propertyFields?has_content>
 	<#list type.propertyFields as field>
 		<#if field.type.isComplexTypeReference()>
-		m.${field.name?cap_first}.DeepCopy().(<#if helper.needsPointerAccess(field)>*</#if>${helper.getLanguageTypeNameForTypeReference(field.type)}),
+		utils.DeepCopy[<#if helper.needsPointerAccess(field)>*</#if>${helper.getLanguageTypeNameForTypeReference(field.type)}](m.${field.name?cap_first}),
 		<#elseif field.type.isArrayTypeReference()>
 			<#assign arrayElementTypeRef=field.type.asArrayTypeReference().orElseThrow().elementTypeReference/>
 		utils.DeepCopySlice[${helper.getLanguageTypeNameForTypeReference(arrayElementTypeRef)}, ${helper.getLanguageTypeNameForTypeReference(arrayElementTypeRef)}](m.${field.name?cap_first}),

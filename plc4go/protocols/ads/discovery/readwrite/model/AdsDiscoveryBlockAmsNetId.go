@@ -337,7 +337,7 @@ func (m *_AdsDiscoveryBlockAmsNetId) deepCopy() *_AdsDiscoveryBlockAmsNetId {
 	}
 	_AdsDiscoveryBlockAmsNetIdCopy := &_AdsDiscoveryBlockAmsNetId{
 		m.AdsDiscoveryBlockContract.(*_AdsDiscoveryBlock).deepCopy(),
-		m.AmsNetId.DeepCopy().(AmsNetId),
+		utils.DeepCopy[AmsNetId](m.AmsNetId),
 	}
 	m.AdsDiscoveryBlockContract.(*_AdsDiscoveryBlock)._SubType = m
 	return _AdsDiscoveryBlockAmsNetIdCopy

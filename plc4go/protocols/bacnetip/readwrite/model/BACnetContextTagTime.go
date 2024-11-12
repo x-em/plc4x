@@ -308,7 +308,7 @@ func (m *_BACnetContextTagTime) deepCopy() *_BACnetContextTagTime {
 	}
 	_BACnetContextTagTimeCopy := &_BACnetContextTagTime{
 		m.BACnetContextTagContract.(*_BACnetContextTag).deepCopy(),
-		m.Payload.DeepCopy().(BACnetTagPayloadTime),
+		utils.DeepCopy[BACnetTagPayloadTime](m.Payload),
 	}
 	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagTimeCopy

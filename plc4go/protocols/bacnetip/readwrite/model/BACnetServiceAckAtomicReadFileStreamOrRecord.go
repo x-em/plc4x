@@ -536,9 +536,9 @@ func (m *_BACnetServiceAckAtomicReadFileStreamOrRecord) deepCopy() *_BACnetServi
 	}
 	_BACnetServiceAckAtomicReadFileStreamOrRecordCopy := &_BACnetServiceAckAtomicReadFileStreamOrRecord{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
 	return _BACnetServiceAckAtomicReadFileStreamOrRecordCopy
 }

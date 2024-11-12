@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataNumberOfAPDURetries) deepCopy() *_BACnetConstruct
 	}
 	_BACnetConstructedDataNumberOfAPDURetriesCopy := &_BACnetConstructedDataNumberOfAPDURetries{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfApduRetries.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfApduRetries),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataNumberOfAPDURetriesCopy

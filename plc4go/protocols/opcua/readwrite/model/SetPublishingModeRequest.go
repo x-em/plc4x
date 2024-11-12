@@ -394,7 +394,7 @@ func (m *_SetPublishingModeRequest) deepCopy() *_SetPublishingModeRequest {
 	}
 	_SetPublishingModeRequestCopy := &_SetPublishingModeRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		m.PublishingEnabled,
 		utils.DeepCopySlice[uint32, uint32](m.SubscriptionIds),
 		m.reservedField0,

@@ -608,7 +608,7 @@ func (m *_APDUComplexAck) deepCopy() *_APDUComplexAck {
 		m.OriginalInvokeId,
 		utils.CopyPtr[uint8](m.SequenceNumber),
 		utils.CopyPtr[uint8](m.ProposedWindowSize),
-		m.ServiceAck.DeepCopy().(BACnetServiceAck),
+		utils.DeepCopy[BACnetServiceAck](m.ServiceAck),
 		utils.CopyPtr[BACnetConfirmedServiceChoice](m.SegmentServiceChoice),
 		utils.DeepCopySlice[byte, byte](m.Segment),
 		m.reservedField0,

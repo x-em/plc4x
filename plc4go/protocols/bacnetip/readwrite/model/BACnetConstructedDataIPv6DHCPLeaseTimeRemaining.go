@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataIPv6DHCPLeaseTimeRemaining) deepCopy() *_BACnetCo
 	}
 	_BACnetConstructedDataIPv6DHCPLeaseTimeRemainingCopy := &_BACnetConstructedDataIPv6DHCPLeaseTimeRemaining{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Ipv6DhcpLeaseTimeRemaining.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.Ipv6DhcpLeaseTimeRemaining),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataIPv6DHCPLeaseTimeRemainingCopy

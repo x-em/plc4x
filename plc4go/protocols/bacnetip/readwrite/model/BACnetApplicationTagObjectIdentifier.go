@@ -357,7 +357,7 @@ func (m *_BACnetApplicationTagObjectIdentifier) deepCopy() *_BACnetApplicationTa
 	}
 	_BACnetApplicationTagObjectIdentifierCopy := &_BACnetApplicationTagObjectIdentifier{
 		m.BACnetApplicationTagContract.(*_BACnetApplicationTag).deepCopy(),
-		m.Payload.DeepCopy().(BACnetTagPayloadObjectIdentifier),
+		utils.DeepCopy[BACnetTagPayloadObjectIdentifier](m.Payload),
 	}
 	m.BACnetApplicationTagContract.(*_BACnetApplicationTag)._SubType = m
 	return _BACnetApplicationTagObjectIdentifierCopy

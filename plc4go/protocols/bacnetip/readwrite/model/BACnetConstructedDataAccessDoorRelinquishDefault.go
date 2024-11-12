@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataAccessDoorRelinquishDefault) deepCopy() *_BACnetC
 	}
 	_BACnetConstructedDataAccessDoorRelinquishDefaultCopy := &_BACnetConstructedDataAccessDoorRelinquishDefault{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.RelinquishDefault.DeepCopy().(BACnetDoorValueTagged),
+		utils.DeepCopy[BACnetDoorValueTagged](m.RelinquishDefault),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccessDoorRelinquishDefaultCopy

@@ -564,12 +564,12 @@ func (m *_BACnetEventParameterSignedOutOfRange) deepCopy() *_BACnetEventParamete
 	}
 	_BACnetEventParameterSignedOutOfRangeCopy := &_BACnetEventParameterSignedOutOfRange{
 		m.BACnetEventParameterContract.(*_BACnetEventParameter).deepCopy(),
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.TimeDelay.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.LowLimit.DeepCopy().(BACnetContextTagSignedInteger),
-		m.HighLimit.DeepCopy().(BACnetContextTagSignedInteger),
-		m.Deadband.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.TimeDelay),
+		utils.DeepCopy[BACnetContextTagSignedInteger](m.LowLimit),
+		utils.DeepCopy[BACnetContextTagSignedInteger](m.HighLimit),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Deadband),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
 	m.BACnetEventParameterContract.(*_BACnetEventParameter)._SubType = m
 	return _BACnetEventParameterSignedOutOfRangeCopy

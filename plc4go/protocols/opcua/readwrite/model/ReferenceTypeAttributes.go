@@ -568,13 +568,13 @@ func (m *_ReferenceTypeAttributes) deepCopy() *_ReferenceTypeAttributes {
 	_ReferenceTypeAttributesCopy := &_ReferenceTypeAttributes{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.SpecifiedAttributes,
-		m.DisplayName.DeepCopy().(LocalizedText),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[LocalizedText](m.DisplayName),
+		utils.DeepCopy[LocalizedText](m.Description),
 		m.WriteMask,
 		m.UserWriteMask,
 		m.Symmetric,
 		m.IsAbstract,
-		m.InverseName.DeepCopy().(LocalizedText),
+		utils.DeepCopy[LocalizedText](m.InverseName),
 		m.reservedField0,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

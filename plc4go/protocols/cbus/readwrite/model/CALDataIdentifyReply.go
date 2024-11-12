@@ -333,7 +333,7 @@ func (m *_CALDataIdentifyReply) deepCopy() *_CALDataIdentifyReply {
 	_CALDataIdentifyReplyCopy := &_CALDataIdentifyReply{
 		m.CALDataContract.(*_CALData).deepCopy(),
 		m.Attribute,
-		m.IdentifyReplyCommand.DeepCopy().(IdentifyReplyCommand),
+		utils.DeepCopy[IdentifyReplyCommand](m.IdentifyReplyCommand),
 	}
 	m.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataIdentifyReplyCopy

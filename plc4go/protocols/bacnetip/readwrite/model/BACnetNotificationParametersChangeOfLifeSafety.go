@@ -565,12 +565,12 @@ func (m *_BACnetNotificationParametersChangeOfLifeSafety) deepCopy() *_BACnetNot
 	}
 	_BACnetNotificationParametersChangeOfLifeSafetyCopy := &_BACnetNotificationParametersChangeOfLifeSafety{
 		m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters).deepCopy(),
-		m.InnerOpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.NewState.DeepCopy().(BACnetLifeSafetyStateTagged),
-		m.NewMode.DeepCopy().(BACnetLifeSafetyModeTagged),
-		m.StatusFlags.DeepCopy().(BACnetStatusFlagsTagged),
-		m.OperationExpected.DeepCopy().(BACnetLifeSafetyOperationTagged),
-		m.InnerClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.InnerOpeningTag),
+		utils.DeepCopy[BACnetLifeSafetyStateTagged](m.NewState),
+		utils.DeepCopy[BACnetLifeSafetyModeTagged](m.NewMode),
+		utils.DeepCopy[BACnetStatusFlagsTagged](m.StatusFlags),
+		utils.DeepCopy[BACnetLifeSafetyOperationTagged](m.OperationExpected),
+		utils.DeepCopy[BACnetClosingTag](m.InnerClosingTag),
 	}
 	m.BACnetNotificationParametersContract.(*_BACnetNotificationParameters)._SubType = m
 	return _BACnetNotificationParametersChangeOfLifeSafetyCopy

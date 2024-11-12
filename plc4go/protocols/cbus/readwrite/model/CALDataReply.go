@@ -333,7 +333,7 @@ func (m *_CALDataReply) deepCopy() *_CALDataReply {
 	_CALDataReplyCopy := &_CALDataReply{
 		m.CALDataContract.(*_CALData).deepCopy(),
 		m.ParamNo,
-		m.ParameterValue.DeepCopy().(ParameterValue),
+		utils.DeepCopy[ParameterValue](m.ParameterValue),
 	}
 	m.CALDataContract.(*_CALData)._SubType = m
 	return _CALDataReplyCopy

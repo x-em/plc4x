@@ -304,7 +304,7 @@ func (m *_BACnetPriorityValueUnsigned) deepCopy() *_BACnetPriorityValueUnsigned 
 	}
 	_BACnetPriorityValueUnsignedCopy := &_BACnetPriorityValueUnsigned{
 		m.BACnetPriorityValueContract.(*_BACnetPriorityValue).deepCopy(),
-		m.UnsignedValue.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.UnsignedValue),
 	}
 	m.BACnetPriorityValueContract.(*_BACnetPriorityValue)._SubType = m
 	return _BACnetPriorityValueUnsignedCopy

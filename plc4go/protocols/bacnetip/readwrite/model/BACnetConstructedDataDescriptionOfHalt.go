@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataDescriptionOfHalt) deepCopy() *_BACnetConstructed
 	}
 	_BACnetConstructedDataDescriptionOfHaltCopy := &_BACnetConstructedDataDescriptionOfHalt{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.DescriptionForHalt.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.DescriptionForHalt),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDescriptionOfHaltCopy

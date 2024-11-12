@@ -433,7 +433,7 @@ func (m *_BACnetProcessIdSelection) deepCopy() *_BACnetProcessIdSelection {
 	}
 	_BACnetProcessIdSelectionCopy := &_BACnetProcessIdSelection{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetProcessIdSelectionCopy
 }

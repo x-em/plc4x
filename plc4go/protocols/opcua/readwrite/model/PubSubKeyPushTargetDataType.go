@@ -664,11 +664,11 @@ func (m *_PubSubKeyPushTargetDataType) deepCopy() *_PubSubKeyPushTargetDataType 
 	}
 	_PubSubKeyPushTargetDataTypeCopy := &_PubSubKeyPushTargetDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ApplicationUri.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.ApplicationUri),
 		utils.DeepCopySlice[PascalString, PascalString](m.PushTargetFolder),
-		m.EndpointUrl.DeepCopy().(PascalString),
-		m.SecurityPolicyUri.DeepCopy().(PascalString),
-		m.UserTokenType.DeepCopy().(UserTokenPolicy),
+		utils.DeepCopy[PascalString](m.EndpointUrl),
+		utils.DeepCopy[PascalString](m.SecurityPolicyUri),
+		utils.DeepCopy[UserTokenPolicy](m.UserTokenType),
 		m.RequestedKeyCount,
 		m.RetryInterval,
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.PushTargetProperties),

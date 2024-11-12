@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLastNotifyRecord) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataLastNotifyRecordCopy := &_BACnetConstructedDataLastNotifyRecord{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LastNotifyRecord.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.LastNotifyRecord),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLastNotifyRecordCopy

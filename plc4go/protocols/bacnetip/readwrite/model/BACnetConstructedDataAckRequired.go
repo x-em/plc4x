@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAckRequired) deepCopy() *_BACnetConstructedDataAc
 	}
 	_BACnetConstructedDataAckRequiredCopy := &_BACnetConstructedDataAckRequired{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AckRequired.DeepCopy().(BACnetEventTransitionBitsTagged),
+		utils.DeepCopy[BACnetEventTransitionBitsTagged](m.AckRequired),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAckRequiredCopy

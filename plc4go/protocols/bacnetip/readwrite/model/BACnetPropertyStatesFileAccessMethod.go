@@ -304,7 +304,7 @@ func (m *_BACnetPropertyStatesFileAccessMethod) deepCopy() *_BACnetPropertyState
 	}
 	_BACnetPropertyStatesFileAccessMethodCopy := &_BACnetPropertyStatesFileAccessMethod{
 		m.BACnetPropertyStatesContract.(*_BACnetPropertyStates).deepCopy(),
-		m.FileAccessMethod.DeepCopy().(BACnetFileAccessMethodTagged),
+		utils.DeepCopy[BACnetFileAccessMethodTagged](m.FileAccessMethod),
 	}
 	m.BACnetPropertyStatesContract.(*_BACnetPropertyStates)._SubType = m
 	return _BACnetPropertyStatesFileAccessMethodCopy

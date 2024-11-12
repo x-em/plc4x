@@ -323,7 +323,7 @@ func (m *_BVLCOriginalUnicastNPDU) deepCopy() *_BVLCOriginalUnicastNPDU {
 	}
 	_BVLCOriginalUnicastNPDUCopy := &_BVLCOriginalUnicastNPDU{
 		m.BVLCContract.(*_BVLC).deepCopy(),
-		m.Npdu.DeepCopy().(NPDU),
+		utils.DeepCopy[NPDU](m.Npdu),
 		m.BvlcPayloadLength,
 	}
 	m.BVLCContract.(*_BVLC)._SubType = m

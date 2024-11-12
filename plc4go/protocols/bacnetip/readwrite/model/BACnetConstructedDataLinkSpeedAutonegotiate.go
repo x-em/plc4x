@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataLinkSpeedAutonegotiate) deepCopy() *_BACnetConstr
 	}
 	_BACnetConstructedDataLinkSpeedAutonegotiateCopy := &_BACnetConstructedDataLinkSpeedAutonegotiate{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.LinkSpeedAutonegotiate.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.LinkSpeedAutonegotiate),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLinkSpeedAutonegotiateCopy

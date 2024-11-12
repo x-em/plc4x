@@ -404,8 +404,8 @@ func (m *_ReplyEncodedReply) deepCopy() *_ReplyEncodedReply {
 	}
 	_ReplyEncodedReplyCopy := &_ReplyEncodedReply{
 		m.ReplyContract.(*_Reply).deepCopy(),
-		m.EncodedReply.DeepCopy().(EncodedReply),
-		m.Chksum.DeepCopy().(Checksum),
+		utils.DeepCopy[EncodedReply](m.EncodedReply),
+		utils.DeepCopy[Checksum](m.Chksum),
 	}
 	m.ReplyContract.(*_Reply)._SubType = m
 	return _ReplyEncodedReplyCopy

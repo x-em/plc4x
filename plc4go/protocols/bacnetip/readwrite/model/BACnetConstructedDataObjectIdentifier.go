@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataObjectIdentifier) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataObjectIdentifierCopy := &_BACnetConstructedDataObjectIdentifier{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ObjectIdentifier.DeepCopy().(BACnetApplicationTagObjectIdentifier),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.ObjectIdentifier),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataObjectIdentifierCopy

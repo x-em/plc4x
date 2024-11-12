@@ -434,7 +434,7 @@ func (m *_BACnetUnconfirmedServiceRequestWhoHasObject) deepCopy() *_BACnetUnconf
 	}
 	_BACnetUnconfirmedServiceRequestWhoHasObjectCopy := &_BACnetUnconfirmedServiceRequestWhoHasObject{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetUnconfirmedServiceRequestWhoHasObjectCopy
 }

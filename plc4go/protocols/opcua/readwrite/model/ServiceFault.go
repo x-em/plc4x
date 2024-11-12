@@ -308,7 +308,7 @@ func (m *_ServiceFault) deepCopy() *_ServiceFault {
 	}
 	_ServiceFaultCopy := &_ServiceFault{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ServiceFaultCopy

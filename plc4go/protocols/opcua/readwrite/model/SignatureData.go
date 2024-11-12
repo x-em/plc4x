@@ -360,8 +360,8 @@ func (m *_SignatureData) deepCopy() *_SignatureData {
 	}
 	_SignatureDataCopy := &_SignatureData{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Algorithm.DeepCopy().(PascalString),
-		m.Signature.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalString](m.Algorithm),
+		utils.DeepCopy[PascalByteString](m.Signature),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _SignatureDataCopy

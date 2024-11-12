@@ -386,7 +386,7 @@ func (m *_CipReadResponse) deepCopy() *_CipReadResponse {
 		m.CipServiceContract.(*_CipService).deepCopy(),
 		m.Status,
 		m.ExtStatus,
-		m.Data.DeepCopy().(CIPData),
+		utils.DeepCopy[CIPData](m.Data),
 		m.reservedField0,
 	}
 	m.CipServiceContract.(*_CipService)._SubType = m

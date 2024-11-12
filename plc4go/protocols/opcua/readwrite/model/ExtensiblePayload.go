@@ -308,7 +308,7 @@ func (m *_ExtensiblePayload) deepCopy() *_ExtensiblePayload {
 	}
 	_ExtensiblePayloadCopy := &_ExtensiblePayload{
 		m.PayloadContract.(*_Payload).deepCopy(),
-		m.Payload.DeepCopy().(RootExtensionObject),
+		utils.DeepCopy[RootExtensionObject](m.Payload),
 	}
 	m.PayloadContract.(*_Payload)._SubType = m
 	return _ExtensiblePayloadCopy

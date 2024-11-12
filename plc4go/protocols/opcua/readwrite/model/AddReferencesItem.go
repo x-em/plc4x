@@ -535,11 +535,11 @@ func (m *_AddReferencesItem) deepCopy() *_AddReferencesItem {
 	}
 	_AddReferencesItemCopy := &_AddReferencesItem{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.SourceNodeId.DeepCopy().(NodeId),
-		m.ReferenceTypeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.SourceNodeId),
+		utils.DeepCopy[NodeId](m.ReferenceTypeId),
 		m.IsForward,
-		m.TargetServerUri.DeepCopy().(PascalString),
-		m.TargetNodeId.DeepCopy().(ExpandedNodeId),
+		utils.DeepCopy[PascalString](m.TargetServerUri),
+		utils.DeepCopy[ExpandedNodeId](m.TargetNodeId),
 		m.TargetNodeClass,
 		m.reservedField0,
 	}

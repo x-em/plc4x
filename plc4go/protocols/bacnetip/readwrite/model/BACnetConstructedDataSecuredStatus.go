@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataSecuredStatus) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataSecuredStatusCopy := &_BACnetConstructedDataSecuredStatus{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.SecuredStatus.DeepCopy().(BACnetDoorSecuredStatusTagged),
+		utils.DeepCopy[BACnetDoorSecuredStatusTagged](m.SecuredStatus),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSecuredStatusCopy

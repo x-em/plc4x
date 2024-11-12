@@ -314,7 +314,7 @@ func (m *_ParameterValueInterfaceOptions1PowerUpSettings) deepCopy() *_Parameter
 	}
 	_ParameterValueInterfaceOptions1PowerUpSettingsCopy := &_ParameterValueInterfaceOptions1PowerUpSettings{
 		m.ParameterValueContract.(*_ParameterValue).deepCopy(),
-		m.Value.DeepCopy().(InterfaceOptions1PowerUpSettings),
+		utils.DeepCopy[InterfaceOptions1PowerUpSettings](m.Value),
 	}
 	m.ParameterValueContract.(*_ParameterValue)._SubType = m
 	return _ParameterValueInterfaceOptions1PowerUpSettingsCopy

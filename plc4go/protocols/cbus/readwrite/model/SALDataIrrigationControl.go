@@ -308,7 +308,7 @@ func (m *_SALDataIrrigationControl) deepCopy() *_SALDataIrrigationControl {
 	}
 	_SALDataIrrigationControlCopy := &_SALDataIrrigationControl{
 		m.SALDataContract.(*_SALData).deepCopy(),
-		m.IrrigationControlData.DeepCopy().(LightingData),
+		utils.DeepCopy[LightingData](m.IrrigationControlData),
 	}
 	m.SALDataContract.(*_SALData)._SubType = m
 	return _SALDataIrrigationControlCopy

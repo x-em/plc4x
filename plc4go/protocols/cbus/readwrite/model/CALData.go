@@ -714,7 +714,7 @@ func (m *_CALData) deepCopy() *_CALData {
 	_CALDataCopy := &_CALData{
 		nil, // will be set by child
 		m.CommandTypeContainer,
-		m.AdditionalData.DeepCopy().(CALData),
+		utils.DeepCopy[CALData](m.AdditionalData),
 		m.RequestContext,
 	}
 	return _CALDataCopy

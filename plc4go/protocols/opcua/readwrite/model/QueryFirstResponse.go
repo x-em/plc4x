@@ -556,12 +556,12 @@ func (m *_QueryFirstResponse) deepCopy() *_QueryFirstResponse {
 	}
 	_QueryFirstResponseCopy := &_QueryFirstResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[QueryDataSet, QueryDataSet](m.QueryDataSets),
-		m.ContinuationPoint.DeepCopy().(PascalByteString),
+		utils.DeepCopy[PascalByteString](m.ContinuationPoint),
 		utils.DeepCopySlice[ParsingResult, ParsingResult](m.ParsingResults),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
-		m.FilterResult.DeepCopy().(ContentFilterResult),
+		utils.DeepCopy[ContentFilterResult](m.FilterResult),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _QueryFirstResponseCopy

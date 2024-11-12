@@ -356,7 +356,7 @@ func (m *_PublishRequest) deepCopy() *_PublishRequest {
 	}
 	_PublishRequestCopy := &_PublishRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
 		utils.DeepCopySlice[SubscriptionAcknowledgement, SubscriptionAcknowledgement](m.SubscriptionAcknowledgements),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

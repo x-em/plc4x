@@ -304,7 +304,7 @@ func (m *_BACnetTimerStateChangeValueUnsigned) deepCopy() *_BACnetTimerStateChan
 	}
 	_BACnetTimerStateChangeValueUnsignedCopy := &_BACnetTimerStateChangeValueUnsigned{
 		m.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue).deepCopy(),
-		m.UnsignedValue.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.UnsignedValue),
 	}
 	m.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue)._SubType = m
 	return _BACnetTimerStateChangeValueUnsignedCopy

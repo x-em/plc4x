@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataLoopAction) deepCopy() *_BACnetConstructedDataLoo
 	}
 	_BACnetConstructedDataLoopActionCopy := &_BACnetConstructedDataLoopAction{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.Action.DeepCopy().(BACnetActionTagged),
+		utils.DeepCopy[BACnetActionTagged](m.Action),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataLoopActionCopy

@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataProcessIdentifierFilter) deepCopy() *_BACnetConst
 	}
 	_BACnetConstructedDataProcessIdentifierFilterCopy := &_BACnetConstructedDataProcessIdentifierFilter{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ProcessIdentifierFilter.DeepCopy().(BACnetProcessIdSelection),
+		utils.DeepCopy[BACnetProcessIdSelection](m.ProcessIdentifierFilter),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataProcessIdentifierFilterCopy

@@ -462,10 +462,10 @@ func (m *_BACnetConfirmedServiceRequestConfirmedTextMessage) deepCopy() *_BACnet
 	}
 	_BACnetConfirmedServiceRequestConfirmedTextMessageCopy := &_BACnetConfirmedServiceRequestConfirmedTextMessage{
 		m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest).deepCopy(),
-		m.TextMessageSourceDevice.DeepCopy().(BACnetContextTagObjectIdentifier),
-		m.MessageClass.DeepCopy().(BACnetConfirmedServiceRequestConfirmedTextMessageMessageClass),
-		m.MessagePriority.DeepCopy().(BACnetConfirmedServiceRequestConfirmedTextMessageMessagePriorityTagged),
-		m.Message.DeepCopy().(BACnetContextTagCharacterString),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.TextMessageSourceDevice),
+		utils.DeepCopy[BACnetConfirmedServiceRequestConfirmedTextMessageMessageClass](m.MessageClass),
+		utils.DeepCopy[BACnetConfirmedServiceRequestConfirmedTextMessageMessagePriorityTagged](m.MessagePriority),
+		utils.DeepCopy[BACnetContextTagCharacterString](m.Message),
 	}
 	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestConfirmedTextMessageCopy

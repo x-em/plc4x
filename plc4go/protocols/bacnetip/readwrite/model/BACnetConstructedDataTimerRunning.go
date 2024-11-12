@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataTimerRunning) deepCopy() *_BACnetConstructedDataT
 	}
 	_BACnetConstructedDataTimerRunningCopy := &_BACnetConstructedDataTimerRunning{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.TimerRunning.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.TimerRunning),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataTimerRunningCopy

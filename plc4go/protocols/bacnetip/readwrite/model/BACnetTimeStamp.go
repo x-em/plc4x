@@ -458,7 +458,7 @@ func (m *_BACnetTimeStamp) deepCopy() *_BACnetTimeStamp {
 	}
 	_BACnetTimeStampCopy := &_BACnetTimeStamp{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetTimeStampCopy
 }

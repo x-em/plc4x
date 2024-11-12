@@ -304,7 +304,7 @@ func (m *_BACnetChannelValueCharacterString) deepCopy() *_BACnetChannelValueChar
 	}
 	_BACnetChannelValueCharacterStringCopy := &_BACnetChannelValueCharacterString{
 		m.BACnetChannelValueContract.(*_BACnetChannelValue).deepCopy(),
-		m.CharacterStringValue.DeepCopy().(BACnetApplicationTagCharacterString),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.CharacterStringValue),
 	}
 	m.BACnetChannelValueContract.(*_BACnetChannelValue)._SubType = m
 	return _BACnetChannelValueCharacterStringCopy

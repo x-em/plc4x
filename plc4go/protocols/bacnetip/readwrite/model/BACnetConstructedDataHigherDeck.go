@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataHigherDeck) deepCopy() *_BACnetConstructedDataHig
 	}
 	_BACnetConstructedDataHigherDeckCopy := &_BACnetConstructedDataHigherDeck{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.HigherDeck.DeepCopy().(BACnetApplicationTagObjectIdentifier),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.HigherDeck),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataHigherDeckCopy

@@ -395,7 +395,7 @@ func (m *_ReadEventDetails) deepCopy() *_ReadEventDetails {
 		m.NumValuesPerNode,
 		m.StartTime,
 		m.EndTime,
-		m.Filter.DeepCopy().(EventFilter),
+		utils.DeepCopy[EventFilter](m.Filter),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ReadEventDetailsCopy

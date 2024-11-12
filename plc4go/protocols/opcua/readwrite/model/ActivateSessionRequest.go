@@ -560,12 +560,12 @@ func (m *_ActivateSessionRequest) deepCopy() *_ActivateSessionRequest {
 	}
 	_ActivateSessionRequestCopy := &_ActivateSessionRequest{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RequestHeader.DeepCopy().(RequestHeader),
-		m.ClientSignature.DeepCopy().(SignatureData),
+		utils.DeepCopy[RequestHeader](m.RequestHeader),
+		utils.DeepCopy[SignatureData](m.ClientSignature),
 		utils.DeepCopySlice[SignedSoftwareCertificate, SignedSoftwareCertificate](m.ClientSoftwareCertificates),
 		utils.DeepCopySlice[PascalString, PascalString](m.LocaleIds),
-		m.UserIdentityToken.DeepCopy().(ExtensionObject),
-		m.UserTokenSignature.DeepCopy().(SignatureData),
+		utils.DeepCopy[ExtensionObject](m.UserIdentityToken),
+		utils.DeepCopy[SignatureData](m.UserTokenSignature),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ActivateSessionRequestCopy

@@ -433,7 +433,7 @@ func (m *_BACnetOptionalUnsigned) deepCopy() *_BACnetOptionalUnsigned {
 	}
 	_BACnetOptionalUnsignedCopy := &_BACnetOptionalUnsigned{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetOptionalUnsignedCopy
 }

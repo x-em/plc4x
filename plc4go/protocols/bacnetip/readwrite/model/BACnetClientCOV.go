@@ -433,7 +433,7 @@ func (m *_BACnetClientCOV) deepCopy() *_BACnetClientCOV {
 	}
 	_BACnetClientCOVCopy := &_BACnetClientCOV{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetClientCOVCopy
 }

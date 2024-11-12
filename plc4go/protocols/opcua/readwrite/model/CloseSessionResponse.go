@@ -308,7 +308,7 @@ func (m *_CloseSessionResponse) deepCopy() *_CloseSessionResponse {
 	}
 	_CloseSessionResponseCopy := &_CloseSessionResponse{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _CloseSessionResponseCopy

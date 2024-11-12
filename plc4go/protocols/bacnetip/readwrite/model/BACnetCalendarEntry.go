@@ -463,7 +463,7 @@ func (m *_BACnetCalendarEntry) deepCopy() *_BACnetCalendarEntry {
 	}
 	_BACnetCalendarEntryCopy := &_BACnetCalendarEntry{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetCalendarEntryCopy
 }

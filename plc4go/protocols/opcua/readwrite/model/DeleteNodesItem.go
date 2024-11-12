@@ -351,7 +351,7 @@ func (m *_DeleteNodesItem) deepCopy() *_DeleteNodesItem {
 	}
 	_DeleteNodesItemCopy := &_DeleteNodesItem{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.NodeId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.NodeId),
 		m.DeleteTargetReferences,
 		m.reservedField0,
 	}

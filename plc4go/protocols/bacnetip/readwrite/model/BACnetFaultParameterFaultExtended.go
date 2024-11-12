@@ -512,11 +512,11 @@ func (m *_BACnetFaultParameterFaultExtended) deepCopy() *_BACnetFaultParameterFa
 	}
 	_BACnetFaultParameterFaultExtendedCopy := &_BACnetFaultParameterFaultExtended{
 		m.BACnetFaultParameterContract.(*_BACnetFaultParameter).deepCopy(),
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.VendorId.DeepCopy().(BACnetVendorIdTagged),
-		m.ExtendedFaultType.DeepCopy().(BACnetContextTagUnsignedInteger),
-		m.Parameters.DeepCopy().(BACnetFaultParameterFaultExtendedParameters),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetVendorIdTagged](m.VendorId),
+		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ExtendedFaultType),
+		utils.DeepCopy[BACnetFaultParameterFaultExtendedParameters](m.Parameters),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
 	m.BACnetFaultParameterContract.(*_BACnetFaultParameter)._SubType = m
 	return _BACnetFaultParameterFaultExtendedCopy

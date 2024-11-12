@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataThreatLevel) deepCopy() *_BACnetConstructedDataTh
 	}
 	_BACnetConstructedDataThreatLevelCopy := &_BACnetConstructedDataThreatLevel{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ThreatLevel.DeepCopy().(BACnetAccessThreatLevel),
+		utils.DeepCopy[BACnetAccessThreatLevel](m.ThreatLevel),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataThreatLevelCopy

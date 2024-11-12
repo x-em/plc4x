@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataCOVIncrement) deepCopy() *_BACnetConstructedDataC
 	}
 	_BACnetConstructedDataCOVIncrementCopy := &_BACnetConstructedDataCOVIncrement{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.CovIncrement.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.CovIncrement),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataCOVIncrementCopy

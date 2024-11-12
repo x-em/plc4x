@@ -437,8 +437,8 @@ func (m *_ServerOnNetwork) deepCopy() *_ServerOnNetwork {
 	_ServerOnNetworkCopy := &_ServerOnNetwork{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
 		m.RecordId,
-		m.ServerName.DeepCopy().(PascalString),
-		m.DiscoveryUrl.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.ServerName),
+		utils.DeepCopy[PascalString](m.DiscoveryUrl),
 		utils.DeepCopySlice[PascalString, PascalString](m.ServerCapabilities),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

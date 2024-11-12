@@ -460,10 +460,10 @@ func (m *_BACnetFaultParameterFaultOutOfRange) deepCopy() *_BACnetFaultParameter
 	}
 	_BACnetFaultParameterFaultOutOfRangeCopy := &_BACnetFaultParameterFaultOutOfRange{
 		m.BACnetFaultParameterContract.(*_BACnetFaultParameter).deepCopy(),
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.MinNormalValue.DeepCopy().(BACnetFaultParameterFaultOutOfRangeMinNormalValue),
-		m.MaxNormalValue.DeepCopy().(BACnetFaultParameterFaultOutOfRangeMaxNormalValue),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetFaultParameterFaultOutOfRangeMinNormalValue](m.MinNormalValue),
+		utils.DeepCopy[BACnetFaultParameterFaultOutOfRangeMaxNormalValue](m.MaxNormalValue),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 	}
 	m.BACnetFaultParameterContract.(*_BACnetFaultParameter)._SubType = m
 	return _BACnetFaultParameterFaultOutOfRangeCopy

@@ -508,11 +508,11 @@ func (m *_PublishedDataSetDataType) deepCopy() *_PublishedDataSetDataType {
 	}
 	_PublishedDataSetDataTypeCopy := &_PublishedDataSetDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Name),
 		utils.DeepCopySlice[PascalString, PascalString](m.DataSetFolder),
-		m.DataSetMetaData.DeepCopy().(DataSetMetaDataType),
+		utils.DeepCopy[DataSetMetaDataType](m.DataSetMetaData),
 		utils.DeepCopySlice[KeyValuePair, KeyValuePair](m.ExtensionFields),
-		m.DataSetSource.DeepCopy().(ExtensionObject),
+		utils.DeepCopy[ExtensionObject](m.DataSetSource),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedDataSetDataTypeCopy

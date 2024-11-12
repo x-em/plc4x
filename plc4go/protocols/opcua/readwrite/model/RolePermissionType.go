@@ -336,7 +336,7 @@ func (m *_RolePermissionType) deepCopy() *_RolePermissionType {
 	}
 	_RolePermissionTypeCopy := &_RolePermissionType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.RoleId.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.RoleId),
 		m.Permissions,
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m

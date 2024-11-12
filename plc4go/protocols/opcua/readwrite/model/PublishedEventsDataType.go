@@ -408,9 +408,9 @@ func (m *_PublishedEventsDataType) deepCopy() *_PublishedEventsDataType {
 	}
 	_PublishedEventsDataTypeCopy := &_PublishedEventsDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.EventNotifier.DeepCopy().(NodeId),
+		utils.DeepCopy[NodeId](m.EventNotifier),
 		utils.DeepCopySlice[SimpleAttributeOperand, SimpleAttributeOperand](m.SelectedFields),
-		m.Filter.DeepCopy().(ContentFilter),
+		utils.DeepCopy[ContentFilter](m.Filter),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _PublishedEventsDataTypeCopy

@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataMachineRoomID) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataMachineRoomIDCopy := &_BACnetConstructedDataMachineRoomID{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.MachineRoomId.DeepCopy().(BACnetApplicationTagObjectIdentifier),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.MachineRoomId),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataMachineRoomIDCopy

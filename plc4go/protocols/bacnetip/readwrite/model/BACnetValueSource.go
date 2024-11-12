@@ -458,7 +458,7 @@ func (m *_BACnetValueSource) deepCopy() *_BACnetValueSource {
 	}
 	_BACnetValueSourceCopy := &_BACnetValueSource{
 		nil, // will be set by child
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
 	}
 	return _BACnetValueSourceCopy
 }

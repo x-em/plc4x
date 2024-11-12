@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataDateValuePresentValue) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataDateValuePresentValueCopy := &_BACnetConstructedDataDateValuePresentValue{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.PresentValue.DeepCopy().(BACnetApplicationTagDate),
+		utils.DeepCopy[BACnetApplicationTagDate](m.PresentValue),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataDateValuePresentValueCopy

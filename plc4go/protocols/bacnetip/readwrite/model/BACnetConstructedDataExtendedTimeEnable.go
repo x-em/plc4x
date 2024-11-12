@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataExtendedTimeEnable) deepCopy() *_BACnetConstructe
 	}
 	_BACnetConstructedDataExtendedTimeEnableCopy := &_BACnetConstructedDataExtendedTimeEnable{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ExtendedTimeEnable.DeepCopy().(BACnetApplicationTagBoolean),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.ExtendedTimeEnable),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataExtendedTimeEnableCopy

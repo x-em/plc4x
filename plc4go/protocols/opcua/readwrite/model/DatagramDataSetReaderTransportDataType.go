@@ -460,10 +460,10 @@ func (m *_DatagramDataSetReaderTransportDataType) deepCopy() *_DatagramDataSetRe
 	}
 	_DatagramDataSetReaderTransportDataTypeCopy := &_DatagramDataSetReaderTransportDataType{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Address.DeepCopy().(ExtensionObject),
-		m.QosCategory.DeepCopy().(PascalString),
+		utils.DeepCopy[ExtensionObject](m.Address),
+		utils.DeepCopy[PascalString](m.QosCategory),
 		utils.DeepCopySlice[ExtensionObject, ExtensionObject](m.DatagramQos),
-		m.Topic.DeepCopy().(PascalString),
+		utils.DeepCopy[PascalString](m.Topic),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _DatagramDataSetReaderTransportDataTypeCopy

@@ -344,7 +344,7 @@ func (m *_BACnetConstructedDataBackupAndRestoreState) deepCopy() *_BACnetConstru
 	}
 	_BACnetConstructedDataBackupAndRestoreStateCopy := &_BACnetConstructedDataBackupAndRestoreState{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.BackupAndRestoreState.DeepCopy().(BACnetBackupStateTagged),
+		utils.DeepCopy[BACnetBackupStateTagged](m.BackupAndRestoreState),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataBackupAndRestoreStateCopy

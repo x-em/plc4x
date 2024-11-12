@@ -360,8 +360,8 @@ func (m *_SubscribeCOVPropertyMultipleError) deepCopy() *_SubscribeCOVPropertyMu
 	}
 	_SubscribeCOVPropertyMultipleErrorCopy := &_SubscribeCOVPropertyMultipleError{
 		m.BACnetErrorContract.(*_BACnetError).deepCopy(),
-		m.ErrorType.DeepCopy().(ErrorEnclosed),
-		m.FirstFailedSubscription.DeepCopy().(SubscribeCOVPropertyMultipleErrorFirstFailedSubscription),
+		utils.DeepCopy[ErrorEnclosed](m.ErrorType),
+		utils.DeepCopy[SubscribeCOVPropertyMultipleErrorFirstFailedSubscription](m.FirstFailedSubscription),
 	}
 	m.BACnetErrorContract.(*_BACnetError)._SubType = m
 	return _SubscribeCOVPropertyMultipleErrorCopy

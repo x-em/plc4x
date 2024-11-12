@@ -494,9 +494,9 @@ func (m *_LDataExtended) deepCopy() *_LDataExtended {
 		m.GroupAddress,
 		m.HopCount,
 		m.ExtendedFrameFormat,
-		m.SourceAddress.DeepCopy().(KnxAddress),
+		utils.DeepCopy[KnxAddress](m.SourceAddress),
 		utils.DeepCopySlice[byte, byte](m.DestinationAddress),
-		m.Apdu.DeepCopy().(Apdu),
+		utils.DeepCopy[Apdu](m.Apdu),
 	}
 	m.LDataFrameContract.(*_LDataFrame)._SubType = m
 	return _LDataExtendedCopy

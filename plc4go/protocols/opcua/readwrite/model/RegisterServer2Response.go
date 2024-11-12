@@ -404,7 +404,7 @@ func (m *_RegisterServer2Response) deepCopy() *_RegisterServer2Response {
 	}
 	_RegisterServer2ResponseCopy := &_RegisterServer2Response{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.ResponseHeader.DeepCopy().(ResponseHeader),
+		utils.DeepCopy[ResponseHeader](m.ResponseHeader),
 		utils.DeepCopySlice[StatusCode, StatusCode](m.ConfigurationResults),
 		utils.DeepCopySlice[DiagnosticInfo, DiagnosticInfo](m.DiagnosticInfos),
 	}

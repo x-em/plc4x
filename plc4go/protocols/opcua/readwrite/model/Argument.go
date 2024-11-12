@@ -483,11 +483,11 @@ func (m *_Argument) deepCopy() *_Argument {
 	}
 	_ArgumentCopy := &_Argument{
 		m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition).deepCopy(),
-		m.Name.DeepCopy().(PascalString),
-		m.DataType.DeepCopy().(NodeId),
+		utils.DeepCopy[PascalString](m.Name),
+		utils.DeepCopy[NodeId](m.DataType),
 		m.ValueRank,
 		utils.DeepCopySlice[uint32, uint32](m.ArrayDimensions),
-		m.Description.DeepCopy().(LocalizedText),
+		utils.DeepCopy[LocalizedText](m.Description),
 	}
 	m.ExtensionObjectDefinitionContract.(*_ExtensionObjectDefinition)._SubType = m
 	return _ArgumentCopy

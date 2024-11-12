@@ -323,7 +323,7 @@ func (m *_CIPEncapsulationReadResponse) deepCopy() *_CIPEncapsulationReadRespons
 	}
 	_CIPEncapsulationReadResponseCopy := &_CIPEncapsulationReadResponse{
 		m.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket).deepCopy(),
-		m.Response.DeepCopy().(DF1ResponseMessage),
+		utils.DeepCopy[DF1ResponseMessage](m.Response),
 		m.PacketLen,
 	}
 	m.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket)._SubType = m

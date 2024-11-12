@@ -408,9 +408,9 @@ func (m *_CBusPointToPointCommandIndirect) deepCopy() *_CBusPointToPointCommandI
 	}
 	_CBusPointToPointCommandIndirectCopy := &_CBusPointToPointCommandIndirect{
 		m.CBusPointToPointCommandContract.(*_CBusPointToPointCommand).deepCopy(),
-		m.BridgeAddress.DeepCopy().(BridgeAddress),
-		m.NetworkRoute.DeepCopy().(NetworkRoute),
-		m.UnitAddress.DeepCopy().(UnitAddress),
+		utils.DeepCopy[BridgeAddress](m.BridgeAddress),
+		utils.DeepCopy[NetworkRoute](m.NetworkRoute),
+		utils.DeepCopy[UnitAddress](m.UnitAddress),
 	}
 	m.CBusPointToPointCommandContract.(*_CBusPointToPointCommand)._SubType = m
 	return _CBusPointToPointCommandIndirectCopy

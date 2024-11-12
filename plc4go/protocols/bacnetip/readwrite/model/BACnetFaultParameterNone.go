@@ -304,7 +304,7 @@ func (m *_BACnetFaultParameterNone) deepCopy() *_BACnetFaultParameterNone {
 	}
 	_BACnetFaultParameterNoneCopy := &_BACnetFaultParameterNone{
 		m.BACnetFaultParameterContract.(*_BACnetFaultParameter).deepCopy(),
-		m.None.DeepCopy().(BACnetContextTagNull),
+		utils.DeepCopy[BACnetContextTagNull](m.None),
 	}
 	m.BACnetFaultParameterContract.(*_BACnetFaultParameter)._SubType = m
 	return _BACnetFaultParameterNoneCopy

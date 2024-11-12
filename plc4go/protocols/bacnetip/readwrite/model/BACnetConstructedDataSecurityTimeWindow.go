@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataSecurityTimeWindow) deepCopy() *_BACnetConstructe
 	}
 	_BACnetConstructedDataSecurityTimeWindowCopy := &_BACnetConstructedDataSecurityTimeWindow{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.SecurityTimeWindow.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.SecurityTimeWindow),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataSecurityTimeWindowCopy

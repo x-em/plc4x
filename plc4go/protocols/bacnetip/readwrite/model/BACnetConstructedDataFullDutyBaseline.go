@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataFullDutyBaseline) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataFullDutyBaselineCopy := &_BACnetConstructedDataFullDutyBaseline{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.FullDutyBaseLine.DeepCopy().(BACnetApplicationTagReal),
+		utils.DeepCopy[BACnetApplicationTagReal](m.FullDutyBaseLine),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataFullDutyBaselineCopy

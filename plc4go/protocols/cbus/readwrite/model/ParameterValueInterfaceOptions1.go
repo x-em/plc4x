@@ -343,7 +343,7 @@ func (m *_ParameterValueInterfaceOptions1) deepCopy() *_ParameterValueInterfaceO
 	}
 	_ParameterValueInterfaceOptions1Copy := &_ParameterValueInterfaceOptions1{
 		m.ParameterValueContract.(*_ParameterValue).deepCopy(),
-		m.Value.DeepCopy().(InterfaceOptions1),
+		utils.DeepCopy[InterfaceOptions1](m.Value),
 		utils.DeepCopySlice[byte, byte](m.Data),
 	}
 	m.ParameterValueContract.(*_ParameterValue)._SubType = m

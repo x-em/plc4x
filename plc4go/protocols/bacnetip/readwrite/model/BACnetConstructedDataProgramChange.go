@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataProgramChange) deepCopy() *_BACnetConstructedData
 	}
 	_BACnetConstructedDataProgramChangeCopy := &_BACnetConstructedDataProgramChange{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.ProgramChange.DeepCopy().(BACnetProgramRequestTagged),
+		utils.DeepCopy[BACnetProgramRequestTagged](m.ProgramChange),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataProgramChangeCopy

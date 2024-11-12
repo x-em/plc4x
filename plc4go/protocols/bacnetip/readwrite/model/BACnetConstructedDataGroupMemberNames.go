@@ -374,7 +374,7 @@ func (m *_BACnetConstructedDataGroupMemberNames) deepCopy() *_BACnetConstructedD
 	}
 	_BACnetConstructedDataGroupMemberNamesCopy := &_BACnetConstructedDataGroupMemberNames{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.NumberOfDataElements.DeepCopy().(BACnetApplicationTagUnsignedInteger),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.NumberOfDataElements),
 		utils.DeepCopySlice[BACnetApplicationTagCharacterString, BACnetApplicationTagCharacterString](m.GroupMemberNames),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m

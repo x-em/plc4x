@@ -343,7 +343,7 @@ func (m *_BACnetConstructedDataAccessEventTime) deepCopy() *_BACnetConstructedDa
 	}
 	_BACnetConstructedDataAccessEventTimeCopy := &_BACnetConstructedDataAccessEventTime{
 		m.BACnetConstructedDataContract.(*_BACnetConstructedData).deepCopy(),
-		m.AccessEventTime.DeepCopy().(BACnetTimeStamp),
+		utils.DeepCopy[BACnetTimeStamp](m.AccessEventTime),
 	}
 	m.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = m
 	return _BACnetConstructedDataAccessEventTimeCopy

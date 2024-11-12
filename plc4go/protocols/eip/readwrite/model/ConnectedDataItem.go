@@ -350,7 +350,7 @@ func (m *_ConnectedDataItem) deepCopy() *_ConnectedDataItem {
 	_ConnectedDataItemCopy := &_ConnectedDataItem{
 		m.TypeIdContract.(*_TypeId).deepCopy(),
 		m.SequenceCount,
-		m.Service.DeepCopy().(CipService),
+		utils.DeepCopy[CipService](m.Service),
 	}
 	m.TypeIdContract.(*_TypeId)._SubType = m
 	return _ConnectedDataItemCopy

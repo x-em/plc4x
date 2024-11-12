@@ -377,8 +377,8 @@ func (m *_OpcuaOpenRequest) deepCopy() *_OpcuaOpenRequest {
 	}
 	_OpcuaOpenRequestCopy := &_OpcuaOpenRequest{
 		m.MessagePDUContract.(*_MessagePDU).deepCopy(),
-		m.OpenRequest.DeepCopy().(OpenChannelMessage),
-		m.Message.DeepCopy().(Payload),
+		utils.DeepCopy[OpenChannelMessage](m.OpenRequest),
+		utils.DeepCopy[Payload](m.Message),
 		m.TotalLength,
 	}
 	m.MessagePDUContract.(*_MessagePDU)._SubType = m
