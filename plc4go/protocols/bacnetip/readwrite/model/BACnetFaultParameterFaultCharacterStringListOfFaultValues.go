@@ -94,6 +94,8 @@ type BACnetFaultParameterFaultCharacterStringListOfFaultValuesBuilder interface 
 	WithClosingTag(BACnetClosingTag) BACnetFaultParameterFaultCharacterStringListOfFaultValuesBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetFaultParameterFaultCharacterStringListOfFaultValuesBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetFaultParameterFaultCharacterStringListOfFaultValuesBuilder
 	// Build builds the BACnetFaultParameterFaultCharacterStringListOfFaultValues or returns an error if something is wrong
 	Build() (BACnetFaultParameterFaultCharacterStringListOfFaultValues, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,6 +157,11 @@ func (b *_BACnetFaultParameterFaultCharacterStringListOfFaultValuesBuilder) With
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetFaultParameterFaultCharacterStringListOfFaultValuesBuilder) WithArgTagNumber(tagNumber uint8) BACnetFaultParameterFaultCharacterStringListOfFaultValuesBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -375,9 +382,9 @@ func (m *_BACnetFaultParameterFaultCharacterStringListOfFaultValues) deepCopy() 
 		return nil
 	}
 	_BACnetFaultParameterFaultCharacterStringListOfFaultValuesCopy := &_BACnetFaultParameterFaultCharacterStringListOfFaultValues{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
 		utils.DeepCopySlice[BACnetApplicationTagCharacterString, BACnetApplicationTagCharacterString](m.ListOfFaultValues),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetFaultParameterFaultCharacterStringListOfFaultValuesCopy

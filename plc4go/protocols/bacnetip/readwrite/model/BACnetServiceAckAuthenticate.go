@@ -82,6 +82,10 @@ type BACnetServiceAckAuthenticateBuilder interface {
 	WithMandatoryFields(bytesOfRemovedService []byte) BACnetServiceAckAuthenticateBuilder
 	// WithBytesOfRemovedService adds BytesOfRemovedService (property field)
 	WithBytesOfRemovedService(...byte) BACnetServiceAckAuthenticateBuilder
+	// WithArgServiceAckPayloadLength sets a parser argument
+	WithArgServiceAckPayloadLength(uint32) BACnetServiceAckAuthenticateBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckAuthenticate or returns an error if something is wrong
 	Build() (BACnetServiceAckAuthenticate, error)
 	// MustBuild does the same as Build but panics on error
@@ -105,6 +109,7 @@ var _ (BACnetServiceAckAuthenticateBuilder) = (*_BACnetServiceAckAuthenticateBui
 
 func (b *_BACnetServiceAckAuthenticateBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckAuthenticate
 }
 
 func (b *_BACnetServiceAckAuthenticateBuilder) WithMandatoryFields(bytesOfRemovedService []byte) BACnetServiceAckAuthenticateBuilder {
@@ -113,6 +118,11 @@ func (b *_BACnetServiceAckAuthenticateBuilder) WithMandatoryFields(bytesOfRemove
 
 func (b *_BACnetServiceAckAuthenticateBuilder) WithBytesOfRemovedService(bytesOfRemovedService ...byte) BACnetServiceAckAuthenticateBuilder {
 	b.BytesOfRemovedService = bytesOfRemovedService
+	return b
+}
+
+func (b *_BACnetServiceAckAuthenticateBuilder) WithArgServiceAckPayloadLength(serviceAckPayloadLength uint32) BACnetServiceAckAuthenticateBuilder {
+	b.ServiceAckPayloadLength = serviceAckPayloadLength
 	return b
 }
 
@@ -131,8 +141,10 @@ func (b *_BACnetServiceAckAuthenticateBuilder) MustBuild() BACnetServiceAckAuthe
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckAuthenticateBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -302,7 +314,7 @@ func (m *_BACnetServiceAckAuthenticate) deepCopy() *_BACnetServiceAckAuthenticat
 		utils.DeepCopySlice[byte, byte](m.BytesOfRemovedService),
 		m.ServiceAckPayloadLength,
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckAuthenticateCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckAuthenticateCopy
 }
 

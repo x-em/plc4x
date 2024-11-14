@@ -82,6 +82,10 @@ type BACnetConfirmedServiceRequestWritePropertyMultipleBuilder interface {
 	WithMandatoryFields(data []BACnetWriteAccessSpecification) BACnetConfirmedServiceRequestWritePropertyMultipleBuilder
 	// WithData adds Data (property field)
 	WithData(...BACnetWriteAccessSpecification) BACnetConfirmedServiceRequestWritePropertyMultipleBuilder
+	// WithArgServiceRequestPayloadLength sets a parser argument
+	WithArgServiceRequestPayloadLength(uint32) BACnetConfirmedServiceRequestWritePropertyMultipleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestWritePropertyMultiple or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestWritePropertyMultiple, error)
 	// MustBuild does the same as Build but panics on error
@@ -105,6 +109,7 @@ var _ (BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) = (*_BACnetCon
 
 func (b *_BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestWritePropertyMultiple
 }
 
 func (b *_BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) WithMandatoryFields(data []BACnetWriteAccessSpecification) BACnetConfirmedServiceRequestWritePropertyMultipleBuilder {
@@ -113,6 +118,11 @@ func (b *_BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) WithMandato
 
 func (b *_BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) WithData(data ...BACnetWriteAccessSpecification) BACnetConfirmedServiceRequestWritePropertyMultipleBuilder {
 	b.Data = data
+	return b
+}
+
+func (b *_BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) WithArgServiceRequestPayloadLength(serviceRequestPayloadLength uint32) BACnetConfirmedServiceRequestWritePropertyMultipleBuilder {
+	b.ServiceRequestPayloadLength = serviceRequestPayloadLength
 	return b
 }
 
@@ -131,8 +141,10 @@ func (b *_BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) MustBuild()
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestWritePropertyMultipleBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -305,7 +317,7 @@ func (m *_BACnetConfirmedServiceRequestWritePropertyMultiple) deepCopy() *_BACne
 		utils.DeepCopySlice[BACnetWriteAccessSpecification, BACnetWriteAccessSpecification](m.Data),
 		m.ServiceRequestPayloadLength,
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestWritePropertyMultipleCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestWritePropertyMultipleCopy
 }
 

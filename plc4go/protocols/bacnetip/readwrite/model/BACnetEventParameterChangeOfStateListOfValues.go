@@ -94,6 +94,8 @@ type BACnetEventParameterChangeOfStateListOfValuesBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetEventParameterChangeOfStateListOfValuesBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetEventParameterChangeOfStateListOfValuesBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetEventParameterChangeOfStateListOfValuesBuilder
 	// Build builds the BACnetEventParameterChangeOfStateListOfValues or returns an error if something is wrong
 	Build() (BACnetEventParameterChangeOfStateListOfValues, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,6 +157,11 @@ func (b *_BACnetEventParameterChangeOfStateListOfValuesBuilder) WithClosingTagBu
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetEventParameterChangeOfStateListOfValuesBuilder) WithArgTagNumber(tagNumber uint8) BACnetEventParameterChangeOfStateListOfValuesBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -375,9 +382,9 @@ func (m *_BACnetEventParameterChangeOfStateListOfValues) deepCopy() *_BACnetEven
 		return nil
 	}
 	_BACnetEventParameterChangeOfStateListOfValuesCopy := &_BACnetEventParameterChangeOfStateListOfValues{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
 		utils.DeepCopySlice[BACnetPropertyStates, BACnetPropertyStates](m.ListOfValues),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetEventParameterChangeOfStateListOfValuesCopy

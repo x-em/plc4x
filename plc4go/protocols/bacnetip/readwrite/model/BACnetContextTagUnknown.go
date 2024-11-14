@@ -82,6 +82,10 @@ type BACnetContextTagUnknownBuilder interface {
 	WithMandatoryFields(unknownData []byte) BACnetContextTagUnknownBuilder
 	// WithUnknownData adds UnknownData (property field)
 	WithUnknownData(...byte) BACnetContextTagUnknownBuilder
+	// WithArgActualLength sets a parser argument
+	WithArgActualLength(uint32) BACnetContextTagUnknownBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetContextTagBuilder
 	// Build builds the BACnetContextTagUnknown or returns an error if something is wrong
 	Build() (BACnetContextTagUnknown, error)
 	// MustBuild does the same as Build but panics on error
@@ -105,6 +109,7 @@ var _ (BACnetContextTagUnknownBuilder) = (*_BACnetContextTagUnknownBuilder)(nil)
 
 func (b *_BACnetContextTagUnknownBuilder) setParent(contract BACnetContextTagContract) {
 	b.BACnetContextTagContract = contract
+	contract.(*_BACnetContextTag)._SubType = b._BACnetContextTagUnknown
 }
 
 func (b *_BACnetContextTagUnknownBuilder) WithMandatoryFields(unknownData []byte) BACnetContextTagUnknownBuilder {
@@ -113,6 +118,11 @@ func (b *_BACnetContextTagUnknownBuilder) WithMandatoryFields(unknownData []byte
 
 func (b *_BACnetContextTagUnknownBuilder) WithUnknownData(unknownData ...byte) BACnetContextTagUnknownBuilder {
 	b.UnknownData = unknownData
+	return b
+}
+
+func (b *_BACnetContextTagUnknownBuilder) WithArgActualLength(actualLength uint32) BACnetContextTagUnknownBuilder {
+	b.ActualLength = actualLength
 	return b
 }
 
@@ -131,8 +141,10 @@ func (b *_BACnetContextTagUnknownBuilder) MustBuild() BACnetContextTagUnknown {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetContextTagUnknownBuilder) Done() BACnetContextTagBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetContextTagBuilder().(*_BACnetContextTagBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -302,7 +314,7 @@ func (m *_BACnetContextTagUnknown) deepCopy() *_BACnetContextTagUnknown {
 		utils.DeepCopySlice[byte, byte](m.UnknownData),
 		m.ActualLength,
 	}
-	m.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
+	_BACnetContextTagUnknownCopy.BACnetContextTagContract.(*_BACnetContextTag)._SubType = m
 	return _BACnetContextTagUnknownCopy
 }
 

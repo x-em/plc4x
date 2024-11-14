@@ -79,6 +79,8 @@ type BACnetClosingTagBuilder interface {
 	WithHeader(BACnetTagHeader) BACnetClosingTagBuilder
 	// WithHeaderBuilder adds Header (property field) which is build by the builder
 	WithHeaderBuilder(func(BACnetTagHeaderBuilder) BACnetTagHeaderBuilder) BACnetClosingTagBuilder
+	// WithArgTagNumberArgument sets a parser argument
+	WithArgTagNumberArgument(uint8) BACnetClosingTagBuilder
 	// Build builds the BACnetClosingTag or returns an error if something is wrong
 	Build() (BACnetClosingTag, error)
 	// MustBuild does the same as Build but panics on error
@@ -117,6 +119,11 @@ func (b *_BACnetClosingTagBuilder) WithHeaderBuilder(builderSupplier func(BACnet
 		}
 		b.err.Append(errors.Wrap(err, "BACnetTagHeaderBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetClosingTagBuilder) WithArgTagNumberArgument(tagNumberArgument uint8) BACnetClosingTagBuilder {
+	b.TagNumberArgument = tagNumberArgument
 	return b
 }
 
@@ -307,7 +314,7 @@ func (m *_BACnetClosingTag) deepCopy() *_BACnetClosingTag {
 		return nil
 	}
 	_BACnetClosingTagCopy := &_BACnetClosingTag{
-		m.Header.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.Header),
 		m.TagNumberArgument,
 	}
 	return _BACnetClosingTagCopy

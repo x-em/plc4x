@@ -125,16 +125,12 @@ type BACnetNotificationParametersChangeOfValueNewValueBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetNotificationParametersChangeOfValueNewValueBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetNotificationParametersChangeOfValueNewValueBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetNotificationParametersChangeOfValueNewValueBuilder
 	// AsBACnetNotificationParametersChangeOfValueNewValueChangedBits converts this build to a subType of BACnetNotificationParametersChangeOfValueNewValue. It is always possible to return to current builder using Done()
-	AsBACnetNotificationParametersChangeOfValueNewValueChangedBits() interface {
-		BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder
-		Done() BACnetNotificationParametersChangeOfValueNewValueBuilder
-	}
+	AsBACnetNotificationParametersChangeOfValueNewValueChangedBits() BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder
 	// AsBACnetNotificationParametersChangeOfValueNewValueChangedValue converts this build to a subType of BACnetNotificationParametersChangeOfValueNewValue. It is always possible to return to current builder using Done()
-	AsBACnetNotificationParametersChangeOfValueNewValueChangedValue() interface {
-		BACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder
-		Done() BACnetNotificationParametersChangeOfValueNewValueBuilder
-	}
+	AsBACnetNotificationParametersChangeOfValueNewValueChangedValue() BACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder
 	// Build builds the BACnetNotificationParametersChangeOfValueNewValue or returns an error if something is wrong
 	PartialBuild() (BACnetNotificationParametersChangeOfValueNewValueContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -224,6 +220,11 @@ func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) WithClosingT
 	return b
 }
 
+func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) WithArgTagNumber(tagNumber uint8) BACnetNotificationParametersChangeOfValueNewValueBuilder {
+	b.TagNumber = tagNumber
+	return b
+}
+
 func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) PartialBuild() (BACnetNotificationParametersChangeOfValueNewValueContract, error) {
 	if b.OpeningTag == nil {
 		if b.err == nil {
@@ -257,14 +258,8 @@ func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) PartialMustB
 	return build
 }
 
-func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) AsBACnetNotificationParametersChangeOfValueNewValueChangedBits() interface {
-	BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder
-	Done() BACnetNotificationParametersChangeOfValueNewValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder
-		Done() BACnetNotificationParametersChangeOfValueNewValueBuilder
-	}); ok {
+func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) AsBACnetNotificationParametersChangeOfValueNewValueChangedBits() BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder {
+	if cb, ok := b.childBuilder.(BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder().(*_BACnetNotificationParametersChangeOfValueNewValueChangedBitsBuilder)
@@ -273,14 +268,8 @@ func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) AsBACnetNoti
 	return cb
 }
 
-func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) AsBACnetNotificationParametersChangeOfValueNewValueChangedValue() interface {
-	BACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder
-	Done() BACnetNotificationParametersChangeOfValueNewValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder
-		Done() BACnetNotificationParametersChangeOfValueNewValueBuilder
-	}); ok {
+func (b *_BACnetNotificationParametersChangeOfValueNewValueBuilder) AsBACnetNotificationParametersChangeOfValueNewValueChangedValue() BACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder {
+	if cb, ok := b.childBuilder.(BACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder().(*_BACnetNotificationParametersChangeOfValueNewValueChangedValueBuilder)
@@ -551,9 +540,9 @@ func (m *_BACnetNotificationParametersChangeOfValueNewValue) deepCopy() *_BACnet
 	}
 	_BACnetNotificationParametersChangeOfValueNewValueCopy := &_BACnetNotificationParametersChangeOfValueNewValue{
 		nil, // will be set by child
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetNotificationParametersChangeOfValueNewValueCopy

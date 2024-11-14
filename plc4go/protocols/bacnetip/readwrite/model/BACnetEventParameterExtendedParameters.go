@@ -203,6 +203,8 @@ type BACnetEventParameterExtendedParametersBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetEventParameterExtendedParametersBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetEventParameterExtendedParametersBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetEventParameterExtendedParametersBuilder
 	// Build builds the BACnetEventParameterExtendedParameters or returns an error if something is wrong
 	Build() (BACnetEventParameterExtendedParameters, error)
 	// MustBuild does the same as Build but panics on error
@@ -529,6 +531,11 @@ func (b *_BACnetEventParameterExtendedParametersBuilder) WithClosingTagBuilder(b
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetEventParameterExtendedParametersBuilder) WithArgTagNumber(tagNumber uint8) BACnetEventParameterExtendedParametersBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -1218,23 +1225,23 @@ func (m *_BACnetEventParameterExtendedParameters) deepCopy() *_BACnetEventParame
 		return nil
 	}
 	_BACnetEventParameterExtendedParametersCopy := &_BACnetEventParameterExtendedParameters{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
-		m.NullValue.DeepCopy().(BACnetApplicationTagNull),
-		m.RealValue.DeepCopy().(BACnetApplicationTagReal),
-		m.UnsignedValue.DeepCopy().(BACnetApplicationTagUnsignedInteger),
-		m.BooleanValue.DeepCopy().(BACnetApplicationTagBoolean),
-		m.IntegerValue.DeepCopy().(BACnetApplicationTagSignedInteger),
-		m.DoubleValue.DeepCopy().(BACnetApplicationTagDouble),
-		m.OctetStringValue.DeepCopy().(BACnetApplicationTagOctetString),
-		m.CharacterStringValue.DeepCopy().(BACnetApplicationTagCharacterString),
-		m.BitStringValue.DeepCopy().(BACnetApplicationTagBitString),
-		m.EnumeratedValue.DeepCopy().(BACnetApplicationTagEnumerated),
-		m.DateValue.DeepCopy().(BACnetApplicationTagDate),
-		m.TimeValue.DeepCopy().(BACnetApplicationTagTime),
-		m.ObjectIdentifier.DeepCopy().(BACnetApplicationTagObjectIdentifier),
-		m.Reference.DeepCopy().(BACnetDeviceObjectPropertyReferenceEnclosed),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
+		utils.DeepCopy[BACnetApplicationTagNull](m.NullValue),
+		utils.DeepCopy[BACnetApplicationTagReal](m.RealValue),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.UnsignedValue),
+		utils.DeepCopy[BACnetApplicationTagBoolean](m.BooleanValue),
+		utils.DeepCopy[BACnetApplicationTagSignedInteger](m.IntegerValue),
+		utils.DeepCopy[BACnetApplicationTagDouble](m.DoubleValue),
+		utils.DeepCopy[BACnetApplicationTagOctetString](m.OctetStringValue),
+		utils.DeepCopy[BACnetApplicationTagCharacterString](m.CharacterStringValue),
+		utils.DeepCopy[BACnetApplicationTagBitString](m.BitStringValue),
+		utils.DeepCopy[BACnetApplicationTagEnumerated](m.EnumeratedValue),
+		utils.DeepCopy[BACnetApplicationTagDate](m.DateValue),
+		utils.DeepCopy[BACnetApplicationTagTime](m.TimeValue),
+		utils.DeepCopy[BACnetApplicationTagObjectIdentifier](m.ObjectIdentifier),
+		utils.DeepCopy[BACnetDeviceObjectPropertyReferenceEnclosed](m.Reference),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetEventParameterExtendedParametersCopy

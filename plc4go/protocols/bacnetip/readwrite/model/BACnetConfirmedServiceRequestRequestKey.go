@@ -82,6 +82,10 @@ type BACnetConfirmedServiceRequestRequestKeyBuilder interface {
 	WithMandatoryFields(bytesOfRemovedService []byte) BACnetConfirmedServiceRequestRequestKeyBuilder
 	// WithBytesOfRemovedService adds BytesOfRemovedService (property field)
 	WithBytesOfRemovedService(...byte) BACnetConfirmedServiceRequestRequestKeyBuilder
+	// WithArgServiceRequestPayloadLength sets a parser argument
+	WithArgServiceRequestPayloadLength(uint32) BACnetConfirmedServiceRequestRequestKeyBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestRequestKey or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestRequestKey, error)
 	// MustBuild does the same as Build but panics on error
@@ -105,6 +109,7 @@ var _ (BACnetConfirmedServiceRequestRequestKeyBuilder) = (*_BACnetConfirmedServi
 
 func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestRequestKey
 }
 
 func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) WithMandatoryFields(bytesOfRemovedService []byte) BACnetConfirmedServiceRequestRequestKeyBuilder {
@@ -113,6 +118,11 @@ func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) WithMandatoryFields(by
 
 func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) WithBytesOfRemovedService(bytesOfRemovedService ...byte) BACnetConfirmedServiceRequestRequestKeyBuilder {
 	b.BytesOfRemovedService = bytesOfRemovedService
+	return b
+}
+
+func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) WithArgServiceRequestPayloadLength(serviceRequestPayloadLength uint32) BACnetConfirmedServiceRequestRequestKeyBuilder {
+	b.ServiceRequestPayloadLength = serviceRequestPayloadLength
 	return b
 }
 
@@ -131,8 +141,10 @@ func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) MustBuild() BACnetConf
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestRequestKeyBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -302,7 +314,7 @@ func (m *_BACnetConfirmedServiceRequestRequestKey) deepCopy() *_BACnetConfirmedS
 		utils.DeepCopySlice[byte, byte](m.BytesOfRemovedService),
 		m.ServiceRequestPayloadLength,
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestRequestKeyCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestRequestKeyCopy
 }
 

@@ -109,6 +109,8 @@ type BACnetConfirmedServiceRequestCreateObjectObjectSpecifierBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetConfirmedServiceRequestCreateObjectObjectSpecifierBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetConfirmedServiceRequestCreateObjectObjectSpecifierBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetConfirmedServiceRequestCreateObjectObjectSpecifierBuilder
 	// Build builds the BACnetConfirmedServiceRequestCreateObjectObjectSpecifier or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestCreateObjectObjectSpecifier, error)
 	// MustBuild does the same as Build but panics on error
@@ -201,6 +203,11 @@ func (b *_BACnetConfirmedServiceRequestCreateObjectObjectSpecifierBuilder) WithC
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetConfirmedServiceRequestCreateObjectObjectSpecifierBuilder) WithArgTagNumber(tagNumber uint8) BACnetConfirmedServiceRequestCreateObjectObjectSpecifierBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -532,10 +539,10 @@ func (m *_BACnetConfirmedServiceRequestCreateObjectObjectSpecifier) deepCopy() *
 		return nil
 	}
 	_BACnetConfirmedServiceRequestCreateObjectObjectSpecifierCopy := &_BACnetConfirmedServiceRequestCreateObjectObjectSpecifier{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.RawObjectType.DeepCopy().(BACnetContextTagEnumerated),
-		m.ObjectIdentifier.DeepCopy().(BACnetContextTagObjectIdentifier),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetContextTagEnumerated](m.RawObjectType),
+		utils.DeepCopy[BACnetContextTagObjectIdentifier](m.ObjectIdentifier),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetConfirmedServiceRequestCreateObjectObjectSpecifierCopy

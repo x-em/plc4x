@@ -103,16 +103,12 @@ type ApduBuilder interface {
 	WithNumbered(bool) ApduBuilder
 	// WithCounter adds Counter (property field)
 	WithCounter(uint8) ApduBuilder
+	// WithArgDataLength sets a parser argument
+	WithArgDataLength(uint8) ApduBuilder
 	// AsApduControlContainer converts this build to a subType of Apdu. It is always possible to return to current builder using Done()
-	AsApduControlContainer() interface {
-		ApduControlContainerBuilder
-		Done() ApduBuilder
-	}
+	AsApduControlContainer() ApduControlContainerBuilder
 	// AsApduDataContainer converts this build to a subType of Apdu. It is always possible to return to current builder using Done()
-	AsApduDataContainer() interface {
-		ApduDataContainerBuilder
-		Done() ApduBuilder
-	}
+	AsApduDataContainer() ApduDataContainerBuilder
 	// Build builds the Apdu or returns an error if something is wrong
 	PartialBuild() (ApduContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -158,6 +154,11 @@ func (b *_ApduBuilder) WithCounter(counter uint8) ApduBuilder {
 	return b
 }
 
+func (b *_ApduBuilder) WithArgDataLength(dataLength uint8) ApduBuilder {
+	b.DataLength = dataLength
+	return b
+}
+
 func (b *_ApduBuilder) PartialBuild() (ApduContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -173,14 +174,8 @@ func (b *_ApduBuilder) PartialMustBuild() ApduContract {
 	return build
 }
 
-func (b *_ApduBuilder) AsApduControlContainer() interface {
-	ApduControlContainerBuilder
-	Done() ApduBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ApduControlContainerBuilder
-		Done() ApduBuilder
-	}); ok {
+func (b *_ApduBuilder) AsApduControlContainer() ApduControlContainerBuilder {
+	if cb, ok := b.childBuilder.(ApduControlContainerBuilder); ok {
 		return cb
 	}
 	cb := NewApduControlContainerBuilder().(*_ApduControlContainerBuilder)
@@ -189,14 +184,8 @@ func (b *_ApduBuilder) AsApduControlContainer() interface {
 	return cb
 }
 
-func (b *_ApduBuilder) AsApduDataContainer() interface {
-	ApduDataContainerBuilder
-	Done() ApduBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ApduDataContainerBuilder
-		Done() ApduBuilder
-	}); ok {
+func (b *_ApduBuilder) AsApduDataContainer() ApduDataContainerBuilder {
+	if cb, ok := b.childBuilder.(ApduDataContainerBuilder); ok {
 		return cb
 	}
 	cb := NewApduDataContainerBuilder().(*_ApduDataContainerBuilder)

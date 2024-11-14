@@ -139,6 +139,8 @@ type NPDUBuilder interface {
 	WithOptionalApdu(APDU) NPDUBuilder
 	// WithOptionalApduBuilder adds Apdu (property field) which is build by the builder
 	WithOptionalApduBuilder(func(APDUBuilder) APDUBuilder) NPDUBuilder
+	// WithArgNpduLength sets a parser argument
+	WithArgNpduLength(uint16) NPDUBuilder
 	// Build builds the NPDU or returns an error if something is wrong
 	Build() (NPDU, error)
 	// MustBuild does the same as Build but panics on error
@@ -253,6 +255,11 @@ func (b *_NPDUBuilder) WithOptionalApduBuilder(builderSupplier func(APDUBuilder)
 		}
 		b.err.Append(errors.Wrap(err, "APDUBuilder failed"))
 	}
+	return b
+}
+
+func (b *_NPDUBuilder) WithArgNpduLength(npduLength uint16) NPDUBuilder {
+	b.NpduLength = npduLength
 	return b
 }
 
@@ -756,7 +763,7 @@ func (m *_NPDU) deepCopy() *_NPDU {
 	}
 	_NPDUCopy := &_NPDU{
 		m.ProtocolVersionNumber,
-		m.Control.DeepCopy().(NPDUControl),
+		utils.DeepCopy[NPDUControl](m.Control),
 		utils.CopyPtr[uint16](m.DestinationNetworkAddress),
 		utils.CopyPtr[uint8](m.DestinationLength),
 		utils.DeepCopySlice[uint8, uint8](m.DestinationAddress),
@@ -764,8 +771,8 @@ func (m *_NPDU) deepCopy() *_NPDU {
 		utils.CopyPtr[uint8](m.SourceLength),
 		utils.DeepCopySlice[uint8, uint8](m.SourceAddress),
 		utils.CopyPtr[uint8](m.HopCount),
-		m.Nlm.DeepCopy().(NLM),
-		m.Apdu.DeepCopy().(APDU),
+		utils.DeepCopy[NLM](m.Nlm),
+		utils.DeepCopy[APDU](m.Apdu),
 		m.NpduLength,
 	}
 	return _NPDUCopy

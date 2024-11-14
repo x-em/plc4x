@@ -95,81 +95,38 @@ type BACnetServiceAckBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() BACnetServiceAckBuilder
+	// WithArgServiceAckLength sets a parser argument
+	WithArgServiceAckLength(uint32) BACnetServiceAckBuilder
 	// AsBACnetServiceAckGetAlarmSummary converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckGetAlarmSummary() interface {
-		BACnetServiceAckGetAlarmSummaryBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckGetAlarmSummary() BACnetServiceAckGetAlarmSummaryBuilder
 	// AsBACnetServiceAckGetEnrollmentSummary converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckGetEnrollmentSummary() interface {
-		BACnetServiceAckGetEnrollmentSummaryBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckGetEnrollmentSummary() BACnetServiceAckGetEnrollmentSummaryBuilder
 	// AsBACnetServiceAckGetEventInformation converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckGetEventInformation() interface {
-		BACnetServiceAckGetEventInformationBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckGetEventInformation() BACnetServiceAckGetEventInformationBuilder
 	// AsBACnetServiceAckAtomicReadFile converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckAtomicReadFile() interface {
-		BACnetServiceAckAtomicReadFileBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckAtomicReadFile() BACnetServiceAckAtomicReadFileBuilder
 	// AsBACnetServiceAckAtomicWriteFile converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckAtomicWriteFile() interface {
-		BACnetServiceAckAtomicWriteFileBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckAtomicWriteFile() BACnetServiceAckAtomicWriteFileBuilder
 	// AsBACnetServiceAckCreateObject converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckCreateObject() interface {
-		BACnetServiceAckCreateObjectBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckCreateObject() BACnetServiceAckCreateObjectBuilder
 	// AsBACnetServiceAckReadProperty converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckReadProperty() interface {
-		BACnetServiceAckReadPropertyBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckReadProperty() BACnetServiceAckReadPropertyBuilder
 	// AsBACnetServiceAckReadPropertyMultiple converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckReadPropertyMultiple() interface {
-		BACnetServiceAckReadPropertyMultipleBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckReadPropertyMultiple() BACnetServiceAckReadPropertyMultipleBuilder
 	// AsBACnetServiceAckReadRange converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckReadRange() interface {
-		BACnetServiceAckReadRangeBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckReadRange() BACnetServiceAckReadRangeBuilder
 	// AsBACnetServiceAckConfirmedPrivateTransfer converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckConfirmedPrivateTransfer() interface {
-		BACnetServiceAckConfirmedPrivateTransferBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckConfirmedPrivateTransfer() BACnetServiceAckConfirmedPrivateTransferBuilder
 	// AsBACnetServiceAckVTOpen converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckVTOpen() interface {
-		BACnetServiceAckVTOpenBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckVTOpen() BACnetServiceAckVTOpenBuilder
 	// AsBACnetServiceAckVTData converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckVTData() interface {
-		BACnetServiceAckVTDataBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckVTData() BACnetServiceAckVTDataBuilder
 	// AsBACnetServiceAckAuthenticate converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckAuthenticate() interface {
-		BACnetServiceAckAuthenticateBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckAuthenticate() BACnetServiceAckAuthenticateBuilder
 	// AsBACnetServiceAckRequestKey converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckRequestKey() interface {
-		BACnetServiceAckRequestKeyBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckRequestKey() BACnetServiceAckRequestKeyBuilder
 	// AsBACnetServiceAckReadPropertyConditional converts this build to a subType of BACnetServiceAck. It is always possible to return to current builder using Done()
-	AsBACnetServiceAckReadPropertyConditional() interface {
-		BACnetServiceAckReadPropertyConditionalBuilder
-		Done() BACnetServiceAckBuilder
-	}
+	AsBACnetServiceAckReadPropertyConditional() BACnetServiceAckReadPropertyConditionalBuilder
 	// Build builds the BACnetServiceAck or returns an error if something is wrong
 	PartialBuild() (BACnetServiceAckContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -205,6 +162,11 @@ func (b *_BACnetServiceAckBuilder) WithMandatoryFields() BACnetServiceAckBuilder
 	return b
 }
 
+func (b *_BACnetServiceAckBuilder) WithArgServiceAckLength(serviceAckLength uint32) BACnetServiceAckBuilder {
+	b.ServiceAckLength = serviceAckLength
+	return b
+}
+
 func (b *_BACnetServiceAckBuilder) PartialBuild() (BACnetServiceAckContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -220,14 +182,8 @@ func (b *_BACnetServiceAckBuilder) PartialMustBuild() BACnetServiceAckContract {
 	return build
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetAlarmSummary() interface {
-	BACnetServiceAckGetAlarmSummaryBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckGetAlarmSummaryBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetAlarmSummary() BACnetServiceAckGetAlarmSummaryBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckGetAlarmSummaryBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckGetAlarmSummaryBuilder().(*_BACnetServiceAckGetAlarmSummaryBuilder)
@@ -236,14 +192,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetAlarmSummary() interface
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetEnrollmentSummary() interface {
-	BACnetServiceAckGetEnrollmentSummaryBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckGetEnrollmentSummaryBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetEnrollmentSummary() BACnetServiceAckGetEnrollmentSummaryBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckGetEnrollmentSummaryBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckGetEnrollmentSummaryBuilder().(*_BACnetServiceAckGetEnrollmentSummaryBuilder)
@@ -252,14 +202,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetEnrollmentSummary() inte
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetEventInformation() interface {
-	BACnetServiceAckGetEventInformationBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckGetEventInformationBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetEventInformation() BACnetServiceAckGetEventInformationBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckGetEventInformationBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckGetEventInformationBuilder().(*_BACnetServiceAckGetEventInformationBuilder)
@@ -268,14 +212,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckGetEventInformation() inter
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAtomicReadFile() interface {
-	BACnetServiceAckAtomicReadFileBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckAtomicReadFileBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAtomicReadFile() BACnetServiceAckAtomicReadFileBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckAtomicReadFileBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckAtomicReadFileBuilder().(*_BACnetServiceAckAtomicReadFileBuilder)
@@ -284,14 +222,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAtomicReadFile() interface 
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAtomicWriteFile() interface {
-	BACnetServiceAckAtomicWriteFileBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckAtomicWriteFileBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAtomicWriteFile() BACnetServiceAckAtomicWriteFileBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckAtomicWriteFileBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckAtomicWriteFileBuilder().(*_BACnetServiceAckAtomicWriteFileBuilder)
@@ -300,14 +232,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAtomicWriteFile() interface
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckCreateObject() interface {
-	BACnetServiceAckCreateObjectBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckCreateObjectBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckCreateObject() BACnetServiceAckCreateObjectBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckCreateObjectBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckCreateObjectBuilder().(*_BACnetServiceAckCreateObjectBuilder)
@@ -316,14 +242,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckCreateObject() interface {
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadProperty() interface {
-	BACnetServiceAckReadPropertyBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckReadPropertyBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadProperty() BACnetServiceAckReadPropertyBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckReadPropertyBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckReadPropertyBuilder().(*_BACnetServiceAckReadPropertyBuilder)
@@ -332,14 +252,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadProperty() interface {
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadPropertyMultiple() interface {
-	BACnetServiceAckReadPropertyMultipleBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckReadPropertyMultipleBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadPropertyMultiple() BACnetServiceAckReadPropertyMultipleBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckReadPropertyMultipleBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckReadPropertyMultipleBuilder().(*_BACnetServiceAckReadPropertyMultipleBuilder)
@@ -348,14 +262,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadPropertyMultiple() inte
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadRange() interface {
-	BACnetServiceAckReadRangeBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckReadRangeBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadRange() BACnetServiceAckReadRangeBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckReadRangeBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckReadRangeBuilder().(*_BACnetServiceAckReadRangeBuilder)
@@ -364,14 +272,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadRange() interface {
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckConfirmedPrivateTransfer() interface {
-	BACnetServiceAckConfirmedPrivateTransferBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckConfirmedPrivateTransferBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckConfirmedPrivateTransfer() BACnetServiceAckConfirmedPrivateTransferBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckConfirmedPrivateTransferBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckConfirmedPrivateTransferBuilder().(*_BACnetServiceAckConfirmedPrivateTransferBuilder)
@@ -380,14 +282,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckConfirmedPrivateTransfer() 
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckVTOpen() interface {
-	BACnetServiceAckVTOpenBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckVTOpenBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckVTOpen() BACnetServiceAckVTOpenBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckVTOpenBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckVTOpenBuilder().(*_BACnetServiceAckVTOpenBuilder)
@@ -396,14 +292,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckVTOpen() interface {
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckVTData() interface {
-	BACnetServiceAckVTDataBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckVTDataBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckVTData() BACnetServiceAckVTDataBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckVTDataBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckVTDataBuilder().(*_BACnetServiceAckVTDataBuilder)
@@ -412,14 +302,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckVTData() interface {
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAuthenticate() interface {
-	BACnetServiceAckAuthenticateBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckAuthenticateBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAuthenticate() BACnetServiceAckAuthenticateBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckAuthenticateBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckAuthenticateBuilder().(*_BACnetServiceAckAuthenticateBuilder)
@@ -428,14 +312,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckAuthenticate() interface {
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckRequestKey() interface {
-	BACnetServiceAckRequestKeyBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckRequestKeyBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckRequestKey() BACnetServiceAckRequestKeyBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckRequestKeyBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckRequestKeyBuilder().(*_BACnetServiceAckRequestKeyBuilder)
@@ -444,14 +322,8 @@ func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckRequestKey() interface {
 	return cb
 }
 
-func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadPropertyConditional() interface {
-	BACnetServiceAckReadPropertyConditionalBuilder
-	Done() BACnetServiceAckBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetServiceAckReadPropertyConditionalBuilder
-		Done() BACnetServiceAckBuilder
-	}); ok {
+func (b *_BACnetServiceAckBuilder) AsBACnetServiceAckReadPropertyConditional() BACnetServiceAckReadPropertyConditionalBuilder {
+	if cb, ok := b.childBuilder.(BACnetServiceAckReadPropertyConditionalBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetServiceAckReadPropertyConditionalBuilder().(*_BACnetServiceAckReadPropertyConditionalBuilder)

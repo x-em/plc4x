@@ -94,6 +94,8 @@ type BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesBuilder in
 	WithClosingTag(BACnetClosingTag) BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesBuilder
 	// Build builds the BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValues or returns an error if something is wrong
 	Build() (BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValues, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,6 +157,11 @@ func (b *_BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesBuild
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesBuilder) WithArgTagNumber(tagNumber uint8) BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -375,9 +382,9 @@ func (m *_BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValues) dee
 		return nil
 	}
 	_BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesCopy := &_BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValues{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
 		utils.DeepCopySlice[BACnetLifeSafetyStateTagged, BACnetLifeSafetyStateTagged](m.ListOfLifeSavetyAlarmValues),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetEventParameterChangeOfLifeSavetyListOfLifeSavetyAlarmValuesCopy

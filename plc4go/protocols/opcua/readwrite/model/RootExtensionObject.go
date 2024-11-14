@@ -87,6 +87,10 @@ type RootExtensionObjectBuilder interface {
 	WithBody(ExtensionObjectDefinition) RootExtensionObjectBuilder
 	// WithBodyBuilder adds Body (property field) which is build by the builder
 	WithBodyBuilder(func(ExtensionObjectDefinitionBuilder) ExtensionObjectDefinitionBuilder) RootExtensionObjectBuilder
+	// WithArgExtensionId sets a parser argument
+	WithArgExtensionId(int32) RootExtensionObjectBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() ExtensionObjectBuilder
 	// Build builds the RootExtensionObject or returns an error if something is wrong
 	Build() (RootExtensionObject, error)
 	// MustBuild does the same as Build but panics on error
@@ -110,6 +114,7 @@ var _ (RootExtensionObjectBuilder) = (*_RootExtensionObjectBuilder)(nil)
 
 func (b *_RootExtensionObjectBuilder) setParent(contract ExtensionObjectContract) {
 	b.ExtensionObjectContract = contract
+	contract.(*_ExtensionObject)._SubType = b._RootExtensionObject
 }
 
 func (b *_RootExtensionObjectBuilder) WithMandatoryFields(body ExtensionObjectDefinition) RootExtensionObjectBuilder {
@@ -134,6 +139,11 @@ func (b *_RootExtensionObjectBuilder) WithBodyBuilder(builderSupplier func(Exten
 	return b
 }
 
+func (b *_RootExtensionObjectBuilder) WithArgExtensionId(extensionId int32) RootExtensionObjectBuilder {
+	b.ExtensionId = extensionId
+	return b
+}
+
 func (b *_RootExtensionObjectBuilder) Build() (RootExtensionObject, error) {
 	if b.Body == nil {
 		if b.err == nil {
@@ -155,8 +165,10 @@ func (b *_RootExtensionObjectBuilder) MustBuild() RootExtensionObject {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_RootExtensionObjectBuilder) Done() ExtensionObjectBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewExtensionObjectBuilder().(*_ExtensionObjectBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -321,10 +333,10 @@ func (m *_RootExtensionObject) deepCopy() *_RootExtensionObject {
 	}
 	_RootExtensionObjectCopy := &_RootExtensionObject{
 		m.ExtensionObjectContract.(*_ExtensionObject).deepCopy(),
-		m.Body.DeepCopy().(ExtensionObjectDefinition),
+		utils.DeepCopy[ExtensionObjectDefinition](m.Body),
 		m.ExtensionId,
 	}
-	m.ExtensionObjectContract.(*_ExtensionObject)._SubType = m
+	_RootExtensionObjectCopy.ExtensionObjectContract.(*_ExtensionObject)._SubType = m
 	return _RootExtensionObjectCopy
 }
 

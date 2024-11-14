@@ -84,6 +84,10 @@ type BVLCReadForeignDeviceTableAckBuilder interface {
 	WithMandatoryFields(table []BVLCForeignDeviceTableEntry) BVLCReadForeignDeviceTableAckBuilder
 	// WithTable adds Table (property field)
 	WithTable(...BVLCForeignDeviceTableEntry) BVLCReadForeignDeviceTableAckBuilder
+	// WithArgBvlcPayloadLength sets a parser argument
+	WithArgBvlcPayloadLength(uint16) BVLCReadForeignDeviceTableAckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCReadForeignDeviceTableAck or returns an error if something is wrong
 	Build() (BVLCReadForeignDeviceTableAck, error)
 	// MustBuild does the same as Build but panics on error
@@ -107,6 +111,7 @@ var _ (BVLCReadForeignDeviceTableAckBuilder) = (*_BVLCReadForeignDeviceTableAckB
 
 func (b *_BVLCReadForeignDeviceTableAckBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCReadForeignDeviceTableAck
 }
 
 func (b *_BVLCReadForeignDeviceTableAckBuilder) WithMandatoryFields(table []BVLCForeignDeviceTableEntry) BVLCReadForeignDeviceTableAckBuilder {
@@ -115,6 +120,11 @@ func (b *_BVLCReadForeignDeviceTableAckBuilder) WithMandatoryFields(table []BVLC
 
 func (b *_BVLCReadForeignDeviceTableAckBuilder) WithTable(table ...BVLCForeignDeviceTableEntry) BVLCReadForeignDeviceTableAckBuilder {
 	b.Table = table
+	return b
+}
+
+func (b *_BVLCReadForeignDeviceTableAckBuilder) WithArgBvlcPayloadLength(bvlcPayloadLength uint16) BVLCReadForeignDeviceTableAckBuilder {
+	b.BvlcPayloadLength = bvlcPayloadLength
 	return b
 }
 
@@ -133,8 +143,10 @@ func (b *_BVLCReadForeignDeviceTableAckBuilder) MustBuild() BVLCReadForeignDevic
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCReadForeignDeviceTableAckBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -306,7 +318,7 @@ func (m *_BVLCReadForeignDeviceTableAck) deepCopy() *_BVLCReadForeignDeviceTable
 		utils.DeepCopySlice[BVLCForeignDeviceTableEntry, BVLCForeignDeviceTableEntry](m.Table),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCReadForeignDeviceTableAckCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCReadForeignDeviceTableAckCopy
 }
 

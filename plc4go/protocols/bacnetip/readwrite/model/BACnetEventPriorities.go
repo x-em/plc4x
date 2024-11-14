@@ -119,6 +119,8 @@ type BACnetEventPrioritiesBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetEventPrioritiesBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetEventPrioritiesBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetEventPrioritiesBuilder
 	// Build builds the BACnetEventPriorities or returns an error if something is wrong
 	Build() (BACnetEventPriorities, error)
 	// MustBuild does the same as Build but panics on error
@@ -229,6 +231,11 @@ func (b *_BACnetEventPrioritiesBuilder) WithClosingTagBuilder(builderSupplier fu
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetEventPrioritiesBuilder) WithArgTagNumber(tagNumber uint8) BACnetEventPrioritiesBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -496,11 +503,11 @@ func (m *_BACnetEventPriorities) deepCopy() *_BACnetEventPriorities {
 		return nil
 	}
 	_BACnetEventPrioritiesCopy := &_BACnetEventPriorities{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.ToOffnormal.DeepCopy().(BACnetApplicationTagUnsignedInteger),
-		m.ToFault.DeepCopy().(BACnetApplicationTagUnsignedInteger),
-		m.ToNormal.DeepCopy().(BACnetApplicationTagUnsignedInteger),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.ToOffnormal),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.ToFault),
+		utils.DeepCopy[BACnetApplicationTagUnsignedInteger](m.ToNormal),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetEventPrioritiesCopy

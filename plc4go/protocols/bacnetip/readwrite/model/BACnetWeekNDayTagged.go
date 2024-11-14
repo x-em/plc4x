@@ -123,6 +123,10 @@ type BACnetWeekNDayTaggedBuilder interface {
 	WithWeekOfMonth(uint8) BACnetWeekNDayTaggedBuilder
 	// WithDayOfWeek adds DayOfWeek (property field)
 	WithDayOfWeek(uint8) BACnetWeekNDayTaggedBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetWeekNDayTaggedBuilder
+	// WithArgTagClass sets a parser argument
+	WithArgTagClass(TagClass) BACnetWeekNDayTaggedBuilder
 	// Build builds the BACnetWeekNDayTagged or returns an error if something is wrong
 	Build() (BACnetWeekNDayTagged, error)
 	// MustBuild does the same as Build but panics on error
@@ -176,6 +180,15 @@ func (b *_BACnetWeekNDayTaggedBuilder) WithWeekOfMonth(weekOfMonth uint8) BACnet
 
 func (b *_BACnetWeekNDayTaggedBuilder) WithDayOfWeek(dayOfWeek uint8) BACnetWeekNDayTaggedBuilder {
 	b.DayOfWeek = dayOfWeek
+	return b
+}
+
+func (b *_BACnetWeekNDayTaggedBuilder) WithArgTagNumber(tagNumber uint8) BACnetWeekNDayTaggedBuilder {
+	b.TagNumber = tagNumber
+	return b
+}
+func (b *_BACnetWeekNDayTaggedBuilder) WithArgTagClass(tagClass TagClass) BACnetWeekNDayTaggedBuilder {
+	b.TagClass = tagClass
 	return b
 }
 
@@ -709,7 +722,7 @@ func (m *_BACnetWeekNDayTagged) deepCopy() *_BACnetWeekNDayTagged {
 		return nil
 	}
 	_BACnetWeekNDayTaggedCopy := &_BACnetWeekNDayTagged{
-		m.Header.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.Header),
 		m.Month,
 		m.WeekOfMonth,
 		m.DayOfWeek,

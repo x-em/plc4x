@@ -85,6 +85,10 @@ type BACnetShedStateTaggedBuilder interface {
 	WithHeaderBuilder(func(BACnetTagHeaderBuilder) BACnetTagHeaderBuilder) BACnetShedStateTaggedBuilder
 	// WithValue adds Value (property field)
 	WithValue(BACnetShedState) BACnetShedStateTaggedBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetShedStateTaggedBuilder
+	// WithArgTagClass sets a parser argument
+	WithArgTagClass(TagClass) BACnetShedStateTaggedBuilder
 	// Build builds the BACnetShedStateTagged or returns an error if something is wrong
 	Build() (BACnetShedStateTagged, error)
 	// MustBuild does the same as Build but panics on error
@@ -128,6 +132,15 @@ func (b *_BACnetShedStateTaggedBuilder) WithHeaderBuilder(builderSupplier func(B
 
 func (b *_BACnetShedStateTaggedBuilder) WithValue(value BACnetShedState) BACnetShedStateTaggedBuilder {
 	b.Value = value
+	return b
+}
+
+func (b *_BACnetShedStateTaggedBuilder) WithArgTagNumber(tagNumber uint8) BACnetShedStateTaggedBuilder {
+	b.TagNumber = tagNumber
+	return b
+}
+func (b *_BACnetShedStateTaggedBuilder) WithArgTagClass(tagClass TagClass) BACnetShedStateTaggedBuilder {
+	b.TagClass = tagClass
 	return b
 }
 
@@ -333,7 +346,7 @@ func (m *_BACnetShedStateTagged) deepCopy() *_BACnetShedStateTagged {
 		return nil
 	}
 	_BACnetShedStateTaggedCopy := &_BACnetShedStateTagged{
-		m.Header.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.Header),
 		m.Value,
 		m.TagNumber,
 		m.TagClass,

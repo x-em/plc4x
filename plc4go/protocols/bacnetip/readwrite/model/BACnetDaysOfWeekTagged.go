@@ -104,6 +104,10 @@ type BACnetDaysOfWeekTaggedBuilder interface {
 	WithPayload(BACnetTagPayloadBitString) BACnetDaysOfWeekTaggedBuilder
 	// WithPayloadBuilder adds Payload (property field) which is build by the builder
 	WithPayloadBuilder(func(BACnetTagPayloadBitStringBuilder) BACnetTagPayloadBitStringBuilder) BACnetDaysOfWeekTaggedBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetDaysOfWeekTaggedBuilder
+	// WithArgTagClass sets a parser argument
+	WithArgTagClass(TagClass) BACnetDaysOfWeekTaggedBuilder
 	// Build builds the BACnetDaysOfWeekTagged or returns an error if something is wrong
 	Build() (BACnetDaysOfWeekTagged, error)
 	// MustBuild does the same as Build but panics on error
@@ -160,6 +164,15 @@ func (b *_BACnetDaysOfWeekTaggedBuilder) WithPayloadBuilder(builderSupplier func
 		}
 		b.err.Append(errors.Wrap(err, "BACnetTagPayloadBitStringBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetDaysOfWeekTaggedBuilder) WithArgTagNumber(tagNumber uint8) BACnetDaysOfWeekTaggedBuilder {
+	b.TagNumber = tagNumber
+	return b
+}
+func (b *_BACnetDaysOfWeekTaggedBuilder) WithArgTagClass(tagClass TagClass) BACnetDaysOfWeekTaggedBuilder {
+	b.TagClass = tagClass
 	return b
 }
 
@@ -520,8 +533,8 @@ func (m *_BACnetDaysOfWeekTagged) deepCopy() *_BACnetDaysOfWeekTagged {
 		return nil
 	}
 	_BACnetDaysOfWeekTaggedCopy := &_BACnetDaysOfWeekTagged{
-		m.Header.DeepCopy().(BACnetTagHeader),
-		m.Payload.DeepCopy().(BACnetTagPayloadBitString),
+		utils.DeepCopy[BACnetTagHeader](m.Header),
+		utils.DeepCopy[BACnetTagPayloadBitString](m.Payload),
 		m.TagNumber,
 		m.TagClass,
 	}

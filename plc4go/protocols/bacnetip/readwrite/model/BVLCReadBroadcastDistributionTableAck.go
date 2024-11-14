@@ -84,6 +84,10 @@ type BVLCReadBroadcastDistributionTableAckBuilder interface {
 	WithMandatoryFields(table []BVLCBroadcastDistributionTableEntry) BVLCReadBroadcastDistributionTableAckBuilder
 	// WithTable adds Table (property field)
 	WithTable(...BVLCBroadcastDistributionTableEntry) BVLCReadBroadcastDistributionTableAckBuilder
+	// WithArgBvlcPayloadLength sets a parser argument
+	WithArgBvlcPayloadLength(uint16) BVLCReadBroadcastDistributionTableAckBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCReadBroadcastDistributionTableAck or returns an error if something is wrong
 	Build() (BVLCReadBroadcastDistributionTableAck, error)
 	// MustBuild does the same as Build but panics on error
@@ -107,6 +111,7 @@ var _ (BVLCReadBroadcastDistributionTableAckBuilder) = (*_BVLCReadBroadcastDistr
 
 func (b *_BVLCReadBroadcastDistributionTableAckBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCReadBroadcastDistributionTableAck
 }
 
 func (b *_BVLCReadBroadcastDistributionTableAckBuilder) WithMandatoryFields(table []BVLCBroadcastDistributionTableEntry) BVLCReadBroadcastDistributionTableAckBuilder {
@@ -115,6 +120,11 @@ func (b *_BVLCReadBroadcastDistributionTableAckBuilder) WithMandatoryFields(tabl
 
 func (b *_BVLCReadBroadcastDistributionTableAckBuilder) WithTable(table ...BVLCBroadcastDistributionTableEntry) BVLCReadBroadcastDistributionTableAckBuilder {
 	b.Table = table
+	return b
+}
+
+func (b *_BVLCReadBroadcastDistributionTableAckBuilder) WithArgBvlcPayloadLength(bvlcPayloadLength uint16) BVLCReadBroadcastDistributionTableAckBuilder {
+	b.BvlcPayloadLength = bvlcPayloadLength
 	return b
 }
 
@@ -133,8 +143,10 @@ func (b *_BVLCReadBroadcastDistributionTableAckBuilder) MustBuild() BVLCReadBroa
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCReadBroadcastDistributionTableAckBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -306,7 +318,7 @@ func (m *_BVLCReadBroadcastDistributionTableAck) deepCopy() *_BVLCReadBroadcastD
 		utils.DeepCopySlice[BVLCBroadcastDistributionTableEntry, BVLCBroadcastDistributionTableEntry](m.Table),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCReadBroadcastDistributionTableAckCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCReadBroadcastDistributionTableAckCopy
 }
 

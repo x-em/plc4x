@@ -99,6 +99,8 @@ type BACnetPropertyStatesEnclosedBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetPropertyStatesEnclosedBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetPropertyStatesEnclosedBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetPropertyStatesEnclosedBuilder
 	// Build builds the BACnetPropertyStatesEnclosed or returns an error if something is wrong
 	Build() (BACnetPropertyStatesEnclosed, error)
 	// MustBuild does the same as Build but panics on error
@@ -173,6 +175,11 @@ func (b *_BACnetPropertyStatesEnclosedBuilder) WithClosingTagBuilder(builderSupp
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetPropertyStatesEnclosedBuilder) WithArgTagNumber(tagNumber uint8) BACnetPropertyStatesEnclosedBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -394,9 +401,9 @@ func (m *_BACnetPropertyStatesEnclosed) deepCopy() *_BACnetPropertyStatesEnclose
 		return nil
 	}
 	_BACnetPropertyStatesEnclosedCopy := &_BACnetPropertyStatesEnclosed{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.PropertyState.DeepCopy().(BACnetPropertyStates),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetPropertyStates](m.PropertyState),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetPropertyStatesEnclosedCopy

@@ -98,6 +98,10 @@ type OpcuaOpenRequestBuilder interface {
 	WithMessage(Payload) OpcuaOpenRequestBuilder
 	// WithMessageBuilder adds Message (property field) which is build by the builder
 	WithMessageBuilder(func(PayloadBuilder) PayloadBuilder) OpcuaOpenRequestBuilder
+	// WithArgTotalLength sets a parser argument
+	WithArgTotalLength(uint32) OpcuaOpenRequestBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() MessagePDUBuilder
 	// Build builds the OpcuaOpenRequest or returns an error if something is wrong
 	Build() (OpcuaOpenRequest, error)
 	// MustBuild does the same as Build but panics on error
@@ -121,6 +125,7 @@ var _ (OpcuaOpenRequestBuilder) = (*_OpcuaOpenRequestBuilder)(nil)
 
 func (b *_OpcuaOpenRequestBuilder) setParent(contract MessagePDUContract) {
 	b.MessagePDUContract = contract
+	contract.(*_MessagePDU)._SubType = b._OpcuaOpenRequest
 }
 
 func (b *_OpcuaOpenRequestBuilder) WithMandatoryFields(openRequest OpenChannelMessage, message Payload) OpcuaOpenRequestBuilder {
@@ -163,6 +168,11 @@ func (b *_OpcuaOpenRequestBuilder) WithMessageBuilder(builderSupplier func(Paylo
 	return b
 }
 
+func (b *_OpcuaOpenRequestBuilder) WithArgTotalLength(totalLength uint32) OpcuaOpenRequestBuilder {
+	b.TotalLength = totalLength
+	return b
+}
+
 func (b *_OpcuaOpenRequestBuilder) Build() (OpcuaOpenRequest, error) {
 	if b.OpenRequest == nil {
 		if b.err == nil {
@@ -190,8 +200,10 @@ func (b *_OpcuaOpenRequestBuilder) MustBuild() OpcuaOpenRequest {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_OpcuaOpenRequestBuilder) Done() MessagePDUBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewMessagePDUBuilder().(*_MessagePDUBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -377,11 +389,11 @@ func (m *_OpcuaOpenRequest) deepCopy() *_OpcuaOpenRequest {
 	}
 	_OpcuaOpenRequestCopy := &_OpcuaOpenRequest{
 		m.MessagePDUContract.(*_MessagePDU).deepCopy(),
-		m.OpenRequest.DeepCopy().(OpenChannelMessage),
-		m.Message.DeepCopy().(Payload),
+		utils.DeepCopy[OpenChannelMessage](m.OpenRequest),
+		utils.DeepCopy[Payload](m.Message),
 		m.TotalLength,
 	}
-	m.MessagePDUContract.(*_MessagePDU)._SubType = m
+	_OpcuaOpenRequestCopy.MessagePDUContract.(*_MessagePDU)._SubType = m
 	return _OpcuaOpenRequestCopy
 }
 

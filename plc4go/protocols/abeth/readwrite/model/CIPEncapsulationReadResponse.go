@@ -89,6 +89,10 @@ type CIPEncapsulationReadResponseBuilder interface {
 	WithResponse(DF1ResponseMessage) CIPEncapsulationReadResponseBuilder
 	// WithResponseBuilder adds Response (property field) which is build by the builder
 	WithResponseBuilder(func(DF1ResponseMessageBuilder) DF1ResponseMessageBuilder) CIPEncapsulationReadResponseBuilder
+	// WithArgPacketLen sets a parser argument
+	WithArgPacketLen(uint16) CIPEncapsulationReadResponseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() CIPEncapsulationPacketBuilder
 	// Build builds the CIPEncapsulationReadResponse or returns an error if something is wrong
 	Build() (CIPEncapsulationReadResponse, error)
 	// MustBuild does the same as Build but panics on error
@@ -112,6 +116,7 @@ var _ (CIPEncapsulationReadResponseBuilder) = (*_CIPEncapsulationReadResponseBui
 
 func (b *_CIPEncapsulationReadResponseBuilder) setParent(contract CIPEncapsulationPacketContract) {
 	b.CIPEncapsulationPacketContract = contract
+	contract.(*_CIPEncapsulationPacket)._SubType = b._CIPEncapsulationReadResponse
 }
 
 func (b *_CIPEncapsulationReadResponseBuilder) WithMandatoryFields(response DF1ResponseMessage) CIPEncapsulationReadResponseBuilder {
@@ -136,6 +141,11 @@ func (b *_CIPEncapsulationReadResponseBuilder) WithResponseBuilder(builderSuppli
 	return b
 }
 
+func (b *_CIPEncapsulationReadResponseBuilder) WithArgPacketLen(packetLen uint16) CIPEncapsulationReadResponseBuilder {
+	b.PacketLen = packetLen
+	return b
+}
+
 func (b *_CIPEncapsulationReadResponseBuilder) Build() (CIPEncapsulationReadResponse, error) {
 	if b.Response == nil {
 		if b.err == nil {
@@ -157,8 +167,10 @@ func (b *_CIPEncapsulationReadResponseBuilder) MustBuild() CIPEncapsulationReadR
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_CIPEncapsulationReadResponseBuilder) Done() CIPEncapsulationPacketBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewCIPEncapsulationPacketBuilder().(*_CIPEncapsulationPacketBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -323,10 +335,10 @@ func (m *_CIPEncapsulationReadResponse) deepCopy() *_CIPEncapsulationReadRespons
 	}
 	_CIPEncapsulationReadResponseCopy := &_CIPEncapsulationReadResponse{
 		m.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket).deepCopy(),
-		m.Response.DeepCopy().(DF1ResponseMessage),
+		utils.DeepCopy[DF1ResponseMessage](m.Response),
 		m.PacketLen,
 	}
-	m.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket)._SubType = m
+	_CIPEncapsulationReadResponseCopy.CIPEncapsulationPacketContract.(*_CIPEncapsulationPacket)._SubType = m
 	return _CIPEncapsulationReadResponseCopy
 }
 

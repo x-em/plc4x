@@ -84,6 +84,10 @@ type UnknownMessageBuilder interface {
 	WithMandatoryFields(unknownData []byte) UnknownMessageBuilder
 	// WithUnknownData adds UnknownData (property field)
 	WithUnknownData(...byte) UnknownMessageBuilder
+	// WithArgTotalLength sets a parser argument
+	WithArgTotalLength(uint16) UnknownMessageBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() KnxNetIpMessageBuilder
 	// Build builds the UnknownMessage or returns an error if something is wrong
 	Build() (UnknownMessage, error)
 	// MustBuild does the same as Build but panics on error
@@ -107,6 +111,7 @@ var _ (UnknownMessageBuilder) = (*_UnknownMessageBuilder)(nil)
 
 func (b *_UnknownMessageBuilder) setParent(contract KnxNetIpMessageContract) {
 	b.KnxNetIpMessageContract = contract
+	contract.(*_KnxNetIpMessage)._SubType = b._UnknownMessage
 }
 
 func (b *_UnknownMessageBuilder) WithMandatoryFields(unknownData []byte) UnknownMessageBuilder {
@@ -115,6 +120,11 @@ func (b *_UnknownMessageBuilder) WithMandatoryFields(unknownData []byte) Unknown
 
 func (b *_UnknownMessageBuilder) WithUnknownData(unknownData ...byte) UnknownMessageBuilder {
 	b.UnknownData = unknownData
+	return b
+}
+
+func (b *_UnknownMessageBuilder) WithArgTotalLength(totalLength uint16) UnknownMessageBuilder {
+	b.TotalLength = totalLength
 	return b
 }
 
@@ -133,8 +143,10 @@ func (b *_UnknownMessageBuilder) MustBuild() UnknownMessage {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_UnknownMessageBuilder) Done() KnxNetIpMessageBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewKnxNetIpMessageBuilder().(*_KnxNetIpMessageBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -304,7 +316,7 @@ func (m *_UnknownMessage) deepCopy() *_UnknownMessage {
 		utils.DeepCopySlice[byte, byte](m.UnknownData),
 		m.TotalLength,
 	}
-	m.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
+	_UnknownMessageCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _UnknownMessageCopy
 }
 

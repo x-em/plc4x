@@ -94,6 +94,8 @@ type BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesBuilder interfa
 	WithClosingTag(BACnetClosingTag) BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesBuilder
 	// Build builds the BACnetEventParameterChangeOfCharacterStringListOfAlarmValues or returns an error if something is wrong
 	Build() (BACnetEventParameterChangeOfCharacterStringListOfAlarmValues, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,6 +157,11 @@ func (b *_BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesBuilder) W
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesBuilder) WithArgTagNumber(tagNumber uint8) BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -375,9 +382,9 @@ func (m *_BACnetEventParameterChangeOfCharacterStringListOfAlarmValues) deepCopy
 		return nil
 	}
 	_BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesCopy := &_BACnetEventParameterChangeOfCharacterStringListOfAlarmValues{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
 		utils.DeepCopySlice[BACnetApplicationTagCharacterString, BACnetApplicationTagCharacterString](m.ListOfAlarmValues),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetEventParameterChangeOfCharacterStringListOfAlarmValuesCopy

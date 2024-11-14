@@ -82,6 +82,10 @@ type BACnetServiceAckReadPropertyMultipleBuilder interface {
 	WithMandatoryFields(data []BACnetReadAccessResult) BACnetServiceAckReadPropertyMultipleBuilder
 	// WithData adds Data (property field)
 	WithData(...BACnetReadAccessResult) BACnetServiceAckReadPropertyMultipleBuilder
+	// WithArgServiceAckPayloadLength sets a parser argument
+	WithArgServiceAckPayloadLength(uint32) BACnetServiceAckReadPropertyMultipleBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetServiceAckBuilder
 	// Build builds the BACnetServiceAckReadPropertyMultiple or returns an error if something is wrong
 	Build() (BACnetServiceAckReadPropertyMultiple, error)
 	// MustBuild does the same as Build but panics on error
@@ -105,6 +109,7 @@ var _ (BACnetServiceAckReadPropertyMultipleBuilder) = (*_BACnetServiceAckReadPro
 
 func (b *_BACnetServiceAckReadPropertyMultipleBuilder) setParent(contract BACnetServiceAckContract) {
 	b.BACnetServiceAckContract = contract
+	contract.(*_BACnetServiceAck)._SubType = b._BACnetServiceAckReadPropertyMultiple
 }
 
 func (b *_BACnetServiceAckReadPropertyMultipleBuilder) WithMandatoryFields(data []BACnetReadAccessResult) BACnetServiceAckReadPropertyMultipleBuilder {
@@ -113,6 +118,11 @@ func (b *_BACnetServiceAckReadPropertyMultipleBuilder) WithMandatoryFields(data 
 
 func (b *_BACnetServiceAckReadPropertyMultipleBuilder) WithData(data ...BACnetReadAccessResult) BACnetServiceAckReadPropertyMultipleBuilder {
 	b.Data = data
+	return b
+}
+
+func (b *_BACnetServiceAckReadPropertyMultipleBuilder) WithArgServiceAckPayloadLength(serviceAckPayloadLength uint32) BACnetServiceAckReadPropertyMultipleBuilder {
+	b.ServiceAckPayloadLength = serviceAckPayloadLength
 	return b
 }
 
@@ -131,8 +141,10 @@ func (b *_BACnetServiceAckReadPropertyMultipleBuilder) MustBuild() BACnetService
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetServiceAckReadPropertyMultipleBuilder) Done() BACnetServiceAckBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetServiceAckBuilder().(*_BACnetServiceAckBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -304,7 +316,7 @@ func (m *_BACnetServiceAckReadPropertyMultiple) deepCopy() *_BACnetServiceAckRea
 		utils.DeepCopySlice[BACnetReadAccessResult, BACnetReadAccessResult](m.Data),
 		m.ServiceAckPayloadLength,
 	}
-	m.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
+	_BACnetServiceAckReadPropertyMultipleCopy.BACnetServiceAckContract.(*_BACnetServiceAck)._SubType = m
 	return _BACnetServiceAckReadPropertyMultipleCopy
 }
 

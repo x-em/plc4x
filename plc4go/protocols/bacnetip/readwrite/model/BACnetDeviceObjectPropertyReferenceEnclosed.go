@@ -99,6 +99,8 @@ type BACnetDeviceObjectPropertyReferenceEnclosedBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetDeviceObjectPropertyReferenceEnclosedBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetDeviceObjectPropertyReferenceEnclosedBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetDeviceObjectPropertyReferenceEnclosedBuilder
 	// Build builds the BACnetDeviceObjectPropertyReferenceEnclosed or returns an error if something is wrong
 	Build() (BACnetDeviceObjectPropertyReferenceEnclosed, error)
 	// MustBuild does the same as Build but panics on error
@@ -173,6 +175,11 @@ func (b *_BACnetDeviceObjectPropertyReferenceEnclosedBuilder) WithClosingTagBuil
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetDeviceObjectPropertyReferenceEnclosedBuilder) WithArgTagNumber(tagNumber uint8) BACnetDeviceObjectPropertyReferenceEnclosedBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -395,9 +402,9 @@ func (m *_BACnetDeviceObjectPropertyReferenceEnclosed) deepCopy() *_BACnetDevice
 		return nil
 	}
 	_BACnetDeviceObjectPropertyReferenceEnclosedCopy := &_BACnetDeviceObjectPropertyReferenceEnclosed{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.Value.DeepCopy().(BACnetDeviceObjectPropertyReference),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetDeviceObjectPropertyReference](m.Value),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetDeviceObjectPropertyReferenceEnclosedCopy

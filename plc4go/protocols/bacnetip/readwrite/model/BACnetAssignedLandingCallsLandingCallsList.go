@@ -94,6 +94,8 @@ type BACnetAssignedLandingCallsLandingCallsListBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetAssignedLandingCallsLandingCallsListBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetAssignedLandingCallsLandingCallsListBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetAssignedLandingCallsLandingCallsListBuilder
 	// Build builds the BACnetAssignedLandingCallsLandingCallsList or returns an error if something is wrong
 	Build() (BACnetAssignedLandingCallsLandingCallsList, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,6 +157,11 @@ func (b *_BACnetAssignedLandingCallsLandingCallsListBuilder) WithClosingTagBuild
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetAssignedLandingCallsLandingCallsListBuilder) WithArgTagNumber(tagNumber uint8) BACnetAssignedLandingCallsLandingCallsListBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -375,9 +382,9 @@ func (m *_BACnetAssignedLandingCallsLandingCallsList) deepCopy() *_BACnetAssigne
 		return nil
 	}
 	_BACnetAssignedLandingCallsLandingCallsListCopy := &_BACnetAssignedLandingCallsLandingCallsList{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
 		utils.DeepCopySlice[BACnetAssignedLandingCallsLandingCallsListEntry, BACnetAssignedLandingCallsLandingCallsListEntry](m.LandingCalls),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetAssignedLandingCallsLandingCallsListCopy

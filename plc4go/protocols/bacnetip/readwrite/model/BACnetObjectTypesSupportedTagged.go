@@ -110,6 +110,10 @@ type BACnetObjectTypesSupportedTaggedBuilder interface {
 	WithPayload(BACnetTagPayloadBitString) BACnetObjectTypesSupportedTaggedBuilder
 	// WithPayloadBuilder adds Payload (property field) which is build by the builder
 	WithPayloadBuilder(func(BACnetTagPayloadBitStringBuilder) BACnetTagPayloadBitStringBuilder) BACnetObjectTypesSupportedTaggedBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetObjectTypesSupportedTaggedBuilder
+	// WithArgTagClass sets a parser argument
+	WithArgTagClass(TagClass) BACnetObjectTypesSupportedTaggedBuilder
 	// Build builds the BACnetObjectTypesSupportedTagged or returns an error if something is wrong
 	Build() (BACnetObjectTypesSupportedTagged, error)
 	// MustBuild does the same as Build but panics on error
@@ -166,6 +170,15 @@ func (b *_BACnetObjectTypesSupportedTaggedBuilder) WithPayloadBuilder(builderSup
 		}
 		b.err.Append(errors.Wrap(err, "BACnetTagPayloadBitStringBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetObjectTypesSupportedTaggedBuilder) WithArgTagNumber(tagNumber uint8) BACnetObjectTypesSupportedTaggedBuilder {
+	b.TagNumber = tagNumber
+	return b
+}
+func (b *_BACnetObjectTypesSupportedTaggedBuilder) WithArgTagClass(tagClass TagClass) BACnetObjectTypesSupportedTaggedBuilder {
+	b.TagClass = tagClass
 	return b
 }
 
@@ -586,8 +599,8 @@ func (m *_BACnetObjectTypesSupportedTagged) deepCopy() *_BACnetObjectTypesSuppor
 		return nil
 	}
 	_BACnetObjectTypesSupportedTaggedCopy := &_BACnetObjectTypesSupportedTagged{
-		m.Header.DeepCopy().(BACnetTagHeader),
-		m.Payload.DeepCopy().(BACnetTagPayloadBitString),
+		utils.DeepCopy[BACnetTagHeader](m.Header),
+		utils.DeepCopy[BACnetTagPayloadBitString](m.Payload),
 		m.TagNumber,
 		m.TagClass,
 	}

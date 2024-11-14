@@ -91,61 +91,30 @@ type ParameterValueBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ParameterValueBuilder
+	// WithArgNumBytes sets a parser argument
+	WithArgNumBytes(uint8) ParameterValueBuilder
 	// AsParameterValueApplicationAddress1 converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueApplicationAddress1() interface {
-		ParameterValueApplicationAddress1Builder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueApplicationAddress1() ParameterValueApplicationAddress1Builder
 	// AsParameterValueApplicationAddress2 converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueApplicationAddress2() interface {
-		ParameterValueApplicationAddress2Builder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueApplicationAddress2() ParameterValueApplicationAddress2Builder
 	// AsParameterValueInterfaceOptions1 converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueInterfaceOptions1() interface {
-		ParameterValueInterfaceOptions1Builder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueInterfaceOptions1() ParameterValueInterfaceOptions1Builder
 	// AsParameterValueBaudRateSelector converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueBaudRateSelector() interface {
-		ParameterValueBaudRateSelectorBuilder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueBaudRateSelector() ParameterValueBaudRateSelectorBuilder
 	// AsParameterValueInterfaceOptions2 converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueInterfaceOptions2() interface {
-		ParameterValueInterfaceOptions2Builder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueInterfaceOptions2() ParameterValueInterfaceOptions2Builder
 	// AsParameterValueInterfaceOptions1PowerUpSettings converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueInterfaceOptions1PowerUpSettings() interface {
-		ParameterValueInterfaceOptions1PowerUpSettingsBuilder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueInterfaceOptions1PowerUpSettings() ParameterValueInterfaceOptions1PowerUpSettingsBuilder
 	// AsParameterValueInterfaceOptions3 converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueInterfaceOptions3() interface {
-		ParameterValueInterfaceOptions3Builder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueInterfaceOptions3() ParameterValueInterfaceOptions3Builder
 	// AsParameterValueCustomManufacturer converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueCustomManufacturer() interface {
-		ParameterValueCustomManufacturerBuilder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueCustomManufacturer() ParameterValueCustomManufacturerBuilder
 	// AsParameterValueSerialNumber converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueSerialNumber() interface {
-		ParameterValueSerialNumberBuilder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueSerialNumber() ParameterValueSerialNumberBuilder
 	// AsParameterValueCustomTypes converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueCustomTypes() interface {
-		ParameterValueCustomTypesBuilder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueCustomTypes() ParameterValueCustomTypesBuilder
 	// AsParameterValueRaw converts this build to a subType of ParameterValue. It is always possible to return to current builder using Done()
-	AsParameterValueRaw() interface {
-		ParameterValueRawBuilder
-		Done() ParameterValueBuilder
-	}
+	AsParameterValueRaw() ParameterValueRawBuilder
 	// Build builds the ParameterValue or returns an error if something is wrong
 	PartialBuild() (ParameterValueContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -181,6 +150,11 @@ func (b *_ParameterValueBuilder) WithMandatoryFields() ParameterValueBuilder {
 	return b
 }
 
+func (b *_ParameterValueBuilder) WithArgNumBytes(numBytes uint8) ParameterValueBuilder {
+	b.NumBytes = numBytes
+	return b
+}
+
 func (b *_ParameterValueBuilder) PartialBuild() (ParameterValueContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -196,14 +170,8 @@ func (b *_ParameterValueBuilder) PartialMustBuild() ParameterValueContract {
 	return build
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueApplicationAddress1() interface {
-	ParameterValueApplicationAddress1Builder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueApplicationAddress1Builder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueApplicationAddress1() ParameterValueApplicationAddress1Builder {
+	if cb, ok := b.childBuilder.(ParameterValueApplicationAddress1Builder); ok {
 		return cb
 	}
 	cb := NewParameterValueApplicationAddress1Builder().(*_ParameterValueApplicationAddress1Builder)
@@ -212,14 +180,8 @@ func (b *_ParameterValueBuilder) AsParameterValueApplicationAddress1() interface
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueApplicationAddress2() interface {
-	ParameterValueApplicationAddress2Builder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueApplicationAddress2Builder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueApplicationAddress2() ParameterValueApplicationAddress2Builder {
+	if cb, ok := b.childBuilder.(ParameterValueApplicationAddress2Builder); ok {
 		return cb
 	}
 	cb := NewParameterValueApplicationAddress2Builder().(*_ParameterValueApplicationAddress2Builder)
@@ -228,14 +190,8 @@ func (b *_ParameterValueBuilder) AsParameterValueApplicationAddress2() interface
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions1() interface {
-	ParameterValueInterfaceOptions1Builder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueInterfaceOptions1Builder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions1() ParameterValueInterfaceOptions1Builder {
+	if cb, ok := b.childBuilder.(ParameterValueInterfaceOptions1Builder); ok {
 		return cb
 	}
 	cb := NewParameterValueInterfaceOptions1Builder().(*_ParameterValueInterfaceOptions1Builder)
@@ -244,14 +200,8 @@ func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions1() interface {
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueBaudRateSelector() interface {
-	ParameterValueBaudRateSelectorBuilder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueBaudRateSelectorBuilder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueBaudRateSelector() ParameterValueBaudRateSelectorBuilder {
+	if cb, ok := b.childBuilder.(ParameterValueBaudRateSelectorBuilder); ok {
 		return cb
 	}
 	cb := NewParameterValueBaudRateSelectorBuilder().(*_ParameterValueBaudRateSelectorBuilder)
@@ -260,14 +210,8 @@ func (b *_ParameterValueBuilder) AsParameterValueBaudRateSelector() interface {
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions2() interface {
-	ParameterValueInterfaceOptions2Builder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueInterfaceOptions2Builder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions2() ParameterValueInterfaceOptions2Builder {
+	if cb, ok := b.childBuilder.(ParameterValueInterfaceOptions2Builder); ok {
 		return cb
 	}
 	cb := NewParameterValueInterfaceOptions2Builder().(*_ParameterValueInterfaceOptions2Builder)
@@ -276,14 +220,8 @@ func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions2() interface {
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions1PowerUpSettings() interface {
-	ParameterValueInterfaceOptions1PowerUpSettingsBuilder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueInterfaceOptions1PowerUpSettingsBuilder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions1PowerUpSettings() ParameterValueInterfaceOptions1PowerUpSettingsBuilder {
+	if cb, ok := b.childBuilder.(ParameterValueInterfaceOptions1PowerUpSettingsBuilder); ok {
 		return cb
 	}
 	cb := NewParameterValueInterfaceOptions1PowerUpSettingsBuilder().(*_ParameterValueInterfaceOptions1PowerUpSettingsBuilder)
@@ -292,14 +230,8 @@ func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions1PowerUpSetting
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions3() interface {
-	ParameterValueInterfaceOptions3Builder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueInterfaceOptions3Builder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions3() ParameterValueInterfaceOptions3Builder {
+	if cb, ok := b.childBuilder.(ParameterValueInterfaceOptions3Builder); ok {
 		return cb
 	}
 	cb := NewParameterValueInterfaceOptions3Builder().(*_ParameterValueInterfaceOptions3Builder)
@@ -308,14 +240,8 @@ func (b *_ParameterValueBuilder) AsParameterValueInterfaceOptions3() interface {
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueCustomManufacturer() interface {
-	ParameterValueCustomManufacturerBuilder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueCustomManufacturerBuilder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueCustomManufacturer() ParameterValueCustomManufacturerBuilder {
+	if cb, ok := b.childBuilder.(ParameterValueCustomManufacturerBuilder); ok {
 		return cb
 	}
 	cb := NewParameterValueCustomManufacturerBuilder().(*_ParameterValueCustomManufacturerBuilder)
@@ -324,14 +250,8 @@ func (b *_ParameterValueBuilder) AsParameterValueCustomManufacturer() interface 
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueSerialNumber() interface {
-	ParameterValueSerialNumberBuilder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueSerialNumberBuilder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueSerialNumber() ParameterValueSerialNumberBuilder {
+	if cb, ok := b.childBuilder.(ParameterValueSerialNumberBuilder); ok {
 		return cb
 	}
 	cb := NewParameterValueSerialNumberBuilder().(*_ParameterValueSerialNumberBuilder)
@@ -340,14 +260,8 @@ func (b *_ParameterValueBuilder) AsParameterValueSerialNumber() interface {
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueCustomTypes() interface {
-	ParameterValueCustomTypesBuilder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueCustomTypesBuilder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueCustomTypes() ParameterValueCustomTypesBuilder {
+	if cb, ok := b.childBuilder.(ParameterValueCustomTypesBuilder); ok {
 		return cb
 	}
 	cb := NewParameterValueCustomTypesBuilder().(*_ParameterValueCustomTypesBuilder)
@@ -356,14 +270,8 @@ func (b *_ParameterValueBuilder) AsParameterValueCustomTypes() interface {
 	return cb
 }
 
-func (b *_ParameterValueBuilder) AsParameterValueRaw() interface {
-	ParameterValueRawBuilder
-	Done() ParameterValueBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterValueRawBuilder
-		Done() ParameterValueBuilder
-	}); ok {
+func (b *_ParameterValueBuilder) AsParameterValueRaw() ParameterValueRawBuilder {
+	if cb, ok := b.childBuilder.(ParameterValueRawBuilder); ok {
 		return cb
 	}
 	cb := NewParameterValueRawBuilder().(*_ParameterValueRawBuilder)

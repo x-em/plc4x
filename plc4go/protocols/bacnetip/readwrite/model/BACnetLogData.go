@@ -125,21 +125,14 @@ type BACnetLogDataBuilder interface {
 	WithClosingTag(BACnetClosingTag) BACnetLogDataBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetLogDataBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetLogDataBuilder
 	// AsBACnetLogDataLogStatus converts this build to a subType of BACnetLogData. It is always possible to return to current builder using Done()
-	AsBACnetLogDataLogStatus() interface {
-		BACnetLogDataLogStatusBuilder
-		Done() BACnetLogDataBuilder
-	}
+	AsBACnetLogDataLogStatus() BACnetLogDataLogStatusBuilder
 	// AsBACnetLogDataLogData converts this build to a subType of BACnetLogData. It is always possible to return to current builder using Done()
-	AsBACnetLogDataLogData() interface {
-		BACnetLogDataLogDataBuilder
-		Done() BACnetLogDataBuilder
-	}
+	AsBACnetLogDataLogData() BACnetLogDataLogDataBuilder
 	// AsBACnetLogDataLogDataTimeChange converts this build to a subType of BACnetLogData. It is always possible to return to current builder using Done()
-	AsBACnetLogDataLogDataTimeChange() interface {
-		BACnetLogDataLogDataTimeChangeBuilder
-		Done() BACnetLogDataBuilder
-	}
+	AsBACnetLogDataLogDataTimeChange() BACnetLogDataLogDataTimeChangeBuilder
 	// Build builds the BACnetLogData or returns an error if something is wrong
 	PartialBuild() (BACnetLogDataContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -229,6 +222,11 @@ func (b *_BACnetLogDataBuilder) WithClosingTagBuilder(builderSupplier func(BACne
 	return b
 }
 
+func (b *_BACnetLogDataBuilder) WithArgTagNumber(tagNumber uint8) BACnetLogDataBuilder {
+	b.TagNumber = tagNumber
+	return b
+}
+
 func (b *_BACnetLogDataBuilder) PartialBuild() (BACnetLogDataContract, error) {
 	if b.OpeningTag == nil {
 		if b.err == nil {
@@ -262,14 +260,8 @@ func (b *_BACnetLogDataBuilder) PartialMustBuild() BACnetLogDataContract {
 	return build
 }
 
-func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogStatus() interface {
-	BACnetLogDataLogStatusBuilder
-	Done() BACnetLogDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetLogDataLogStatusBuilder
-		Done() BACnetLogDataBuilder
-	}); ok {
+func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogStatus() BACnetLogDataLogStatusBuilder {
+	if cb, ok := b.childBuilder.(BACnetLogDataLogStatusBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetLogDataLogStatusBuilder().(*_BACnetLogDataLogStatusBuilder)
@@ -278,14 +270,8 @@ func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogStatus() interface {
 	return cb
 }
 
-func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogData() interface {
-	BACnetLogDataLogDataBuilder
-	Done() BACnetLogDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetLogDataLogDataBuilder
-		Done() BACnetLogDataBuilder
-	}); ok {
+func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogData() BACnetLogDataLogDataBuilder {
+	if cb, ok := b.childBuilder.(BACnetLogDataLogDataBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetLogDataLogDataBuilder().(*_BACnetLogDataLogDataBuilder)
@@ -294,14 +280,8 @@ func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogData() interface {
 	return cb
 }
 
-func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogDataTimeChange() interface {
-	BACnetLogDataLogDataTimeChangeBuilder
-	Done() BACnetLogDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		BACnetLogDataLogDataTimeChangeBuilder
-		Done() BACnetLogDataBuilder
-	}); ok {
+func (b *_BACnetLogDataBuilder) AsBACnetLogDataLogDataTimeChange() BACnetLogDataLogDataTimeChangeBuilder {
+	if cb, ok := b.childBuilder.(BACnetLogDataLogDataTimeChangeBuilder); ok {
 		return cb
 	}
 	cb := NewBACnetLogDataLogDataTimeChangeBuilder().(*_BACnetLogDataLogDataTimeChangeBuilder)
@@ -575,9 +555,9 @@ func (m *_BACnetLogData) deepCopy() *_BACnetLogData {
 	}
 	_BACnetLogDataCopy := &_BACnetLogData{
 		nil, // will be set by child
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
-		m.PeekedTagHeader.DeepCopy().(BACnetTagHeader),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
+		utils.DeepCopy[BACnetTagHeader](m.PeekedTagHeader),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetLogDataCopy

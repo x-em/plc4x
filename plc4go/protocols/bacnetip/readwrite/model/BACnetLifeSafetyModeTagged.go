@@ -92,6 +92,10 @@ type BACnetLifeSafetyModeTaggedBuilder interface {
 	WithValue(BACnetLifeSafetyMode) BACnetLifeSafetyModeTaggedBuilder
 	// WithProprietaryValue adds ProprietaryValue (property field)
 	WithProprietaryValue(uint32) BACnetLifeSafetyModeTaggedBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetLifeSafetyModeTaggedBuilder
+	// WithArgTagClass sets a parser argument
+	WithArgTagClass(TagClass) BACnetLifeSafetyModeTaggedBuilder
 	// Build builds the BACnetLifeSafetyModeTagged or returns an error if something is wrong
 	Build() (BACnetLifeSafetyModeTagged, error)
 	// MustBuild does the same as Build but panics on error
@@ -140,6 +144,15 @@ func (b *_BACnetLifeSafetyModeTaggedBuilder) WithValue(value BACnetLifeSafetyMod
 
 func (b *_BACnetLifeSafetyModeTaggedBuilder) WithProprietaryValue(proprietaryValue uint32) BACnetLifeSafetyModeTaggedBuilder {
 	b.ProprietaryValue = proprietaryValue
+	return b
+}
+
+func (b *_BACnetLifeSafetyModeTaggedBuilder) WithArgTagNumber(tagNumber uint8) BACnetLifeSafetyModeTaggedBuilder {
+	b.TagNumber = tagNumber
+	return b
+}
+func (b *_BACnetLifeSafetyModeTaggedBuilder) WithArgTagClass(tagClass TagClass) BACnetLifeSafetyModeTaggedBuilder {
+	b.TagClass = tagClass
 	return b
 }
 
@@ -393,7 +406,7 @@ func (m *_BACnetLifeSafetyModeTagged) deepCopy() *_BACnetLifeSafetyModeTagged {
 		return nil
 	}
 	_BACnetLifeSafetyModeTaggedCopy := &_BACnetLifeSafetyModeTagged{
-		m.Header.DeepCopy().(BACnetTagHeader),
+		utils.DeepCopy[BACnetTagHeader](m.Header),
 		m.Value,
 		m.ProprietaryValue,
 		m.TagNumber,

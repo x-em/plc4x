@@ -101,21 +101,16 @@ type ReplyBuilder interface {
 	WithMandatoryFields(peekedByte byte) ReplyBuilder
 	// WithPeekedByte adds PeekedByte (property field)
 	WithPeekedByte(byte) ReplyBuilder
+	// WithArgCBusOptions sets a parser argument
+	WithArgCBusOptions(CBusOptions) ReplyBuilder
+	// WithArgRequestContext sets a parser argument
+	WithArgRequestContext(RequestContext) ReplyBuilder
 	// AsPowerUpReply converts this build to a subType of Reply. It is always possible to return to current builder using Done()
-	AsPowerUpReply() interface {
-		PowerUpReplyBuilder
-		Done() ReplyBuilder
-	}
+	AsPowerUpReply() PowerUpReplyBuilder
 	// AsParameterChangeReply converts this build to a subType of Reply. It is always possible to return to current builder using Done()
-	AsParameterChangeReply() interface {
-		ParameterChangeReplyBuilder
-		Done() ReplyBuilder
-	}
+	AsParameterChangeReply() ParameterChangeReplyBuilder
 	// AsReplyEncodedReply converts this build to a subType of Reply. It is always possible to return to current builder using Done()
-	AsReplyEncodedReply() interface {
-		ReplyEncodedReplyBuilder
-		Done() ReplyBuilder
-	}
+	AsReplyEncodedReply() ReplyEncodedReplyBuilder
 	// Build builds the Reply or returns an error if something is wrong
 	PartialBuild() (ReplyContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -156,6 +151,15 @@ func (b *_ReplyBuilder) WithPeekedByte(peekedByte byte) ReplyBuilder {
 	return b
 }
 
+func (b *_ReplyBuilder) WithArgCBusOptions(cBusOptions CBusOptions) ReplyBuilder {
+	b.CBusOptions = cBusOptions
+	return b
+}
+func (b *_ReplyBuilder) WithArgRequestContext(requestContext RequestContext) ReplyBuilder {
+	b.RequestContext = requestContext
+	return b
+}
+
 func (b *_ReplyBuilder) PartialBuild() (ReplyContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -171,14 +175,8 @@ func (b *_ReplyBuilder) PartialMustBuild() ReplyContract {
 	return build
 }
 
-func (b *_ReplyBuilder) AsPowerUpReply() interface {
-	PowerUpReplyBuilder
-	Done() ReplyBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		PowerUpReplyBuilder
-		Done() ReplyBuilder
-	}); ok {
+func (b *_ReplyBuilder) AsPowerUpReply() PowerUpReplyBuilder {
+	if cb, ok := b.childBuilder.(PowerUpReplyBuilder); ok {
 		return cb
 	}
 	cb := NewPowerUpReplyBuilder().(*_PowerUpReplyBuilder)
@@ -187,14 +185,8 @@ func (b *_ReplyBuilder) AsPowerUpReply() interface {
 	return cb
 }
 
-func (b *_ReplyBuilder) AsParameterChangeReply() interface {
-	ParameterChangeReplyBuilder
-	Done() ReplyBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ParameterChangeReplyBuilder
-		Done() ReplyBuilder
-	}); ok {
+func (b *_ReplyBuilder) AsParameterChangeReply() ParameterChangeReplyBuilder {
+	if cb, ok := b.childBuilder.(ParameterChangeReplyBuilder); ok {
 		return cb
 	}
 	cb := NewParameterChangeReplyBuilder().(*_ParameterChangeReplyBuilder)
@@ -203,14 +195,8 @@ func (b *_ReplyBuilder) AsParameterChangeReply() interface {
 	return cb
 }
 
-func (b *_ReplyBuilder) AsReplyEncodedReply() interface {
-	ReplyEncodedReplyBuilder
-	Done() ReplyBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ReplyEncodedReplyBuilder
-		Done() ReplyBuilder
-	}); ok {
+func (b *_ReplyBuilder) AsReplyEncodedReply() ReplyEncodedReplyBuilder {
+	if cb, ok := b.childBuilder.(ReplyEncodedReplyBuilder); ok {
 		return cb
 	}
 	cb := NewReplyEncodedReplyBuilder().(*_ReplyEncodedReplyBuilder)

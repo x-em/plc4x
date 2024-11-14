@@ -89,6 +89,10 @@ type BVLCOriginalUnicastNPDUBuilder interface {
 	WithNpdu(NPDU) BVLCOriginalUnicastNPDUBuilder
 	// WithNpduBuilder adds Npdu (property field) which is build by the builder
 	WithNpduBuilder(func(NPDUBuilder) NPDUBuilder) BVLCOriginalUnicastNPDUBuilder
+	// WithArgBvlcPayloadLength sets a parser argument
+	WithArgBvlcPayloadLength(uint16) BVLCOriginalUnicastNPDUBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCOriginalUnicastNPDU or returns an error if something is wrong
 	Build() (BVLCOriginalUnicastNPDU, error)
 	// MustBuild does the same as Build but panics on error
@@ -112,6 +116,7 @@ var _ (BVLCOriginalUnicastNPDUBuilder) = (*_BVLCOriginalUnicastNPDUBuilder)(nil)
 
 func (b *_BVLCOriginalUnicastNPDUBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCOriginalUnicastNPDU
 }
 
 func (b *_BVLCOriginalUnicastNPDUBuilder) WithMandatoryFields(npdu NPDU) BVLCOriginalUnicastNPDUBuilder {
@@ -136,6 +141,11 @@ func (b *_BVLCOriginalUnicastNPDUBuilder) WithNpduBuilder(builderSupplier func(N
 	return b
 }
 
+func (b *_BVLCOriginalUnicastNPDUBuilder) WithArgBvlcPayloadLength(bvlcPayloadLength uint16) BVLCOriginalUnicastNPDUBuilder {
+	b.BvlcPayloadLength = bvlcPayloadLength
+	return b
+}
+
 func (b *_BVLCOriginalUnicastNPDUBuilder) Build() (BVLCOriginalUnicastNPDU, error) {
 	if b.Npdu == nil {
 		if b.err == nil {
@@ -157,8 +167,10 @@ func (b *_BVLCOriginalUnicastNPDUBuilder) MustBuild() BVLCOriginalUnicastNPDU {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCOriginalUnicastNPDUBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -323,10 +335,10 @@ func (m *_BVLCOriginalUnicastNPDU) deepCopy() *_BVLCOriginalUnicastNPDU {
 	}
 	_BVLCOriginalUnicastNPDUCopy := &_BVLCOriginalUnicastNPDU{
 		m.BVLCContract.(*_BVLC).deepCopy(),
-		m.Npdu.DeepCopy().(NPDU),
+		utils.DeepCopy[NPDU](m.Npdu),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCOriginalUnicastNPDUCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCOriginalUnicastNPDUCopy
 }
 

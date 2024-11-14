@@ -100,46 +100,24 @@ type MessagePDUBuilder interface {
 	WithMandatoryFields(chunk ChunkType) MessagePDUBuilder
 	// WithChunk adds Chunk (property field)
 	WithChunk(ChunkType) MessagePDUBuilder
+	// WithArgBinary sets a parser argument
+	WithArgBinary(bool) MessagePDUBuilder
 	// AsOpcuaHelloRequest converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaHelloRequest() interface {
-		OpcuaHelloRequestBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaHelloRequest() OpcuaHelloRequestBuilder
 	// AsOpcuaAcknowledgeResponse converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaAcknowledgeResponse() interface {
-		OpcuaAcknowledgeResponseBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaAcknowledgeResponse() OpcuaAcknowledgeResponseBuilder
 	// AsOpcuaOpenRequest converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaOpenRequest() interface {
-		OpcuaOpenRequestBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaOpenRequest() OpcuaOpenRequestBuilder
 	// AsOpcuaOpenResponse converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaOpenResponse() interface {
-		OpcuaOpenResponseBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaOpenResponse() OpcuaOpenResponseBuilder
 	// AsOpcuaCloseRequest converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaCloseRequest() interface {
-		OpcuaCloseRequestBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaCloseRequest() OpcuaCloseRequestBuilder
 	// AsOpcuaMessageRequest converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaMessageRequest() interface {
-		OpcuaMessageRequestBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaMessageRequest() OpcuaMessageRequestBuilder
 	// AsOpcuaMessageResponse converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaMessageResponse() interface {
-		OpcuaMessageResponseBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaMessageResponse() OpcuaMessageResponseBuilder
 	// AsOpcuaMessageError converts this build to a subType of MessagePDU. It is always possible to return to current builder using Done()
-	AsOpcuaMessageError() interface {
-		OpcuaMessageErrorBuilder
-		Done() MessagePDUBuilder
-	}
+	AsOpcuaMessageError() OpcuaMessageErrorBuilder
 	// Build builds the MessagePDU or returns an error if something is wrong
 	PartialBuild() (MessagePDUContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -180,6 +158,11 @@ func (b *_MessagePDUBuilder) WithChunk(chunk ChunkType) MessagePDUBuilder {
 	return b
 }
 
+func (b *_MessagePDUBuilder) WithArgBinary(binary bool) MessagePDUBuilder {
+	b.Binary = binary
+	return b
+}
+
 func (b *_MessagePDUBuilder) PartialBuild() (MessagePDUContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -195,14 +178,8 @@ func (b *_MessagePDUBuilder) PartialMustBuild() MessagePDUContract {
 	return build
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaHelloRequest() interface {
-	OpcuaHelloRequestBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaHelloRequestBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaHelloRequest() OpcuaHelloRequestBuilder {
+	if cb, ok := b.childBuilder.(OpcuaHelloRequestBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaHelloRequestBuilder().(*_OpcuaHelloRequestBuilder)
@@ -211,14 +188,8 @@ func (b *_MessagePDUBuilder) AsOpcuaHelloRequest() interface {
 	return cb
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaAcknowledgeResponse() interface {
-	OpcuaAcknowledgeResponseBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaAcknowledgeResponseBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaAcknowledgeResponse() OpcuaAcknowledgeResponseBuilder {
+	if cb, ok := b.childBuilder.(OpcuaAcknowledgeResponseBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaAcknowledgeResponseBuilder().(*_OpcuaAcknowledgeResponseBuilder)
@@ -227,14 +198,8 @@ func (b *_MessagePDUBuilder) AsOpcuaAcknowledgeResponse() interface {
 	return cb
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaOpenRequest() interface {
-	OpcuaOpenRequestBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaOpenRequestBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaOpenRequest() OpcuaOpenRequestBuilder {
+	if cb, ok := b.childBuilder.(OpcuaOpenRequestBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaOpenRequestBuilder().(*_OpcuaOpenRequestBuilder)
@@ -243,14 +208,8 @@ func (b *_MessagePDUBuilder) AsOpcuaOpenRequest() interface {
 	return cb
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaOpenResponse() interface {
-	OpcuaOpenResponseBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaOpenResponseBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaOpenResponse() OpcuaOpenResponseBuilder {
+	if cb, ok := b.childBuilder.(OpcuaOpenResponseBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaOpenResponseBuilder().(*_OpcuaOpenResponseBuilder)
@@ -259,14 +218,8 @@ func (b *_MessagePDUBuilder) AsOpcuaOpenResponse() interface {
 	return cb
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaCloseRequest() interface {
-	OpcuaCloseRequestBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaCloseRequestBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaCloseRequest() OpcuaCloseRequestBuilder {
+	if cb, ok := b.childBuilder.(OpcuaCloseRequestBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaCloseRequestBuilder().(*_OpcuaCloseRequestBuilder)
@@ -275,14 +228,8 @@ func (b *_MessagePDUBuilder) AsOpcuaCloseRequest() interface {
 	return cb
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaMessageRequest() interface {
-	OpcuaMessageRequestBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaMessageRequestBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaMessageRequest() OpcuaMessageRequestBuilder {
+	if cb, ok := b.childBuilder.(OpcuaMessageRequestBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaMessageRequestBuilder().(*_OpcuaMessageRequestBuilder)
@@ -291,14 +238,8 @@ func (b *_MessagePDUBuilder) AsOpcuaMessageRequest() interface {
 	return cb
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaMessageResponse() interface {
-	OpcuaMessageResponseBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaMessageResponseBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaMessageResponse() OpcuaMessageResponseBuilder {
+	if cb, ok := b.childBuilder.(OpcuaMessageResponseBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaMessageResponseBuilder().(*_OpcuaMessageResponseBuilder)
@@ -307,14 +248,8 @@ func (b *_MessagePDUBuilder) AsOpcuaMessageResponse() interface {
 	return cb
 }
 
-func (b *_MessagePDUBuilder) AsOpcuaMessageError() interface {
-	OpcuaMessageErrorBuilder
-	Done() MessagePDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		OpcuaMessageErrorBuilder
-		Done() MessagePDUBuilder
-	}); ok {
+func (b *_MessagePDUBuilder) AsOpcuaMessageError() OpcuaMessageErrorBuilder {
+	if cb, ok := b.childBuilder.(OpcuaMessageErrorBuilder); ok {
 		return cb
 	}
 	cb := NewOpcuaMessageErrorBuilder().(*_OpcuaMessageErrorBuilder)

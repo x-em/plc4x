@@ -82,6 +82,10 @@ type BACnetConfirmedServiceRequestVTCloseBuilder interface {
 	WithMandatoryFields(listOfRemoteVtSessionIdentifiers []BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTCloseBuilder
 	// WithListOfRemoteVtSessionIdentifiers adds ListOfRemoteVtSessionIdentifiers (property field)
 	WithListOfRemoteVtSessionIdentifiers(...BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTCloseBuilder
+	// WithArgServiceRequestPayloadLength sets a parser argument
+	WithArgServiceRequestPayloadLength(uint32) BACnetConfirmedServiceRequestVTCloseBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BACnetConfirmedServiceRequestBuilder
 	// Build builds the BACnetConfirmedServiceRequestVTClose or returns an error if something is wrong
 	Build() (BACnetConfirmedServiceRequestVTClose, error)
 	// MustBuild does the same as Build but panics on error
@@ -105,6 +109,7 @@ var _ (BACnetConfirmedServiceRequestVTCloseBuilder) = (*_BACnetConfirmedServiceR
 
 func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) setParent(contract BACnetConfirmedServiceRequestContract) {
 	b.BACnetConfirmedServiceRequestContract = contract
+	contract.(*_BACnetConfirmedServiceRequest)._SubType = b._BACnetConfirmedServiceRequestVTClose
 }
 
 func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) WithMandatoryFields(listOfRemoteVtSessionIdentifiers []BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTCloseBuilder {
@@ -113,6 +118,11 @@ func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) WithMandatoryFields(listO
 
 func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) WithListOfRemoteVtSessionIdentifiers(listOfRemoteVtSessionIdentifiers ...BACnetApplicationTagUnsignedInteger) BACnetConfirmedServiceRequestVTCloseBuilder {
 	b.ListOfRemoteVtSessionIdentifiers = listOfRemoteVtSessionIdentifiers
+	return b
+}
+
+func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) WithArgServiceRequestPayloadLength(serviceRequestPayloadLength uint32) BACnetConfirmedServiceRequestVTCloseBuilder {
+	b.ServiceRequestPayloadLength = serviceRequestPayloadLength
 	return b
 }
 
@@ -131,8 +141,10 @@ func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) MustBuild() BACnetConfirm
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BACnetConfirmedServiceRequestVTCloseBuilder) Done() BACnetConfirmedServiceRequestBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBACnetConfirmedServiceRequestBuilder().(*_BACnetConfirmedServiceRequestBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -304,7 +316,7 @@ func (m *_BACnetConfirmedServiceRequestVTClose) deepCopy() *_BACnetConfirmedServ
 		utils.DeepCopySlice[BACnetApplicationTagUnsignedInteger, BACnetApplicationTagUnsignedInteger](m.ListOfRemoteVtSessionIdentifiers),
 		m.ServiceRequestPayloadLength,
 	}
-	m.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
+	_BACnetConfirmedServiceRequestVTCloseCopy.BACnetConfirmedServiceRequestContract.(*_BACnetConfirmedServiceRequest)._SubType = m
 	return _BACnetConfirmedServiceRequestVTCloseCopy
 }
 

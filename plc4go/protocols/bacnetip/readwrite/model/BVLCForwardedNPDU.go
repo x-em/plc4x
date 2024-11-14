@@ -101,6 +101,10 @@ type BVLCForwardedNPDUBuilder interface {
 	WithNpdu(NPDU) BVLCForwardedNPDUBuilder
 	// WithNpduBuilder adds Npdu (property field) which is build by the builder
 	WithNpduBuilder(func(NPDUBuilder) NPDUBuilder) BVLCForwardedNPDUBuilder
+	// WithArgBvlcPayloadLength sets a parser argument
+	WithArgBvlcPayloadLength(uint16) BVLCForwardedNPDUBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCForwardedNPDU or returns an error if something is wrong
 	Build() (BVLCForwardedNPDU, error)
 	// MustBuild does the same as Build but panics on error
@@ -124,6 +128,7 @@ var _ (BVLCForwardedNPDUBuilder) = (*_BVLCForwardedNPDUBuilder)(nil)
 
 func (b *_BVLCForwardedNPDUBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCForwardedNPDU
 }
 
 func (b *_BVLCForwardedNPDUBuilder) WithMandatoryFields(ip []uint8, port uint16, npdu NPDU) BVLCForwardedNPDUBuilder {
@@ -158,6 +163,11 @@ func (b *_BVLCForwardedNPDUBuilder) WithNpduBuilder(builderSupplier func(NPDUBui
 	return b
 }
 
+func (b *_BVLCForwardedNPDUBuilder) WithArgBvlcPayloadLength(bvlcPayloadLength uint16) BVLCForwardedNPDUBuilder {
+	b.BvlcPayloadLength = bvlcPayloadLength
+	return b
+}
+
 func (b *_BVLCForwardedNPDUBuilder) Build() (BVLCForwardedNPDU, error) {
 	if b.Npdu == nil {
 		if b.err == nil {
@@ -179,8 +189,10 @@ func (b *_BVLCForwardedNPDUBuilder) MustBuild() BVLCForwardedNPDU {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCForwardedNPDUBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -383,10 +395,10 @@ func (m *_BVLCForwardedNPDU) deepCopy() *_BVLCForwardedNPDU {
 		m.BVLCContract.(*_BVLC).deepCopy(),
 		utils.DeepCopySlice[uint8, uint8](m.Ip),
 		m.Port,
-		m.Npdu.DeepCopy().(NPDU),
+		utils.DeepCopy[NPDU](m.Npdu),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCForwardedNPDUCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCForwardedNPDUCopy
 }
 

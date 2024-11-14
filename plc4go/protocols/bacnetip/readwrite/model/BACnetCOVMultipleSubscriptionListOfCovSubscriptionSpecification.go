@@ -94,6 +94,8 @@ type BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationBuilder inte
 	WithClosingTag(BACnetClosingTag) BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationBuilder
 	// WithClosingTagBuilder adds ClosingTag (property field) which is build by the builder
 	WithClosingTagBuilder(func(BACnetClosingTagBuilder) BACnetClosingTagBuilder) BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationBuilder
+	// WithArgTagNumber sets a parser argument
+	WithArgTagNumber(uint8) BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationBuilder
 	// Build builds the BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecification or returns an error if something is wrong
 	Build() (BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecification, error)
 	// MustBuild does the same as Build but panics on error
@@ -155,6 +157,11 @@ func (b *_BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationBuilder
 		}
 		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
+	return b
+}
+
+func (b *_BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationBuilder) WithArgTagNumber(tagNumber uint8) BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationBuilder {
+	b.TagNumber = tagNumber
 	return b
 }
 
@@ -375,9 +382,9 @@ func (m *_BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecification) deepC
 		return nil
 	}
 	_BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationCopy := &_BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecification{
-		m.OpeningTag.DeepCopy().(BACnetOpeningTag),
+		utils.DeepCopy[BACnetOpeningTag](m.OpeningTag),
 		utils.DeepCopySlice[BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationEntry, BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationEntry](m.ListOfCovSubscriptionSpecificationEntry),
-		m.ClosingTag.DeepCopy().(BACnetClosingTag),
+		utils.DeepCopy[BACnetClosingTag](m.ClosingTag),
 		m.TagNumber,
 	}
 	return _BACnetCOVMultipleSubscriptionListOfCovSubscriptionSpecificationCopy

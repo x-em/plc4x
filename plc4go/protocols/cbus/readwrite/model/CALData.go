@@ -111,56 +111,28 @@ type CALDataBuilder interface {
 	WithOptionalAdditionalData(CALData) CALDataBuilder
 	// WithOptionalAdditionalDataBuilder adds AdditionalData (property field) which is build by the builder
 	WithOptionalAdditionalDataBuilder(func(CALDataBuilder) CALDataBuilder) CALDataBuilder
+	// WithArgRequestContext sets a parser argument
+	WithArgRequestContext(RequestContext) CALDataBuilder
 	// AsCALDataReset converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataReset() interface {
-		CALDataResetBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataReset() CALDataResetBuilder
 	// AsCALDataRecall converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataRecall() interface {
-		CALDataRecallBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataRecall() CALDataRecallBuilder
 	// AsCALDataIdentify converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataIdentify() interface {
-		CALDataIdentifyBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataIdentify() CALDataIdentifyBuilder
 	// AsCALDataGetStatus converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataGetStatus() interface {
-		CALDataGetStatusBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataGetStatus() CALDataGetStatusBuilder
 	// AsCALDataWrite converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataWrite() interface {
-		CALDataWriteBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataWrite() CALDataWriteBuilder
 	// AsCALDataIdentifyReply converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataIdentifyReply() interface {
-		CALDataIdentifyReplyBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataIdentifyReply() CALDataIdentifyReplyBuilder
 	// AsCALDataReply converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataReply() interface {
-		CALDataReplyBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataReply() CALDataReplyBuilder
 	// AsCALDataAcknowledge converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataAcknowledge() interface {
-		CALDataAcknowledgeBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataAcknowledge() CALDataAcknowledgeBuilder
 	// AsCALDataStatus converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataStatus() interface {
-		CALDataStatusBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataStatus() CALDataStatusBuilder
 	// AsCALDataStatusExtended converts this build to a subType of CALData. It is always possible to return to current builder using Done()
-	AsCALDataStatusExtended() interface {
-		CALDataStatusExtendedBuilder
-		Done() CALDataBuilder
-	}
+	AsCALDataStatusExtended() CALDataStatusExtendedBuilder
 	// Build builds the CALData or returns an error if something is wrong
 	PartialBuild() (CALDataContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -219,6 +191,11 @@ func (b *_CALDataBuilder) WithOptionalAdditionalDataBuilder(builderSupplier func
 	return b
 }
 
+func (b *_CALDataBuilder) WithArgRequestContext(requestContext RequestContext) CALDataBuilder {
+	b.RequestContext = requestContext
+	return b
+}
+
 func (b *_CALDataBuilder) PartialBuild() (CALDataContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -234,14 +211,8 @@ func (b *_CALDataBuilder) PartialMustBuild() CALDataContract {
 	return build
 }
 
-func (b *_CALDataBuilder) AsCALDataReset() interface {
-	CALDataResetBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataResetBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataReset() CALDataResetBuilder {
+	if cb, ok := b.childBuilder.(CALDataResetBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataResetBuilder().(*_CALDataResetBuilder)
@@ -250,14 +221,8 @@ func (b *_CALDataBuilder) AsCALDataReset() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataRecall() interface {
-	CALDataRecallBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataRecallBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataRecall() CALDataRecallBuilder {
+	if cb, ok := b.childBuilder.(CALDataRecallBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataRecallBuilder().(*_CALDataRecallBuilder)
@@ -266,14 +231,8 @@ func (b *_CALDataBuilder) AsCALDataRecall() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataIdentify() interface {
-	CALDataIdentifyBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataIdentifyBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataIdentify() CALDataIdentifyBuilder {
+	if cb, ok := b.childBuilder.(CALDataIdentifyBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataIdentifyBuilder().(*_CALDataIdentifyBuilder)
@@ -282,14 +241,8 @@ func (b *_CALDataBuilder) AsCALDataIdentify() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataGetStatus() interface {
-	CALDataGetStatusBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataGetStatusBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataGetStatus() CALDataGetStatusBuilder {
+	if cb, ok := b.childBuilder.(CALDataGetStatusBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataGetStatusBuilder().(*_CALDataGetStatusBuilder)
@@ -298,14 +251,8 @@ func (b *_CALDataBuilder) AsCALDataGetStatus() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataWrite() interface {
-	CALDataWriteBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataWriteBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataWrite() CALDataWriteBuilder {
+	if cb, ok := b.childBuilder.(CALDataWriteBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataWriteBuilder().(*_CALDataWriteBuilder)
@@ -314,14 +261,8 @@ func (b *_CALDataBuilder) AsCALDataWrite() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataIdentifyReply() interface {
-	CALDataIdentifyReplyBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataIdentifyReplyBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataIdentifyReply() CALDataIdentifyReplyBuilder {
+	if cb, ok := b.childBuilder.(CALDataIdentifyReplyBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataIdentifyReplyBuilder().(*_CALDataIdentifyReplyBuilder)
@@ -330,14 +271,8 @@ func (b *_CALDataBuilder) AsCALDataIdentifyReply() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataReply() interface {
-	CALDataReplyBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataReplyBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataReply() CALDataReplyBuilder {
+	if cb, ok := b.childBuilder.(CALDataReplyBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataReplyBuilder().(*_CALDataReplyBuilder)
@@ -346,14 +281,8 @@ func (b *_CALDataBuilder) AsCALDataReply() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataAcknowledge() interface {
-	CALDataAcknowledgeBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataAcknowledgeBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataAcknowledge() CALDataAcknowledgeBuilder {
+	if cb, ok := b.childBuilder.(CALDataAcknowledgeBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataAcknowledgeBuilder().(*_CALDataAcknowledgeBuilder)
@@ -362,14 +291,8 @@ func (b *_CALDataBuilder) AsCALDataAcknowledge() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataStatus() interface {
-	CALDataStatusBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataStatusBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataStatus() CALDataStatusBuilder {
+	if cb, ok := b.childBuilder.(CALDataStatusBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataStatusBuilder().(*_CALDataStatusBuilder)
@@ -378,14 +301,8 @@ func (b *_CALDataBuilder) AsCALDataStatus() interface {
 	return cb
 }
 
-func (b *_CALDataBuilder) AsCALDataStatusExtended() interface {
-	CALDataStatusExtendedBuilder
-	Done() CALDataBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		CALDataStatusExtendedBuilder
-		Done() CALDataBuilder
-	}); ok {
+func (b *_CALDataBuilder) AsCALDataStatusExtended() CALDataStatusExtendedBuilder {
+	if cb, ok := b.childBuilder.(CALDataStatusExtendedBuilder); ok {
 		return cb
 	}
 	cb := NewCALDataStatusExtendedBuilder().(*_CALDataStatusExtendedBuilder)
@@ -714,7 +631,7 @@ func (m *_CALData) deepCopy() *_CALData {
 	_CALDataCopy := &_CALData{
 		nil, // will be set by child
 		m.CommandTypeContainer,
-		m.AdditionalData.DeepCopy().(CALData),
+		utils.DeepCopy[CALData](m.AdditionalData),
 		m.RequestContext,
 	}
 	return _CALDataCopy

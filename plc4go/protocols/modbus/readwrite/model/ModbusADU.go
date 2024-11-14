@@ -92,21 +92,14 @@ type ModbusADUBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() ModbusADUBuilder
+	// WithArgResponse sets a parser argument
+	WithArgResponse(bool) ModbusADUBuilder
 	// AsModbusTcpADU converts this build to a subType of ModbusADU. It is always possible to return to current builder using Done()
-	AsModbusTcpADU() interface {
-		ModbusTcpADUBuilder
-		Done() ModbusADUBuilder
-	}
+	AsModbusTcpADU() ModbusTcpADUBuilder
 	// AsModbusRtuADU converts this build to a subType of ModbusADU. It is always possible to return to current builder using Done()
-	AsModbusRtuADU() interface {
-		ModbusRtuADUBuilder
-		Done() ModbusADUBuilder
-	}
+	AsModbusRtuADU() ModbusRtuADUBuilder
 	// AsModbusAsciiADU converts this build to a subType of ModbusADU. It is always possible to return to current builder using Done()
-	AsModbusAsciiADU() interface {
-		ModbusAsciiADUBuilder
-		Done() ModbusADUBuilder
-	}
+	AsModbusAsciiADU() ModbusAsciiADUBuilder
 	// Build builds the ModbusADU or returns an error if something is wrong
 	PartialBuild() (ModbusADUContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -142,6 +135,11 @@ func (b *_ModbusADUBuilder) WithMandatoryFields() ModbusADUBuilder {
 	return b
 }
 
+func (b *_ModbusADUBuilder) WithArgResponse(response bool) ModbusADUBuilder {
+	b.Response = response
+	return b
+}
+
 func (b *_ModbusADUBuilder) PartialBuild() (ModbusADUContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -157,14 +155,8 @@ func (b *_ModbusADUBuilder) PartialMustBuild() ModbusADUContract {
 	return build
 }
 
-func (b *_ModbusADUBuilder) AsModbusTcpADU() interface {
-	ModbusTcpADUBuilder
-	Done() ModbusADUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ModbusTcpADUBuilder
-		Done() ModbusADUBuilder
-	}); ok {
+func (b *_ModbusADUBuilder) AsModbusTcpADU() ModbusTcpADUBuilder {
+	if cb, ok := b.childBuilder.(ModbusTcpADUBuilder); ok {
 		return cb
 	}
 	cb := NewModbusTcpADUBuilder().(*_ModbusTcpADUBuilder)
@@ -173,14 +165,8 @@ func (b *_ModbusADUBuilder) AsModbusTcpADU() interface {
 	return cb
 }
 
-func (b *_ModbusADUBuilder) AsModbusRtuADU() interface {
-	ModbusRtuADUBuilder
-	Done() ModbusADUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ModbusRtuADUBuilder
-		Done() ModbusADUBuilder
-	}); ok {
+func (b *_ModbusADUBuilder) AsModbusRtuADU() ModbusRtuADUBuilder {
+	if cb, ok := b.childBuilder.(ModbusRtuADUBuilder); ok {
 		return cb
 	}
 	cb := NewModbusRtuADUBuilder().(*_ModbusRtuADUBuilder)
@@ -189,14 +175,8 @@ func (b *_ModbusADUBuilder) AsModbusRtuADU() interface {
 	return cb
 }
 
-func (b *_ModbusADUBuilder) AsModbusAsciiADU() interface {
-	ModbusAsciiADUBuilder
-	Done() ModbusADUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		ModbusAsciiADUBuilder
-		Done() ModbusADUBuilder
-	}); ok {
+func (b *_ModbusADUBuilder) AsModbusAsciiADU() ModbusAsciiADUBuilder {
+	if cb, ok := b.childBuilder.(ModbusAsciiADUBuilder); ok {
 		return cb
 	}
 	cb := NewModbusAsciiADUBuilder().(*_ModbusAsciiADUBuilder)

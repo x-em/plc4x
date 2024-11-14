@@ -84,6 +84,10 @@ type BVLCSecureBVLLBuilder interface {
 	WithMandatoryFields(securityWrapper []byte) BVLCSecureBVLLBuilder
 	// WithSecurityWrapper adds SecurityWrapper (property field)
 	WithSecurityWrapper(...byte) BVLCSecureBVLLBuilder
+	// WithArgBvlcPayloadLength sets a parser argument
+	WithArgBvlcPayloadLength(uint16) BVLCSecureBVLLBuilder
+	// Done is used to finish work on this child and return (or create one if none) to the parent builder
+	Done() BVLCBuilder
 	// Build builds the BVLCSecureBVLL or returns an error if something is wrong
 	Build() (BVLCSecureBVLL, error)
 	// MustBuild does the same as Build but panics on error
@@ -107,6 +111,7 @@ var _ (BVLCSecureBVLLBuilder) = (*_BVLCSecureBVLLBuilder)(nil)
 
 func (b *_BVLCSecureBVLLBuilder) setParent(contract BVLCContract) {
 	b.BVLCContract = contract
+	contract.(*_BVLC)._SubType = b._BVLCSecureBVLL
 }
 
 func (b *_BVLCSecureBVLLBuilder) WithMandatoryFields(securityWrapper []byte) BVLCSecureBVLLBuilder {
@@ -115,6 +120,11 @@ func (b *_BVLCSecureBVLLBuilder) WithMandatoryFields(securityWrapper []byte) BVL
 
 func (b *_BVLCSecureBVLLBuilder) WithSecurityWrapper(securityWrapper ...byte) BVLCSecureBVLLBuilder {
 	b.SecurityWrapper = securityWrapper
+	return b
+}
+
+func (b *_BVLCSecureBVLLBuilder) WithArgBvlcPayloadLength(bvlcPayloadLength uint16) BVLCSecureBVLLBuilder {
+	b.BvlcPayloadLength = bvlcPayloadLength
 	return b
 }
 
@@ -133,8 +143,10 @@ func (b *_BVLCSecureBVLLBuilder) MustBuild() BVLCSecureBVLL {
 	return build
 }
 
-// Done is used to finish work on this child and return to the parent builder
 func (b *_BVLCSecureBVLLBuilder) Done() BVLCBuilder {
+	if b.parentBuilder == nil {
+		b.parentBuilder = NewBVLCBuilder().(*_BVLCBuilder)
+	}
 	return b.parentBuilder
 }
 
@@ -304,7 +316,7 @@ func (m *_BVLCSecureBVLL) deepCopy() *_BVLCSecureBVLL {
 		utils.DeepCopySlice[byte, byte](m.SecurityWrapper),
 		m.BvlcPayloadLength,
 	}
-	m.BVLCContract.(*_BVLC)._SubType = m
+	_BVLCSecureBVLLCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCSecureBVLLCopy
 }
 

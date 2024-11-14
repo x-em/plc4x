@@ -93,51 +93,26 @@ type APDUBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
 	WithMandatoryFields() APDUBuilder
+	// WithArgApduLength sets a parser argument
+	WithArgApduLength(uint16) APDUBuilder
 	// AsAPDUConfirmedRequest converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUConfirmedRequest() interface {
-		APDUConfirmedRequestBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUConfirmedRequest() APDUConfirmedRequestBuilder
 	// AsAPDUUnconfirmedRequest converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUUnconfirmedRequest() interface {
-		APDUUnconfirmedRequestBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUUnconfirmedRequest() APDUUnconfirmedRequestBuilder
 	// AsAPDUSimpleAck converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUSimpleAck() interface {
-		APDUSimpleAckBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUSimpleAck() APDUSimpleAckBuilder
 	// AsAPDUComplexAck converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUComplexAck() interface {
-		APDUComplexAckBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUComplexAck() APDUComplexAckBuilder
 	// AsAPDUSegmentAck converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUSegmentAck() interface {
-		APDUSegmentAckBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUSegmentAck() APDUSegmentAckBuilder
 	// AsAPDUError converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUError() interface {
-		APDUErrorBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUError() APDUErrorBuilder
 	// AsAPDUReject converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUReject() interface {
-		APDURejectBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUReject() APDURejectBuilder
 	// AsAPDUAbort converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUAbort() interface {
-		APDUAbortBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUAbort() APDUAbortBuilder
 	// AsAPDUUnknown converts this build to a subType of APDU. It is always possible to return to current builder using Done()
-	AsAPDUUnknown() interface {
-		APDUUnknownBuilder
-		Done() APDUBuilder
-	}
+	AsAPDUUnknown() APDUUnknownBuilder
 	// Build builds the APDU or returns an error if something is wrong
 	PartialBuild() (APDUContract, error)
 	// MustBuild does the same as Build but panics on error
@@ -173,6 +148,11 @@ func (b *_APDUBuilder) WithMandatoryFields() APDUBuilder {
 	return b
 }
 
+func (b *_APDUBuilder) WithArgApduLength(apduLength uint16) APDUBuilder {
+	b.ApduLength = apduLength
+	return b
+}
+
 func (b *_APDUBuilder) PartialBuild() (APDUContract, error) {
 	if b.err != nil {
 		return nil, errors.Wrap(b.err, "error occurred during build")
@@ -188,14 +168,8 @@ func (b *_APDUBuilder) PartialMustBuild() APDUContract {
 	return build
 }
 
-func (b *_APDUBuilder) AsAPDUConfirmedRequest() interface {
-	APDUConfirmedRequestBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUConfirmedRequestBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUConfirmedRequest() APDUConfirmedRequestBuilder {
+	if cb, ok := b.childBuilder.(APDUConfirmedRequestBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUConfirmedRequestBuilder().(*_APDUConfirmedRequestBuilder)
@@ -204,14 +178,8 @@ func (b *_APDUBuilder) AsAPDUConfirmedRequest() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUUnconfirmedRequest() interface {
-	APDUUnconfirmedRequestBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUUnconfirmedRequestBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUUnconfirmedRequest() APDUUnconfirmedRequestBuilder {
+	if cb, ok := b.childBuilder.(APDUUnconfirmedRequestBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUUnconfirmedRequestBuilder().(*_APDUUnconfirmedRequestBuilder)
@@ -220,14 +188,8 @@ func (b *_APDUBuilder) AsAPDUUnconfirmedRequest() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUSimpleAck() interface {
-	APDUSimpleAckBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUSimpleAckBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUSimpleAck() APDUSimpleAckBuilder {
+	if cb, ok := b.childBuilder.(APDUSimpleAckBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUSimpleAckBuilder().(*_APDUSimpleAckBuilder)
@@ -236,14 +198,8 @@ func (b *_APDUBuilder) AsAPDUSimpleAck() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUComplexAck() interface {
-	APDUComplexAckBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUComplexAckBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUComplexAck() APDUComplexAckBuilder {
+	if cb, ok := b.childBuilder.(APDUComplexAckBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUComplexAckBuilder().(*_APDUComplexAckBuilder)
@@ -252,14 +208,8 @@ func (b *_APDUBuilder) AsAPDUComplexAck() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUSegmentAck() interface {
-	APDUSegmentAckBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUSegmentAckBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUSegmentAck() APDUSegmentAckBuilder {
+	if cb, ok := b.childBuilder.(APDUSegmentAckBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUSegmentAckBuilder().(*_APDUSegmentAckBuilder)
@@ -268,14 +218,8 @@ func (b *_APDUBuilder) AsAPDUSegmentAck() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUError() interface {
-	APDUErrorBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUErrorBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUError() APDUErrorBuilder {
+	if cb, ok := b.childBuilder.(APDUErrorBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUErrorBuilder().(*_APDUErrorBuilder)
@@ -284,14 +228,8 @@ func (b *_APDUBuilder) AsAPDUError() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUReject() interface {
-	APDURejectBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDURejectBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUReject() APDURejectBuilder {
+	if cb, ok := b.childBuilder.(APDURejectBuilder); ok {
 		return cb
 	}
 	cb := NewAPDURejectBuilder().(*_APDURejectBuilder)
@@ -300,14 +238,8 @@ func (b *_APDUBuilder) AsAPDUReject() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUAbort() interface {
-	APDUAbortBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUAbortBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUAbort() APDUAbortBuilder {
+	if cb, ok := b.childBuilder.(APDUAbortBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUAbortBuilder().(*_APDUAbortBuilder)
@@ -316,14 +248,8 @@ func (b *_APDUBuilder) AsAPDUAbort() interface {
 	return cb
 }
 
-func (b *_APDUBuilder) AsAPDUUnknown() interface {
-	APDUUnknownBuilder
-	Done() APDUBuilder
-} {
-	if cb, ok := b.childBuilder.(interface {
-		APDUUnknownBuilder
-		Done() APDUBuilder
-	}); ok {
+func (b *_APDUBuilder) AsAPDUUnknown() APDUUnknownBuilder {
+	if cb, ok := b.childBuilder.(APDUUnknownBuilder); ok {
 		return cb
 	}
 	cb := NewAPDUUnknownBuilder().(*_APDUUnknownBuilder)
