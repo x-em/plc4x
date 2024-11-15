@@ -1661,7 +1661,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>${project.basedir}/website/main/generated/</source>
+                    <source>${project.basedir}/src/main/generated/</source>
                   </sources>
                 </configuration>
               </execution>
