@@ -823,6 +823,8 @@
             <exclude>ui/frontend/project/node/**</exclude>
             <exclude>ui/frontend/project/node_modules/**</exclude>
 
+            <exclude>website/node_modules/**</exclude>
+
             <exclude>.mvn/**</exclude>
 
             <!-- Exclude core dumps-->
