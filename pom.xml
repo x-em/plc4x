@@ -1219,7 +1219,7 @@
             It also seems that as soon as we update to 3.20.0 (the next version) the asciidoctor plugin stops
             generating output.
           -->
-          <version>3.21.0</version>
+          <version>${version.maven-site-plugin}</version>
 
           <configuration>
             <!--templateFile>${session.executionRootDirectory}/src/site/template/site.vm</templateFile-->
