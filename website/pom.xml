@@ -388,8 +388,7 @@
 
         </executions>
         <configuration>
-          <nodeVersion>v23.1.0</nodeVersion>
-          <npmVersion>10.9.0</npmVersion>
+          <nodeVersion>v17.9.1</nodeVersion>
           <workingDirectory>${pom.basedir}/target</workingDirectory>
           <installDirectory>${pom.basedir}/target</installDirectory>
         </configuration>
