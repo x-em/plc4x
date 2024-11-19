@@ -20,8 +20,8 @@
 pipeline {
 
     agent {
-        node('plc4x2') {
-            label 'plc4x'
+        node {
+            label 'plc4x2'
         }
     }
 
@@ -210,8 +210,8 @@ pipeline {
             }
             // Only the nodes labeled 'git-websites' have the credentials to commit to the.
             agent {
-                node('websites1') {
-                    label 'git-websites'
+                node {
+                    label 'websites1'
                 }
             }
             steps {
