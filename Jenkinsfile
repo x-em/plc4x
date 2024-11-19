@@ -180,7 +180,20 @@ pipeline {
                     label 'git-websites'
                 }
             }
+            options { skipDefaultCheckout() }
             stages {
+                stage('Cleanup') {
+                    steps {
+                        echo 'Cleaning up the workspace'
+                        deleteDir()
+                    }
+                }
+                stage('Checkout') {
+                    steps {
+                        echo 'Checking out branch ' + env.BRANCH_NAME
+                        checkout scm
+                    }
+                }
                 stage('Build site') {
                     when {
                         branch 'develop'
@@ -193,7 +206,6 @@ pipeline {
                         sh './mvnw -P${JENKINS_PROFILE},skip-prerequisite-check site -X -pl . -pl website'
                     }
                 }
-
                 stage('Stage site') {
                     when {
                         branch 'develop'
@@ -215,7 +227,6 @@ pipeline {
                         //stash includes: 'target/staging/**/*', name: 'plc4x-site'
                     }
                 }
-
                 stage('Deploy site') {
                     when {
                         branch 'develop'
