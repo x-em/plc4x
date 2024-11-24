@@ -394,6 +394,6 @@ git merge -X theirs releases/code-generation/{{current-last-released-version}}
 Possibly a manual conflict resolution has to be done afterwards. After that, changes need to
 be pushed.
 
-In contrast to main releases of PLC4X we won't do any JIRA version updates, updating of the download page or notifying of the world email to announce@apache.org
+In contrast to main releases of PLC4X we won't do any GitHub Issues version updates, updating of the download page or notifying of the world email to announce@apache.org
 
 So now you're done. Congrats!

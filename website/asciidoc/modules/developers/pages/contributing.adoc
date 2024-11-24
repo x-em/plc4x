@@ -108,17 +108,9 @@ You can do this by executing the following command:
 
 === Bug Reports
 
-We use https://issues.apache.org/jira/projects/PLC4X[JIRA] as our Bug & Issue Tracker.
+We use https://github.com/apache/plc4x/issues[GitHub Issues] as our Bug & Issue Tracker.
 
 Feel free to submit `feature requests`, `bug reports`, `patches`, `comment on issues`, ...
-
-In order to be able to do so, you need to create an account first.
-
-Currently Apache has a separate login system for JIRA and all other services, this might change in the future, but right now it's the way things are.
-
-So if you are considering to contribute more than just a one-time-patch, please choose a username that hasn't been used by an existing http://people.apache.org/committer-index.html[Apache committer] as this will simplify things if we invite you to become part of the team.
-
-If you want to be assigned to an issue because you want to work on it, please request to be added to the JIRA groups on our http://plc4x.apache.org/mailing-lists.html[developers mailing list]
 
 == Documentation
 
