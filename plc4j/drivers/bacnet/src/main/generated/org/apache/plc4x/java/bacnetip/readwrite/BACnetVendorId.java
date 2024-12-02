@@ -34,10 +34,9 @@ public enum BACnetVendorId {
   JOHNSON_CONTROLS_INC((int) 5, (int) 5, (String) "Johnson Controls, Inc."),
   ABB_FORMERLY_AMERICAN_AUTO_MATRIX(
       (int) 6, (int) 6, (String) "ABB (Formerly American Auto-Matrix)"),
-  SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE(
-      (int) 7, (int) 7, (String) "Siemens Schweiz AG (Formerly: Landis & Staefa Division Europe)"),
+  SIEMENS_SCHWEIZAG((int) 7, (int) 7, (String) "Siemens Schweiz AG"),
   DELTA_CONTROLS((int) 8, (int) 8, (String) "Delta Controls"),
-  SIEMENS_SCHWEIZAG((int) 9, (int) 9, (String) "Siemens Schweiz AG"),
+  SIEMENS_SCHWEIZAG1((int) 9, (int) 9, (String) "Siemens Schweiz AG"),
   SCHNEIDER_ELECTRIC((int) 10, (int) 10, (String) "Schneider Electric"),
   TAC((int) 11, (int) 11, (String) "TAC"),
   ORION_ANALYSIS_CORPORATION((int) 12, (int) 12, (String) "Orion Analysis Corporation"),
@@ -50,8 +49,7 @@ public enum BACnetVendorId {
   TACAB((int) 19, (int) 19, (String) "TAC AB"),
   HEWLETT_PACKARD_COMPANY((int) 20, (int) 20, (String) "Hewlett-Packard Company"),
   DORSETTES_INC((int) 21, (int) 21, (String) "Dorsette’s Inc."),
-  SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG(
-      (int) 22, (int) 22, (String) "Siemens Schweiz AG (Formerly: Cerberus AG)"),
+  SIEMENS_SCHWEIZAG2((int) 22, (int) 22, (String) "Siemens Schweiz AG"),
   YORK_CONTROLS_GROUP((int) 23, (int) 23, (String) "York Controls Group"),
   AUTOMATED_LOGIC_CORPORATION((int) 24, (int) 24, (String) "Automated Logic Corporation"),
   CSI_CONTROL_SYSTEMS_INTERNATIONAL(
@@ -1726,6 +1724,25 @@ public enum BACnetVendorId {
   MESSUNG_SYSTEMS_PVT_LTD((int) 1501, (int) 1501, (String) "Messung Systems Pvt Ltd."),
   ABB_ELECTRIFICATION_CANADA_INC(
       (int) 1502, (int) 1502, (String) "ABB Electrification Canada Inc."),
+  CORE_CONTROLS((int) 1503, (int) 1503, (String) "Core Controls"),
+  NOORD_TECHDOO((int) 1504, (int) 1504, (String) "Noord Tech d.o.o."),
+  VARIBITSAS((int) 1505, (int) 1505, (String) "Varibits AS"),
+  ROGER_SPZOOSPK((int) 1506, (int) 1506, (String) "Roger Sp. z o.o. sp.k."),
+  VIEGA_GMBH_COKG((int) 1507, (int) 1507, (String) "Viega GmbH & Co. KG"),
+  ASTERSOFT((int) 1508, (int) 1508, (String) "Astersoft"),
+  BIGEU((int) 1509, (int) 1509, (String) "BIG-EU"),
+  INFERRIX_LIMITED((int) 1510, (int) 1510, (String) "Inferrix Limited"),
+  RICHARDS_ELECTRIC_MOTOR_CO((int) 1511, (int) 1511, (String) "Richards Electric Motor Co."),
+  DAPP_CONTROLS((int) 1512, (int) 1512, (String) "dAPPControls"),
+  ENTOUCH_CONTROLS((int) 1513, (int) 1513, (String) "Entouch Controls"),
+  ARIF_MESUT_YAVUZ((int) 1514, (int) 1514, (String) "Arif Mesut Yavuz"),
+  BUBBLY_NET((int) 1515, (int) 1515, (String) "BubblyNet"),
+  AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD(
+      (int) 1516, (int) 1516, (String) "AlMayssan Technical Services Co. Ltd."),
+  VIRIDI_PARENTE_INC((int) 1517, (int) 1517, (String) "Viridi Parente, Inc."),
+  NOVEL_APPS_CORP((int) 1518, (int) 1518, (String) "Novel Apps Corp."),
+  OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD(
+      (int) 1519, (int) 1519, (String) "Oventrop (China) HVAC System Technology Co., Ltd."),
   UNKNOWN_VENDOR((int) 0xFFFF, (int) 0xFFFF, (String) "Unknown");
   private static final Map<Integer, BACnetVendorId> map;
 
