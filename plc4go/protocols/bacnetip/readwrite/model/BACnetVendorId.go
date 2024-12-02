@@ -50,9 +50,9 @@ const (
 	BACnetVendorId_POLAR_SOFT                                                                   BACnetVendorId = 4
 	BACnetVendorId_JOHNSON_CONTROLS_INC                                                         BACnetVendorId = 5
 	BACnetVendorId_ABB_FORMERLY_AMERICAN_AUTO_MATRIX                                            BACnetVendorId = 6
-	BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE                     BACnetVendorId = 7
+	BACnetVendorId_SIEMENS_SCHWEIZAG                                                            BACnetVendorId = 7
 	BACnetVendorId_DELTA_CONTROLS                                                               BACnetVendorId = 8
-	BACnetVendorId_SIEMENS_SCHWEIZAG                                                            BACnetVendorId = 9
+	BACnetVendorId_SIEMENS_SCHWEIZAG1                                                           BACnetVendorId = 9
 	BACnetVendorId_SCHNEIDER_ELECTRIC                                                           BACnetVendorId = 10
 	BACnetVendorId_TAC                                                                          BACnetVendorId = 11
 	BACnetVendorId_ORION_ANALYSIS_CORPORATION                                                   BACnetVendorId = 12
@@ -65,7 +65,7 @@ const (
 	BACnetVendorId_TACAB                                                                        BACnetVendorId = 19
 	BACnetVendorId_HEWLETT_PACKARD_COMPANY                                                      BACnetVendorId = 20
 	BACnetVendorId_DORSETTES_INC                                                                BACnetVendorId = 21
-	BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG                                        BACnetVendorId = 22
+	BACnetVendorId_SIEMENS_SCHWEIZAG2                                                           BACnetVendorId = 22
 	BACnetVendorId_YORK_CONTROLS_GROUP                                                          BACnetVendorId = 23
 	BACnetVendorId_AUTOMATED_LOGIC_CORPORATION                                                  BACnetVendorId = 24
 	BACnetVendorId_CSI_CONTROL_SYSTEMS_INTERNATIONAL                                            BACnetVendorId = 25
@@ -1537,6 +1537,23 @@ const (
 	BACnetVendorId_SHENZHENINVT_ELECTRIC_CO_LTD                                                 BACnetVendorId = 1500
 	BACnetVendorId_MESSUNG_SYSTEMS_PVT_LTD                                                      BACnetVendorId = 1501
 	BACnetVendorId_ABB_ELECTRIFICATION_CANADA_INC                                               BACnetVendorId = 1502
+	BACnetVendorId_CORE_CONTROLS                                                                BACnetVendorId = 1503
+	BACnetVendorId_NOORD_TECHDOO                                                                BACnetVendorId = 1504
+	BACnetVendorId_VARIBITSAS                                                                   BACnetVendorId = 1505
+	BACnetVendorId_ROGER_SPZOOSPK                                                               BACnetVendorId = 1506
+	BACnetVendorId_VIEGA_GMBH_COKG                                                              BACnetVendorId = 1507
+	BACnetVendorId_ASTERSOFT                                                                    BACnetVendorId = 1508
+	BACnetVendorId_BIGEU                                                                        BACnetVendorId = 1509
+	BACnetVendorId_INFERRIX_LIMITED                                                             BACnetVendorId = 1510
+	BACnetVendorId_RICHARDS_ELECTRIC_MOTOR_CO                                                   BACnetVendorId = 1511
+	BACnetVendorId_DAPP_CONTROLS                                                                BACnetVendorId = 1512
+	BACnetVendorId_ENTOUCH_CONTROLS                                                             BACnetVendorId = 1513
+	BACnetVendorId_ARIF_MESUT_YAVUZ                                                             BACnetVendorId = 1514
+	BACnetVendorId_BUBBLY_NET                                                                   BACnetVendorId = 1515
+	BACnetVendorId_AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD                                         BACnetVendorId = 1516
+	BACnetVendorId_VIRIDI_PARENTE_INC                                                           BACnetVendorId = 1517
+	BACnetVendorId_NOVEL_APPS_CORP                                                              BACnetVendorId = 1518
+	BACnetVendorId_OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD                                  BACnetVendorId = 1519
 	BACnetVendorId_UNKNOWN_VENDOR                                                               BACnetVendorId = 0xFFFF
 )
 
@@ -1552,9 +1569,9 @@ func init() {
 		BACnetVendorId_POLAR_SOFT,
 		BACnetVendorId_JOHNSON_CONTROLS_INC,
 		BACnetVendorId_ABB_FORMERLY_AMERICAN_AUTO_MATRIX,
-		BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE,
-		BACnetVendorId_DELTA_CONTROLS,
 		BACnetVendorId_SIEMENS_SCHWEIZAG,
+		BACnetVendorId_DELTA_CONTROLS,
+		BACnetVendorId_SIEMENS_SCHWEIZAG1,
 		BACnetVendorId_SCHNEIDER_ELECTRIC,
 		BACnetVendorId_TAC,
 		BACnetVendorId_ORION_ANALYSIS_CORPORATION,
@@ -1567,7 +1584,7 @@ func init() {
 		BACnetVendorId_TACAB,
 		BACnetVendorId_HEWLETT_PACKARD_COMPANY,
 		BACnetVendorId_DORSETTES_INC,
-		BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG,
+		BACnetVendorId_SIEMENS_SCHWEIZAG2,
 		BACnetVendorId_YORK_CONTROLS_GROUP,
 		BACnetVendorId_AUTOMATED_LOGIC_CORPORATION,
 		BACnetVendorId_CSI_CONTROL_SYSTEMS_INTERNATIONAL,
@@ -3039,6 +3056,23 @@ func init() {
 		BACnetVendorId_SHENZHENINVT_ELECTRIC_CO_LTD,
 		BACnetVendorId_MESSUNG_SYSTEMS_PVT_LTD,
 		BACnetVendorId_ABB_ELECTRIFICATION_CANADA_INC,
+		BACnetVendorId_CORE_CONTROLS,
+		BACnetVendorId_NOORD_TECHDOO,
+		BACnetVendorId_VARIBITSAS,
+		BACnetVendorId_ROGER_SPZOOSPK,
+		BACnetVendorId_VIEGA_GMBH_COKG,
+		BACnetVendorId_ASTERSOFT,
+		BACnetVendorId_BIGEU,
+		BACnetVendorId_INFERRIX_LIMITED,
+		BACnetVendorId_RICHARDS_ELECTRIC_MOTOR_CO,
+		BACnetVendorId_DAPP_CONTROLS,
+		BACnetVendorId_ENTOUCH_CONTROLS,
+		BACnetVendorId_ARIF_MESUT_YAVUZ,
+		BACnetVendorId_BUBBLY_NET,
+		BACnetVendorId_AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD,
+		BACnetVendorId_VIRIDI_PARENTE_INC,
+		BACnetVendorId_NOVEL_APPS_CORP,
+		BACnetVendorId_OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD,
 		BACnetVendorId_UNKNOWN_VENDOR,
 	}
 }
@@ -5285,9 +5319,77 @@ func (e BACnetVendorId) VendorId() uint16 {
 		{ /* '1502' */
 			return 1502
 		}
+	case 1503:
+		{ /* '1503' */
+			return 1503
+		}
+	case 1504:
+		{ /* '1504' */
+			return 1504
+		}
+	case 1505:
+		{ /* '1505' */
+			return 1505
+		}
+	case 1506:
+		{ /* '1506' */
+			return 1506
+		}
+	case 1507:
+		{ /* '1507' */
+			return 1507
+		}
+	case 1508:
+		{ /* '1508' */
+			return 1508
+		}
+	case 1509:
+		{ /* '1509' */
+			return 1509
+		}
 	case 151:
 		{ /* '151' */
 			return 151
+		}
+	case 1510:
+		{ /* '1510' */
+			return 1510
+		}
+	case 1511:
+		{ /* '1511' */
+			return 1511
+		}
+	case 1512:
+		{ /* '1512' */
+			return 1512
+		}
+	case 1513:
+		{ /* '1513' */
+			return 1513
+		}
+	case 1514:
+		{ /* '1514' */
+			return 1514
+		}
+	case 1515:
+		{ /* '1515' */
+			return 1515
+		}
+	case 1516:
+		{ /* '1516' */
+			return 1516
+		}
+	case 1517:
+		{ /* '1517' */
+			return 1517
+		}
+	case 1518:
+		{ /* '1518' */
+			return 1518
+		}
+	case 1519:
+		{ /* '1519' */
+			return 1519
 		}
 	case 152:
 		{ /* '152' */
@@ -11283,9 +11385,77 @@ func (e BACnetVendorId) VendorName() string {
 		{ /* '1502' */
 			return "ABB Electrification Canada Inc."
 		}
+	case 1503:
+		{ /* '1503' */
+			return "Core Controls"
+		}
+	case 1504:
+		{ /* '1504' */
+			return "Noord Tech d.o.o."
+		}
+	case 1505:
+		{ /* '1505' */
+			return "Varibits AS"
+		}
+	case 1506:
+		{ /* '1506' */
+			return "Roger Sp. z o.o. sp.k."
+		}
+	case 1507:
+		{ /* '1507' */
+			return "Viega GmbH & Co. KG"
+		}
+	case 1508:
+		{ /* '1508' */
+			return "Astersoft"
+		}
+	case 1509:
+		{ /* '1509' */
+			return "BIG-EU"
+		}
 	case 151:
 		{ /* '151' */
 			return "Titan Products, Ltd."
+		}
+	case 1510:
+		{ /* '1510' */
+			return "Inferrix Limited"
+		}
+	case 1511:
+		{ /* '1511' */
+			return "Richards Electric Motor Co."
+		}
+	case 1512:
+		{ /* '1512' */
+			return "dAPPControls"
+		}
+	case 1513:
+		{ /* '1513' */
+			return "Entouch Controls"
+		}
+	case 1514:
+		{ /* '1514' */
+			return "Arif Mesut Yavuz"
+		}
+	case 1515:
+		{ /* '1515' */
+			return "BubblyNet"
+		}
+	case 1516:
+		{ /* '1516' */
+			return "AlMayssan Technical Services Co. Ltd."
+		}
+	case 1517:
+		{ /* '1517' */
+			return "Viridi Parente, Inc."
+		}
+	case 1518:
+		{ /* '1518' */
+			return "Novel Apps Corp."
+		}
+	case 1519:
+		{ /* '1519' */
+			return "Oventrop (China) HVAC System Technology Co., Ltd."
 		}
 	case 152:
 		{ /* '152' */
@@ -11589,7 +11759,7 @@ func (e BACnetVendorId) VendorName() string {
 		}
 	case 22:
 		{ /* '22' */
-			return "Siemens Schweiz AG (Formerly: Cerberus AG)"
+			return "Siemens Schweiz AG"
 		}
 	case 220:
 		{ /* '220' */
@@ -13709,7 +13879,7 @@ func (e BACnetVendorId) VendorName() string {
 		}
 	case 7:
 		{ /* '7' */
-			return "Siemens Schweiz AG (Formerly: Landis & Staefa Division Europe)"
+			return "Siemens Schweiz AG"
 		}
 	case 70:
 		{ /* '70' */
@@ -16160,8 +16330,42 @@ func BACnetVendorIdByValue(value uint16) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_MESSUNG_SYSTEMS_PVT_LTD, true
 	case 1502:
 		return BACnetVendorId_ABB_ELECTRIFICATION_CANADA_INC, true
+	case 1503:
+		return BACnetVendorId_CORE_CONTROLS, true
+	case 1504:
+		return BACnetVendorId_NOORD_TECHDOO, true
+	case 1505:
+		return BACnetVendorId_VARIBITSAS, true
+	case 1506:
+		return BACnetVendorId_ROGER_SPZOOSPK, true
+	case 1507:
+		return BACnetVendorId_VIEGA_GMBH_COKG, true
+	case 1508:
+		return BACnetVendorId_ASTERSOFT, true
+	case 1509:
+		return BACnetVendorId_BIGEU, true
 	case 151:
 		return BACnetVendorId_TITAN_PRODUCTS_LTD, true
+	case 1510:
+		return BACnetVendorId_INFERRIX_LIMITED, true
+	case 1511:
+		return BACnetVendorId_RICHARDS_ELECTRIC_MOTOR_CO, true
+	case 1512:
+		return BACnetVendorId_DAPP_CONTROLS, true
+	case 1513:
+		return BACnetVendorId_ENTOUCH_CONTROLS, true
+	case 1514:
+		return BACnetVendorId_ARIF_MESUT_YAVUZ, true
+	case 1515:
+		return BACnetVendorId_BUBBLY_NET, true
+	case 1516:
+		return BACnetVendorId_AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD, true
+	case 1517:
+		return BACnetVendorId_VIRIDI_PARENTE_INC, true
+	case 1518:
+		return BACnetVendorId_NOVEL_APPS_CORP, true
+	case 1519:
+		return BACnetVendorId_OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD, true
 	case 152:
 		return BACnetVendorId_REGEL_PARTNERS, true
 	case 153:
@@ -16313,7 +16517,7 @@ func BACnetVendorIdByValue(value uint16) (enum BACnetVendorId, ok bool) {
 	case 219:
 		return BACnetVendorId_AIRCUITY, true
 	case 22:
-		return BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG, true
+		return BACnetVendorId_SIEMENS_SCHWEIZAG2, true
 	case 220:
 		return BACnetVendorId_CONTROL_TECHNIQUES_LTD, true
 	case 221:
@@ -17373,7 +17577,7 @@ func BACnetVendorIdByValue(value uint16) (enum BACnetVendorId, ok bool) {
 	case 699:
 		return BACnetVendorId_IPID_SPZOO_LIMITED, true
 	case 7:
-		return BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE, true
+		return BACnetVendorId_SIEMENS_SCHWEIZAG, true
 	case 70:
 		return BACnetVendorId_RLE_TECHNOLOGIES, true
 	case 700:
@@ -17813,7 +18017,7 @@ func BACnetVendorIdByValue(value uint16) (enum BACnetVendorId, ok bool) {
 	case 899:
 		return BACnetVendorId_BIHL_WIEDEMANN_GMBH, true
 	case 9:
-		return BACnetVendorId_SIEMENS_SCHWEIZAG, true
+		return BACnetVendorId_SIEMENS_SCHWEIZAG1, true
 	case 90:
 		return BACnetVendorId_HITACHI_LTD, true
 	case 900:
@@ -19156,8 +19360,42 @@ func BACnetVendorIdByName(value string) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_MESSUNG_SYSTEMS_PVT_LTD, true
 	case "ABB_ELECTRIFICATION_CANADA_INC":
 		return BACnetVendorId_ABB_ELECTRIFICATION_CANADA_INC, true
+	case "CORE_CONTROLS":
+		return BACnetVendorId_CORE_CONTROLS, true
+	case "NOORD_TECHDOO":
+		return BACnetVendorId_NOORD_TECHDOO, true
+	case "VARIBITSAS":
+		return BACnetVendorId_VARIBITSAS, true
+	case "ROGER_SPZOOSPK":
+		return BACnetVendorId_ROGER_SPZOOSPK, true
+	case "VIEGA_GMBH_COKG":
+		return BACnetVendorId_VIEGA_GMBH_COKG, true
+	case "ASTERSOFT":
+		return BACnetVendorId_ASTERSOFT, true
+	case "BIGEU":
+		return BACnetVendorId_BIGEU, true
 	case "TITAN_PRODUCTS_LTD":
 		return BACnetVendorId_TITAN_PRODUCTS_LTD, true
+	case "INFERRIX_LIMITED":
+		return BACnetVendorId_INFERRIX_LIMITED, true
+	case "RICHARDS_ELECTRIC_MOTOR_CO":
+		return BACnetVendorId_RICHARDS_ELECTRIC_MOTOR_CO, true
+	case "DAPP_CONTROLS":
+		return BACnetVendorId_DAPP_CONTROLS, true
+	case "ENTOUCH_CONTROLS":
+		return BACnetVendorId_ENTOUCH_CONTROLS, true
+	case "ARIF_MESUT_YAVUZ":
+		return BACnetVendorId_ARIF_MESUT_YAVUZ, true
+	case "BUBBLY_NET":
+		return BACnetVendorId_BUBBLY_NET, true
+	case "AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD":
+		return BACnetVendorId_AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD, true
+	case "VIRIDI_PARENTE_INC":
+		return BACnetVendorId_VIRIDI_PARENTE_INC, true
+	case "NOVEL_APPS_CORP":
+		return BACnetVendorId_NOVEL_APPS_CORP, true
+	case "OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD":
+		return BACnetVendorId_OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD, true
 	case "REGEL_PARTNERS":
 		return BACnetVendorId_REGEL_PARTNERS, true
 	case "NATIONAL_ENVIRONMENTAL_PRODUCT":
@@ -19308,8 +19546,8 @@ func BACnetVendorIdByName(value string) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_IMPACT_FACILITY_SOLUTIONS_INC, true
 	case "AIRCUITY":
 		return BACnetVendorId_AIRCUITY, true
-	case "SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG":
-		return BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG, true
+	case "SIEMENS_SCHWEIZAG2":
+		return BACnetVendorId_SIEMENS_SCHWEIZAG2, true
 	case "CONTROL_TECHNIQUES_LTD":
 		return BACnetVendorId_CONTROL_TECHNIQUES_LTD, true
 	case "OPEN_GENERAL_PTY_LTD":
@@ -20368,8 +20606,8 @@ func BACnetVendorIdByName(value string) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_HDL, true
 	case "IPID_SPZOO_LIMITED":
 		return BACnetVendorId_IPID_SPZOO_LIMITED, true
-	case "SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE":
-		return BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE, true
+	case "SIEMENS_SCHWEIZAG":
+		return BACnetVendorId_SIEMENS_SCHWEIZAG, true
 	case "RLE_TECHNOLOGIES":
 		return BACnetVendorId_RLE_TECHNOLOGIES, true
 	case "FUJI_ELECTRIC_CO_LTD":
@@ -20808,8 +21046,8 @@ func BACnetVendorIdByName(value string) (enum BACnetVendorId, ok bool) {
 		return BACnetVendorId_ANNICOM, true
 	case "BIHL_WIEDEMANN_GMBH":
 		return BACnetVendorId_BIHL_WIEDEMANN_GMBH, true
-	case "SIEMENS_SCHWEIZAG":
-		return BACnetVendorId_SIEMENS_SCHWEIZAG, true
+	case "SIEMENS_SCHWEIZAG1":
+		return BACnetVendorId_SIEMENS_SCHWEIZAG1, true
 	case "HITACHI_LTD":
 		return BACnetVendorId_HITACHI_LTD, true
 	case "DRAPER_INC":
@@ -22224,8 +22462,42 @@ func (e BACnetVendorId) PLC4XEnumName() string {
 		return "MESSUNG_SYSTEMS_PVT_LTD"
 	case BACnetVendorId_ABB_ELECTRIFICATION_CANADA_INC:
 		return "ABB_ELECTRIFICATION_CANADA_INC"
+	case BACnetVendorId_CORE_CONTROLS:
+		return "CORE_CONTROLS"
+	case BACnetVendorId_NOORD_TECHDOO:
+		return "NOORD_TECHDOO"
+	case BACnetVendorId_VARIBITSAS:
+		return "VARIBITSAS"
+	case BACnetVendorId_ROGER_SPZOOSPK:
+		return "ROGER_SPZOOSPK"
+	case BACnetVendorId_VIEGA_GMBH_COKG:
+		return "VIEGA_GMBH_COKG"
+	case BACnetVendorId_ASTERSOFT:
+		return "ASTERSOFT"
+	case BACnetVendorId_BIGEU:
+		return "BIGEU"
 	case BACnetVendorId_TITAN_PRODUCTS_LTD:
 		return "TITAN_PRODUCTS_LTD"
+	case BACnetVendorId_INFERRIX_LIMITED:
+		return "INFERRIX_LIMITED"
+	case BACnetVendorId_RICHARDS_ELECTRIC_MOTOR_CO:
+		return "RICHARDS_ELECTRIC_MOTOR_CO"
+	case BACnetVendorId_DAPP_CONTROLS:
+		return "DAPP_CONTROLS"
+	case BACnetVendorId_ENTOUCH_CONTROLS:
+		return "ENTOUCH_CONTROLS"
+	case BACnetVendorId_ARIF_MESUT_YAVUZ:
+		return "ARIF_MESUT_YAVUZ"
+	case BACnetVendorId_BUBBLY_NET:
+		return "BUBBLY_NET"
+	case BACnetVendorId_AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD:
+		return "AL_MAYSSAN_TECHNICAL_SERVICES_CO_LTD"
+	case BACnetVendorId_VIRIDI_PARENTE_INC:
+		return "VIRIDI_PARENTE_INC"
+	case BACnetVendorId_NOVEL_APPS_CORP:
+		return "NOVEL_APPS_CORP"
+	case BACnetVendorId_OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD:
+		return "OVENTROP_CHINAHVAC_SYSTEM_TECHNOLOGY_CO_LTD"
 	case BACnetVendorId_REGEL_PARTNERS:
 		return "REGEL_PARTNERS"
 	case BACnetVendorId_NATIONAL_ENVIRONMENTAL_PRODUCT:
@@ -22376,8 +22648,8 @@ func (e BACnetVendorId) PLC4XEnumName() string {
 		return "IMPACT_FACILITY_SOLUTIONS_INC"
 	case BACnetVendorId_AIRCUITY:
 		return "AIRCUITY"
-	case BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG:
-		return "SIEMENS_SCHWEIZAG_FORMERLY_CERBERUSAG"
+	case BACnetVendorId_SIEMENS_SCHWEIZAG2:
+		return "SIEMENS_SCHWEIZAG2"
 	case BACnetVendorId_CONTROL_TECHNIQUES_LTD:
 		return "CONTROL_TECHNIQUES_LTD"
 	case BACnetVendorId_OPEN_GENERAL_PTY_LTD:
@@ -23436,8 +23708,8 @@ func (e BACnetVendorId) PLC4XEnumName() string {
 		return "HDL"
 	case BACnetVendorId_IPID_SPZOO_LIMITED:
 		return "IPID_SPZOO_LIMITED"
-	case BACnetVendorId_SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE:
-		return "SIEMENS_SCHWEIZAG_FORMERLY_LANDIS_STAEFA_DIVISION_EUROPE"
+	case BACnetVendorId_SIEMENS_SCHWEIZAG:
+		return "SIEMENS_SCHWEIZAG"
 	case BACnetVendorId_RLE_TECHNOLOGIES:
 		return "RLE_TECHNOLOGIES"
 	case BACnetVendorId_FUJI_ELECTRIC_CO_LTD:
@@ -23876,8 +24148,8 @@ func (e BACnetVendorId) PLC4XEnumName() string {
 		return "ANNICOM"
 	case BACnetVendorId_BIHL_WIEDEMANN_GMBH:
 		return "BIHL_WIEDEMANN_GMBH"
-	case BACnetVendorId_SIEMENS_SCHWEIZAG:
-		return "SIEMENS_SCHWEIZAG"
+	case BACnetVendorId_SIEMENS_SCHWEIZAG1:
+		return "SIEMENS_SCHWEIZAG1"
 	case BACnetVendorId_HITACHI_LTD:
 		return "HITACHI_LTD"
 	case BACnetVendorId_DRAPER_INC:
