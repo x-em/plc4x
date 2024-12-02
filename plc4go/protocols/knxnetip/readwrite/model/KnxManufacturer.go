@@ -406,7 +406,7 @@ const (
 	KnxManufacturer_M_V2_SPA                                             KnxManufacturer = 360
 	KnxManufacturer_M_JOHNSON_CONTROLS                                   KnxManufacturer = 361
 	KnxManufacturer_M_ARKUD                                              KnxManufacturer = 362
-	KnxManufacturer_M_IRIDIUM_LTD_                                       KnxManufacturer = 363
+	KnxManufacturer_M_IRIDI_LTD_                                         KnxManufacturer = 363
 	KnxManufacturer_M_BSMART                                             KnxManufacturer = 364
 	KnxManufacturer_M_BAB_TECHNOLOGIE_GMBH                               KnxManufacturer = 365
 	KnxManufacturer_M_NICE_SPA                                           KnxManufacturer = 366
@@ -741,8 +741,10 @@ const (
 	KnxManufacturer_M_ALLORADO                                           KnxManufacturer = 695
 	KnxManufacturer_M_FUZHOU_MILI_TECHNOLOGY_CO___LTD                    KnxManufacturer = 696
 	KnxManufacturer_M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD               KnxManufacturer = 697
-	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 698
-	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 699
+	KnxManufacturer_M_HYSINE                                             KnxManufacturer = 698
+	KnxManufacturer_M_SANTAN                                             KnxManufacturer = 699
+	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 700
+	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 701
 )
 
 var KnxManufacturerValues []KnxManufacturer
@@ -1113,7 +1115,7 @@ func init() {
 		KnxManufacturer_M_V2_SPA,
 		KnxManufacturer_M_JOHNSON_CONTROLS,
 		KnxManufacturer_M_ARKUD,
-		KnxManufacturer_M_IRIDIUM_LTD_,
+		KnxManufacturer_M_IRIDI_LTD_,
 		KnxManufacturer_M_BSMART,
 		KnxManufacturer_M_BAB_TECHNOLOGIE_GMBH,
 		KnxManufacturer_M_NICE_SPA,
@@ -1448,6 +1450,8 @@ func init() {
 		KnxManufacturer_M_ALLORADO,
 		KnxManufacturer_M_FUZHOU_MILI_TECHNOLOGY_CO___LTD,
 		KnxManufacturer_M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD,
+		KnxManufacturer_M_HYSINE,
+		KnxManufacturer_M_SANTAN,
 		KnxManufacturer_M_ABB___RESERVED,
 		KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED,
 	}
@@ -4117,11 +4121,11 @@ func (e KnxManufacturer) Number() uint16 {
 		}
 	case 698:
 		{ /* '698' */
-			return 43954
+			return 756
 		}
 	case 699:
 		{ /* '699' */
-			return 43959
+			return 757
 		}
 	case 7:
 		{ /* '7' */
@@ -4130,6 +4134,14 @@ func (e KnxManufacturer) Number() uint16 {
 	case 70:
 		{ /* '70' */
 			return 109
+		}
+	case 700:
+		{ /* '700' */
+			return 43954
+		}
+	case 701:
+		{ /* '701' */
+			return 43959
 		}
 	case 71:
 		{ /* '71' */
@@ -5451,7 +5463,7 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 363:
 		{ /* '363' */
-			return "Iridium Ltd."
+			return "iRidi Ltd."
 		}
 	case 364:
 		{ /* '364' */
@@ -6935,11 +6947,11 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 698:
 		{ /* '698' */
-			return "ABB - reserved"
+			return "Hysine"
 		}
 	case 699:
 		{ /* '699' */
-			return "Busch-Jaeger Elektro - reserved"
+			return "SANTAN"
 		}
 	case 7:
 		{ /* '7' */
@@ -6948,6 +6960,14 @@ func (e KnxManufacturer) Name() string {
 	case 70:
 		{ /* '70' */
 			return "Belden Wire & Cable B.V."
+		}
+	case 700:
+		{ /* '700' */
+			return "ABB - reserved"
+		}
+	case 701:
+		{ /* '701' */
+			return "Busch-Jaeger Elektro - reserved"
 		}
 	case 71:
 		{ /* '71' */
@@ -7679,7 +7699,7 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 362:
 		return KnxManufacturer_M_ARKUD, true
 	case 363:
-		return KnxManufacturer_M_IRIDIUM_LTD_, true
+		return KnxManufacturer_M_IRIDI_LTD_, true
 	case 364:
 		return KnxManufacturer_M_BSMART, true
 	case 365:
@@ -8421,13 +8441,17 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 697:
 		return KnxManufacturer_M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD, true
 	case 698:
-		return KnxManufacturer_M_ABB___RESERVED, true
+		return KnxManufacturer_M_HYSINE, true
 	case 699:
-		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
+		return KnxManufacturer_M_SANTAN, true
 	case 7:
 		return KnxManufacturer_M_GIRA_GIERSIEPEN, true
 	case 70:
 		return KnxManufacturer_M_BELDEN_WIRE_AND_CABLE_B_V_, true
+	case 700:
+		return KnxManufacturer_M_ABB___RESERVED, true
+	case 701:
+		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
 	case 71:
 		return KnxManufacturer_M_BECKER_ANTRIEBE_GMBH, true
 	case 72:
@@ -9084,8 +9108,8 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_JOHNSON_CONTROLS, true
 	case "M_ARKUD":
 		return KnxManufacturer_M_ARKUD, true
-	case "M_IRIDIUM_LTD_":
-		return KnxManufacturer_M_IRIDIUM_LTD_, true
+	case "M_IRIDI_LTD_":
+		return KnxManufacturer_M_IRIDI_LTD_, true
 	case "M_BSMART":
 		return KnxManufacturer_M_BSMART, true
 	case "M_BAB_TECHNOLOGIE_GMBH":
@@ -9826,14 +9850,18 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_FUZHOU_MILI_TECHNOLOGY_CO___LTD, true
 	case "M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD":
 		return KnxManufacturer_M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD, true
-	case "M_ABB___RESERVED":
-		return KnxManufacturer_M_ABB___RESERVED, true
-	case "M_BUSCH_JAEGER_ELEKTRO___RESERVED":
-		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
+	case "M_HYSINE":
+		return KnxManufacturer_M_HYSINE, true
+	case "M_SANTAN":
+		return KnxManufacturer_M_SANTAN, true
 	case "M_GIRA_GIERSIEPEN":
 		return KnxManufacturer_M_GIRA_GIERSIEPEN, true
 	case "M_BELDEN_WIRE_AND_CABLE_B_V_":
 		return KnxManufacturer_M_BELDEN_WIRE_AND_CABLE_B_V_, true
+	case "M_ABB___RESERVED":
+		return KnxManufacturer_M_ABB___RESERVED, true
+	case "M_BUSCH_JAEGER_ELEKTRO___RESERVED":
+		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
 	case "M_BECKER_ANTRIEBE_GMBH":
 		return KnxManufacturer_M_BECKER_ANTRIEBE_GMBH, true
 	case "M_J_STEHLEPlusSOEHNE_GMBH":
@@ -10562,8 +10590,8 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_JOHNSON_CONTROLS"
 	case KnxManufacturer_M_ARKUD:
 		return "M_ARKUD"
-	case KnxManufacturer_M_IRIDIUM_LTD_:
-		return "M_IRIDIUM_LTD_"
+	case KnxManufacturer_M_IRIDI_LTD_:
+		return "M_IRIDI_LTD_"
 	case KnxManufacturer_M_BSMART:
 		return "M_BSMART"
 	case KnxManufacturer_M_BAB_TECHNOLOGIE_GMBH:
@@ -11304,14 +11332,18 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_FUZHOU_MILI_TECHNOLOGY_CO___LTD"
 	case KnxManufacturer_M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD:
 		return "M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD"
-	case KnxManufacturer_M_ABB___RESERVED:
-		return "M_ABB___RESERVED"
-	case KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED:
-		return "M_BUSCH_JAEGER_ELEKTRO___RESERVED"
+	case KnxManufacturer_M_HYSINE:
+		return "M_HYSINE"
+	case KnxManufacturer_M_SANTAN:
+		return "M_SANTAN"
 	case KnxManufacturer_M_GIRA_GIERSIEPEN:
 		return "M_GIRA_GIERSIEPEN"
 	case KnxManufacturer_M_BELDEN_WIRE_AND_CABLE_B_V_:
 		return "M_BELDEN_WIRE_AND_CABLE_B_V_"
+	case KnxManufacturer_M_ABB___RESERVED:
+		return "M_ABB___RESERVED"
+	case KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED:
+		return "M_BUSCH_JAEGER_ELEKTRO___RESERVED"
 	case KnxManufacturer_M_BECKER_ANTRIEBE_GMBH:
 		return "M_BECKER_ANTRIEBE_GMBH"
 	case KnxManufacturer_M_J_STEHLEPlusSOEHNE_GMBH:
