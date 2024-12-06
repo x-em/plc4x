@@ -87,7 +87,7 @@ class PlcMemoryBlockIdent:
         read_buffer.push_context("PlcMemoryBlockIdent")
 
         block_type: int = read_buffer.read_unsigned_byte(
-            logical_name="blockType", bit_length=8
+            logical_name="block_type", bit_length=8
         )
 
         folio: int = read_buffer.read_unsigned_byte(logical_name="folio", bit_length=8)
@@ -97,7 +97,7 @@ class PlcMemoryBlockIdent:
         )
 
         memory_length: int = read_buffer.read_unsigned_int(
-            logical_name="memoryLength", bit_length=32
+            logical_name="memory_length", bit_length=32
         )
 
         read_buffer.pop_context("PlcMemoryBlockIdent")
@@ -127,11 +127,5 @@ class PlcMemoryBlockIdent:
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""

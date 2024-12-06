@@ -23,6 +23,7 @@ import org.apache.plc4x.java.api.model.ArrayInfo;
 import org.apache.plc4x.java.api.model.PlcTag;
 import org.apache.plc4x.java.api.types.PlcValueType;
 import org.apache.plc4x.java.modbus.readwrite.*;
+import org.apache.plc4x.java.modbus.types.ModbusByteOrder;
 import org.apache.plc4x.java.spi.codegen.WithOption;
 import org.apache.plc4x.java.spi.generation.SerializationException;
 import org.apache.plc4x.java.spi.generation.WriteBuffer;
@@ -46,6 +47,7 @@ public abstract class ModbusTag implements PlcTag, Serializable {
 
     private final ModbusDataType dataType;
     private final Short unitId;
+    private final ModbusByteOrder byteOrder;
 
     public static ModbusTag of(String addressString) {
         if (ModbusTagCoil.matches(addressString)) {
@@ -73,7 +75,7 @@ public abstract class ModbusTag implements PlcTag, Serializable {
             address += ":" + getDataType().name();
         }
         if(!getArrayInfo().isEmpty()) {
-            address += "[" + getArrayInfo().get(0).getUpperBound() + "]";
+            address += "[" + (getArrayInfo().get(0).getUpperBound() + 1) + "]";
         }
         return address;
     }
@@ -103,6 +105,11 @@ public abstract class ModbusTag implements PlcTag, Serializable {
         this.unitId = Optional.ofNullable(config.get("unit-id"))
             .map(Short::parseShort)
             .orElse(null);
+        if(config.containsKey("byte-order")) {
+            this.byteOrder = ModbusByteOrder.valueOf(config.get("byte-order"));
+        } else {
+            this.byteOrder = null;
+        }
     }
 
     /**
@@ -115,6 +122,10 @@ public abstract class ModbusTag implements PlcTag, Serializable {
 
     public Short getUnitId() {
         return unitId;
+    }
+
+    public ModbusByteOrder getByteOrder() {
+        return byteOrder;
     }
 
     /**
@@ -147,7 +158,7 @@ public abstract class ModbusTag implements PlcTag, Serializable {
     @Override
     public List<ArrayInfo> getArrayInfo() {
         if(quantity != 1) {
-            return Collections.singletonList(new DefaultArrayInfo(0, quantity));
+            return Collections.singletonList(new DefaultArrayInfo(0, quantity - 1));
         }
         return Collections.emptyList();
     }

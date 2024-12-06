@@ -28,7 +28,8 @@ from plc4py.protocols.modbus.readwrite.ModbusPDUReadFileRecordResponseItem impor
 )
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
-from sys import getsizeof
+from plc4py.spi.values.Common import get_size_of_array
+from plc4py.utils.ConnectionStringHandling import strtobool
 from typing import Any
 from typing import ClassVar
 from typing import List
@@ -47,8 +48,8 @@ class ModbusPDUReadFileRecordResponse(ModbusPDU):
         write_buffer.push_context("ModbusPDUReadFileRecordResponse")
 
         # Implicit Field (byte_count) (Used for parsing, but its value is not stored as it's implicitly given by the objects content)
-        byte_count: int = int(getsizeof(self.items))
-        write_buffer.write_unsigned_byte(byte_count, logical_name="byteCount")
+        byte_count: int = int(get_size_of_array(self.items))
+        write_buffer.write_unsigned_byte(byte_count, logical_name="byte_count")
 
         # Array Field (items)
         write_buffer.write_complex_array(self.items, logical_name="items")
@@ -76,8 +77,11 @@ class ModbusPDUReadFileRecordResponse(ModbusPDU):
     def static_parse_builder(read_buffer: ReadBuffer, response: bool):
         read_buffer.push_context("ModbusPDUReadFileRecordResponse")
 
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         byte_count: int = read_buffer.read_unsigned_byte(
-            logical_name="byteCount", response=response
+            logical_name="byte_count", response=response
         )
 
         items: List[Any] = read_buffer.read_array_field(
@@ -105,14 +109,8 @@ class ModbusPDUReadFileRecordResponse(ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -122,7 +120,7 @@ class ModbusPDUReadFileRecordResponseBuilder:
     def build(
         self,
     ) -> ModbusPDUReadFileRecordResponse:
-        modbus_pdu_read_file_record_response: ModbusPDUReadFileRecordResponse = (
+        modbus_pduread_file_record_response: ModbusPDUReadFileRecordResponse = (
             ModbusPDUReadFileRecordResponse(self.items)
         )
-        return modbus_pdu_read_file_record_response
+        return modbus_pduread_file_record_response

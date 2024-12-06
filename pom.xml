@@ -24,8 +24,7 @@
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
-    <!-- When updating to 32 the site build starts failing -->
-    <version>32</version>
+    <version>33</version>
   </parent>
 
   <groupId>org.apache.plc4x</groupId>
@@ -100,63 +99,63 @@
     <sonar.cfamily.build-wrapper-output>${project.basedir}/plc4c/target/build-wrapper-output
     </sonar.cfamily.build-wrapper-output>
 
-    <plc4x-code-generation.version>1.7.0</plc4x-code-generation.version>
+    <plc4x-code-generation.version>1.8.0-SNAPSHOT</plc4x-code-generation.version>
 
-    <antlr.version>4.13.1</antlr.version>
+    <antlr.version>4.13.2</antlr.version>
     <apiguardian.version>1.1.2</apiguardian.version>
-    <assertj.version>3.25.3</assertj.version>
-    <awaitility.version>4.2.1</awaitility.version>
+    <assertj.version>3.26.3</assertj.version>
+    <awaitility.version>4.2.2</awaitility.version>
     <!-- The currently available version is 2.0.5 and anything above 1.4.3 is no longer compatible with our code -->
     <bit-io.version>1.4.3</bit-io.version>
-    <bouncycastle.version>1.78.1</bouncycastle.version>
-    <byte-buddy.version>1.14.14</byte-buddy.version>
-    <!-- Be sure to keep this version set to the version of the cmake-maven-plugin -->
-    <cmake-version>3.27.2</cmake-version>
+    <bouncycastle.version>1.79</bouncycastle.version>
+    <byte-buddy.version>1.15.10</byte-buddy.version>
+    <cmake.version>3.30.2-b1</cmake.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
-    <commons-cli.version>1.7.0</commons-cli.version>
-    <commons-codec.version>1.16.1</commons-codec.version>
+    <commons-cli.version>1.9.0</commons-cli.version>
+    <commons-codec.version>1.17.1</commons-codec.version>
     <commons-collections4.version>4.4</commons-collections4.version>
-    <commons-compress.version>1.26.1</commons-compress.version>
-    <commons-configuration2.version>2.10.1</commons-configuration2.version>
-    <commons-io.version>2.16.1</commons-io.version>
-    <commons-lang3.version>3.14.0</commons-lang3.version>
-    <commons-logging.version>1.3.1</commons-logging.version>
+    <commons-compress.version>1.27.1</commons-compress.version>
+    <commons-configuration2.version>2.11.0</commons-configuration2.version>
+    <commons-io.version>2.18.0</commons-io.version>
+    <commons-lang3.version>3.17.0</commons-lang3.version>
+    <commons-logging.version>1.3.4</commons-logging.version>
     <commons-math3.version>3.6.1</commons-math3.version>
-    <commons-net.version>3.10.0</commons-net.version>
+    <commons-net.version>3.11.1</commons-net.version>
     <commons-text.version>1.12.0</commons-text.version>
-    <commons-csv.version>1.10.0</commons-csv.version>
+    <commons-csv.version>1.12.0</commons-csv.version>
     <dom4j.version>2.1.4</dom4j.version>
-    <equalsverifier.version>3.16.1</equalsverifier.version>
+    <equalsverifier.version>3.17.4</equalsverifier.version>
+    <!-- It seems freemarker 2.3.32 was the last to support Java 11, 2.3.33 requires Java 16 -->
     <freemarker.version>2.3.32</freemarker.version>
-    <groovy.version>4.0.21</groovy.version>
-    <guava.version>33.1.0-jre</guava.version>
-    <hamcrest.version>2.2</hamcrest.version>
+    <groovy.version>4.0.24</groovy.version>
+    <guava.version>33.3.1-jre</guava.version>
+    <hamcrest.version>3.0</hamcrest.version>
     <httpclient.version>4.5.14</httpclient.version>
     <httpcore.version>4.4.16</httpcore.version>
-    <jackson.version>2.16.1</jackson.version>
-    <woodstox-core.version>6.5.1</woodstox-core.version>
+    <jackson.version>2.18.2</jackson.version>
+    <woodstox-core.version>7.1.0</woodstox-core.version>
     <!-- When updating this to the latest version, we're getting errors in the opcua server tests -->
     <jaxb.version>4.0.4</jaxb.version>
     <!-- Starting with Jetty 12 Java 17 is required -->
     <jetty-util.version>11.0.20</jetty-util.version>
-    <jna.version>5.14.0</jna.version>
+    <jna.version>5.15.0</jna.version>
     <jserialcom.version>2.11.0</jserialcom.version>
-    <junit.jupiter.version>5.10.2</junit.jupiter.version>
+    <junit.jupiter.version>5.11.3</junit.jupiter.version>
     <junit.platform.version>1.8.2</junit.platform.version>
-    <logback.version>1.5.6</logback.version>
+    <logback.version>1.5.12</logback.version>
     <maven.clean.plugin.version>3.2.0</maven.clean.plugin.version>
-    <milo.version>0.6.12</milo.version>
-    <mockito.version>5.11.0</mockito.version>
-    <netty.version>4.1.109.Final</netty.version>
+    <milo.version>0.6.15</milo.version>
+    <mockito.version>5.14.2</mockito.version>
+    <netty.version>4.1.115.Final</netty.version>
     <pcap4j.version>1.8.2</pcap4j.version>
-    <slf4j.version>2.0.13</slf4j.version>
-    <vavr.version>0.10.4</vavr.version>
+    <slf4j.version>2.0.16</slf4j.version>
+    <vavr.version>0.10.5</vavr.version>
     <xmlunit.version>2.10.0</xmlunit.version>
 
     <!-- Site properties -->
     <asciidoctor.maven.plugin.version>2.2.6</asciidoctor.maven.plugin.version>
-    <asciidoctorj.version>2.5.12</asciidoctorj.version>
-    <asciidoctorj.diagram.version>2.3.0</asciidoctorj.diagram.version>
+    <asciidoctorj.version>2.5.11</asciidoctorj.version>
+    <asciidoctorj.diagram.version>2.3.1</asciidoctorj.diagram.version>
 
     <skip-code-generation>false</skip-code-generation>
     <skip-code-generation-tests>true</skip-code-generation-tests>
@@ -173,6 +172,7 @@
   <modules>
     <!-- Definition of the protocol message formats -->
     <module>protocols</module>
+    <module>website</module>
   </modules>
 
   <dependencyManagement>
@@ -217,11 +217,6 @@
         <scope>import</scope>
       </dependency>
 
-      <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils</artifactId>
-        <version>${commons-beanutils.version}</version>
-      </dependency>
       <dependency>
         <groupId>commons-cli</groupId>
         <artifactId>commons-cli</artifactId>
@@ -281,7 +276,7 @@
       <dependency>
         <groupId>com.google.googlejavaformat</groupId>
         <artifactId>google-java-format</artifactId>
-        <version>1.22.0</version>
+        <version>1.24.0</version>
       </dependency>
 
       <dependency>
@@ -536,18 +531,22 @@
         <artifactId>xmlunit-matchers</artifactId>
         <version>${xmlunit.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.opentest4j</groupId>
+        <artifactId>opentest4j</artifactId>
+        <version>1.3.0</version>
+      </dependency>
 
-      <!-- TODO: There's also 3.2.2, but the javacan dependency only seem to be poms with stuff in core and epoll sub-modules -->
       <dependency>
         <groupId>tel.schich</groupId>
         <artifactId>javacan-core</artifactId>
-        <version>3.3.2</version>
+        <version>3.5.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.skyscreamer</groupId>
         <artifactId>jsonassert</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.3</version>
         <exclusions>
           <exclusion>
             <groupId>com.vaadin.external.google</groupId>
@@ -568,6 +567,12 @@
       ****************************************************************************** -->
 
       <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>stax2-api</artifactId>
+        <version>4.2.2</version>
+      </dependency>
+
+      <dependency>
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>${commons-logging.version}</version>
@@ -576,7 +581,7 @@
       <dependency>
         <groupId>com.google.errorprone</groupId>
         <artifactId>error_prone_annotations</artifactId>
-        <version>2.27.0</version>
+        <version>2.36.0</version>
       </dependency>
 
       <dependency>
@@ -594,7 +599,7 @@
       <dependency>
         <groupId>com.google.j2objc</groupId>
         <artifactId>j2objc-annotations</artifactId>
-        <version>2.8</version>
+        <version>3.0.0</version>
       </dependency>
 
       <dependency>
@@ -618,7 +623,7 @@
       <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -640,7 +645,7 @@
             </goals>
             <inherited>false</inherited>
             <configuration>
-              <source>${project.basedir}/src/main/script/prerequisiteCheck.groovy</source>
+              <source>${project.basedir}/website/main/script/prerequisiteCheck.groovy</source>
             </configuration>
           </execution>
           <!--
@@ -654,7 +659,7 @@
               <goal>execute</goal>
             </goals>
             <configuration>
-              <source>${project.basedir}/src/main/script/preSiteGeneration.groovy</source>
+              <source>${project.basedir}/website/main/script/preSiteGeneration.groovy</source>
             </configuration>
           </execution>
         </executions>
@@ -662,7 +667,7 @@
           <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.12.7</version>
+            <version>2.13.0</version>
           </dependency>
           <dependency>
             <groupId>org.apache.groovy</groupId>
@@ -689,7 +694,11 @@
         <executions>
           <execution>
             <id>license-check</id>
-            <phase>verify</phase>
+            <!--
+              Moved from the default validate phase to the test phase, as there are issues with newer
+              shade-plugin versions seem to interfere with the rat plugin.
+            -->
+            <phase>test</phase>
             <goals>
               <goal>check</goal>
             </goals>
@@ -813,6 +822,8 @@
             <exclude>ui/frontend/project/dist/**</exclude>
             <exclude>ui/frontend/project/node/**</exclude>
             <exclude>ui/frontend/project/node_modules/**</exclude>
+
+            <exclude>website/node_modules/**</exclude>
 
             <exclude>.mvn/**</exclude>
 
@@ -947,12 +958,12 @@
           <dependency>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>extra-enforcer-rules</artifactId>
-            <version>1.8.0</version>
+            <version>1.9.0</version>
           </dependency>
           <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-tree</artifactId>
-            <version>3.2.1</version>
+            <version>3.3.0</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -967,55 +978,6 @@
         Starting here the following plugins are used for generating the projects website.
 
       -->
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-site-resources</id>
-            <!-- Only execute this for the parent module -->
-            <inherited>false</inherited>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/site</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.basedir}/src/site/resources-filtered</directory>
-                  <filtering>true</filtering>
-                  <targetPath>${project.build.directory}/site</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <!--
-            Copy the schemas that might be distributed throughout the codebase to a central "schemas"
-            directory so IDEs can automatically pull them in.
-          -->
-          <execution>
-            <id>copy-schemas</id>
-            <!-- Only execute this for the parent module -->
-            <inherited>false</inherited>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/site</outputDirectory>
-              <resources>
-                <!-- Copy the resources for the test-suites -->
-                <resource>
-                  <directory>${project.basedir}/plc4j/utils/test-utils/src/main/resources/schemas</directory>
-                  <targetPath>${project.build.directory}/site/schemas</targetPath>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
 
       <!--
         Make the maven-site-plugin stage the output in the "asf-site" branch
@@ -1069,7 +1031,13 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.4.1</version>
+          <version>3.5.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>3.8.1</version>
         </plugin>
 
         <plugin>
@@ -1099,7 +1067,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.9.0</version>
+          <version>1.13.0</version>
         </plugin>
 
         <plugin>
@@ -1129,13 +1097,15 @@
             <dependency>
               <groupId>org.codehaus.plexus</groupId>
               <artifactId>plexus-compiler-eclipse</artifactId>
+              <!-- Starting with 2.14 java 17 is mandatory -->
               <version>2.13.0</version>
             </dependency>
             <!-- Redundant import, however we might need to bump this version more often -->
             <dependency>
               <groupId>org.eclipse.jdt</groupId>
               <artifactId>ecj</artifactId>
-              <version>3.32.0</version>
+              <!-- Starting with 3.34.0 java 17 is mandatory -->
+              <version>3.33.0</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -1143,7 +1113,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.2.5</version>
+          <version>3.5.2</version>
           <dependencies>
             <dependency>
               <groupId>org.junit.jupiter</groupId>
@@ -1159,8 +1129,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.2.5</version>
-          <!--version>2.22.2</version-->
+          <version>3.5.2</version>
           <dependencies>
             <dependency>
               <groupId>org.junit.jupiter</groupId>
@@ -1173,7 +1142,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.4.1</version>
+          <version>3.4.2</version>
         </plugin>
 
         <plugin>
@@ -1203,8 +1172,8 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
-          <!-- It seems that when going to 3.3.0 the apache-rat-plugin fails when the shade plugin is also being run -->
-          <version>3.2.4</version>
+          <!-- Had to move the rat plugin execution to a phase before the shade plugin is executed to avoid errors -->
+          <version>3.6.0</version>
           <configuration>
             <outputFile>
               ${project.build.directory}/${project.artifactId}-${project.version}-uber-jar.${project.packaging}
@@ -1231,6 +1200,12 @@
           </configuration>
         </plugin>
 
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.8.0</version>
+        </plugin>
+
         <!-- Configure the Site generation -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1239,56 +1214,29 @@
             The asciidoctor plugin support for the site plugin 4 will remain in draft until the site plugin
             is officially released in version 4. Till then, we would have to build our own version of the
             draft branch of the plugin. So for now, we'll stay at 3.x.
+            https://github.com/asciidoctor/asciidoctor-maven-plugin/pull/685
+
+            It also seems that as soon as we update to 3.20.0 (the next version) the asciidoctor plugin stops
+            generating output.
           -->
-          <version>3.12.1</version>
+          <version>${version.maven-site-plugin}</version>
+
           <configuration>
             <!--templateFile>${session.executionRootDirectory}/src/site/template/site.vm</templateFile-->
-            <generateReports>true</generateReports>
-            <generateSitemap>true</generateSitemap>
+            <generateReports>false</generateReports>
+            <generateSitemap>false</generateSitemap>
             <relativizeDecorationLinks>false</relativizeDecorationLinks>
             <locales>en</locales>
             <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
-            <outputEncoding>${project.reporting.outputencoding}</outputEncoding>
-            <!--
-              IntelliJ can't find the asciidoc config option in the site plugin, which is correct.
-              However, this config section is used by the asciidoctor site plugin extension. So please
-              ignore this error, it's actually ok.
-            -->
-            <asciidoc>
-              <attributes>
-                <source-highlighter>prettify</source-highlighter>
-                <imagesoutdir>${project.build.directory}/site/images</imagesoutdir>
-                <pom-adoc>${project.build.directory}/pom.adoc</pom-adoc>
-              </attributes>
-              <requires>
-                <require>asciidoctor-diagram</require>
-              </requires>
-            </asciidoc>
+            <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
+
           </configuration>
-          <dependencies>
-            <!-- Add support for asciidoctor -->
-            <dependency>
-              <groupId>org.asciidoctor</groupId>
-              <artifactId>asciidoctor-maven-plugin</artifactId>
-              <version>${asciidoctor.maven.plugin.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.asciidoctor</groupId>
-              <artifactId>asciidoctorj</artifactId>
-              <version>${asciidoctorj.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.asciidoctor</groupId>
-              <artifactId>asciidoctorj-diagram</artifactId>
-              <version>${asciidoctorj.diagram.version}</version>
-            </dependency>
-          </dependencies>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.6.3</version>
+          <version>3.11.1</version>
           <configuration>
             <!--
               This will suppress the generation of a hidden timestamp at the top of each generated html page
@@ -1313,26 +1261,26 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.5.0</version>
         </plugin>
 
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.5.0</version>
+          <version>3.6.0</version>
         </plugin>
 
         <plugin>
           <groupId>com.googlecode.cmake-maven-project</groupId>
           <artifactId>cmake-maven-plugin</artifactId>
           <!-- Not all versions have all types of binaries deployed -->
-          <version>3.27.7-b1</version>
+          <version>${cmake.version}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.1.1</version>
           <configuration>
             <!-- Tell the plugin to always release all modules using the same version -->
             <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -1343,21 +1291,20 @@
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
-          <version>3.11.0.3922</version>
+          <version>5.0.0.4389</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <!--
-          TODO: somehow the newer version (checked till 3.3.0) is broken as it reports dependencies which are compile in fact
-          e.g. plc4j-connection-pool:
-          [INFO] - maven-dependency-plugin:3.2.0:analyze-only (check-dependencies) @ plc4j-connection-pool -
-          [WARNING] Non-test scoped test only dependencies found:
-          [WARNING]    org.apache.commons:commons-pool2:jar:2.11.1:compile
-          [WARNING]    org.apache.plc4x:plc4j-api:jar:0.11.0-SNAPSHOT:compile
-          -->
-          <version>3.1.2</version>
+          <version>3.8.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.shared</groupId>
+              <artifactId>maven-dependency-analyzer</artifactId>
+              <version>1.15.1</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1810,7 +1757,7 @@
           <plugin>
             <groupId>org.cyclonedx</groupId>
             <artifactId>cyclonedx-maven-plugin</artifactId>
-            <version>2.8.0</version>
+            <version>2.9.1</version>
             <!-- Only run this in the root module of the project -->
             <inherited>false</inherited>
             <configuration>

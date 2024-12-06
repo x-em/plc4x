@@ -62,7 +62,7 @@ class UmasConstants:
         read_buffer.push_context("UmasConstants")
 
         UMAS_TCP_DEFAULT_PORT: int = read_buffer.read_unsigned_short(
-            logical_name="UmasTcpDefaultPort"
+            logical_name="umas_tcp_default_port"
         )
 
         read_buffer.pop_context("UmasConstants")
@@ -84,11 +84,5 @@ class UmasConstants:
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""

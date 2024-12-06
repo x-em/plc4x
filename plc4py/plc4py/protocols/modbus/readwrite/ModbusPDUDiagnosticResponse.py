@@ -25,6 +25,7 @@ from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 from typing import ClassVar
 import math
 
@@ -70,8 +71,11 @@ class ModbusPDUDiagnosticResponse(ModbusPDU):
     def static_parse_builder(read_buffer: ReadBuffer, response: bool):
         read_buffer.push_context("ModbusPDUDiagnosticResponse")
 
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         sub_function: int = read_buffer.read_unsigned_short(
-            logical_name="subFunction", bit_length=16, response=response
+            logical_name="sub_function", bit_length=16, response=response
         )
 
         data: int = read_buffer.read_unsigned_short(
@@ -101,14 +105,8 @@ class ModbusPDUDiagnosticResponse(ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -119,7 +117,7 @@ class ModbusPDUDiagnosticResponseBuilder:
     def build(
         self,
     ) -> ModbusPDUDiagnosticResponse:
-        modbus_pdu_diagnostic_response: ModbusPDUDiagnosticResponse = (
+        modbus_pdudiagnostic_response: ModbusPDUDiagnosticResponse = (
             ModbusPDUDiagnosticResponse(self.sub_function, self.data)
         )
-        return modbus_pdu_diagnostic_response
+        return modbus_pdudiagnostic_response

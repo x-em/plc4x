@@ -114,14 +114,14 @@ public enum KnxManufacturer {
   M_INNOTEAM((int) 84, (int) 123, (String) "Innoteam"),
   M_ISE_GMBH((int) 85, (int) 124, (String) "ise GmbH"),
   M_TEAM_FOR_TRONICS((int) 86, (int) 125, (String) "TEAM FOR TRONICS"),
-  M_CIAT((int) 87, (int) 126, (String) "CIAT"),
+  M_CARRIER_SAS((int) 87, (int) 126, (String) "CARRIER SAS"),
   M_REMEHA_BV((int) 88, (int) 127, (String) "Remeha BV"),
   M_ESYLUX((int) 89, (int) 128, (String) "ESYLUX"),
   M_BASALTE((int) 90, (int) 129, (String) "BASALTE"),
   M_VESTAMATIC((int) 91, (int) 130, (String) "Vestamatic"),
   M_MDT_TECHNOLOGIES((int) 92, (int) 131, (String) "MDT technologies"),
   M_WARENDORFER_KUECHEN_GMBH((int) 93, (int) 132, (String) "Warendorfer Küchen GmbH"),
-  M_VIDEO_STAR((int) 94, (int) 133, (String) "Video-Star"),
+  M_GVS((int) 94, (int) 133, (String) "GVS"),
   M_SITEK((int) 95, (int) 134, (String) "Sitek"),
   M_CONTROLTRONIC((int) 96, (int) 135, (String) "CONTROLtronic"),
   M_FUNCTION_TECHNOLOGY((int) 97, (int) 136, (String) "function Technology"),
@@ -409,7 +409,7 @@ public enum KnxManufacturer {
   M_V2_SPA((int) 360, (int) 411, (String) "V2 SpA"),
   M_JOHNSON_CONTROLS((int) 361, (int) 412, (String) "Johnson Controls"),
   M_ARKUD((int) 362, (int) 413, (String) "Arkud"),
-  M_IRIDIUM_LTD_((int) 363, (int) 414, (String) "Iridium Ltd."),
+  M_IRIDI_LTD_((int) 363, (int) 414, (String) "iRidi Ltd."),
   M_BSMART((int) 364, (int) 415, (String) "bsmart"),
   M_BAB_TECHNOLOGIE_GMBH((int) 365, (int) 416, (String) "BAB TECHNOLOGIE GmbH"),
   M_NICE_SPA((int) 366, (int) 417, (String) "NICE Spa"),
@@ -559,7 +559,7 @@ public enum KnxManufacturer {
   M_BERGHOF_AUTOMATION_GMBH((int) 485, (int) 540, (String) "Berghof Automation GmbH"),
   M_TOTAL_AUTOMATION_AND_CONTROLS_GMBH(
       (int) 486, (int) 541, (String) "Total Automation and controls GmbH"),
-  M_DOVIT((int) 487, (int) 542, (String) "dovit"),
+  M_DOVIT((int) 487, (int) 542, (String) "DOVIT"),
   M_INSTALIGHTING_GMBH((int) 488, (int) 543, (String) "Instalighting GmbH"),
   M_UNI_TEC((int) 489, (int) 544, (String) "UNI-TEC"),
   M_CASATUNES((int) 490, (int) 545, (String) "CasaTunes"),
@@ -779,9 +779,44 @@ public enum KnxManufacturer {
   M_TECNIKABEL((int) 673, (int) 731, (String) "TECNIKABEL"),
   M_ATIOS_AG((int) 674, (int) 732, (String) "Atios AG"),
   M_SMARTLICHT((int) 675, (int) 733, (String) "SmartLicht"),
-  M_ABB___RESERVED((int) 676, (int) 43954, (String) "ABB - reserved"),
+  M_BEIJING_BEVONE_ELECTRIC_CO__LTD_(
+      (int) 676, (int) 734, (String) "Beijing Bevone Electric Co. Ltd."),
+  M_ELSMART((int) 677, (int) 735, (String) "ELSMART"),
+  M_MIDDLE_EAST_SPECIALIZED_CABLES_CO__MESC(
+      (int) 678, (int) 736, (String) "Middle East Specialized Cables Co. (MESC)"),
+  M_HANGZHOU_SANYUAN_CABLE_CO___LTD(
+      (int) 679, (int) 737, (String) "HANGZHOU SANYUAN CABLE CO., LTD"),
+  M_BEIJING_HAILIN_CONTROL_TECHNOLOGY_INC_(
+      (int) 680, (int) 738, (String) "Beijing HaiLin Control Technology Inc."),
+  M_HANGZHOU_SNOWYI_TECHNOLOGY_CO__LTD_(
+      (int) 681, (int) 739, (String) "HangZhou Snowyi Technology Co.,LTD."),
+  M_XIAMEN_E_TOP_CONTROLS_TECHNOLOGY_CO__LTD(
+      (int) 682, (int) 740, (String) "Xiamen E-Top Controls Technology Co.,Ltd"),
+  M_VITRUM_DESIGN((int) 683, (int) 741, (String) "Vitrum Design"),
+  M_DETRONS((int) 684, (int) 742, (String) "DETRONS"),
+  M_ZHEJIANG_FORICK__INTELLIGENT_TECHNOLOGY_CO___LTD(
+      (int) 685, (int) 743, (String) "Zhejiang FORICK, Intelligent Technology Co., LTD"),
+  M_VARNI_DIGITAL_PRIVATE_LIMITED((int) 686, (int) 744, (String) "Varni Digital Private Limited"),
+  M_3A_ENTREPRISE_APS((int) 687, (int) 745, (String) "3a entreprise aps"),
+  M_ITALIANA_CONDUTTORI_SRL((int) 688, (int) 746, (String) "Italiana Conduttori srl"),
+  M_XIAMEN_LEELEN_TECHNOLOGY_CO__LTD_(
+      (int) 689, (int) 747, (String) "Xiamen Leelen Technology Co.,Ltd."),
+  M_LEDNX((int) 690, (int) 748, (String) "LedNX"),
+  M_EBELONG((int) 691, (int) 749, (String) "ebelong"),
+  M_ASTRA_LED_AG((int) 692, (int) 750, (String) "Astra-LED AG"),
+  M_WONDERFUL_HI_TECH_CO___LTD_((int) 693, (int) 751, (String) "Wonderful Hi-Tech Co., Ltd."),
+  M_REXLITE_AI_INTEGRATIONS_CO__LTD(
+      (int) 694, (int) 752, (String) "REXLiTE Ai Integrations CO.,LTD"),
+  M_ALLORADO((int) 695, (int) 753, (String) "Allorado"),
+  M_FUZHOU_MILI_TECHNOLOGY_CO___LTD(
+      (int) 696, (int) 754, (String) "FUZHOU MILI TECHNOLOGY CO., LTD"),
+  M_MAXTREEN_BUILDING_TECHNOLOGY_CO__LTD(
+      (int) 697, (int) 755, (String) "Maxtreen building technology co.,ltd"),
+  M_HYSINE((int) 698, (int) 756, (String) "Hysine"),
+  M_SANTAN((int) 699, (int) 757, (String) "SANTAN"),
+  M_ABB___RESERVED((int) 700, (int) 43954, (String) "ABB - reserved"),
   M_BUSCH_JAEGER_ELEKTRO___RESERVED(
-      (int) 677, (int) 43959, (String) "Busch-Jaeger Elektro - reserved");
+      (int) 701, (int) 43959, (String) "Busch-Jaeger Elektro - reserved");
   private static final Map<Integer, KnxManufacturer> map;
 
   static {

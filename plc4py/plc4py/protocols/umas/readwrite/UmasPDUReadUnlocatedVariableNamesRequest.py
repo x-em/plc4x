@@ -44,7 +44,7 @@ class UmasPDUReadUnlocatedVariableNamesRequest(UmasPDUItem):
     umas_function_key: ClassVar[int] = 0x26
     umas_request_function_key: ClassVar[int] = 0
 
-    def serialize_umas_pdu_item_child(self, write_buffer: WriteBuffer):
+    def serialize_umas_pduitem_child(self, write_buffer: WriteBuffer):
         write_buffer.push_context("UmasPDUReadUnlocatedVariableNamesRequest")
 
         # Simple Field (recordType)
@@ -108,8 +108,13 @@ class UmasPDUReadUnlocatedVariableNamesRequest(UmasPDUItem):
     ):
         read_buffer.push_context("UmasPDUReadUnlocatedVariableNamesRequest")
 
+        if isinstance(umas_request_function_key, str):
+            umas_request_function_key = int(umas_request_function_key)
+        if isinstance(byte_length, str):
+            byte_length = int(byte_length)
+
         record_type: int = read_buffer.read_unsigned_short(
-            logical_name="recordType",
+            logical_name="record_type",
             bit_length=16,
             byte_order=ByteOrder.LITTLE_ENDIAN,
             umas_request_function_key=umas_request_function_key,
@@ -125,7 +130,7 @@ class UmasPDUReadUnlocatedVariableNamesRequest(UmasPDUItem):
         )
 
         hardware_id: int = read_buffer.read_unsigned_int(
-            logical_name="hardwareId",
+            logical_name="hardware_id",
             bit_length=32,
             byte_order=ByteOrder.LITTLE_ENDIAN,
             umas_request_function_key=umas_request_function_key,
@@ -133,7 +138,7 @@ class UmasPDUReadUnlocatedVariableNamesRequest(UmasPDUItem):
         )
 
         block_no: int = read_buffer.read_unsigned_short(
-            logical_name="blockNo",
+            logical_name="block_no",
             bit_length=16,
             byte_order=ByteOrder.LITTLE_ENDIAN,
             umas_request_function_key=umas_request_function_key,
@@ -185,14 +190,8 @@ class UmasPDUReadUnlocatedVariableNamesRequest(UmasPDUItem):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -206,7 +205,7 @@ class UmasPDUReadUnlocatedVariableNamesRequestBuilder:
     def build(
         self, byte_length: int, pairing_key
     ) -> UmasPDUReadUnlocatedVariableNamesRequest:
-        umas_pdu_read_unlocated_variable_names_request: (
+        umas_pduread_unlocated_variable_names_request: (
             UmasPDUReadUnlocatedVariableNamesRequest
         ) = UmasPDUReadUnlocatedVariableNamesRequest(
             byte_length,
@@ -217,4 +216,4 @@ class UmasPDUReadUnlocatedVariableNamesRequestBuilder:
             self.block_no,
             self.offset,
         )
-        return umas_pdu_read_unlocated_variable_names_request
+        return umas_pduread_unlocated_variable_names_request

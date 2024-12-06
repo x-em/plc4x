@@ -47,7 +47,7 @@ class UmasPDUItem(ABC, PlcMessage):
         pass
 
     @abstractmethod
-    def serialize_umas_pdu_item_child(self, write_buffer: WriteBuffer) -> None:
+    def serialize_umas_pduitem_child(self, write_buffer: WriteBuffer) -> None:
         pass
 
     def serialize(self, write_buffer: WriteBuffer):
@@ -61,13 +61,13 @@ class UmasPDUItem(ABC, PlcMessage):
         # Discriminator Field (umasFunctionKey) (Used as input to a switch field)
         write_buffer.write_unsigned_byte(
             self.umas_function_key,
-            logical_name="umasFunctionKey",
+            logical_name="umas_function_key",
             bit_length=8,
             byte_order=ByteOrder.LITTLE_ENDIAN,
         )
 
         # Switch field (Serialize the sub-type)
-        self.serialize_umas_pdu_item_child(write_buffer)
+        self.serialize_umas_pduitem_child(write_buffer)
 
         write_buffer.pop_context("UmasPDUItem")
 
@@ -130,8 +130,13 @@ class UmasPDUItem(ABC, PlcMessage):
     ):
         read_buffer.push_context("UmasPDUItem")
 
+        if isinstance(umas_request_function_key, str):
+            umas_request_function_key = int(umas_request_function_key)
+        if isinstance(byte_length, str):
+            byte_length = int(byte_length)
+
         pairing_key: int = read_buffer.read_unsigned_byte(
-            logical_name="pairingKey",
+            logical_name="pairing_key",
             bit_length=8,
             byte_order=ByteOrder.LITTLE_ENDIAN,
             umas_request_function_key=umas_request_function_key,
@@ -139,7 +144,7 @@ class UmasPDUItem(ABC, PlcMessage):
         )
 
         umas_function_key: int = read_buffer.read_unsigned_byte(
-            logical_name="umasFunctionKey",
+            logical_name="umas_function_key",
             bit_length=8,
             byte_order=ByteOrder.LITTLE_ENDIAN,
             umas_request_function_key=umas_request_function_key,
@@ -202,6 +207,15 @@ class UmasPDUItem(ABC, PlcMessage):
             builder = UmasPDUReadVariableRequest.static_parse_builder(
                 read_buffer, umas_request_function_key, byte_length
             )
+        from plc4py.protocols.umas.readwrite.UmasPDUWriteVariableRequest import (
+            UmasPDUWriteVariableRequest,
+        )
+
+        if umas_function_key == int(0x23):
+
+            builder = UmasPDUWriteVariableRequest.static_parse_builder(
+                read_buffer, umas_request_function_key, byte_length
+            )
         from plc4py.protocols.umas.readwrite.UmasPDUReadUnlocatedVariableNamesRequest import (
             UmasPDUReadUnlocatedVariableNamesRequest,
         )
@@ -209,6 +223,15 @@ class UmasPDUItem(ABC, PlcMessage):
         if umas_function_key == int(0x26):
 
             builder = UmasPDUReadUnlocatedVariableNamesRequest.static_parse_builder(
+                read_buffer, umas_request_function_key, byte_length
+            )
+        from plc4py.protocols.umas.readwrite.UmasPDUErrorResponse import (
+            UmasPDUErrorResponse,
+        )
+
+        if umas_function_key == int(0xFD):
+
+            builder = UmasPDUErrorResponse.static_parse_builder(
                 read_buffer, umas_request_function_key, byte_length
             )
         from plc4py.protocols.umas.readwrite.UmasInitCommsResponse import (
@@ -256,6 +279,15 @@ class UmasPDUItem(ABC, PlcMessage):
             builder = UmasPDUReadVariableResponse.static_parse_builder(
                 read_buffer, umas_request_function_key, byte_length
             )
+        from plc4py.protocols.umas.readwrite.UmasPDUWriteVariableResponse import (
+            UmasPDUWriteVariableResponse,
+        )
+
+        if umas_function_key == int(0xFE) and umas_request_function_key == int(0x23):
+
+            builder = UmasPDUWriteVariableResponse.static_parse_builder(
+                read_buffer, umas_request_function_key, byte_length
+            )
         from plc4py.protocols.umas.readwrite.UmasPDUReadUnlocatedVariableResponse import (
             UmasPDUReadUnlocatedVariableResponse,
         )
@@ -279,8 +311,8 @@ class UmasPDUItem(ABC, PlcMessage):
 
         read_buffer.pop_context("UmasPDUItem")
         # Create the instance
-        _umas_pdu_item: UmasPDUItem = builder.build(pairing_key, byte_length)
-        return _umas_pdu_item
+        _umas_pduitem: UmasPDUItem = builder.build(pairing_key, byte_length)
+        return _umas_pduitem
 
     def equals(self, o: object) -> bool:
         if self == o:
@@ -296,14 +328,8 @@ class UmasPDUItem(ABC, PlcMessage):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass

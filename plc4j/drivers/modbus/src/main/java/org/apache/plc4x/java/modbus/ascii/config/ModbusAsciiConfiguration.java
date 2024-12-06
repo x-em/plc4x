@@ -18,13 +18,13 @@
  */
 package org.apache.plc4x.java.modbus.ascii.config;
 
+import org.apache.plc4x.java.modbus.types.ModbusByteOrder;
 import org.apache.plc4x.java.spi.configuration.PlcConnectionConfiguration;
 import org.apache.plc4x.java.spi.configuration.annotations.ConfigurationParameter;
 import org.apache.plc4x.java.spi.configuration.annotations.Description;
 import org.apache.plc4x.java.spi.configuration.annotations.Since;
 import org.apache.plc4x.java.spi.configuration.annotations.defaults.IntDefaultValue;
 import org.apache.plc4x.java.spi.configuration.annotations.defaults.StringDefaultValue;
-import org.apache.plc4x.java.spi.generation.ByteOrder;
 
 public class ModbusAsciiConfiguration implements PlcConnectionConfiguration {
 
@@ -43,9 +43,23 @@ public class ModbusAsciiConfiguration implements PlcConnectionConfiguration {
     @Description("Default encoding used for transporting register values (Defaults to BIG_ENDIAN).\n" +
         "Allowed values are: \n" +
         " - BIG_ENDIAN\n" +
-        " - LITTLE_ENDIAN")
+        " - LITTLE_ENDIAN\n" +
+        " - BIG_ENDIAN_BYTE_SWAP\n" +
+        " - LITTLE_ENDIAN_BYTE_SWAP\n")
     @Since("0.13.0")
-    private ByteOrder defaultPayloadByteOrder;
+    private ModbusByteOrder defaultPayloadByteOrder;
+
+    @ConfigurationParameter("max-coils-per-request")
+    @IntDefaultValue(2000)
+    @Description("Maximum number of coils addressable in one request (Defaults to 2000)")
+    @Since("0.13.0")
+    private int maxCoilsPerRequest;
+
+    @ConfigurationParameter("max-registers-per-request")
+    @IntDefaultValue(125)
+    @Description("Maximum number of registers addressable in one request (Defaults to 125)")
+    @Since("0.13.0")
+    private int maxRegistersPerRequest;
 
     public int getRequestTimeout() {
         return requestTimeout;
@@ -63,12 +77,28 @@ public class ModbusAsciiConfiguration implements PlcConnectionConfiguration {
         this.defaultUnitIdentifier = defaultUnitIdentifier;
     }
 
-    public ByteOrder getDefaultPayloadByteOrder() {
+    public ModbusByteOrder getDefaultPayloadByteOrder() {
         return defaultPayloadByteOrder;
     }
 
-    public void setDefaultPayloadByteOrder(ByteOrder defaultPayloadByteOrder) {
+    public void setDefaultPayloadByteOrder(ModbusByteOrder defaultPayloadByteOrder) {
         this.defaultPayloadByteOrder = defaultPayloadByteOrder;
+    }
+
+    public int getMaxCoilsPerRequest() {
+        return maxCoilsPerRequest;
+    }
+
+    public void setMaxCoilsPerRequest(int maxCoilsPerRequest) {
+        this.maxCoilsPerRequest = maxCoilsPerRequest;
+    }
+
+    public int getMaxRegistersPerRequest() {
+        return maxRegistersPerRequest;
+    }
+
+    public void setMaxRegistersPerRequest(int maxRegistersPerRequest) {
+        this.maxRegistersPerRequest = maxRegistersPerRequest;
     }
 
     @Override
@@ -77,6 +107,8 @@ public class ModbusAsciiConfiguration implements PlcConnectionConfiguration {
             "requestTimeout=" + requestTimeout +
             ", defaultUnitIdentifier=" + defaultUnitIdentifier +
             ", defaultPayloadByteOrder=" + defaultPayloadByteOrder +
+            ", maxCoilsPerRequest=" + maxCoilsPerRequest +
+            ", maxRegistersPerRequest=" + maxRegistersPerRequest +
             '}';
     }
 

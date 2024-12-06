@@ -18,12 +18,13 @@
  */
 package org.apache.plc4x.language.go;
 
-import freemarker.template.*;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.apache.plc4x.plugins.codegenerator.protocol.freemarker.FreemarkerLanguageOutput;
 import org.apache.plc4x.plugins.codegenerator.protocol.freemarker.FreemarkerLanguageTemplateHelper;
 import org.apache.plc4x.plugins.codegenerator.types.definitions.TypeDefinition;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 
 public class GoLanguageOutput extends FreemarkerLanguageOutput {
@@ -35,7 +36,9 @@ public class GoLanguageOutput extends FreemarkerLanguageOutput {
 
     @Override
     public Set<String> supportedOptions() {
-        return Collections.emptySet();
+        return new HashSet<>(List.of(
+            // Map containing the type-names for external types.
+            "externalTypes"));
     }
 
     @Override
@@ -75,8 +78,8 @@ public class GoLanguageOutput extends FreemarkerLanguageOutput {
 
     @Override
     protected FreemarkerLanguageTemplateHelper getHelper(TypeDefinition thisType, String protocolName, String flavorName, Map<String, TypeDefinition> types,
-        Map<String, String> options) {
-        return new GoLanguageTemplateHelper(thisType, protocolName, flavorName, types);
+                                                         Map<String, Object> options) {
+        return new GoLanguageTemplateHelper(thisType, protocolName, flavorName, types, options);
     }
 
 }

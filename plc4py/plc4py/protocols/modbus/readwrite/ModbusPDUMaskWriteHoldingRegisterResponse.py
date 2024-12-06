@@ -25,6 +25,7 @@ from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 from typing import ClassVar
 import math
 
@@ -81,16 +82,19 @@ class ModbusPDUMaskWriteHoldingRegisterResponse(ModbusPDU):
     def static_parse_builder(read_buffer: ReadBuffer, response: bool):
         read_buffer.push_context("ModbusPDUMaskWriteHoldingRegisterResponse")
 
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         reference_address: int = read_buffer.read_unsigned_short(
-            logical_name="referenceAddress", bit_length=16, response=response
+            logical_name="reference_address", bit_length=16, response=response
         )
 
         and_mask: int = read_buffer.read_unsigned_short(
-            logical_name="andMask", bit_length=16, response=response
+            logical_name="and_mask", bit_length=16, response=response
         )
 
         or_mask: int = read_buffer.read_unsigned_short(
-            logical_name="orMask", bit_length=16, response=response
+            logical_name="or_mask", bit_length=16, response=response
         )
 
         read_buffer.pop_context("ModbusPDUMaskWriteHoldingRegisterResponse")
@@ -121,14 +125,8 @@ class ModbusPDUMaskWriteHoldingRegisterResponse(ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -140,9 +138,9 @@ class ModbusPDUMaskWriteHoldingRegisterResponseBuilder:
     def build(
         self,
     ) -> ModbusPDUMaskWriteHoldingRegisterResponse:
-        modbus_pdu_mask_write_holding_register_response: (
+        modbus_pdumask_write_holding_register_response: (
             ModbusPDUMaskWriteHoldingRegisterResponse
         ) = ModbusPDUMaskWriteHoldingRegisterResponse(
             self.reference_address, self.and_mask, self.or_mask
         )
-        return modbus_pdu_mask_write_holding_register_response
+        return modbus_pdumask_write_holding_register_response

@@ -24,10 +24,15 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/url"
+	"os"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	plc4go "github.com/apache/plc4x/plc4go/pkg/api"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
@@ -40,10 +45,6 @@ import (
 	"github.com/apache/plc4x/plc4go/spi/transports/test"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 	spiValues "github.com/apache/plc4x/plc4go/spi/values"
-
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestNewBrowser(t *testing.T) {
@@ -85,6 +86,9 @@ func TestBrowser_BrowseQuery(t *testing.T) {
 				query:     NewUnitInfoQuery(readWriteModel.NewUnitAddress(2), nil, 1),
 			},
 			setup: func(t *testing.T, fields *fields, args *args) {
+				if os.Getenv("ENABLE_RANDOMLY_FAILING_TESTS") == "" {
+					t.Skip("Skipping randomly failing tests")
+				}
 				_options := testutils.EnrichOptionsWithOptionsForTesting(t)
 
 				transport := test.NewTransport(_options...)

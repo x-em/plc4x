@@ -41,7 +41,7 @@ class UmasPDUReadUnlocatedVariableResponse(UmasPDUItem):
     umas_function_key: ClassVar[int] = 0xFE
     umas_request_function_key: ClassVar[int] = 0x26
 
-    def serialize_umas_pdu_item_child(self, write_buffer: WriteBuffer):
+    def serialize_umas_pduitem_child(self, write_buffer: WriteBuffer):
         write_buffer.push_context("UmasPDUReadUnlocatedVariableResponse")
 
         # Array Field (block)
@@ -69,6 +69,11 @@ class UmasPDUReadUnlocatedVariableResponse(UmasPDUItem):
         read_buffer: ReadBuffer, umas_request_function_key: int, byte_length: int
     ):
         read_buffer.push_context("UmasPDUReadUnlocatedVariableResponse")
+
+        if isinstance(umas_request_function_key, str):
+            umas_request_function_key = int(umas_request_function_key)
+        if isinstance(byte_length, str):
+            byte_length = int(byte_length)
 
         block: List[Any] = read_buffer.read_array_field(
             logical_name="block",
@@ -99,14 +104,8 @@ class UmasPDUReadUnlocatedVariableResponse(UmasPDUItem):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -116,7 +115,7 @@ class UmasPDUReadUnlocatedVariableResponseBuilder:
     def build(
         self, byte_length: int, pairing_key
     ) -> UmasPDUReadUnlocatedVariableResponse:
-        umas_pdu_read_unlocated_variable_response: (
+        umas_pduread_unlocated_variable_response: (
             UmasPDUReadUnlocatedVariableResponse
         ) = UmasPDUReadUnlocatedVariableResponse(byte_length, pairing_key, self.block)
-        return umas_pdu_read_unlocated_variable_response
+        return umas_pduread_unlocated_variable_response

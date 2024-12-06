@@ -25,6 +25,7 @@ from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 from typing import Any
 from typing import ClassVar
 from typing import List
@@ -56,7 +57,7 @@ class ModbusPDUWriteMultipleCoilsRequest(ModbusPDU):
 
         # Implicit Field (byte_count) (Used for parsing, but its value is not stored as it's implicitly given by the objects content)
         byte_count: int = int(len(self.value))
-        write_buffer.write_unsigned_byte(byte_count, logical_name="byteCount")
+        write_buffer.write_unsigned_byte(byte_count, logical_name="byte_count")
 
         # Array Field (value)
         write_buffer.write_byte_array(self.value, logical_name="value")
@@ -89,8 +90,11 @@ class ModbusPDUWriteMultipleCoilsRequest(ModbusPDU):
     def static_parse_builder(read_buffer: ReadBuffer, response: bool):
         read_buffer.push_context("ModbusPDUWriteMultipleCoilsRequest")
 
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         starting_address: int = read_buffer.read_unsigned_short(
-            logical_name="startingAddress", bit_length=16, response=response
+            logical_name="starting_address", bit_length=16, response=response
         )
 
         quantity: int = read_buffer.read_unsigned_short(
@@ -98,7 +102,7 @@ class ModbusPDUWriteMultipleCoilsRequest(ModbusPDU):
         )
 
         byte_count: int = read_buffer.read_unsigned_byte(
-            logical_name="byteCount", response=response
+            logical_name="byte_count", response=response
         )
 
         value: List[Any] = read_buffer.read_array_field(
@@ -134,14 +138,8 @@ class ModbusPDUWriteMultipleCoilsRequest(ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -153,9 +151,9 @@ class ModbusPDUWriteMultipleCoilsRequestBuilder:
     def build(
         self,
     ) -> ModbusPDUWriteMultipleCoilsRequest:
-        modbus_pdu_write_multiple_coils_request: ModbusPDUWriteMultipleCoilsRequest = (
+        modbus_pduwrite_multiple_coils_request: ModbusPDUWriteMultipleCoilsRequest = (
             ModbusPDUWriteMultipleCoilsRequest(
                 self.starting_address, self.quantity, self.value
             )
         )
-        return modbus_pdu_write_multiple_coils_request
+        return modbus_pduwrite_multiple_coils_request

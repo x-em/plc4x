@@ -28,6 +28,7 @@ from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.DriverType import DriverType
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 import math
 
 
@@ -102,6 +103,11 @@ class ModbusADU(ABC, PlcMessage):
     ):
         read_buffer.push_context("ModbusADU")
 
+        if isinstance(driver_type, str):
+            driver_type = DriverType[driver_type]
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         # Switch Field (Depending on the discriminator values, passes the instantiation to a sub-type)
         builder: ModbusADUBuilder = None
         from plc4py.protocols.modbus.readwrite.ModbusTcpADU import ModbusTcpADU
@@ -153,14 +159,8 @@ class ModbusADU(ABC, PlcMessage):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass

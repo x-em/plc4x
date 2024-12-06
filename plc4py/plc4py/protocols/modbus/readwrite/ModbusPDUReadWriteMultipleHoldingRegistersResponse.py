@@ -25,6 +25,7 @@ from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 from typing import Any
 from typing import ClassVar
 from typing import List
@@ -44,7 +45,7 @@ class ModbusPDUReadWriteMultipleHoldingRegistersResponse(ModbusPDU):
 
         # Implicit Field (byte_count) (Used for parsing, but its value is not stored as it's implicitly given by the objects content)
         byte_count: int = int(len(self.value))
-        write_buffer.write_unsigned_byte(byte_count, logical_name="byteCount")
+        write_buffer.write_unsigned_byte(byte_count, logical_name="byte_count")
 
         # Array Field (value)
         write_buffer.write_byte_array(self.value, logical_name="value")
@@ -71,8 +72,11 @@ class ModbusPDUReadWriteMultipleHoldingRegistersResponse(ModbusPDU):
     def static_parse_builder(read_buffer: ReadBuffer, response: bool):
         read_buffer.push_context("ModbusPDUReadWriteMultipleHoldingRegistersResponse")
 
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         byte_count: int = read_buffer.read_unsigned_byte(
-            logical_name="byteCount", response=response
+            logical_name="byte_count", response=response
         )
 
         value: List[Any] = read_buffer.read_array_field(
@@ -102,14 +106,8 @@ class ModbusPDUReadWriteMultipleHoldingRegistersResponse(ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -119,7 +117,7 @@ class ModbusPDUReadWriteMultipleHoldingRegistersResponseBuilder:
     def build(
         self,
     ) -> ModbusPDUReadWriteMultipleHoldingRegistersResponse:
-        modbus_pdu_read_write_multiple_holding_registers_response: (
+        modbus_pduread_write_multiple_holding_registers_response: (
             ModbusPDUReadWriteMultipleHoldingRegistersResponse
         ) = ModbusPDUReadWriteMultipleHoldingRegistersResponse(self.value)
-        return modbus_pdu_read_write_multiple_holding_registers_response
+        return modbus_pduread_write_multiple_holding_registers_response

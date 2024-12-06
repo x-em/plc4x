@@ -29,7 +29,6 @@ import org.apache.plc4x.java.api.metadata.Option;
 import org.apache.plc4x.java.api.metadata.OptionMetadata;
 import org.apache.plc4x.java.api.types.OptionType;
 import org.apache.plc4x.java.api.metadata.PlcDriverMetadata;
-import org.apache.plc4x.java.api.value.PlcValueHandler;
 import org.apache.plc4x.java.spi.configuration.ConfigurationFactory;
 import org.apache.plc4x.java.spi.configuration.annotations.*;
 import org.apache.plc4x.java.spi.configuration.annotations.defaults.*;
@@ -38,6 +37,8 @@ import org.apache.plc4x.java.spi.metadata.DefaultOption;
 import org.apache.plc4x.java.spi.metadata.DefaultOptionMetadata;
 import org.apache.plc4x.java.spi.optimizer.BaseOptimizer;
 import org.apache.plc4x.java.spi.transport.Transport;
+import org.apache.plc4x.java.spi.values.DefaultPlcValueHandler;
+import org.apache.plc4x.java.spi.values.PlcValueHandler;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -234,7 +235,7 @@ public abstract class GeneratedDriverBase<BASE_PACKET extends Message> implement
 
             @Override
             public boolean isDiscoverySupported() {
-                return canBrowse();
+                return canDiscover();
             }
 
         };
@@ -260,6 +261,10 @@ public abstract class GeneratedDriverBase<BASE_PACKET extends Message> implement
         return false;
     }
 
+    protected boolean canDiscover() {
+        return false;
+    }
+
     protected boolean fireDiscoverEvent() {
         return false;
     }
@@ -280,9 +285,9 @@ public abstract class GeneratedDriverBase<BASE_PACKET extends Message> implement
         return null;
     }
 
-    protected abstract PlcTagHandler getTagHandler();
-
-    protected abstract PlcValueHandler getValueHandler();
+    protected PlcValueHandler getValueHandler() {
+        return new DefaultPlcValueHandler();
+    }
 
     protected abstract ProtocolStackConfigurer<BASE_PACKET> getStackConfigurer();
 
@@ -393,7 +398,6 @@ public abstract class GeneratedDriverBase<BASE_PACKET extends Message> implement
 
         return new DefaultNettyPlcConnection(
             canPing(), canRead(), canWrite(), canSubscribe(), canBrowse(),
-            getTagHandler(),
             getValueHandler(),
             configuration,
             channelFactory,

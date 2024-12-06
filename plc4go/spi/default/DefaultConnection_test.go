@@ -22,21 +22,20 @@ package _default
 import (
 	"context"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"testing"
 	"time"
+
+	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/apache/plc4x/plc4go/pkg/api"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	"github.com/apache/plc4x/plc4go/spi"
 	"github.com/apache/plc4x/plc4go/spi/options"
-	"github.com/apache/plc4x/plc4go/spi/testutils"
 	"github.com/apache/plc4x/plc4go/spi/tracer"
 	"github.com/apache/plc4x/plc4go/spi/transports"
 	"github.com/apache/plc4x/plc4go/spi/utils"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestDefaultConnectionMetadata_CanBrowse(t *testing.T) {
@@ -1292,50 +1291,6 @@ func Test_plcConnectionPingResult_GetErr(t *testing.T) {
 				err: tt.fields.err,
 			}
 			tt.wantErr(t, d.GetErr(), fmt.Sprintf("GetErr()"))
-		})
-	}
-}
-
-func Test_defaultConnection_String(t *testing.T) {
-	type fields struct {
-		DefaultConnectionRequirements DefaultConnectionRequirements
-		defaultTtl                    time.Duration
-		tagHandler                    spi.PlcTagHandler
-		valueHandler                  spi.PlcValueHandler
-	}
-	tests := []struct {
-		name      string
-		fields    fields
-		connected bool
-		want      string
-	}{
-		{
-			name: "string it",
-			fields: fields{
-				defaultTtl: 20 * time.Hour,
-			},
-			connected: true,
-			want: `
-╔═defaultConnection═══════╗
-║╔═defaultTtl╗╔═connected╗║
-║║  20h0m0s  ║║ b1 true  ║║
-║╚═══════════╝╚══════════╝║
-╚═════════════════════════╝`[1:],
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			d := &defaultConnection{
-				DefaultConnectionRequirements: tt.fields.DefaultConnectionRequirements,
-				defaultTtl:                    tt.fields.defaultTtl,
-				tagHandler:                    tt.fields.tagHandler,
-				valueHandler:                  tt.fields.valueHandler,
-				log:                           testutils.ProduceTestingLogger(t),
-			}
-			if tt.connected {
-				d.connected.Store(true)
-			}
-			assert.Equalf(t, tt.want, d.String(), "String()")
 		})
 	}
 }

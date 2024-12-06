@@ -16,15 +16,15 @@
 #  under the License.
 import struct
 import types
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Union, Any
+from typing import Any, List, Union
 
 import aenum
 from bitarray import bitarray
-from bitarray.util import zeros, ba2int, ba2base
+from bitarray.util import ba2base, ba2int, zeros
 
-from plc4py.api.exceptions.exceptions import SerializationException
+from plc4py.api.exceptions.exceptions import SerializationException, ParseException
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.utils.GenericTypes import ByteOrder, ByteOrderAware
 
@@ -132,7 +132,11 @@ class ReadBuffer(ByteOrderAware, PositionAware, ABC):
 
     @abstractmethod
     def read_enum(
-        self, bit_length: int = -1, logical_name: str = "", read_function=None, **kwargs
+        self,
+        bit_length: int = -1,
+        logical_name: str = "",
+        read_function=None,
+        **kwargs,
     ) -> Any:
         raise NotImplementedError
 
@@ -144,7 +148,7 @@ class ReadBuffer(ByteOrderAware, PositionAware, ABC):
         count: int = None,
         length: int = None,
         terminated=None,
-        **kwargs
+        **kwargs,
     ) -> List[Any]:
         raise NotImplementedError
 
@@ -206,7 +210,8 @@ class ReadBufferByteBased(ReadBuffer):
             raise SerializationException("unsigned byte can only contain max 8 bits")
         else:
             result: int = ba2int(
-                self.bb[self.position : self.position + bit_length], signed=False
+                self.bb[self.position : self.position + bit_length],
+                signed=False,
             )
             self.position += bit_length
             return result
@@ -215,6 +220,7 @@ class ReadBufferByteBased(ReadBuffer):
         self, bit_length: int = 16, logical_name: str = "", **kwargs
     ) -> int:
         byte_order = kwargs.get("byte_order", self.byte_order)
+        encoding = kwargs.get("encoding", "")
         if bit_length <= 0:
             raise SerializationException("unsigned short must contain at least 1 bit")
         elif bit_length > 16:
@@ -222,19 +228,41 @@ class ReadBufferByteBased(ReadBuffer):
         else:
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endian_string = "<"
+                padded = bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                ) + (16 - bit_length) * bitarray("0")
             else:
                 endian_string = ">"
-            padded = (16 - bit_length) * bitarray("0") + bitarray(
-                self.bb[self.position : self.position + bit_length]
-            )
-            result: int = struct.unpack(endian_string + "H", padded)[0]
-            self.position += bit_length
-            return result
+                padded = (16 - bit_length) * bitarray("0") + bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                )
+
+            if encoding == "BCD":
+                if bit_length % 4 != 0:
+                    raise ParseException(
+                        "'BCD' encoded fields must have a length that is a multiple of 4 bits long"
+                    )
+                result: int = 0
+                for i in range(0, bit_length, 4):
+                    digit: int = ba2int(padded[i : i + 4])
+                    if digit > 9:
+                        raise ParseException(
+                            "'BCD' encoded value is not a correctly encoded BCD value"
+                        )
+                    multiplier = 10 ** ((int(bit_length - i) / 4) - 1)
+                    result += multiplier * digit
+                self.position += bit_length
+                return result
+            else:
+                result: int = struct.unpack(endian_string + "H", padded)[0]
+                self.position += bit_length
+                return result
 
     def read_unsigned_int(
         self, bit_length: int = 32, logical_name: str = "", **kwargs
     ) -> int:
         byte_order = kwargs.get("byte_order", self.byte_order)
+        encoding = kwargs.get("encoding", "")
         if bit_length <= 0:
             raise SerializationException("unsigned int must contain at least 1 bit")
         elif bit_length > 32:
@@ -242,14 +270,36 @@ class ReadBufferByteBased(ReadBuffer):
         else:
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endian_string = "<"
+                padded = bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                ) + (32 - bit_length) * bitarray("0")
             else:
                 endian_string = ">"
-            padded = (32 - bit_length) * bitarray("0") + bitarray(
-                self.bb[self.position : self.position + bit_length]
-            )
-            result: int = struct.unpack(endian_string + "I", padded)[0]
-            self.position += bit_length
-            return result
+                padded = (32 - bit_length) * bitarray("0") + bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                )
+            if encoding == "BCD":
+                if bit_length % 4 != 0:
+                    raise ParseException(
+                        "'BCD' encoded fields must have a length that is a multiple of 4 bits long"
+                    )
+                if byte_order == ByteOrder.LITTLE_ENDIAN:
+                    padded = padded[8:16] + padded[:8] + padded[24:32] + padded[16:24]
+                result: int = 0
+                for i in range(0, bit_length, 4):
+                    digit: int = ba2int(padded[i : i + 4])
+                    if digit > 9:
+                        raise ParseException(
+                            "'BCD' encoded value is not a correctly encoded BCD value"
+                        )
+                    multiplier = 10 ** ((int(bit_length - i) / 4) - 1)
+                    result += multiplier * digit
+                self.position += bit_length
+                return result
+            else:
+                result: int = struct.unpack(endian_string + "I", padded)[0]
+                self.position += bit_length
+                return result
 
     def read_unsigned_long(
         self, bit_length: int = 64, logical_name: str = "", **kwargs
@@ -262,11 +312,14 @@ class ReadBufferByteBased(ReadBuffer):
         else:
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endian_string = "<"
+                padded = bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                ) + (64 - bit_length) * bitarray("0")
             else:
                 endian_string = ">"
-            padded = (64 - bit_length) * bitarray("0") + bitarray(
-                self.bb[self.position : self.position + bit_length]
-            )
+                padded = (64 - bit_length) * bitarray("0") + bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                )
             result: int = struct.unpack(endian_string + "Q", padded)[0]
             self.position += bit_length
             return result
@@ -281,7 +334,8 @@ class ReadBufferByteBased(ReadBuffer):
             raise SerializationException("signed byte can only contain max 8 bits")
         else:
             result: int = ba2int(
-                self.bb[self.position : self.position + bit_length], signed=False
+                self.bb[self.position : self.position + bit_length],
+                signed=False,
             )
             self.position += bit_length
             return result
@@ -295,11 +349,14 @@ class ReadBufferByteBased(ReadBuffer):
         else:
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endian_string = "<"
+                padded = bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                ) + (16 - bit_length) * bitarray("0")
             else:
                 endian_string = ">"
-            padded = (16 - bit_length) * bitarray("0") + bitarray(
-                self.bb[self.position : self.position + bit_length]
-            )
+                padded = (16 - bit_length) * bitarray("0") + bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                )
             result: int = struct.unpack(endian_string + "h", padded)[0]
             self.position += bit_length
             return result
@@ -313,11 +370,19 @@ class ReadBufferByteBased(ReadBuffer):
         else:
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endian_string = "<"
+                padded = bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                ) + (32 - bit_length) * bitarray("0")
             else:
                 endian_string = ">"
-            padded = (32 - bit_length) * bitarray("0") + bitarray(
-                self.bb[self.position : self.position + bit_length]
-            )
+                padded = (32 - bit_length) * bitarray("0") + bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                )
+            if (
+                byte_order == ByteOrder.BIG_ENDIAN_BYTE_SWAP
+                or byte_order == ByteOrder.LITTLE_ENDIAN_BYTE_SWAP
+            ):
+                padded = padded[16:] + padded[0:16]
             result: int = struct.unpack(endian_string + "i", padded)[0]
             self.position += bit_length
             return result
@@ -331,11 +396,19 @@ class ReadBufferByteBased(ReadBuffer):
         else:
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endian_string = "<"
+                padded = bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                ) + (64 - bit_length) * bitarray("0")
             else:
                 endian_string = ">"
-            padded = (64 - bit_length) * bitarray("0") + bitarray(
-                self.bb[self.position : self.position + bit_length]
-            )
+                padded = (64 - bit_length) * bitarray("0") + bitarray(
+                    self.bb[self.position : self.position + bit_length]
+                )
+            if (
+                byte_order == ByteOrder.BIG_ENDIAN_BYTE_SWAP
+                or byte_order == ByteOrder.LITTLE_ENDIAN_BYTE_SWAP
+            ):
+                padded = padded[16:32] + padded[0:16] + padded[48:] + padded[32:48]
             result: int = struct.unpack(endian_string + "q", padded)[0]
             self.position += bit_length
             return result
@@ -350,8 +423,15 @@ class ReadBufferByteBased(ReadBuffer):
             endianness: str = ">"
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endianness = "<"
+            buffer = self.bb[self.position : self.position + bit_length]
+            if (
+                byte_order == ByteOrder.BIG_ENDIAN_BYTE_SWAP
+                or byte_order == ByteOrder.LITTLE_ENDIAN_BYTE_SWAP
+            ):
+                buffer = buffer[16:] + buffer[0:16]
             result: float = struct.unpack(
-                endianness + "f", self.bb[self.position : self.position + bit_length]
+                endianness + "f",
+                buffer,
             )[0]
             self.position += bit_length
             return result
@@ -366,8 +446,15 @@ class ReadBufferByteBased(ReadBuffer):
             endianness: str = ">"
             if byte_order == ByteOrder.LITTLE_ENDIAN:
                 endianness = "<"
+            buffer = self.bb[self.position : self.position + bit_length]
+            if (
+                byte_order == ByteOrder.BIG_ENDIAN_BYTE_SWAP
+                or byte_order == ByteOrder.LITTLE_ENDIAN_BYTE_SWAP
+            ):
+                buffer = buffer[16:32] + buffer[0:16] + buffer[48:] + buffer[32:48]
             result: float = struct.unpack(
-                endianness + "d", self.bb[self.position : self.position + bit_length]
+                endianness + "d",
+                buffer,
             )[0]
             self.position += bit_length
             return result
@@ -381,12 +468,17 @@ class ReadBufferByteBased(ReadBuffer):
             return read_function()
 
     def read_enum(
-        self, bit_length: int = -1, logical_name: str = "", read_function=None, **kwargs
+        self,
+        bit_length: int = -1,
+        logical_name: str = "",
+        read_function=None,
+        **kwargs,
     ) -> Any:
         if isinstance(read_function, aenum._enum.EnumType):
             enum_return_value = read_function(
                 ba2int(
-                    self.bb[self.position : self.position + bit_length], signed=False
+                    self.bb[self.position : self.position + bit_length],
+                    signed=False,
                 )
             )
             return enum_return_value
@@ -398,11 +490,13 @@ class ReadBufferByteBased(ReadBuffer):
 
     def read_str(self, bit_length: int = -1, logical_name: str = "", **kwargs) -> str:
         byte_order = kwargs.get("byte_order", self.byte_order)
-        result: str = struct.unpack(
+        encoding = kwargs.get("encoding", "utf-8")
+        result: bytes = struct.unpack(
             str(int(bit_length / 8)) + "s",
             self.bb[self.position : self.position + bit_length],
         )[0]
         self.position += bit_length
+        result = result.decode(encoding=encoding, errors="strict")
         return result
 
     def read_array_field(
@@ -412,11 +506,19 @@ class ReadBufferByteBased(ReadBuffer):
         count: int = None,
         length: int = None,
         terminated=None,
-        **kwargs
+        **kwargs,
     ) -> List[Any]:
         if count is not None:
             parsed_array = []
             for _ in range(count):
+                parsed_array.append(
+                    read_function(logical_name=logical_name, read_buffer=self, **kwargs)
+                )
+            return parsed_array
+        elif length is not None:
+            parsed_array = []
+            end_pos = self.get_pos() + (length * 8)
+            while self.get_pos() < end_pos:
                 parsed_array.append(
                     read_function(logical_name=logical_name, read_buffer=self, **kwargs)
                 )

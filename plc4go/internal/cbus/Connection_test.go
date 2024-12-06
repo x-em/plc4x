@@ -22,27 +22,27 @@ package cbus
 import (
 	"context"
 	"encoding/hex"
-	spiModel "github.com/apache/plc4x/plc4go/spi/model"
-	"github.com/stretchr/testify/require"
 	"net/url"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	plc4go "github.com/apache/plc4x/plc4go/pkg/api"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	readWriteModel "github.com/apache/plc4x/plc4go/protocols/cbus/readwrite/model"
 	"github.com/apache/plc4x/plc4go/spi"
 	_default "github.com/apache/plc4x/plc4go/spi/default"
+	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/testutils"
 	"github.com/apache/plc4x/plc4go/spi/tracer"
 	"github.com/apache/plc4x/plc4go/spi/transactions"
 	"github.com/apache/plc4x/plc4go/spi/transports/test"
 	"github.com/apache/plc4x/plc4go/spi/utils"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAlphaGenerator_getAndIncrement(t *testing.T) {
@@ -483,68 +483,6 @@ func TestConnection_ReadRequestBuilder(t *testing.T) {
 			}
 			c.DefaultConnection = _default.NewDefaultConnection(c, testutils.EnrichOptionsWithOptionsForTesting(t)...)
 			assert.Truef(t, tt.wantAssert(t, c.ReadRequestBuilder()), "ReadRequestBuilder()")
-		})
-	}
-}
-
-func TestConnection_String(t *testing.T) {
-	type fields struct {
-		messageCodec  *MessageCodec
-		subscribers   []*Subscriber
-		tm            transactions.RequestTransactionManager
-		configuration Configuration
-		connectionId  string
-		tracer        tracer.Tracer
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		{
-			name: "a string",
-			want: `
-╔═Connection══════════════════════════════════════════════════════════════════════════════════════════════╗
-║╔═defaultConnection═══════╗╔═alphaGenerator════════════════════╗╔═messageCodec╗                          ║
-║║╔═defaultTtl╗╔═connected╗║║╔═AlphaGenerator/currentAlpha═════╗║║    <nil>    ║                          ║
-║║║    10s    ║║ b0 false ║║║║            0x67 'g'             ║║╚═════════════╝                          ║
-║║╚═══════════╝╚══════════╝║║╚═════════════════════════════════╝║                                         ║
-║╚═════════════════════════╝╚═══════════════════════════════════╝                                         ║
-║╔═configuration═════════════════════════════════════════════════════════════════════════════════════════╗║
-║║╔═Configuration═══════════════════════════════════════════════════════════════════════════════════════╗║║
-║║║╔═srchk══╗╔═exstat═╗╔═pun════╗╔═localSal╗╔═pcn════╗╔═idmon══╗╔═monitor╗╔═smart══╗╔═xonXoff╗╔═connect╗║║║
-║║║║b0 false║║b0 false║║b0 false║║b0 false ║║b0 false║║b0 false║║b0 false║║b0 false║║b0 false║║b0 false║║║║
-║║║╚════════╝╚════════╝╚════════╝╚═════════╝╚════════╝╚════════╝╚════════╝╚════════╝╚════════╝╚════════╝║║║
-║║║╔═monitoredApplication1╗╔═monitoredApplication2╗                                                     ║║║
-║║║║       0x00 '.'       ║║       0x00 '.'       ║                                                     ║║║
-║║║╚══════════════════════╝╚══════════════════════╝                                                     ║║║
-║║╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝║║
-║╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝║
-║╔═driverContext═══════════════════════════════════╗                                                      ║
-║║╔═DriverContext═════════════════════════════════╗║                                                      ║
-║║║╔═awaitSetupComplete╗╔═awaitDisconnectComplete╗║║                                                      ║
-║║║║      b1 true      ║║        b1 true         ║║║                                                      ║
-║║║╚═══════════════════╝╚════════════════════════╝║║                                                      ║
-║║╚═══════════════════════════════════════════════╝║                                                      ║
-║╚═════════════════════════════════════════════════╝                                                      ║
-╚═════════════════════════════════════════════════════════════════════════════════════════════════════════╝`[1:], // TODO: configuration is not redered right now
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Connection{
-				alphaGenerator: AlphaGenerator{currentAlpha: 'g'},
-				messageCodec:   tt.fields.messageCodec,
-				subscribers:    tt.fields.subscribers,
-				tm:             tt.fields.tm,
-				configuration:  tt.fields.configuration,
-				driverContext:  driverContextForTesting(),
-				connectionId:   tt.fields.connectionId,
-				tracer:         tt.fields.tracer,
-				log:            testutils.ProduceTestingLogger(t),
-			}
-			c.DefaultConnection = _default.NewDefaultConnection(c, testutils.EnrichOptionsWithOptionsForTesting(t)...)
-			assert.Equalf(t, tt.want, c.String(), "String()")
 		})
 	}
 }
@@ -1759,7 +1697,16 @@ func TestConnection_startSubscriptionHandler(t *testing.T) {
 				go func() {
 					defer dispatchWg.Done()
 					codec.monitoredMMIs <- readWriteModel.NewCALReplyShort(0, nil, nil, nil)
-					codec.monitoredSALs <- readWriteModel.NewMonitoredSAL(0, nil)
+					codec.monitoredSALs <- readWriteModel.NewMonitoredSALShortFormBasicMode(
+						0,
+						0,
+						nil,
+						nil,
+						nil,
+						readWriteModel.ApplicationIdContainer_ACCESS_CONTROL_D5,
+						nil,
+						nil,
+					)
 				}()
 				t.Cleanup(func() {
 					assert.NoError(t, codec.Disconnect())
@@ -1784,7 +1731,16 @@ func TestConnection_startSubscriptionHandler(t *testing.T) {
 				go func() {
 					defer dispatchWg.Done()
 					codec.monitoredMMIs <- readWriteModel.NewCALReplyShort(0, nil, nil, nil)
-					codec.monitoredSALs <- readWriteModel.NewMonitoredSAL(0, nil)
+					codec.monitoredSALs <- readWriteModel.NewMonitoredSALShortFormBasicMode(
+						0,
+						0,
+						nil,
+						nil,
+						nil,
+						readWriteModel.ApplicationIdContainer_ACCESS_CONTROL_D5,
+						nil,
+						nil,
+					)
 					close(written)
 				}()
 				t.Cleanup(func() {

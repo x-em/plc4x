@@ -101,7 +101,7 @@ class UmasPDUReadDatatypeNamesResponse:
         range: int = read_buffer.read_unsigned_byte(logical_name="range", bit_length=8)
 
         next_address: int = read_buffer.read_unsigned_short(
-            logical_name="nextAddress", bit_length=16
+            logical_name="next_address", bit_length=16
         )
 
         unknown1: int = read_buffer.read_unsigned_byte(
@@ -109,7 +109,7 @@ class UmasPDUReadDatatypeNamesResponse:
         )
 
         no_of_records: int = read_buffer.read_unsigned_short(
-            logical_name="noOfRecords", bit_length=16
+            logical_name="no_of_records", bit_length=16
         )
 
         records: List[Any] = read_buffer.read_array_field(
@@ -120,12 +120,12 @@ class UmasPDUReadDatatypeNamesResponse:
 
         read_buffer.pop_context("UmasPDUReadDatatypeNamesResponse")
         # Create the instance
-        _umas_pdu_read_datatype_names_response: UmasPDUReadDatatypeNamesResponse = (
+        _umas_pduread_datatype_names_response: UmasPDUReadDatatypeNamesResponse = (
             UmasPDUReadDatatypeNamesResponse(
                 range, next_address, unknown1, no_of_records, records
             )
         )
-        return _umas_pdu_read_datatype_names_response
+        return _umas_pduread_datatype_names_response
 
     def equals(self, o: object) -> bool:
         if self == o:
@@ -148,11 +148,5 @@ class UmasPDUReadDatatypeNamesResponse:
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""

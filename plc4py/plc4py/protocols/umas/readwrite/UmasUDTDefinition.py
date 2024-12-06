@@ -101,7 +101,7 @@ class UmasUDTDefinition:
         read_buffer.push_context("UmasUDTDefinition")
 
         data_type: int = read_buffer.read_unsigned_short(
-            logical_name="dataType", bit_length=16
+            logical_name="data_type", bit_length=16
         )
 
         offset: int = read_buffer.read_unsigned_short(
@@ -123,10 +123,10 @@ class UmasUDTDefinition:
 
         read_buffer.pop_context("UmasUDTDefinition")
         # Create the instance
-        _umas_udt_definition: UmasUDTDefinition = UmasUDTDefinition(
+        _umas_udtdefinition: UmasUDTDefinition = UmasUDTDefinition(
             data_type, offset, unknown5, unknown4, value
         )
-        return _umas_udt_definition
+        return _umas_udtdefinition
 
     def equals(self, o: object) -> bool:
         if self == o:
@@ -149,11 +149,5 @@ class UmasUDTDefinition:
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""

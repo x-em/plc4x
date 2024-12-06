@@ -37,7 +37,7 @@ class UmasPDUPlcStatusRequest(UmasPDUItem):
     umas_function_key: ClassVar[int] = 0x04
     umas_request_function_key: ClassVar[int] = 0
 
-    def serialize_umas_pdu_item_child(self, write_buffer: WriteBuffer):
+    def serialize_umas_pduitem_child(self, write_buffer: WriteBuffer):
         write_buffer.push_context("UmasPDUPlcStatusRequest")
 
         write_buffer.pop_context("UmasPDUPlcStatusRequest")
@@ -57,6 +57,11 @@ class UmasPDUPlcStatusRequest(UmasPDUItem):
     ):
         read_buffer.push_context("UmasPDUPlcStatusRequest")
 
+        if isinstance(umas_request_function_key, str):
+            umas_request_function_key = int(umas_request_function_key)
+        if isinstance(byte_length, str):
+            byte_length = int(byte_length)
+
         read_buffer.pop_context("UmasPDUPlcStatusRequest")
         # Create the instance
         return UmasPDUPlcStatusRequestBuilder()
@@ -75,22 +80,16 @@ class UmasPDUPlcStatusRequest(UmasPDUItem):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
 class UmasPDUPlcStatusRequestBuilder:
 
     def build(self, byte_length: int, pairing_key) -> UmasPDUPlcStatusRequest:
-        umas_pdu_plc_status_request: UmasPDUPlcStatusRequest = UmasPDUPlcStatusRequest(
+        umas_pduplc_status_request: UmasPDUPlcStatusRequest = UmasPDUPlcStatusRequest(
             byte_length,
             pairing_key,
         )
-        return umas_pdu_plc_status_request
+        return umas_pduplc_status_request

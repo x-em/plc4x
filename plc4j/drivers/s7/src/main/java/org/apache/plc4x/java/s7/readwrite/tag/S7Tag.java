@@ -71,15 +71,28 @@ public class S7Tag implements PlcTag, Serializable {
     private final byte bitOffset;
     private final int numElements;
 
-    protected S7Tag(TransportSize dataType, MemoryArea memoryArea,
+    public S7Tag(TransportSize dataType, MemoryArea memoryArea,
                     int blockNumber, int byteOffset,
                     byte bitOffset, int numElements) {
         this.dataType = dataType;
         this.memoryArea = memoryArea;
         this.blockNumber = blockNumber;
-        this.byteOffset = byteOffset;
-        this.bitOffset = bitOffset;
         this.numElements = numElements;
+        
+        //TODO: Should this address conversion be done in the mspec?
+        switch (dataType) {
+            case COUNTER: {
+                this.bitOffset = (byte) ((byteOffset) & 0x0007);
+                this.byteOffset = (byteOffset >> 3);
+                break;
+            }
+            default :{
+                this.byteOffset = byteOffset;
+                this.bitOffset = bitOffset;                
+            }
+            
+        }
+        
     }
 
     @Override
@@ -97,6 +110,8 @@ public class S7Tag implements PlcTag, Serializable {
                 return PlcValueType.DATE_AND_LTIME;
             case "DTL":
                 return PlcValueType.DATE_AND_LTIME;
+            case "COUNTER":
+                return PlcValueType.WORD;                
             default:
                 return PlcValueType.valueOf(dataType.name());
         }
@@ -105,7 +120,7 @@ public class S7Tag implements PlcTag, Serializable {
     @Override
     public List<ArrayInfo> getArrayInfo() {
         if (numElements != 1) {
-            return Collections.singletonList(new DefaultArrayInfo(0, numElements));
+            return Collections.singletonList(new DefaultArrayInfo(0, numElements - 1));
         }
         return Collections.emptyList();
     }
@@ -148,7 +163,11 @@ public class S7Tag implements PlcTag, Serializable {
     public static S7Tag of(String tagString) {
         Matcher matcher;
         if ((matcher = DATA_BLOCK_ADDRESS_PATTERN.matcher(tagString)).matches()) {
-            TransportSize dataType = TransportSize.valueOf(matcher.group(DATA_TYPE));
+            String dataTypeName = matcher.group(DATA_TYPE);
+            if("RAW_BYTE_ARRAY".equals(dataTypeName)) {
+                dataTypeName = "BYTE";
+            }
+            TransportSize dataType = TransportSize.valueOf(dataTypeName);
             MemoryArea memoryArea = MemoryArea.DATA_BLOCKS;
             Short transferSizeCode = getSizeCode(matcher.group(TRANSFER_SIZE_CODE));
             int blockNumber = checkDataBlockNumber(Integer.parseInt(matcher.group(BLOCK_NUMBER)));
@@ -171,7 +190,11 @@ public class S7Tag implements PlcTag, Serializable {
 
             return new S7Tag(dataType, memoryArea, blockNumber, byteOffset, bitOffset, numElements);
         } else if ((matcher = DATA_BLOCK_SHORT_PATTERN.matcher(tagString)).matches()) {
-            TransportSize dataType = TransportSize.valueOf(matcher.group(DATA_TYPE));
+            String dataTypeName = matcher.group(DATA_TYPE);
+            if("RAW_BYTE_ARRAY".equals(dataTypeName)) {
+                dataTypeName = "BYTE";
+            }
+            TransportSize dataType = TransportSize.valueOf(dataTypeName);
             MemoryArea memoryArea = MemoryArea.DATA_BLOCKS;
             int blockNumber = checkDataBlockNumber(Integer.parseInt(matcher.group(BLOCK_NUMBER)));
             int byteOffset = checkByteOffset(Integer.parseInt(matcher.group(BYTE_OFFSET)));

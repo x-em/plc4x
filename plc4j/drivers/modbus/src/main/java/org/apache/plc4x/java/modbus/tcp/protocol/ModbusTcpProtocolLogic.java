@@ -28,11 +28,13 @@ import org.apache.plc4x.java.modbus.base.protocol.ModbusProtocolLogic;
 import org.apache.plc4x.java.modbus.base.tag.ModbusTagHandler;
 import org.apache.plc4x.java.modbus.readwrite.*;
 import org.apache.plc4x.java.modbus.tcp.config.ModbusTcpConfiguration;
+import org.apache.plc4x.java.modbus.types.ModbusByteOrder;
 import org.apache.plc4x.java.spi.ConversationContext;
 import org.apache.plc4x.java.spi.configuration.HasConfiguration;
+import org.apache.plc4x.java.spi.connection.PlcTagHandler;
 import org.apache.plc4x.java.spi.generation.ParseException;
 import org.apache.plc4x.java.spi.messages.*;
-import org.apache.plc4x.java.spi.messages.utils.ResponseItem;
+import org.apache.plc4x.java.spi.messages.utils.DefaultPlcResponseItem;
 import org.apache.plc4x.java.spi.transaction.RequestTransactionManager;
 
 import java.time.Duration;
@@ -52,6 +54,11 @@ public class ModbusTcpProtocolLogic extends ModbusProtocolLogic<ModbusTcpADU> im
         this.pingAddress = new ModbusTagHandler().parseTag(configuration.getPingAddress());
         this.defaultPayloadByteOrder = configuration.getDefaultPayloadByteOrder();
         this.tm = new RequestTransactionManager(1);
+    }
+
+    @Override
+    public PlcTagHandler getTagHandler() {
+        return new ModbusTagHandler();
     }
 
     @Override
@@ -76,7 +83,7 @@ public class ModbusTcpProtocolLogic extends ModbusProtocolLogic<ModbusTcpADU> im
         ModbusTcpADU modbusTcpADU = new ModbusTcpADU(transactionIdentifier, unitId, readRequestPdu);
 
         RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
-        transaction.submit(() -> context.sendRequest(modbusTcpADU)
+        transaction.submit(() -> conversationContext.sendRequest(modbusTcpADU)
             .expectResponse(ModbusTcpADU.class, requestTimeout)
             .onTimeout(future::completeExceptionally)
             .onError((p, e) -> future.completeExceptionally(e))
@@ -119,7 +126,7 @@ public class ModbusTcpProtocolLogic extends ModbusProtocolLogic<ModbusTcpADU> im
             }
             ModbusTcpADU modbusTcpADU = new ModbusTcpADU(transactionIdentifier, unitId, requestPdu);
             RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
-            transaction.submit(() -> context.sendRequest(modbusTcpADU)
+            transaction.submit(() -> conversationContext.sendRequest(modbusTcpADU)
                 .expectResponse(ModbusTcpADU.class, requestTimeout)
                 .onTimeout(future::completeExceptionally)
                 .onError((p, e) -> future.completeExceptionally(e))
@@ -136,7 +143,11 @@ public class ModbusTcpProtocolLogic extends ModbusProtocolLogic<ModbusTcpADU> im
                         responseCode = getErrorCode(errorResponse);
                     } else {
                         try {
-                            plcValue = toPlcValue(requestPdu, responsePdu, tag.getDataType());
+                            ModbusByteOrder byteOrder = defaultPayloadByteOrder;
+                            if(tag.getByteOrder() != null) {
+                                byteOrder = tag.getByteOrder();
+                            }
+                            plcValue = toPlcValue(requestPdu, responsePdu, tag.getDataType(), byteOrder);
                             responseCode = PlcResponseCode.OK;
                         } catch (ParseException e) {
                             // Add an error response code ...
@@ -146,7 +157,7 @@ public class ModbusTcpProtocolLogic extends ModbusProtocolLogic<ModbusTcpADU> im
 
                     // Prepare the response.
                     PlcReadResponse response = new DefaultPlcReadResponse(request,
-                        Collections.singletonMap(tagName, new ResponseItem<>(responseCode, plcValue)));
+                        Collections.singletonMap(tagName, new DefaultPlcResponseItem<>(responseCode, plcValue)));
 
                     // Pass the response back to the application.
                     future.complete(response);
@@ -185,7 +196,7 @@ public class ModbusTcpProtocolLogic extends ModbusProtocolLogic<ModbusTcpADU> im
             }
             ModbusTcpADU modbusTcpADU = new ModbusTcpADU(transactionIdentifier, unitId, requestPdu);
             RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
-            transaction.submit(() -> context.sendRequest(modbusTcpADU)
+            transaction.submit(() -> conversationContext.sendRequest(modbusTcpADU)
                 .expectResponse(ModbusTcpADU.class, requestTimeout)
                 .onTimeout(future::completeExceptionally)
                 .onError((p, e) -> future.completeExceptionally(e))

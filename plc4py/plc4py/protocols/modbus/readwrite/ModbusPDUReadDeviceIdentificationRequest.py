@@ -28,6 +28,7 @@ from plc4py.protocols.modbus.readwrite.ModbusDeviceInformationLevel import (
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 from typing import ClassVar
 import math
 
@@ -80,8 +81,11 @@ class ModbusPDUReadDeviceIdentificationRequest(ModbusPDU):
     def static_parse_builder(read_buffer: ReadBuffer, response: bool):
         read_buffer.push_context("ModbusPDUReadDeviceIdentificationRequest")
 
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         MEI_TYPE: int = read_buffer.read_unsigned_byte(
-            logical_name="meiType", response=response
+            logical_name="mei_type", response=response
         )
 
         level: ModbusDeviceInformationLevel = read_buffer.read_enum(
@@ -92,7 +96,7 @@ class ModbusPDUReadDeviceIdentificationRequest(ModbusPDU):
         )
 
         object_id: int = read_buffer.read_unsigned_byte(
-            logical_name="objectId", bit_length=8, response=response
+            logical_name="object_id", bit_length=8, response=response
         )
 
         read_buffer.pop_context("ModbusPDUReadDeviceIdentificationRequest")
@@ -120,14 +124,8 @@ class ModbusPDUReadDeviceIdentificationRequest(ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -138,7 +136,7 @@ class ModbusPDUReadDeviceIdentificationRequestBuilder:
     def build(
         self,
     ) -> ModbusPDUReadDeviceIdentificationRequest:
-        modbus_pdu_read_device_identification_request: (
+        modbus_pduread_device_identification_request: (
             ModbusPDUReadDeviceIdentificationRequest
         ) = ModbusPDUReadDeviceIdentificationRequest(self.level, self.object_id)
-        return modbus_pdu_read_device_identification_request
+        return modbus_pduread_device_identification_request

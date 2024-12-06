@@ -27,6 +27,7 @@ from plc4py.protocols.modbus.readwrite.ModbusADU import ModbusADU
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 from plc4py.utils.GenericTypes import ByteOrder
 from typing import ClassVar
 import math
@@ -102,8 +103,13 @@ class ModbusTcpADU(ModbusADU):
     ):
         read_buffer.push_context("ModbusTcpADU")
 
+        if isinstance(driver_type, str):
+            driver_type = DriverType[driver_type]
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         transaction_identifier: int = read_buffer.read_unsigned_short(
-            logical_name="transactionIdentifier",
+            logical_name="transaction_identifier",
             bit_length=16,
             byte_order=ByteOrder.BIG_ENDIAN,
             driver_type=driver_type,
@@ -111,7 +117,7 @@ class ModbusTcpADU(ModbusADU):
         )
 
         PROTOCOL_IDENTIFIER: int = read_buffer.read_unsigned_short(
-            logical_name="protocolIdentifier",
+            logical_name="protocol_identifier",
             byte_order=ByteOrder.BIG_ENDIAN,
             driver_type=driver_type,
             response=response,
@@ -125,7 +131,7 @@ class ModbusTcpADU(ModbusADU):
         )
 
         unit_identifier: int = read_buffer.read_unsigned_byte(
-            logical_name="unitIdentifier",
+            logical_name="unit_identifier",
             bit_length=8,
             byte_order=ByteOrder.BIG_ENDIAN,
             driver_type=driver_type,
@@ -164,14 +170,8 @@ class ModbusTcpADU(ModbusADU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass

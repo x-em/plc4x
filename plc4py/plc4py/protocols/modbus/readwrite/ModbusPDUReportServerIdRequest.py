@@ -25,6 +25,7 @@ from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.modbus.readwrite.ModbusPDU import ModbusPDU
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
+from plc4py.utils.ConnectionStringHandling import strtobool
 from typing import ClassVar
 import math
 
@@ -54,6 +55,9 @@ class ModbusPDUReportServerIdRequest(ModbusPDU):
     def static_parse_builder(read_buffer: ReadBuffer, response: bool):
         read_buffer.push_context("ModbusPDUReportServerIdRequest")
 
+        if isinstance(response, str):
+            response = bool(strtobool(response))
+
         read_buffer.pop_context("ModbusPDUReportServerIdRequest")
         # Create the instance
         return ModbusPDUReportServerIdRequestBuilder()
@@ -72,14 +76,8 @@ class ModbusPDUReportServerIdRequest(ModbusPDU):
         return hash(self)
 
     def __str__(self) -> str:
-        pass
-        # write_buffer_box_based: WriteBufferBoxBased = WriteBufferBoxBased(True, True)
-        # try:
-        #    write_buffer_box_based.writeSerializable(self)
-        # except SerializationException as e:
-        #    raise PlcRuntimeException(e)
-
-        # return "\n" + str(write_buffer_box_based.get_box()) + "\n"
+        # TODO:- Implement a generic python object to probably json convertor or something.
+        return ""
 
 
 @dataclass
@@ -88,7 +86,7 @@ class ModbusPDUReportServerIdRequestBuilder:
     def build(
         self,
     ) -> ModbusPDUReportServerIdRequest:
-        modbus_pdu_report_server_id_request: ModbusPDUReportServerIdRequest = (
+        modbus_pdureport_server_id_request: ModbusPDUReportServerIdRequest = (
             ModbusPDUReportServerIdRequest()
         )
-        return modbus_pdu_report_server_id_request
+        return modbus_pdureport_server_id_request
