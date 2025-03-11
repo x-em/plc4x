@@ -34,13 +34,16 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func GetIPAddresses(localLog zerolog.Logger, ctx context.Context, netInterface net.Interface, useArpBasedScan bool) (foundIps chan net.IP, err error) {
+func GetIPAddresses(localLog zerolog.Logger, ctx context.Context, netInterface net.Interface, useArpBasedScan bool) (foundIps chan net.IP, wg *sync.WaitGroup, err error) {
 	foundIps = make(chan net.IP, 65536)
 	addrs, err := netInterface.Addrs()
 	if err != nil {
-		return nil, errors.Wrap(err, "Error getting addresses")
+		return nil, nil, errors.Wrap(err, "Error getting addresses")
 	}
+	wg = new(sync.WaitGroup)
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		defer func() {
 			if err := recover(); err != nil {
 				localLog.Error().
@@ -49,7 +52,7 @@ func GetIPAddresses(localLog zerolog.Logger, ctx context.Context, netInterface n
 					Msg("panic-ed")
 			}
 		}()
-		wg := &sync.WaitGroup{}
+		wg := new(sync.WaitGroup)
 		for _, address := range addrs {
 			// Check if context has been cancelled before continuing
 			select {
@@ -90,7 +93,7 @@ func GetIPAddresses(localLog zerolog.Logger, ctx context.Context, netInterface n
 		localLog.Trace().Msg("Closing found ips channel")
 		close(foundIps)
 	}()
-	return foundIps, nil
+	return foundIps, wg, nil
 }
 
 // As PING operations might be blocked by a firewall, responding to ARP packets is mandatory for IP based
@@ -165,7 +168,6 @@ func lockupIpsUsingArp(localLog zerolog.Logger, ctx context.Context, netInterfac
 				localLog.Trace().IPAddr("ip", ip).Msg("Scheduling discovery for IP")
 				timeout := time.NewTimer(2 * time.Second)
 				go func(ip net.IP) {
-					defer CleanupTimer(timeout)
 					select {
 					case <-ctx.Done():
 					case foundIps <- DuplicateIP(ip):
@@ -177,7 +179,9 @@ func lockupIpsUsingArp(localLog zerolog.Logger, ctx context.Context, netInterfac
 	}(handle, netInterface, stop)
 	// Make sure we clean up after 10 seconds.
 	defer func() {
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			wg.Done()
 			time.Sleep(10 * time.Second)
 			handle.Close()
@@ -253,7 +257,6 @@ func lookupIps(localLog zerolog.Logger, ctx context.Context, ipnet *net.IPNet, f
 		timeout := time.NewTimer(2 * time.Second)
 		go func(ip net.IP) {
 			defer func() { wg.Done() }()
-			defer CleanupTimer(timeout)
 			select {
 			case <-ctx.Done():
 			case foundIps <- ip:

@@ -26,15 +26,13 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
-
-	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
 var upScaleInterval = 100 * time.Millisecond
 var downScaleInterval = 5 * time.Second
 var timeToBecomeUnused = 5 * time.Second
 
-//go:generate plc4xGenerator -type=dynamicExecutor
+//go:generate go tool plc4xGenerator -type=dynamicExecutor
 type dynamicExecutor struct {
 	*executor
 
@@ -42,6 +40,8 @@ type dynamicExecutor struct {
 	currentNumberOfWorkers atomic.Int32
 	dynamicStateChange     sync.Mutex
 	interrupter            chan struct{}
+
+	wg sync.WaitGroup // use to track spawned go routines
 
 	dynamicWorkers sync.WaitGroup
 }
@@ -70,7 +70,9 @@ func (e *dynamicExecutor) Start() {
 	mutex := sync.Mutex{}
 	e.interrupter = make(chan struct{})
 	// Worker spawner
+	e.wg.Add(1)
 	go func() {
+		defer e.wg.Done()
 		e.dynamicWorkers.Add(1)
 		defer e.dynamicWorkers.Done()
 		defer func() {
@@ -111,7 +113,6 @@ func (e *dynamicExecutor) Start() {
 			func() {
 				workerLog.Debug().Dur("upScaleInterval", upScaleInterval).Msg("Sleeping")
 				timer := time.NewTimer(upScaleInterval)
-				defer utils.CleanupTimer(timer)
 				select {
 				case <-timer.C:
 				case <-e.interrupter:
@@ -122,8 +123,10 @@ func (e *dynamicExecutor) Start() {
 		workerLog.Info().Msg("Terminated")
 	}()
 	// Worker killer
+	e.dynamicWorkers.Add(1)
+	e.wg.Add(1)
 	go func() {
-		e.dynamicWorkers.Add(1)
+		defer e.wg.Done()
 		defer e.dynamicWorkers.Done()
 		defer func() {
 			if err := recover(); err != nil {
@@ -168,7 +171,6 @@ func (e *dynamicExecutor) Start() {
 			func() {
 				workerLog.Debug().Dur("downScaleInterval", downScaleInterval).Msg("Sleeping for %v")
 				timer := time.NewTimer(downScaleInterval)
-				defer utils.CleanupTimer(timer)
 				select {
 				case <-timer.C:
 				case <-e.interrupter:

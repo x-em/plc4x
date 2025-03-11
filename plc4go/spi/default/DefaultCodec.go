@@ -72,7 +72,7 @@ type withCustomMessageHandler struct {
 	customMessageHandler func(codec DefaultCodecRequirements, message spi.Message) bool
 }
 
-//go:generate plc4xGenerator -type=defaultCodec
+//go:generate go tool plc4xGenerator -type=defaultCodec
 type defaultCodec struct {
 	DefaultCodecRequirements `ignore:"true"`
 
@@ -89,6 +89,8 @@ type defaultCodec struct {
 
 	receiveTimeout                 time.Duration
 	traceDefaultMessageCodecWorker bool
+
+	wg sync.WaitGroup // use to track spawned go routines
 
 	log zerolog.Logger
 }
@@ -341,7 +343,9 @@ mainLoop:
 		var err error
 		{
 			syncer := make(chan struct{})
+			m.wg.Add(1)
 			go func() {
+				defer m.wg.Done()
 				defer close(syncer)
 				if !m.running.Load() {
 					err = errors.New("not running")
@@ -352,9 +356,8 @@ mainLoop:
 			timeoutTimer := time.NewTimer(m.receiveTimeout)
 			select {
 			case <-syncer:
-				utils.CleanupTimer(timeoutTimer)
+				// nothing
 			case <-timeoutTimer.C:
-				utils.CleanupTimer(timeoutTimer)
 				workerLog.Error().Dur("receiveTimeout", m.receiveTimeout).Msg("receive timeout")
 				continue mainLoop
 			}

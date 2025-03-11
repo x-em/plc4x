@@ -28,10 +28,9 @@ import (
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/internal/bacnetip/bacgopes/comp"
-	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
-//go:generate plc4xGenerator -type=IOQueue -prefix=iocb_
+//go:generate go tool plc4xGenerator -type=IOQueue -prefix=iocb_
 type IOQueue struct {
 	name     string
 	notEmpty sync.Cond
@@ -64,7 +63,7 @@ func (i *IOQueue) Put(iocb IOCBContract) error {
 	// add the request to the end of the list of iocb's at same priority
 	priority := iocb.getPriority()
 
-	heap.Push(&i.Queue, PriorityItem[int, IOCBContract]{iocb, priority, 0})
+	heap.Push(&i.Queue, PriorityItem[int, IOCBContract]{Value: iocb, Priority: priority})
 
 	i.notEmpty.Broadcast()
 	return nil
@@ -94,7 +93,6 @@ func (i *IOQueue) Get(block bool, delay *time.Duration) (IOCBContract, error) {
 				close(gotSomething)
 			}()
 			timeout := time.NewTimer(*delay)
-			defer utils.CleanupTimer(timeout)
 			select {
 			case <-gotSomething:
 			case <-timeout.C:
