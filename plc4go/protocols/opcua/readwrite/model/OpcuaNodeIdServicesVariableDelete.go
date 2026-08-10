@@ -23,9 +23,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -42,6 +42,9 @@ type IOpcuaNodeIdServicesVariableDelete interface {
 
 const (
 	OpcuaNodeIdServicesVariableDelete_DeleteFileMethodType_InputArguments                 OpcuaNodeIdServicesVariableDelete = 13349
+	OpcuaNodeIdServicesVariableDelete_DeleteCertificateMethodType_InputArguments          OpcuaNodeIdServicesVariableDelete = 19331
+	OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_InputArguments  OpcuaNodeIdServicesVariableDelete = 24029
+	OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_OutputArguments OpcuaNodeIdServicesVariableDelete = 24030
 	OpcuaNodeIdServicesVariableDelete_DeletePriorityMappingEntryMethodType_InputArguments OpcuaNodeIdServicesVariableDelete = 25236
 )
 
@@ -51,6 +54,9 @@ func init() {
 	_ = errors.New
 	OpcuaNodeIdServicesVariableDeleteValues = []OpcuaNodeIdServicesVariableDelete{
 		OpcuaNodeIdServicesVariableDelete_DeleteFileMethodType_InputArguments,
+		OpcuaNodeIdServicesVariableDelete_DeleteCertificateMethodType_InputArguments,
+		OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_InputArguments,
+		OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_OutputArguments,
 		OpcuaNodeIdServicesVariableDelete_DeletePriorityMappingEntryMethodType_InputArguments,
 	}
 }
@@ -59,6 +65,12 @@ func OpcuaNodeIdServicesVariableDeleteByValue(value int32) (enum OpcuaNodeIdServ
 	switch value {
 	case 13349:
 		return OpcuaNodeIdServicesVariableDelete_DeleteFileMethodType_InputArguments, true
+	case 19331:
+		return OpcuaNodeIdServicesVariableDelete_DeleteCertificateMethodType_InputArguments, true
+	case 24029:
+		return OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_InputArguments, true
+	case 24030:
+		return OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_OutputArguments, true
 	case 25236:
 		return OpcuaNodeIdServicesVariableDelete_DeletePriorityMappingEntryMethodType_InputArguments, true
 	}
@@ -69,6 +81,12 @@ func OpcuaNodeIdServicesVariableDeleteByName(value string) (enum OpcuaNodeIdServ
 	switch value {
 	case "DeleteFileMethodType_InputArguments":
 		return OpcuaNodeIdServicesVariableDelete_DeleteFileMethodType_InputArguments, true
+	case "DeleteCertificateMethodType_InputArguments":
+		return OpcuaNodeIdServicesVariableDelete_DeleteCertificateMethodType_InputArguments, true
+	case "DeleteAliasesFromCategoryMethodType_InputArguments":
+		return OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_InputArguments, true
+	case "DeleteAliasesFromCategoryMethodType_OutputArguments":
+		return OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_OutputArguments, true
 	case "DeletePriorityMappingEntryMethodType_InputArguments":
 		return OpcuaNodeIdServicesVariableDelete_DeletePriorityMappingEntryMethodType_InputArguments, true
 	}
@@ -144,6 +162,12 @@ func (e OpcuaNodeIdServicesVariableDelete) PLC4XEnumName() string {
 	switch e {
 	case OpcuaNodeIdServicesVariableDelete_DeleteFileMethodType_InputArguments:
 		return "DeleteFileMethodType_InputArguments"
+	case OpcuaNodeIdServicesVariableDelete_DeleteCertificateMethodType_InputArguments:
+		return "DeleteCertificateMethodType_InputArguments"
+	case OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_InputArguments:
+		return "DeleteAliasesFromCategoryMethodType_InputArguments"
+	case OpcuaNodeIdServicesVariableDelete_DeleteAliasesFromCategoryMethodType_OutputArguments:
+		return "DeleteAliasesFromCategoryMethodType_OutputArguments"
 	case OpcuaNodeIdServicesVariableDelete_DeletePriorityMappingEntryMethodType_InputArguments:
 		return "DeletePriorityMappingEntryMethodType_InputArguments"
 	}

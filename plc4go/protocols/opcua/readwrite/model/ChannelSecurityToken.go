@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -115,7 +117,7 @@ type _ChannelSecurityTokenBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ChannelSecurityTokenBuilder) = (*_ChannelSecurityTokenBuilder)(nil)
@@ -150,8 +152,8 @@ func (b *_ChannelSecurityTokenBuilder) WithRevisedLifetime(revisedLifetime uint3
 }
 
 func (b *_ChannelSecurityTokenBuilder) Build() (ChannelSecurityToken, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ChannelSecurityToken.deepCopy(), nil
 }
@@ -177,8 +179,8 @@ func (b *_ChannelSecurityTokenBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_ChannelSecurityTokenBuilder) DeepCopy() any {
 	_copy := b.CreateChannelSecurityTokenBuilder().(*_ChannelSecurityTokenBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +253,7 @@ func CastChannelSecurityToken(structType any) ChannelSecurityToken {
 	return nil
 }
 
-func (m *_ChannelSecurityToken) GetTypeName() string {
+func (m *_ChannelSecurityToken) GetPlx4xTypeName() string {
 	return "ChannelSecurityToken"
 }
 
@@ -288,25 +290,25 @@ func (m *_ChannelSecurityToken) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	channelId, err := ReadSimpleField(ctx, "channelId", ReadUnsignedInt(readBuffer, uint8(32)))
+	channelId, err := ReadSimpleField(ctx, "channelId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'channelId' field"))
 	}
 	m.ChannelId = channelId
 
-	tokenId, err := ReadSimpleField(ctx, "tokenId", ReadUnsignedInt(readBuffer, uint8(32)))
+	tokenId, err := ReadSimpleField(ctx, "tokenId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'tokenId' field"))
 	}
 	m.TokenId = tokenId
 
-	createdAt, err := ReadSimpleField(ctx, "createdAt", ReadSignedLong(readBuffer, uint8(64)))
+	createdAt, err := ReadSimpleField(ctx, "createdAt", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'createdAt' field"))
 	}
 	m.CreatedAt = createdAt
 
-	revisedLifetime, err := ReadSimpleField(ctx, "revisedLifetime", ReadUnsignedInt(readBuffer, uint8(32)))
+	revisedLifetime, err := ReadSimpleField(ctx, "revisedLifetime", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'revisedLifetime' field"))
 	}
@@ -337,19 +339,19 @@ func (m *_ChannelSecurityToken) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for ChannelSecurityToken")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "channelId", m.GetChannelId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "channelId", m.GetChannelId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'channelId' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "tokenId", m.GetTokenId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "tokenId", m.GetTokenId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'tokenId' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "createdAt", m.GetCreatedAt(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "createdAt", m.GetCreatedAt(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'createdAt' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "revisedLifetime", m.GetRevisedLifetime(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "revisedLifetime", m.GetRevisedLifetime(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'revisedLifetime' field")
 		}
 

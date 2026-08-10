@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -100,7 +101,7 @@ func NewBACnetAssignedLandingCallsLandingCallsListEntryBuilder() BACnetAssignedL
 type _BACnetAssignedLandingCallsLandingCallsListEntryBuilder struct {
 	*_BACnetAssignedLandingCallsLandingCallsListEntry
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetAssignedLandingCallsLandingCallsListEntryBuilder) = (*_BACnetAssignedLandingCallsLandingCallsListEntryBuilder)(nil)
@@ -119,10 +120,7 @@ func (b *_BACnetAssignedLandingCallsLandingCallsListEntryBuilder) WithFloorNumbe
 	var err error
 	b.FloorNumber, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -137,29 +135,20 @@ func (b *_BACnetAssignedLandingCallsLandingCallsListEntryBuilder) WithDirectionB
 	var err error
 	b.Direction, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetLiftCarDirectionTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetLiftCarDirectionTaggedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetAssignedLandingCallsLandingCallsListEntryBuilder) Build() (BACnetAssignedLandingCallsLandingCallsListEntry, error) {
 	if b.FloorNumber == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'floorNumber' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'floorNumber' not set"))
 	}
 	if b.Direction == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'direction' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'direction' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetAssignedLandingCallsLandingCallsListEntry.deepCopy(), nil
 }
@@ -174,8 +163,8 @@ func (b *_BACnetAssignedLandingCallsLandingCallsListEntryBuilder) MustBuild() BA
 
 func (b *_BACnetAssignedLandingCallsLandingCallsListEntryBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetAssignedLandingCallsLandingCallsListEntryBuilder().(*_BACnetAssignedLandingCallsLandingCallsListEntryBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -222,7 +211,7 @@ func CastBACnetAssignedLandingCallsLandingCallsListEntry(structType any) BACnetA
 	return nil
 }
 
-func (m *_BACnetAssignedLandingCallsLandingCallsListEntry) GetTypeName() string {
+func (m *_BACnetAssignedLandingCallsLandingCallsListEntry) GetPlx4xTypeName() string {
 	return "BACnetAssignedLandingCallsLandingCallsListEntry"
 }
 
@@ -253,7 +242,7 @@ func BACnetAssignedLandingCallsLandingCallsListEntryParseWithBufferProducer() fu
 }
 
 func BACnetAssignedLandingCallsLandingCallsListEntryParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetAssignedLandingCallsLandingCallsListEntry, error) {
-	v, err := (&_BACnetAssignedLandingCallsLandingCallsListEntry{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetAssignedLandingCallsLandingCallsListEntry)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

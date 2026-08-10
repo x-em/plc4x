@@ -24,7 +24,6 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/internal/ads/model"
@@ -32,12 +31,16 @@ import (
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	adsModel "github.com/apache/plc4x/plc4go/protocols/ads/readwrite/model"
 	_default "github.com/apache/plc4x/plc4go/spi/default"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/transports"
+	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
 type Driver struct {
 	_default.DefaultDriver
+
+	discoverer *Discoverer
 
 	log      zerolog.Logger
 	_options []options.WithOption // Used to pass them downstream
@@ -46,15 +49,17 @@ type Driver struct {
 func NewDriver(_options ...options.WithOption) plc4go.PlcDriver {
 	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
 	driver := &Driver{
-		log:      customLogger,
-		_options: _options,
+		discoverer: NewDiscoverer(_options...),
+		log:        customLogger,
+		_options:   _options,
 	}
 	driver.DefaultDriver = _default.NewDefaultDriver(driver, "ads", "Beckhoff TwinCat ADS", "tcp", NewTagHandler())
 	return driver
 }
 
-func (m *Driver) GetConnectionWithContext(ctx context.Context, transportUrl url.URL, transports map[string]transports.Transport, driverOptions map[string][]string) <-chan plc4go.PlcConnectionConnectResult {
-	m.log.Debug().
+func (d *Driver) GetConnection(ctx context.Context, transportUrl url.URL, transports map[string]transports.Transport, driverOptions map[string][]string) (plc4go.PlcConnection, error) {
+	connectionLog := d.log.With().Ctx(ctx).Str("transportUrl", transportUrl.String()).Logger()
+	connectionLog.Debug().
 		Stringer("transportUrl", &transportUrl).
 		Int("nTransports", len(transports)).
 		Int("nDriverOptions", len(driverOptions)).
@@ -62,13 +67,11 @@ func (m *Driver) GetConnectionWithContext(ctx context.Context, transportUrl url.
 	// Get the transport specified in the url
 	transport, ok := transports[transportUrl.Scheme]
 	if !ok {
-		m.log.Error().
+		connectionLog.Error().
 			Stringer("transportUrl", &transportUrl).
 			Str("scheme", transportUrl.Scheme).
 			Msg("We couldn't find a transport for scheme")
-		ch := make(chan plc4go.PlcConnectionConnectResult, 1)
-		ch <- _default.NewDefaultPlcConnectionConnectResult(nil, errors.Errorf("couldn't find transport for given transport url %#v", transportUrl))
-		return ch
+		return nil, errors.Errorf("couldn't find transport for given transport url %#v", transportUrl)
 	}
 	// Provide a default-port to the transport, which is used, if the user doesn't provide on in the connection string.
 	driverOptions["defaultTcpPort"] = []string{strconv.Itoa(int(adsModel.AdsConstants_ADSTCPDEFAULTPORT))}
@@ -76,50 +79,53 @@ func (m *Driver) GetConnectionWithContext(ctx context.Context, transportUrl url.
 	transportInstance, err := transport.CreateTransportInstance(
 		transportUrl,
 		driverOptions,
-		append(m._options, options.WithCustomLogger(m.log))...,
+		append(d._options, options.WithCustomLogger(connectionLog))...,
 	)
 	if err != nil {
-		m.log.Error().
+		connectionLog.Error().
 			Stringer("transportUrl", &transportUrl).
 			Strs("defaultTcpPort", driverOptions["defaultTcpPort"]).
 			Msg("We couldn't create a transport instance for port")
-		ch := make(chan plc4go.PlcConnectionConnectResult, 1)
-		ch <- _default.NewDefaultPlcConnectionConnectResult(nil, errors.New("couldn't initialize transport configuration for given transport url "+transportUrl.String()))
-		return ch
+		return nil, errors.New("couldn't initialize transport configuration for given transport url " + transportUrl.String())
 	}
 
 	// Create a new codec for taking care of encoding/decoding of messages
 	codec := NewMessageCodec(
 		transportInstance,
-		append(m._options, options.WithCustomLogger(m.log))...,
+		append(d._options, options.WithCustomLogger(connectionLog))...,
 	)
-	m.log.Debug().Stringer("codec", codec).Msg("working with codec")
+	connectionLog.Debug().Interface("codec", codec).Msg("working with codec")
 
-	configuration, err := model.ParseFromOptions(m.log, driverOptions)
+	configuration, err := model.ParseFromOptions(connectionLog, driverOptions)
 	if err != nil {
-		m.log.Error().Err(err).Msg("Invalid driverOptions")
-		ch := make(chan plc4go.PlcConnectionConnectResult, 1)
-		ch <- _default.NewDefaultPlcConnectionConnectResult(nil, errors.Wrap(err, "invalid configuration"))
-		return ch
+		connectionLog.Error().Err(err).Msg("Invalid driverOptions")
+		return nil, errors.Wrap(err, "invalid configuration")
 	}
+	// TODO: check if we want to attach the configuration to the logger
 
 	// Create the new connection
 	connection, err := NewConnection(codec, configuration, driverOptions)
 	if err != nil {
-		ch := make(chan plc4go.PlcConnectionConnectResult, 1)
-		ch <- _default.NewDefaultPlcConnectionConnectResult(nil, errors.Wrap(err, "couldn't create connection"))
-		return ch
+		return nil, errors.Wrap(err, "couldn't create connection")
 	}
-	m.log.Debug().Stringer("connection", connection).Msg("created connection, connecting now")
-	return connection.ConnectWithContext(ctx)
+	connectionLog.Debug().Interface("connection", connection).Msg("created connection, connecting now")
+	if err := connection.Connect(ctx); err != nil {
+		return nil, errors.Wrap(err, "Error connecting connection")
+	}
+	return connection, nil
 }
 
-func (m *Driver) SupportsDiscovery() bool {
+func (d *Driver) SupportsDiscovery() bool {
 	return true
 }
 
-func (m *Driver) DiscoverWithContext(ctx context.Context, callback func(event apiModel.PlcDiscoveryItem), discoveryOptions ...options.WithDiscoveryOption) error {
-	return NewDiscoverer(
-		append(m._options, options.WithCustomLogger(m.log))...,
-	).Discover(ctx, callback, discoveryOptions...)
+func (d *Driver) Discover(ctx context.Context, callback func(event apiModel.PlcDiscoveryItem), discoveryOptions ...options.WithDiscoveryOption) error {
+	return d.discoverer.Discover(ctx, callback, discoveryOptions...)
+}
+
+func (d *Driver) Close() error {
+	defer utils.StopWarn(d.log)()
+	d.log.Trace().Msg("Closing driver")
+	d.log.Trace().Msg("Closing discoverer")
+	return d.discoverer.Close()
 }

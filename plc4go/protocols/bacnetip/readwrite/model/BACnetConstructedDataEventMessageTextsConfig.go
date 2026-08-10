@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -45,6 +46,7 @@ type BACnetConstructedDataEventMessageTextsConfig interface {
 	// GetEventMessageTextsConfig returns EventMessageTextsConfig (property field)
 	GetEventMessageTextsConfig() []BACnetOptionalCharacterString
 	// GetZero returns Zero (virtual field)
+	// TODO: uint 64 ---> big int in java == boom
 	GetZero() uint64
 	// GetToOffnormalTextConfig returns ToOffnormalTextConfig (virtual field)
 	GetToOffnormalTextConfig() BACnetOptionalCharacterString
@@ -69,9 +71,9 @@ var _ BACnetConstructedDataEventMessageTextsConfig = (*_BACnetConstructedDataEve
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataEventMessageTextsConfig)(nil)
 
 // NewBACnetConstructedDataEventMessageTextsConfig factory function for _BACnetConstructedDataEventMessageTextsConfig
-func NewBACnetConstructedDataEventMessageTextsConfig(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, eventMessageTextsConfig []BACnetOptionalCharacterString, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataEventMessageTextsConfig {
+func NewBACnetConstructedDataEventMessageTextsConfig(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, eventMessageTextsConfig []BACnetOptionalCharacterString) *_BACnetConstructedDataEventMessageTextsConfig {
 	_result := &_BACnetConstructedDataEventMessageTextsConfig{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		NumberOfDataElements:          numberOfDataElements,
 		EventMessageTextsConfig:       eventMessageTextsConfig,
 	}
@@ -113,7 +115,7 @@ type _BACnetConstructedDataEventMessageTextsConfigBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataEventMessageTextsConfigBuilder) = (*_BACnetConstructedDataEventMessageTextsConfigBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_BACnetConstructedDataEventMessageTextsConfigBuilder) WithOptionalNumbe
 	var err error
 	b.NumberOfDataElements, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -151,8 +150,8 @@ func (b *_BACnetConstructedDataEventMessageTextsConfigBuilder) WithEventMessageT
 }
 
 func (b *_BACnetConstructedDataEventMessageTextsConfigBuilder) Build() (BACnetConstructedDataEventMessageTextsConfig, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataEventMessageTextsConfig.deepCopy(), nil
 }
@@ -178,8 +177,8 @@ func (b *_BACnetConstructedDataEventMessageTextsConfigBuilder) buildForBACnetCon
 
 func (b *_BACnetConstructedDataEventMessageTextsConfigBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataEventMessageTextsConfigBuilder().(*_BACnetConstructedDataEventMessageTextsConfigBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -289,7 +288,7 @@ func CastBACnetConstructedDataEventMessageTextsConfig(structType any) BACnetCons
 	return nil
 }
 
-func (m *_BACnetConstructedDataEventMessageTextsConfig) GetTypeName() string {
+func (m *_BACnetConstructedDataEventMessageTextsConfig) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataEventMessageTextsConfig"
 }
 
@@ -410,7 +409,7 @@ func (m *_BACnetConstructedDataEventMessageTextsConfig) SerializeWithWriteBuffer
 			return errors.Wrap(_zeroErr, "Error serializing 'zero' field")
 		}
 
-		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", GetRef(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", new(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'numberOfDataElements' field")
 		}
 

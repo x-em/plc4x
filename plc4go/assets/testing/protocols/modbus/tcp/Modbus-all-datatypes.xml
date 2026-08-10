@@ -22,8 +22,8 @@
 
   <name>Modbus All Types</name>
 
-  <protocolName>modbus</protocolName>
-  <outputFlavor>read-write</outputFlavor>
+  <protocol-name>modbus</protocol-name>
+  <output-flavor>read-write</output-flavor>
 
   <driver-name>modbus-tcp</driver-name>
 
@@ -147,18 +147,16 @@
           <ModbusTcpADU>
             <transactionIdentifier dataType="uint" bitLength="16">1</transactionIdentifier>
             <protocolIdentifier dataType="uint" bitLength="16">0</protocolIdentifier>
-            <length dataType="uint" bitLength="16">9</length>
+            <length dataType="uint" bitLength="16">6</length>
             <unitIdentifier dataType="uint" bitLength="8">1</unitIdentifier>
             <pdu>
               <ModbusPDU>
                 <errorFlag dataType="bit" bitLength="1">false</errorFlag>
-                <functionFlag dataType="uint" bitLength="7">16</functionFlag>
-                <ModbusPDUWriteMultipleHoldingRegistersRequest>
-                  <startingAddress dataType="uint" bitLength="16">0</startingAddress>
-                  <quantity dataType="uint" bitLength="16">1</quantity>
-                  <byteCount dataType="uint" bitLength="8">2</byteCount>
-                  <value dataType="byte" bitLength="16">0x0001</value>
-                </ModbusPDUWriteMultipleHoldingRegistersRequest>
+                <functionFlag dataType="uint" bitLength="7">6</functionFlag>
+                <ModbusPDUWriteSingleRegisterRequest>
+                  <address dataType="uint" bitLength="16">0</address>
+                  <value dataType="uint" bitLength="16">1</value>
+                </ModbusPDUWriteSingleRegisterRequest>
               </ModbusPDU>
             </pdu>
           </ModbusTcpADU>
@@ -304,7 +302,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -342,18 +340,16 @@
           <ModbusTcpADU>
             <transactionIdentifier dataType="uint" bitLength="16">1</transactionIdentifier>
             <protocolIdentifier dataType="uint" bitLength="16">0</protocolIdentifier>
-            <length dataType="uint" bitLength="16">9</length>
+            <length dataType="uint" bitLength="16">6</length>
             <unitIdentifier dataType="uint" bitLength="8">1</unitIdentifier>
             <pdu>
               <ModbusPDU>
                 <errorFlag dataType="bit" bitLength="1">false</errorFlag>
-                <functionFlag dataType="uint" bitLength="7">16</functionFlag>
-                <ModbusPDUWriteMultipleHoldingRegistersRequest>
-                  <startingAddress dataType="uint" bitLength="16">1</startingAddress>
-                  <quantity dataType="uint" bitLength="16">1</quantity>
-                  <byteCount dataType="uint" bitLength="8">2</byteCount>
-                  <value dataType="byte" bitLength="16">0x002a</value>
-                </ModbusPDUWriteMultipleHoldingRegistersRequest>
+                <functionFlag dataType="uint" bitLength="7">6</functionFlag>
+                <ModbusPDUWriteSingleRegisterRequest>
+                  <address dataType="uint" bitLength="16">1</address>
+                  <value dataType="uint" bitLength="16">42</value>
+                </ModbusPDUWriteSingleRegisterRequest>
               </ModbusPDU>
             </pdu>
           </ModbusTcpADU>
@@ -499,7 +495,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -537,18 +533,16 @@
           <ModbusTcpADU>
             <transactionIdentifier dataType="uint" bitLength="16">1</transactionIdentifier>
             <protocolIdentifier dataType="uint" bitLength="16">0</protocolIdentifier>
-            <length dataType="uint" bitLength="16">9</length>
+            <length dataType="uint" bitLength="16">6</length>
             <unitIdentifier dataType="uint" bitLength="8">1</unitIdentifier>
             <pdu>
               <ModbusPDU>
                 <errorFlag dataType="bit" bitLength="1">false</errorFlag>
-                <functionFlag dataType="uint" bitLength="7">16</functionFlag>
-                <ModbusPDUWriteMultipleHoldingRegistersRequest>
-                  <startingAddress dataType="uint" bitLength="16">2</startingAddress>
-                  <quantity dataType="uint" bitLength="16">1</quantity>
-                  <byteCount dataType="uint" bitLength="8">2</byteCount>
-                  <value dataType="byte" bitLength="16">0xa5b8</value>
-                </ModbusPDUWriteMultipleHoldingRegistersRequest>
+                <functionFlag dataType="uint" bitLength="7">6</functionFlag>
+                <ModbusPDUWriteSingleRegisterRequest>
+                  <address dataType="uint" bitLength="16">2</address>
+                  <value dataType="uint" bitLength="16">42424</value>
+                </ModbusPDUWriteSingleRegisterRequest>
               </ModbusPDU>
             </pdu>
           </ModbusTcpADU>
@@ -694,7 +688,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -889,7 +883,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -927,18 +921,16 @@
           <ModbusTcpADU>
             <transactionIdentifier dataType="uint" bitLength="16">1</transactionIdentifier>
             <protocolIdentifier dataType="uint" bitLength="16">0</protocolIdentifier>
-            <length dataType="uint" bitLength="16">9</length>
+            <length dataType="uint" bitLength="16">6</length>
             <unitIdentifier dataType="uint" bitLength="8">1</unitIdentifier>
             <pdu>
               <ModbusPDU>
                 <errorFlag dataType="bit" bitLength="1">false</errorFlag>
-                <functionFlag dataType="uint" bitLength="7">16</functionFlag>
-                <ModbusPDUWriteMultipleHoldingRegistersRequest>
-                  <startingAddress dataType="uint" bitLength="16">9</startingAddress>
-                  <quantity dataType="uint" bitLength="16">1</quantity>
-                  <byteCount dataType="uint" bitLength="8">2</byteCount>
-                  <value dataType="byte" bitLength="16">0x00d6</value>
-                </ModbusPDUWriteMultipleHoldingRegistersRequest>
+                <functionFlag dataType="uint" bitLength="7">6</functionFlag>
+                <ModbusPDUWriteSingleRegisterRequest>
+                  <address dataType="uint" bitLength="16">9</address>
+                  <value dataType="uint" bitLength="16">214</value>
+                </ModbusPDUWriteSingleRegisterRequest>
               </ModbusPDU>
             </pdu>
           </ModbusTcpADU>
@@ -1084,7 +1076,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -1122,18 +1114,16 @@
           <ModbusTcpADU>
             <transactionIdentifier dataType="uint" bitLength="16">1</transactionIdentifier>
             <protocolIdentifier dataType="uint" bitLength="16">0</protocolIdentifier>
-            <length dataType="uint" bitLength="16">9</length>
+            <length dataType="uint" bitLength="16">6</length>
             <unitIdentifier dataType="uint" bitLength="8">1</unitIdentifier>
             <pdu>
               <ModbusPDU>
                 <errorFlag dataType="bit" bitLength="1">false</errorFlag>
-                <functionFlag dataType="uint" bitLength="7">16</functionFlag>
-                <ModbusPDUWriteMultipleHoldingRegistersRequest>
-                  <startingAddress dataType="uint" bitLength="16">10</startingAddress>
-                  <quantity dataType="uint" bitLength="16">1</quantity>
-                  <byteCount dataType="uint" bitLength="8">2</byteCount>
-                  <value dataType="byte" bitLength="16">0x002a</value>
-                </ModbusPDUWriteMultipleHoldingRegistersRequest>
+                <functionFlag dataType="uint" bitLength="7">6</functionFlag>
+                <ModbusPDUWriteSingleRegisterRequest>
+                  <address dataType="uint" bitLength="16">10</address>
+                  <value dataType="uint" bitLength="16">42</value>
+                </ModbusPDUWriteSingleRegisterRequest>
               </ModbusPDU>
             </pdu>
           </ModbusTcpADU>
@@ -1279,7 +1269,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -1317,18 +1307,16 @@
           <ModbusTcpADU>
             <transactionIdentifier dataType="uint" bitLength="16">1</transactionIdentifier>
             <protocolIdentifier dataType="uint" bitLength="16">0</protocolIdentifier>
-            <length dataType="uint" bitLength="16">9</length>
+            <length dataType="uint" bitLength="16">6</length>
             <unitIdentifier dataType="uint" bitLength="8">1</unitIdentifier>
             <pdu>
               <ModbusPDU>
                 <errorFlag dataType="bit" bitLength="1">false</errorFlag>
-                <functionFlag dataType="uint" bitLength="7">16</functionFlag>
-                <ModbusPDUWriteMultipleHoldingRegistersRequest>
-                  <startingAddress dataType="uint" bitLength="16">11</startingAddress>
-                  <quantity dataType="uint" bitLength="16">1</quantity>
-                  <byteCount dataType="uint" bitLength="8">2</byteCount>
-                  <value dataType="byte" bitLength="16">0xf688</value>
-                </ModbusPDUWriteMultipleHoldingRegistersRequest>
+                <functionFlag dataType="uint" bitLength="7">6</functionFlag>
+                <ModbusPDUWriteSingleRegisterRequest>
+                  <address dataType="uint" bitLength="16">11</address>
+                  <value dataType="uint" bitLength="16">63112</value>
+                </ModbusPDUWriteSingleRegisterRequest>
               </ModbusPDU>
             </pdu>
           </ModbusTcpADU>
@@ -1474,7 +1462,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -1512,18 +1500,16 @@
           <ModbusTcpADU>
             <transactionIdentifier dataType="uint" bitLength="16">1</transactionIdentifier>
             <protocolIdentifier dataType="uint" bitLength="16">0</protocolIdentifier>
-            <length dataType="uint" bitLength="16">9</length>
+            <length dataType="uint" bitLength="16">6</length>
             <unitIdentifier dataType="uint" bitLength="8">1</unitIdentifier>
             <pdu>
               <ModbusPDU>
                 <errorFlag dataType="bit" bitLength="1">false</errorFlag>
-                <functionFlag dataType="uint" bitLength="7">16</functionFlag>
-                <ModbusPDUWriteMultipleHoldingRegistersRequest>
-                  <startingAddress dataType="uint" bitLength="16">12</startingAddress>
-                  <quantity dataType="uint" bitLength="16">1</quantity>
-                  <byteCount dataType="uint" bitLength="8">2</byteCount>
-                  <value dataType="byte" bitLength="16">0xa5b8</value>
-                </ModbusPDUWriteMultipleHoldingRegistersRequest>
+                <functionFlag dataType="uint" bitLength="7">6</functionFlag>
+                <ModbusPDUWriteSingleRegisterRequest>
+                  <address dataType="uint" bitLength="16">12</address>
+                  <value dataType="uint" bitLength="16">42424</value>
+                </ModbusPDUWriteSingleRegisterRequest>
               </ModbusPDU>
             </pdu>
           </ModbusTcpADU>
@@ -1669,7 +1655,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -1864,7 +1850,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -2059,7 +2045,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -2254,7 +2240,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
@@ -2449,12 +2435,12 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>
                 <value>
-                  <PlcREAL dataType="float" bitLength="32">3.1415929794311523</PlcREAL>
+                  <PlcREAL dataType="float" bitLength="32">3.141593</PlcREAL>
                 </value>
               </PlcResponseItem>
             </hurz>
@@ -2544,7 +2530,7 @@
                         </ModbusTagHoldingRegister>
                       </tag>
                       <value>
-                        <PlcREAL dataType="float" bitLength="32">3.1415929794311523</PlcREAL>
+                        <PlcREAL dataType="float" bitLength="32">3.141593</PlcREAL>
                       </value>
                     </PlcTagValueItem>
                   </hurz>
@@ -2644,7 +2630,7 @@
               </PlcTagRequest>
             </PlcReadRequest>
           </request>
-          <values isList="true">
+           <values isList="true">
             <hurz>
               <PlcResponseItem>
                 <code dataType="string" bitLength="16" encoding="UTF-8">OK</code>

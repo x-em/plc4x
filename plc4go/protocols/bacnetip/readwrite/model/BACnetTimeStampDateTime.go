@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +103,7 @@ type _BACnetTimeStampDateTimeBuilder struct {
 
 	parentBuilder *_BACnetTimeStampBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetTimeStampDateTimeBuilder) = (*_BACnetTimeStampDateTimeBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_BACnetTimeStampDateTimeBuilder) WithDateTimeValueBuilder(builderSuppli
 	var err error
 	b.DateTimeValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDateTimeEnclosedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDateTimeEnclosedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetTimeStampDateTimeBuilder) Build() (BACnetTimeStampDateTime, error) {
 	if b.DateTimeValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dateTimeValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dateTimeValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetTimeStampDateTime.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_BACnetTimeStampDateTimeBuilder) buildForBACnetTimeStamp() (BACnetTimeS
 
 func (b *_BACnetTimeStampDateTimeBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetTimeStampDateTimeBuilder().(*_BACnetTimeStampDateTimeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +221,7 @@ func CastBACnetTimeStampDateTime(structType any) BACnetTimeStampDateTime {
 	return nil
 }
 
-func (m *_BACnetTimeStampDateTime) GetTypeName() string {
+func (m *_BACnetTimeStampDateTime) GetPlx4xTypeName() string {
 	return "BACnetTimeStampDateTime"
 }
 

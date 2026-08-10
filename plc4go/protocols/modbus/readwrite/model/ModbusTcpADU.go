@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -46,10 +47,17 @@ type ModbusTcpADU interface {
 	utils.Copyable
 	ModbusADU
 	// GetTransactionIdentifier returns TransactionIdentifier (property field)
+	// It is used for transaction pairing, the MODBUS server copies in the response the transaction
+	// identifier of the request.
 	GetTransactionIdentifier() uint16
 	// GetUnitIdentifier returns UnitIdentifier (property field)
+	// This field is used for intra-system routing purpose. It is typically used to communicate to
+	// a MODBUS+ or a MODBUS serial line slave through a gateway between an Ethernet TCP-IP network
+	// and a MODBUS serial line. This field is set by the MODBUS Client in the request and must be
+	// returned with the same value in the response by the server.
 	GetUnitIdentifier() uint8
 	// GetPdu returns Pdu (property field)
+	// The actual modbus payload
 	GetPdu() ModbusPDU
 	// IsModbusTcpADU is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsModbusTcpADU()
@@ -69,12 +77,12 @@ var _ ModbusTcpADU = (*_ModbusTcpADU)(nil)
 var _ ModbusADURequirements = (*_ModbusTcpADU)(nil)
 
 // NewModbusTcpADU factory function for _ModbusTcpADU
-func NewModbusTcpADU(transactionIdentifier uint16, unitIdentifier uint8, pdu ModbusPDU, response bool) *_ModbusTcpADU {
+func NewModbusTcpADU(transactionIdentifier uint16, unitIdentifier uint8, pdu ModbusPDU) *_ModbusTcpADU {
 	if pdu == nil {
 		panic("pdu of type ModbusPDU for ModbusTcpADU must not be nil")
 	}
 	_result := &_ModbusTcpADU{
-		ModbusADUContract:     NewModbusADU(response),
+		ModbusADUContract:     NewModbusADU(),
 		TransactionIdentifier: transactionIdentifier,
 		UnitIdentifier:        unitIdentifier,
 		Pdu:                   pdu,
@@ -119,7 +127,7 @@ type _ModbusTcpADUBuilder struct {
 
 	parentBuilder *_ModbusADUBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ModbusTcpADUBuilder) = (*_ModbusTcpADUBuilder)(nil)
@@ -153,23 +161,17 @@ func (b *_ModbusTcpADUBuilder) WithPduBuilder(builderSupplier func(ModbusPDUBuil
 	var err error
 	b.Pdu, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ModbusPDUBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ModbusPDUBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ModbusTcpADUBuilder) Build() (ModbusTcpADU, error) {
 	if b.Pdu == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'pdu' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'pdu' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ModbusTcpADU.deepCopy(), nil
 }
@@ -195,8 +197,8 @@ func (b *_ModbusTcpADUBuilder) buildForModbusADU() (ModbusADU, error) {
 
 func (b *_ModbusTcpADUBuilder) DeepCopy() any {
 	_copy := b.CreateModbusTcpADUBuilder().(*_ModbusTcpADUBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -278,7 +280,7 @@ func CastModbusTcpADU(structType any) ModbusTcpADU {
 	return nil
 }
 
-func (m *_ModbusTcpADU) GetTypeName() string {
+func (m *_ModbusTcpADU) GetPlx4xTypeName() string {
 	return "ModbusTcpADU"
 }
 
@@ -318,31 +320,31 @@ func (m *_ModbusTcpADU) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	transactionIdentifier, err := ReadSimpleField(ctx, "transactionIdentifier", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithByteOrder(binary.BigEndian))
+	transactionIdentifier, err := ReadSimpleField(ctx, "transactionIdentifier", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'transactionIdentifier' field"))
 	}
 	m.TransactionIdentifier = transactionIdentifier
 
-	protocolIdentifier, err := ReadConstField[uint16](ctx, "protocolIdentifier", ReadUnsignedShort(readBuffer, uint8(16)), ModbusTcpADU_PROTOCOLIDENTIFIER, codegen.WithByteOrder(binary.BigEndian))
+	protocolIdentifier, err := ReadConstField[uint16](ctx, "protocolIdentifier", ReadUnsignedShort(readBuffer, uint8(16)), ModbusTcpADU_PROTOCOLIDENTIFIER, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'protocolIdentifier' field"))
 	}
 	_ = protocolIdentifier
 
-	length, err := ReadImplicitField[uint16](ctx, "length", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithByteOrder(binary.BigEndian))
+	length, err := ReadImplicitField[uint16](ctx, "length", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'length' field"))
 	}
 	_ = length
 
-	unitIdentifier, err := ReadSimpleField(ctx, "unitIdentifier", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithByteOrder(binary.BigEndian))
+	unitIdentifier, err := ReadSimpleField(ctx, "unitIdentifier", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'unitIdentifier' field"))
 	}
 	m.UnitIdentifier = unitIdentifier
 
-	pdu, err := ReadSimpleField[ModbusPDU](ctx, "pdu", ReadComplex[ModbusPDU](ModbusPDUParseWithBufferProducer[ModbusPDU]((bool)(response)), readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	pdu, err := ReadSimpleField[ModbusPDU](ctx, "pdu", ReadComplex[ModbusPDU](ModbusPDUParseWithBufferProducer[ModbusPDU]((bool)(response)), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'pdu' field"))
 	}
@@ -373,23 +375,23 @@ func (m *_ModbusTcpADU) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for ModbusTcpADU")
 		}
 
-		if err := WriteSimpleField[uint16](ctx, "transactionIdentifier", m.GetTransactionIdentifier(), WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[uint16](ctx, "transactionIdentifier", m.GetTransactionIdentifier(), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'transactionIdentifier' field")
 		}
 
-		if err := WriteConstField(ctx, "protocolIdentifier", ModbusTcpADU_PROTOCOLIDENTIFIER, WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteConstField(ctx, "protocolIdentifier", ModbusTcpADU_PROTOCOLIDENTIFIER, WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'protocolIdentifier' field")
 		}
 		length := uint16(uint16(m.GetPdu().GetLengthInBytes(ctx)) + uint16(uint16(1)))
-		if err := WriteImplicitField(ctx, "length", length, WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteImplicitField(ctx, "length", length, WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'length' field")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "unitIdentifier", m.GetUnitIdentifier(), WriteUnsignedByte(writeBuffer, 8), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "unitIdentifier", m.GetUnitIdentifier(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'unitIdentifier' field")
 		}
 
-		if err := WriteSimpleField[ModbusPDU](ctx, "pdu", m.GetPdu(), WriteComplex[ModbusPDU](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[ModbusPDU](ctx, "pdu", m.GetPdu(), WriteComplex[ModbusPDU](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'pdu' field")
 		}
 

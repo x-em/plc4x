@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -124,7 +125,7 @@ type _TypeIdBuilder struct {
 
 	childBuilder _TypeIdChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TypeIdBuilder) = (*_TypeIdBuilder)(nil)
@@ -134,8 +135,8 @@ func (b *_TypeIdBuilder) WithMandatoryFields() TypeIdBuilder {
 }
 
 func (b *_TypeIdBuilder) PartialBuild() (TypeIdContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TypeId.deepCopy(), nil
 }
@@ -222,8 +223,8 @@ func (b *_TypeIdBuilder) DeepCopy() any {
 	_copy := b.CreateTypeIdBuilder().(*_TypeIdBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_TypeIdChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -252,7 +253,7 @@ func CastTypeId(structType any) TypeId {
 	return nil
 }
 
-func (m *_TypeId) GetTypeName() string {
+func (m *_TypeId) GetPlx4xTypeName() string {
 	return "TypeId"
 }
 
@@ -288,7 +289,7 @@ func TypeIdParseWithBufferProducer[T TypeId]() func(ctx context.Context, readBuf
 }
 
 func TypeIdParseWithBuffer[T TypeId](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_TypeId{}).parse(ctx, readBuffer)
+	v, err := (new(_TypeId)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

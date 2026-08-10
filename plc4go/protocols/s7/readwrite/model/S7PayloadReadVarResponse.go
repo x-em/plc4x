@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ S7PayloadReadVarResponse = (*_S7PayloadReadVarResponse)(nil)
 var _ S7PayloadRequirements = (*_S7PayloadReadVarResponse)(nil)
 
 // NewS7PayloadReadVarResponse factory function for _S7PayloadReadVarResponse
-func NewS7PayloadReadVarResponse(items []S7VarPayloadDataItem, parameter S7Parameter) *_S7PayloadReadVarResponse {
+func NewS7PayloadReadVarResponse(items []S7VarPayloadDataItem) *_S7PayloadReadVarResponse {
 	_result := &_S7PayloadReadVarResponse{
-		S7PayloadContract: NewS7Payload(parameter),
+		S7PayloadContract: NewS7Payload(),
 		Items:             items,
 	}
 	_result.S7PayloadContract.(*_S7Payload)._SubType = _result
@@ -97,7 +98,7 @@ type _S7PayloadReadVarResponseBuilder struct {
 
 	parentBuilder *_S7PayloadBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7PayloadReadVarResponseBuilder) = (*_S7PayloadReadVarResponseBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_S7PayloadReadVarResponseBuilder) WithItems(items ...S7VarPayloadDataIt
 }
 
 func (b *_S7PayloadReadVarResponseBuilder) Build() (S7PayloadReadVarResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7PayloadReadVarResponse.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_S7PayloadReadVarResponseBuilder) buildForS7Payload() (S7Payload, error
 
 func (b *_S7PayloadReadVarResponseBuilder) DeepCopy() any {
 	_copy := b.CreateS7PayloadReadVarResponseBuilder().(*_S7PayloadReadVarResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastS7PayloadReadVarResponse(structType any) S7PayloadReadVarResponse {
 	return nil
 }
 
-func (m *_S7PayloadReadVarResponse) GetTypeName() string {
+func (m *_S7PayloadReadVarResponse) GetPlx4xTypeName() string {
 	return "S7PayloadReadVarResponse"
 }
 
@@ -221,9 +222,7 @@ func (m *_S7PayloadReadVarResponse) GetLengthInBits(ctx context.Context) uint16 
 	if len(m.Items) > 0 {
 		for _curItem, element := range m.Items {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Items), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

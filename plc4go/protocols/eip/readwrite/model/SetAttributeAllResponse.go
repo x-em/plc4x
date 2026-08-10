@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ SetAttributeAllResponse = (*_SetAttributeAllResponse)(nil)
 var _ CipServiceRequirements = (*_SetAttributeAllResponse)(nil)
 
 // NewSetAttributeAllResponse factory function for _SetAttributeAllResponse
-func NewSetAttributeAllResponse(serviceLen uint16) *_SetAttributeAllResponse {
+func NewSetAttributeAllResponse() *_SetAttributeAllResponse {
 	_result := &_SetAttributeAllResponse{
-		CipServiceContract: NewCipService(serviceLen),
+		CipServiceContract: NewCipService(),
 	}
 	_result.CipServiceContract.(*_CipService)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _SetAttributeAllResponseBuilder struct {
 
 	parentBuilder *_CipServiceBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SetAttributeAllResponseBuilder) = (*_SetAttributeAllResponseBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_SetAttributeAllResponseBuilder) WithMandatoryFields() SetAttributeAllR
 }
 
 func (b *_SetAttributeAllResponseBuilder) Build() (SetAttributeAllResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SetAttributeAllResponse.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_SetAttributeAllResponseBuilder) buildForCipService() (CipService, erro
 
 func (b *_SetAttributeAllResponseBuilder) DeepCopy() any {
 	_copy := b.CreateSetAttributeAllResponseBuilder().(*_SetAttributeAllResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -187,7 +188,7 @@ func CastSetAttributeAllResponse(structType any) SetAttributeAllResponse {
 	return nil
 }
 
-func (m *_SetAttributeAllResponse) GetTypeName() string {
+func (m *_SetAttributeAllResponse) GetPlx4xTypeName() string {
 	return "SetAttributeAllResponse"
 }
 

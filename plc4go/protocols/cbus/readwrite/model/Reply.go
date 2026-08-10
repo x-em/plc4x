@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -51,10 +54,6 @@ type Reply interface {
 type ReplyContract interface {
 	// GetPeekedByte returns PeekedByte (property field)
 	GetPeekedByte() byte
-	// GetCBusOptions() returns a parser argument
-	GetCBusOptions() CBusOptions
-	// GetRequestContext() returns a parser argument
-	GetRequestContext() RequestContext
 	// IsReply is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsReply()
 	// CreateBuilder creates a ReplyBuilder
@@ -76,17 +75,13 @@ type _Reply struct {
 		ReplyRequirements
 	}
 	PeekedByte byte
-
-	// Arguments.
-	CBusOptions    CBusOptions
-	RequestContext RequestContext
 }
 
 var _ ReplyContract = (*_Reply)(nil)
 
 // NewReply factory function for _Reply
-func NewReply(peekedByte byte, cBusOptions CBusOptions, requestContext RequestContext) *_Reply {
-	return &_Reply{PeekedByte: peekedByte, CBusOptions: cBusOptions, RequestContext: requestContext}
+func NewReply(peekedByte byte) *_Reply {
+	return &_Reply{PeekedByte: peekedByte}
 }
 
 ///////////////////////////////////////////////////////////
@@ -101,10 +96,6 @@ type ReplyBuilder interface {
 	WithMandatoryFields(peekedByte byte) ReplyBuilder
 	// WithPeekedByte adds PeekedByte (property field)
 	WithPeekedByte(byte) ReplyBuilder
-	// WithArgCBusOptions sets a parser argument
-	WithArgCBusOptions(CBusOptions) ReplyBuilder
-	// WithArgRequestContext sets a parser argument
-	WithArgRequestContext(RequestContext) ReplyBuilder
 	// AsPowerUpReply converts this build to a subType of Reply. It is always possible to return to current builder using Done()
 	AsPowerUpReply() PowerUpReplyBuilder
 	// AsParameterChangeReply converts this build to a subType of Reply. It is always possible to return to current builder using Done()
@@ -137,7 +128,7 @@ type _ReplyBuilder struct {
 
 	childBuilder _ReplyChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ReplyBuilder) = (*_ReplyBuilder)(nil)
@@ -151,18 +142,9 @@ func (b *_ReplyBuilder) WithPeekedByte(peekedByte byte) ReplyBuilder {
 	return b
 }
 
-func (b *_ReplyBuilder) WithArgCBusOptions(cBusOptions CBusOptions) ReplyBuilder {
-	b.CBusOptions = cBusOptions
-	return b
-}
-func (b *_ReplyBuilder) WithArgRequestContext(requestContext RequestContext) ReplyBuilder {
-	b.RequestContext = requestContext
-	return b
-}
-
 func (b *_ReplyBuilder) PartialBuild() (ReplyContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._Reply.deepCopy(), nil
 }
@@ -229,8 +211,8 @@ func (b *_ReplyBuilder) DeepCopy() any {
 	_copy := b.CreateReplyBuilder().(*_ReplyBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_ReplyChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -273,7 +255,7 @@ func CastReply(structType any) Reply {
 	return nil
 }
 
-func (m *_Reply) GetTypeName() string {
+func (m *_Reply) GetPlx4xTypeName() string {
 	return "Reply"
 }
 
@@ -292,7 +274,7 @@ func (m *_Reply) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func ReplyParse[T Reply](ctx context.Context, theBytes []byte, cBusOptions CBusOptions, requestContext RequestContext) (T, error) {
-	return ReplyParseWithBuffer[T](ctx, utils.NewReadBufferByteBased(theBytes), cBusOptions, requestContext)
+	return ReplyParseWithBuffer[T](ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)), cBusOptions, requestContext)
 }
 
 func ReplyParseWithBufferProducer[T Reply](cBusOptions CBusOptions, requestContext RequestContext) func(ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
@@ -307,7 +289,7 @@ func ReplyParseWithBufferProducer[T Reply](cBusOptions CBusOptions, requestConte
 }
 
 func ReplyParseWithBuffer[T Reply](ctx context.Context, readBuffer utils.ReadBuffer, cBusOptions CBusOptions, requestContext RequestContext) (T, error) {
-	v, err := (&_Reply{CBusOptions: cBusOptions, RequestContext: requestContext}).parse(ctx, readBuffer, cBusOptions, requestContext)
+	v, err := (new(_Reply)).parse(ctx, readBuffer, cBusOptions, requestContext)
 	if err != nil {
 		var zero T
 		return zero, err
@@ -329,7 +311,7 @@ func (m *_Reply) parse(ctx context.Context, readBuffer utils.ReadBuffer, cBusOpt
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	peekedByte, err := ReadPeekField[byte](ctx, "peekedByte", ReadByte(readBuffer, 8), 0)
+	peekedByte, err := ReadPeekField[byte](ctx, "peekedByte", ReadByte(readBuffer, 8), 0, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'peekedByte' field"))
 	}
@@ -384,19 +366,6 @@ func (pm *_Reply) serializeParent(ctx context.Context, writeBuffer utils.WriteBu
 	return nil
 }
 
-////
-// Arguments Getter
-
-func (m *_Reply) GetCBusOptions() CBusOptions {
-	return m.CBusOptions
-}
-func (m *_Reply) GetRequestContext() RequestContext {
-	return m.RequestContext
-}
-
-//
-////
-
 func (m *_Reply) IsReply() {}
 
 func (m *_Reply) DeepCopy() any {
@@ -410,8 +379,6 @@ func (m *_Reply) deepCopy() *_Reply {
 	_ReplyCopy := &_Reply{
 		nil, // will be set by child
 		m.PeekedByte,
-		m.CBusOptions,
-		m.RequestContext,
 	}
 	return _ReplyCopy
 }

@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -43,6 +46,7 @@ type ParameterValueBaudRateSelector interface {
 	// GetValue returns Value (property field)
 	GetValue() BaudRateSelector
 	// GetData returns Data (property field)
+	// TODO: find out what additional bytes mean here...
 	GetData() []byte
 	// IsParameterValueBaudRateSelector is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsParameterValueBaudRateSelector()
@@ -61,9 +65,9 @@ var _ ParameterValueBaudRateSelector = (*_ParameterValueBaudRateSelector)(nil)
 var _ ParameterValueRequirements = (*_ParameterValueBaudRateSelector)(nil)
 
 // NewParameterValueBaudRateSelector factory function for _ParameterValueBaudRateSelector
-func NewParameterValueBaudRateSelector(value BaudRateSelector, data []byte, numBytes uint8) *_ParameterValueBaudRateSelector {
+func NewParameterValueBaudRateSelector(value BaudRateSelector, data []byte) *_ParameterValueBaudRateSelector {
 	_result := &_ParameterValueBaudRateSelector{
-		ParameterValueContract: NewParameterValue(numBytes),
+		ParameterValueContract: NewParameterValue(),
 		Value:                  value,
 		Data:                   data,
 	}
@@ -103,7 +107,7 @@ type _ParameterValueBaudRateSelectorBuilder struct {
 
 	parentBuilder *_ParameterValueBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ParameterValueBaudRateSelectorBuilder) = (*_ParameterValueBaudRateSelectorBuilder)(nil)
@@ -128,8 +132,8 @@ func (b *_ParameterValueBaudRateSelectorBuilder) WithData(data ...byte) Paramete
 }
 
 func (b *_ParameterValueBaudRateSelectorBuilder) Build() (ParameterValueBaudRateSelector, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ParameterValueBaudRateSelector.deepCopy(), nil
 }
@@ -155,8 +159,8 @@ func (b *_ParameterValueBaudRateSelectorBuilder) buildForParameterValue() (Param
 
 func (b *_ParameterValueBaudRateSelectorBuilder) DeepCopy() any {
 	_copy := b.CreateParameterValueBaudRateSelectorBuilder().(*_ParameterValueBaudRateSelectorBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +225,7 @@ func CastParameterValueBaudRateSelector(structType any) ParameterValueBaudRateSe
 	return nil
 }
 
-func (m *_ParameterValueBaudRateSelector) GetTypeName() string {
+func (m *_ParameterValueBaudRateSelector) GetPlx4xTypeName() string {
 	return "ParameterValueBaudRateSelector"
 }
 
@@ -259,13 +263,13 @@ func (m *_ParameterValueBaudRateSelector) parse(ctx context.Context, readBuffer 
 		return nil, errors.WithStack(utils.ParseValidationError{Message: "BaudRateSelector has exactly one byte"})
 	}
 
-	value, err := ReadEnumField[BaudRateSelector](ctx, "value", "BaudRateSelector", ReadEnum(BaudRateSelectorByValue, ReadUnsignedByte(readBuffer, uint8(8))))
+	value, err := ReadEnumField[BaudRateSelector](ctx, "value", "BaudRateSelector", ReadEnum(BaudRateSelectorByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'value' field"))
 	}
 	m.Value = value
 
-	data, err := readBuffer.ReadByteArray("data", int(int32(numBytes)-int32(int32(1))))
+	data, err := readBuffer.ReadByteArray("data", int(int32(numBytes)-int32(int32(1))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'data' field"))
 	}
@@ -279,7 +283,7 @@ func (m *_ParameterValueBaudRateSelector) parse(ctx context.Context, readBuffer 
 }
 
 func (m *_ParameterValueBaudRateSelector) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -296,11 +300,11 @@ func (m *_ParameterValueBaudRateSelector) SerializeWithWriteBuffer(ctx context.C
 			return errors.Wrap(pushErr, "Error pushing for ParameterValueBaudRateSelector")
 		}
 
-		if err := WriteSimpleEnumField[BaudRateSelector](ctx, "value", "BaudRateSelector", m.GetValue(), WriteEnum[BaudRateSelector, uint8](BaudRateSelector.GetValue, BaudRateSelector.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8))); err != nil {
+		if err := WriteSimpleEnumField[BaudRateSelector](ctx, "value", "BaudRateSelector", m.GetValue(), WriteEnum[BaudRateSelector, uint8](BaudRateSelector.GetValue, BaudRateSelector.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'value' field")
 		}
 
-		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'data' field")
 		}
 

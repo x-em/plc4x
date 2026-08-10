@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +104,7 @@ type _NetworkAddressDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NetworkAddressDataTypeBuilder) = (*_NetworkAddressDataTypeBuilder)(nil)
@@ -126,23 +128,17 @@ func (b *_NetworkAddressDataTypeBuilder) WithNetworkInterfaceBuilder(builderSupp
 	var err error
 	b.NetworkInterface, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_NetworkAddressDataTypeBuilder) Build() (NetworkAddressDataType, error) {
 	if b.NetworkInterface == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'networkInterface' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'networkInterface' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NetworkAddressDataType.deepCopy(), nil
 }
@@ -168,8 +164,8 @@ func (b *_NetworkAddressDataTypeBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_NetworkAddressDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateNetworkAddressDataTypeBuilder().(*_NetworkAddressDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +226,7 @@ func CastNetworkAddressDataType(structType any) NetworkAddressDataType {
 	return nil
 }
 
-func (m *_NetworkAddressDataType) GetTypeName() string {
+func (m *_NetworkAddressDataType) GetPlx4xTypeName() string {
 	return "NetworkAddressDataType"
 }
 
@@ -258,7 +254,7 @@ func (m *_NetworkAddressDataType) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	networkInterface, err := ReadSimpleField[PascalString](ctx, "networkInterface", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	networkInterface, err := ReadSimpleField[PascalString](ctx, "networkInterface", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'networkInterface' field"))
 	}
@@ -289,7 +285,7 @@ func (m *_NetworkAddressDataType) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for NetworkAddressDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "networkInterface", m.GetNetworkInterface(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "networkInterface", m.GetNetworkInterface(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'networkInterface' field")
 		}
 

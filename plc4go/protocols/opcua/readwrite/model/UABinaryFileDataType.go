@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -143,7 +145,7 @@ type _UABinaryFileDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (UABinaryFileDataTypeBuilder) = (*_UABinaryFileDataTypeBuilder)(nil)
@@ -187,10 +189,7 @@ func (b *_UABinaryFileDataTypeBuilder) WithSchemaLocationBuilder(builderSupplier
 	var err error
 	b.SchemaLocation, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -210,29 +209,20 @@ func (b *_UABinaryFileDataTypeBuilder) WithBodyBuilder(builderSupplier func(Vari
 	var err error
 	b.Body, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "VariantBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "VariantBuilder failed"))
 	}
 	return b
 }
 
 func (b *_UABinaryFileDataTypeBuilder) Build() (UABinaryFileDataType, error) {
 	if b.SchemaLocation == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'schemaLocation' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'schemaLocation' not set"))
 	}
 	if b.Body == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'body' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'body' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._UABinaryFileDataType.deepCopy(), nil
 }
@@ -258,8 +248,8 @@ func (b *_UABinaryFileDataTypeBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_UABinaryFileDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateUABinaryFileDataTypeBuilder().(*_UABinaryFileDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -344,7 +334,7 @@ func CastUABinaryFileDataType(structType any) UABinaryFileDataType {
 	return nil
 }
 
-func (m *_UABinaryFileDataType) GetTypeName() string {
+func (m *_UABinaryFileDataType) GetPlx4xTypeName() string {
 	return "UABinaryFileDataType"
 }
 
@@ -358,9 +348,7 @@ func (m *_UABinaryFileDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Namespaces) > 0 {
 		for _curItem, element := range m.Namespaces {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Namespaces), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -371,9 +359,7 @@ func (m *_UABinaryFileDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.StructureDataTypes) > 0 {
 		for _curItem, element := range m.StructureDataTypes {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.StructureDataTypes), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -384,9 +370,7 @@ func (m *_UABinaryFileDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.EnumDataTypes) > 0 {
 		for _curItem, element := range m.EnumDataTypes {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.EnumDataTypes), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -397,9 +381,7 @@ func (m *_UABinaryFileDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.SimpleDataTypes) > 0 {
 		for _curItem, element := range m.SimpleDataTypes {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.SimpleDataTypes), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -413,9 +395,7 @@ func (m *_UABinaryFileDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.FileHeader) > 0 {
 		for _curItem, element := range m.FileHeader {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.FileHeader), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -440,73 +420,73 @@ func (m *_UABinaryFileDataType) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfNamespaces, err := ReadImplicitField[int32](ctx, "noOfNamespaces", ReadSignedInt(readBuffer, uint8(32)))
+	noOfNamespaces, err := ReadImplicitField[int32](ctx, "noOfNamespaces", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfNamespaces' field"))
 	}
 	_ = noOfNamespaces
 
-	namespaces, err := ReadCountArrayField[PascalString](ctx, "namespaces", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfNamespaces))
+	namespaces, err := ReadCountArrayField[PascalString](ctx, "namespaces", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfNamespaces), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'namespaces' field"))
 	}
 	m.Namespaces = namespaces
 
-	noOfStructureDataTypes, err := ReadImplicitField[int32](ctx, "noOfStructureDataTypes", ReadSignedInt(readBuffer, uint8(32)))
+	noOfStructureDataTypes, err := ReadImplicitField[int32](ctx, "noOfStructureDataTypes", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfStructureDataTypes' field"))
 	}
 	_ = noOfStructureDataTypes
 
-	structureDataTypes, err := ReadCountArrayField[StructureDescription](ctx, "structureDataTypes", ReadComplex[StructureDescription](ExtensionObjectDefinitionParseWithBufferProducer[StructureDescription]((int32)(int32(15489))), readBuffer), uint64(noOfStructureDataTypes))
+	structureDataTypes, err := ReadCountArrayField[StructureDescription](ctx, "structureDataTypes", ReadComplex[StructureDescription](ExtensionObjectDefinitionParseWithBufferProducer[StructureDescription]((int32)(int32(15489))), readBuffer), uint64(noOfStructureDataTypes), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'structureDataTypes' field"))
 	}
 	m.StructureDataTypes = structureDataTypes
 
-	noOfEnumDataTypes, err := ReadImplicitField[int32](ctx, "noOfEnumDataTypes", ReadSignedInt(readBuffer, uint8(32)))
+	noOfEnumDataTypes, err := ReadImplicitField[int32](ctx, "noOfEnumDataTypes", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfEnumDataTypes' field"))
 	}
 	_ = noOfEnumDataTypes
 
-	enumDataTypes, err := ReadCountArrayField[EnumDescription](ctx, "enumDataTypes", ReadComplex[EnumDescription](ExtensionObjectDefinitionParseWithBufferProducer[EnumDescription]((int32)(int32(15490))), readBuffer), uint64(noOfEnumDataTypes))
+	enumDataTypes, err := ReadCountArrayField[EnumDescription](ctx, "enumDataTypes", ReadComplex[EnumDescription](ExtensionObjectDefinitionParseWithBufferProducer[EnumDescription]((int32)(int32(15490))), readBuffer), uint64(noOfEnumDataTypes), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'enumDataTypes' field"))
 	}
 	m.EnumDataTypes = enumDataTypes
 
-	noOfSimpleDataTypes, err := ReadImplicitField[int32](ctx, "noOfSimpleDataTypes", ReadSignedInt(readBuffer, uint8(32)))
+	noOfSimpleDataTypes, err := ReadImplicitField[int32](ctx, "noOfSimpleDataTypes", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfSimpleDataTypes' field"))
 	}
 	_ = noOfSimpleDataTypes
 
-	simpleDataTypes, err := ReadCountArrayField[SimpleTypeDescription](ctx, "simpleDataTypes", ReadComplex[SimpleTypeDescription](ExtensionObjectDefinitionParseWithBufferProducer[SimpleTypeDescription]((int32)(int32(15007))), readBuffer), uint64(noOfSimpleDataTypes))
+	simpleDataTypes, err := ReadCountArrayField[SimpleTypeDescription](ctx, "simpleDataTypes", ReadComplex[SimpleTypeDescription](ExtensionObjectDefinitionParseWithBufferProducer[SimpleTypeDescription]((int32)(int32(15007))), readBuffer), uint64(noOfSimpleDataTypes), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'simpleDataTypes' field"))
 	}
 	m.SimpleDataTypes = simpleDataTypes
 
-	schemaLocation, err := ReadSimpleField[PascalString](ctx, "schemaLocation", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	schemaLocation, err := ReadSimpleField[PascalString](ctx, "schemaLocation", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'schemaLocation' field"))
 	}
 	m.SchemaLocation = schemaLocation
 
-	noOfFileHeader, err := ReadImplicitField[int32](ctx, "noOfFileHeader", ReadSignedInt(readBuffer, uint8(32)))
+	noOfFileHeader, err := ReadImplicitField[int32](ctx, "noOfFileHeader", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfFileHeader' field"))
 	}
 	_ = noOfFileHeader
 
-	fileHeader, err := ReadCountArrayField[KeyValuePair](ctx, "fileHeader", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfFileHeader))
+	fileHeader, err := ReadCountArrayField[KeyValuePair](ctx, "fileHeader", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfFileHeader), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'fileHeader' field"))
 	}
 	m.FileHeader = fileHeader
 
-	body, err := ReadSimpleField[Variant](ctx, "body", ReadComplex[Variant](VariantParseWithBuffer, readBuffer))
+	body, err := ReadSimpleField[Variant](ctx, "body", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'body' field"))
 	}
@@ -537,51 +517,51 @@ func (m *_UABinaryFileDataType) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for UABinaryFileDataType")
 		}
 		noOfNamespaces := int32(utils.InlineIf(bool((m.GetNamespaces()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetNamespaces()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfNamespaces", noOfNamespaces, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfNamespaces", noOfNamespaces, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfNamespaces' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "namespaces", m.GetNamespaces(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "namespaces", m.GetNamespaces(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'namespaces' field")
 		}
 		noOfStructureDataTypes := int32(utils.InlineIf(bool((m.GetStructureDataTypes()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetStructureDataTypes()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfStructureDataTypes", noOfStructureDataTypes, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfStructureDataTypes", noOfStructureDataTypes, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfStructureDataTypes' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "structureDataTypes", m.GetStructureDataTypes(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "structureDataTypes", m.GetStructureDataTypes(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'structureDataTypes' field")
 		}
 		noOfEnumDataTypes := int32(utils.InlineIf(bool((m.GetEnumDataTypes()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetEnumDataTypes()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfEnumDataTypes", noOfEnumDataTypes, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfEnumDataTypes", noOfEnumDataTypes, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfEnumDataTypes' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "enumDataTypes", m.GetEnumDataTypes(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "enumDataTypes", m.GetEnumDataTypes(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'enumDataTypes' field")
 		}
 		noOfSimpleDataTypes := int32(utils.InlineIf(bool((m.GetSimpleDataTypes()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetSimpleDataTypes()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfSimpleDataTypes", noOfSimpleDataTypes, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfSimpleDataTypes", noOfSimpleDataTypes, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfSimpleDataTypes' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "simpleDataTypes", m.GetSimpleDataTypes(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "simpleDataTypes", m.GetSimpleDataTypes(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'simpleDataTypes' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "schemaLocation", m.GetSchemaLocation(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "schemaLocation", m.GetSchemaLocation(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'schemaLocation' field")
 		}
 		noOfFileHeader := int32(utils.InlineIf(bool((m.GetFileHeader()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetFileHeader()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfFileHeader", noOfFileHeader, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfFileHeader", noOfFileHeader, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfFileHeader' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "fileHeader", m.GetFileHeader(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "fileHeader", m.GetFileHeader(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'fileHeader' field")
 		}
 
-		if err := WriteSimpleField[Variant](ctx, "body", m.GetBody(), WriteComplex[Variant](writeBuffer)); err != nil {
+		if err := WriteSimpleField[Variant](ctx, "body", m.GetBody(), WriteComplex[Variant](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'body' field")
 		}
 

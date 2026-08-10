@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -141,7 +143,7 @@ type _UserTokenPolicyBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (UserTokenPolicyBuilder) = (*_UserTokenPolicyBuilder)(nil)
@@ -165,10 +167,7 @@ func (b *_UserTokenPolicyBuilder) WithPolicyIdBuilder(builderSupplier func(Pasca
 	var err error
 	b.PolicyId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -188,10 +187,7 @@ func (b *_UserTokenPolicyBuilder) WithIssuedTokenTypeBuilder(builderSupplier fun
 	var err error
 	b.IssuedTokenType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -206,10 +202,7 @@ func (b *_UserTokenPolicyBuilder) WithIssuerEndpointUrlBuilder(builderSupplier f
 	var err error
 	b.IssuerEndpointUrl, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -224,41 +217,26 @@ func (b *_UserTokenPolicyBuilder) WithSecurityPolicyUriBuilder(builderSupplier f
 	var err error
 	b.SecurityPolicyUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_UserTokenPolicyBuilder) Build() (UserTokenPolicy, error) {
 	if b.PolicyId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'policyId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'policyId' not set"))
 	}
 	if b.IssuedTokenType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'issuedTokenType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'issuedTokenType' not set"))
 	}
 	if b.IssuerEndpointUrl == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'issuerEndpointUrl' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'issuerEndpointUrl' not set"))
 	}
 	if b.SecurityPolicyUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'securityPolicyUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'securityPolicyUri' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._UserTokenPolicy.deepCopy(), nil
 }
@@ -284,8 +262,8 @@ func (b *_UserTokenPolicyBuilder) buildForExtensionObjectDefinition() (Extension
 
 func (b *_UserTokenPolicyBuilder) DeepCopy() any {
 	_copy := b.CreateUserTokenPolicyBuilder().(*_UserTokenPolicyBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -362,7 +340,7 @@ func CastUserTokenPolicy(structType any) UserTokenPolicy {
 	return nil
 }
 
-func (m *_UserTokenPolicy) GetTypeName() string {
+func (m *_UserTokenPolicy) GetPlx4xTypeName() string {
 	return "UserTokenPolicy"
 }
 
@@ -402,31 +380,31 @@ func (m *_UserTokenPolicy) parse(ctx context.Context, readBuffer utils.ReadBuffe
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	policyId, err := ReadSimpleField[PascalString](ctx, "policyId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	policyId, err := ReadSimpleField[PascalString](ctx, "policyId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'policyId' field"))
 	}
 	m.PolicyId = policyId
 
-	tokenType, err := ReadEnumField[UserTokenType](ctx, "tokenType", "UserTokenType", ReadEnum(UserTokenTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	tokenType, err := ReadEnumField[UserTokenType](ctx, "tokenType", "UserTokenType", ReadEnum(UserTokenTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'tokenType' field"))
 	}
 	m.TokenType = tokenType
 
-	issuedTokenType, err := ReadSimpleField[PascalString](ctx, "issuedTokenType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	issuedTokenType, err := ReadSimpleField[PascalString](ctx, "issuedTokenType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'issuedTokenType' field"))
 	}
 	m.IssuedTokenType = issuedTokenType
 
-	issuerEndpointUrl, err := ReadSimpleField[PascalString](ctx, "issuerEndpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	issuerEndpointUrl, err := ReadSimpleField[PascalString](ctx, "issuerEndpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'issuerEndpointUrl' field"))
 	}
 	m.IssuerEndpointUrl = issuerEndpointUrl
 
-	securityPolicyUri, err := ReadSimpleField[PascalString](ctx, "securityPolicyUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	securityPolicyUri, err := ReadSimpleField[PascalString](ctx, "securityPolicyUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityPolicyUri' field"))
 	}
@@ -457,23 +435,23 @@ func (m *_UserTokenPolicy) SerializeWithWriteBuffer(ctx context.Context, writeBu
 			return errors.Wrap(pushErr, "Error pushing for UserTokenPolicy")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "policyId", m.GetPolicyId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "policyId", m.GetPolicyId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'policyId' field")
 		}
 
-		if err := WriteSimpleEnumField[UserTokenType](ctx, "tokenType", "UserTokenType", m.GetTokenType(), WriteEnum[UserTokenType, uint32](UserTokenType.GetValue, UserTokenType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[UserTokenType](ctx, "tokenType", "UserTokenType", m.GetTokenType(), WriteEnum[UserTokenType, uint32](UserTokenType.GetValue, UserTokenType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'tokenType' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "issuedTokenType", m.GetIssuedTokenType(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "issuedTokenType", m.GetIssuedTokenType(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'issuedTokenType' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "issuerEndpointUrl", m.GetIssuerEndpointUrl(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "issuerEndpointUrl", m.GetIssuerEndpointUrl(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'issuerEndpointUrl' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "securityPolicyUri", m.GetSecurityPolicyUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "securityPolicyUri", m.GetSecurityPolicyUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityPolicyUri' field")
 		}
 

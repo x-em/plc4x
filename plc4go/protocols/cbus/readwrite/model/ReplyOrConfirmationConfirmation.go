@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,12 +64,12 @@ var _ ReplyOrConfirmationConfirmation = (*_ReplyOrConfirmationConfirmation)(nil)
 var _ ReplyOrConfirmationRequirements = (*_ReplyOrConfirmationConfirmation)(nil)
 
 // NewReplyOrConfirmationConfirmation factory function for _ReplyOrConfirmationConfirmation
-func NewReplyOrConfirmationConfirmation(peekedByte byte, confirmation Confirmation, embeddedReply ReplyOrConfirmation, cBusOptions CBusOptions, requestContext RequestContext) *_ReplyOrConfirmationConfirmation {
+func NewReplyOrConfirmationConfirmation(peekedByte byte, confirmation Confirmation, embeddedReply ReplyOrConfirmation) *_ReplyOrConfirmationConfirmation {
 	if confirmation == nil {
 		panic("confirmation of type Confirmation for ReplyOrConfirmationConfirmation must not be nil")
 	}
 	_result := &_ReplyOrConfirmationConfirmation{
-		ReplyOrConfirmationContract: NewReplyOrConfirmation(peekedByte, cBusOptions, requestContext),
+		ReplyOrConfirmationContract: NewReplyOrConfirmation(peekedByte),
 		Confirmation:                confirmation,
 		EmbeddedReply:               embeddedReply,
 	}
@@ -110,7 +113,7 @@ type _ReplyOrConfirmationConfirmationBuilder struct {
 
 	parentBuilder *_ReplyOrConfirmationBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ReplyOrConfirmationConfirmationBuilder) = (*_ReplyOrConfirmationConfirmationBuilder)(nil)
@@ -134,10 +137,7 @@ func (b *_ReplyOrConfirmationConfirmationBuilder) WithConfirmationBuilder(builde
 	var err error
 	b.Confirmation, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ConfirmationBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ConfirmationBuilder failed"))
 	}
 	return b
 }
@@ -152,23 +152,17 @@ func (b *_ReplyOrConfirmationConfirmationBuilder) WithOptionalEmbeddedReplyBuild
 	var err error
 	b.EmbeddedReply, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ReplyOrConfirmationBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ReplyOrConfirmationBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ReplyOrConfirmationConfirmationBuilder) Build() (ReplyOrConfirmationConfirmation, error) {
 	if b.Confirmation == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'confirmation' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'confirmation' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ReplyOrConfirmationConfirmation.deepCopy(), nil
 }
@@ -194,8 +188,8 @@ func (b *_ReplyOrConfirmationConfirmationBuilder) buildForReplyOrConfirmation() 
 
 func (b *_ReplyOrConfirmationConfirmationBuilder) DeepCopy() any {
 	_copy := b.CreateReplyOrConfirmationConfirmationBuilder().(*_ReplyOrConfirmationConfirmationBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -256,7 +250,7 @@ func CastReplyOrConfirmationConfirmation(structType any) ReplyOrConfirmationConf
 	return nil
 }
 
-func (m *_ReplyOrConfirmationConfirmation) GetTypeName() string {
+func (m *_ReplyOrConfirmationConfirmation) GetPlx4xTypeName() string {
 	return "ReplyOrConfirmationConfirmation"
 }
 
@@ -289,14 +283,14 @@ func (m *_ReplyOrConfirmationConfirmation) parse(ctx context.Context, readBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	confirmation, err := ReadSimpleField[Confirmation](ctx, "confirmation", ReadComplex[Confirmation](ConfirmationParseWithBuffer, readBuffer))
+	confirmation, err := ReadSimpleField[Confirmation](ctx, "confirmation", ReadComplex[Confirmation](ConfirmationParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'confirmation' field"))
 	}
 	m.Confirmation = confirmation
 
 	var embeddedReply ReplyOrConfirmation
-	_embeddedReply, err := ReadOptionalField[ReplyOrConfirmation](ctx, "embeddedReply", ReadComplex[ReplyOrConfirmation](ReplyOrConfirmationParseWithBufferProducer[ReplyOrConfirmation]((CBusOptions)(cBusOptions), (RequestContext)(requestContext)), readBuffer), true)
+	_embeddedReply, err := ReadOptionalField[ReplyOrConfirmation](ctx, "embeddedReply", ReadComplex[ReplyOrConfirmation](ReplyOrConfirmationParseWithBufferProducer[ReplyOrConfirmation]((CBusOptions)(cBusOptions), (RequestContext)(requestContext)), readBuffer), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'embeddedReply' field"))
 	}
@@ -313,7 +307,7 @@ func (m *_ReplyOrConfirmationConfirmation) parse(ctx context.Context, readBuffer
 }
 
 func (m *_ReplyOrConfirmationConfirmation) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -330,11 +324,11 @@ func (m *_ReplyOrConfirmationConfirmation) SerializeWithWriteBuffer(ctx context.
 			return errors.Wrap(pushErr, "Error pushing for ReplyOrConfirmationConfirmation")
 		}
 
-		if err := WriteSimpleField[Confirmation](ctx, "confirmation", m.GetConfirmation(), WriteComplex[Confirmation](writeBuffer)); err != nil {
+		if err := WriteSimpleField[Confirmation](ctx, "confirmation", m.GetConfirmation(), WriteComplex[Confirmation](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'confirmation' field")
 		}
 
-		if err := WriteOptionalField[ReplyOrConfirmation](ctx, "embeddedReply", GetRef(m.GetEmbeddedReply()), WriteComplex[ReplyOrConfirmation](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[ReplyOrConfirmation](ctx, "embeddedReply", new(m.GetEmbeddedReply()), WriteComplex[ReplyOrConfirmation](writeBuffer), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'embeddedReply' field")
 		}
 

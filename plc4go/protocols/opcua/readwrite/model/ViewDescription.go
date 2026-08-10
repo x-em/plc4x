@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -114,7 +116,7 @@ type _ViewDescriptionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ViewDescriptionBuilder) = (*_ViewDescriptionBuilder)(nil)
@@ -138,10 +140,7 @@ func (b *_ViewDescriptionBuilder) WithViewIdBuilder(builderSupplier func(NodeIdB
 	var err error
 	b.ViewId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -158,13 +157,10 @@ func (b *_ViewDescriptionBuilder) WithViewVersion(viewVersion uint32) ViewDescri
 
 func (b *_ViewDescriptionBuilder) Build() (ViewDescription, error) {
 	if b.ViewId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'viewId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'viewId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ViewDescription.deepCopy(), nil
 }
@@ -190,8 +186,8 @@ func (b *_ViewDescriptionBuilder) buildForExtensionObjectDefinition() (Extension
 
 func (b *_ViewDescriptionBuilder) DeepCopy() any {
 	_copy := b.CreateViewDescriptionBuilder().(*_ViewDescriptionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -260,7 +256,7 @@ func CastViewDescription(structType any) ViewDescription {
 	return nil
 }
 
-func (m *_ViewDescription) GetTypeName() string {
+func (m *_ViewDescription) GetPlx4xTypeName() string {
 	return "ViewDescription"
 }
 
@@ -294,19 +290,19 @@ func (m *_ViewDescription) parse(ctx context.Context, readBuffer utils.ReadBuffe
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	viewId, err := ReadSimpleField[NodeId](ctx, "viewId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	viewId, err := ReadSimpleField[NodeId](ctx, "viewId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'viewId' field"))
 	}
 	m.ViewId = viewId
 
-	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)))
+	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timestamp' field"))
 	}
 	m.Timestamp = timestamp
 
-	viewVersion, err := ReadSimpleField(ctx, "viewVersion", ReadUnsignedInt(readBuffer, uint8(32)))
+	viewVersion, err := ReadSimpleField(ctx, "viewVersion", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'viewVersion' field"))
 	}
@@ -337,15 +333,15 @@ func (m *_ViewDescription) SerializeWithWriteBuffer(ctx context.Context, writeBu
 			return errors.Wrap(pushErr, "Error pushing for ViewDescription")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "viewId", m.GetViewId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "viewId", m.GetViewId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'viewId' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timestamp' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "viewVersion", m.GetViewVersion(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "viewVersion", m.GetViewVersion(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'viewVersion' field")
 		}
 

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewIntegerIdBuilder() IntegerIdBuilder {
 type _IntegerIdBuilder struct {
 	*_IntegerId
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IntegerIdBuilder) = (*_IntegerIdBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_IntegerIdBuilder) WithMandatoryFields() IntegerIdBuilder {
 }
 
 func (b *_IntegerIdBuilder) Build() (IntegerId, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IntegerId.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_IntegerIdBuilder) MustBuild() IntegerId {
 
 func (b *_IntegerIdBuilder) DeepCopy() any {
 	_copy := b.CreateIntegerIdBuilder().(*_IntegerIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastIntegerId(structType any) IntegerId {
 	return nil
 }
 
-func (m *_IntegerId) GetTypeName() string {
+func (m *_IntegerId) GetPlx4xTypeName() string {
 	return "IntegerId"
 }
 
@@ -159,7 +160,7 @@ func IntegerIdParseWithBufferProducer() func(ctx context.Context, readBuffer uti
 }
 
 func IntegerIdParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (IntegerId, error) {
-	v, err := (&_IntegerId{}).parse(ctx, readBuffer)
+	v, err := (new(_IntegerId)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

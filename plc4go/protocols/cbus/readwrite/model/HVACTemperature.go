@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -40,6 +41,7 @@ type HVACTemperature interface {
 	utils.Serializable
 	utils.Copyable
 	// GetTemperatureValue returns TemperatureValue (property field)
+	// TODO: check values from Air Conditioning Application 25.5.1
 	GetTemperatureValue() int16
 	// GetTemperatureInCelcius returns TemperatureInCelcius (virtual field)
 	GetTemperatureInCelcius() float32
@@ -87,7 +89,7 @@ func NewHVACTemperatureBuilder() HVACTemperatureBuilder {
 type _HVACTemperatureBuilder struct {
 	*_HVACTemperature
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (HVACTemperatureBuilder) = (*_HVACTemperatureBuilder)(nil)
@@ -102,8 +104,8 @@ func (b *_HVACTemperatureBuilder) WithTemperatureValue(temperatureValue int16) H
 }
 
 func (b *_HVACTemperatureBuilder) Build() (HVACTemperature, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._HVACTemperature.deepCopy(), nil
 }
@@ -118,8 +120,8 @@ func (b *_HVACTemperatureBuilder) MustBuild() HVACTemperature {
 
 func (b *_HVACTemperatureBuilder) DeepCopy() any {
 	_copy := b.CreateHVACTemperatureBuilder().(*_HVACTemperatureBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -177,7 +179,7 @@ func CastHVACTemperature(structType any) HVACTemperature {
 	return nil
 }
 
-func (m *_HVACTemperature) GetTypeName() string {
+func (m *_HVACTemperature) GetPlx4xTypeName() string {
 	return "HVACTemperature"
 }
 
@@ -207,7 +209,7 @@ func HVACTemperatureParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func HVACTemperatureParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (HVACTemperature, error) {
-	v, err := (&_HVACTemperature{}).parse(ctx, readBuffer)
+	v, err := (new(_HVACTemperature)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

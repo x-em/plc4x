@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -99,7 +100,7 @@ func NewTemperatureBroadcastDataBuilder() TemperatureBroadcastDataBuilder {
 type _TemperatureBroadcastDataBuilder struct {
 	*_TemperatureBroadcastData
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TemperatureBroadcastDataBuilder) = (*_TemperatureBroadcastDataBuilder)(nil)
@@ -124,8 +125,8 @@ func (b *_TemperatureBroadcastDataBuilder) WithTemperatureByte(temperatureByte b
 }
 
 func (b *_TemperatureBroadcastDataBuilder) Build() (TemperatureBroadcastData, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TemperatureBroadcastData.deepCopy(), nil
 }
@@ -140,8 +141,8 @@ func (b *_TemperatureBroadcastDataBuilder) MustBuild() TemperatureBroadcastData 
 
 func (b *_TemperatureBroadcastDataBuilder) DeepCopy() any {
 	_copy := b.CreateTemperatureBroadcastDataBuilder().(*_TemperatureBroadcastDataBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -213,7 +214,7 @@ func CastTemperatureBroadcastData(structType any) TemperatureBroadcastData {
 	return nil
 }
 
-func (m *_TemperatureBroadcastData) GetTypeName() string {
+func (m *_TemperatureBroadcastData) GetPlx4xTypeName() string {
 	return "TemperatureBroadcastData"
 }
 
@@ -251,7 +252,7 @@ func TemperatureBroadcastDataParseWithBufferProducer() func(ctx context.Context,
 }
 
 func TemperatureBroadcastDataParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (TemperatureBroadcastData, error) {
-	v, err := (&_TemperatureBroadcastData{}).parse(ctx, readBuffer)
+	v, err := (new(_TemperatureBroadcastData)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

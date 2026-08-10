@@ -21,14 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
-	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -88,7 +88,7 @@ func NewAmsStringBuilder() AmsStringBuilder {
 type _AmsStringBuilder struct {
 	*_AmsString
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AmsStringBuilder) = (*_AmsStringBuilder)(nil)
@@ -103,8 +103,8 @@ func (b *_AmsStringBuilder) WithText(text string) AmsStringBuilder {
 }
 
 func (b *_AmsStringBuilder) Build() (AmsString, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AmsString.deepCopy(), nil
 }
@@ -119,8 +119,8 @@ func (b *_AmsStringBuilder) MustBuild() AmsString {
 
 func (b *_AmsStringBuilder) DeepCopy() any {
 	_copy := b.CreateAmsStringBuilder().(*_AmsStringBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -163,7 +163,7 @@ func CastAmsString(structType any) AmsString {
 	return nil
 }
 
-func (m *_AmsString) GetTypeName() string {
+func (m *_AmsString) GetPlx4xTypeName() string {
 	return "AmsString"
 }
 
@@ -197,7 +197,7 @@ func AmsStringParseWithBufferProducer() func(ctx context.Context, readBuffer uti
 }
 
 func AmsStringParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (AmsString, error) {
-	v, err := (&_AmsString{}).parse(ctx, readBuffer)
+	v, err := (new(_AmsString)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (m *_AmsString) parse(ctx context.Context, readBuffer utils.ReadBuffer) (__
 	}
 	_ = strLen
 
-	text, err := ReadSimpleField(ctx, "text", ReadString(readBuffer, uint32(int32(int32(8))*int32((int32(strLen)-int32(int32(1)))))), codegen.WithEncoding("UTF-8"))
+	text, err := ReadSimpleField(ctx, "text", ReadString(readBuffer, uint32(int32(int32(8))*int32((int32(strLen)-int32(int32(1)))))))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'text' field"))
 	}
@@ -259,7 +259,7 @@ func (m *_AmsString) SerializeWithWriteBuffer(ctx context.Context, writeBuffer u
 		return errors.Wrap(err, "Error serializing 'strLen' field")
 	}
 
-	if err := WriteSimpleField[string](ctx, "text", m.GetText(), WriteString(writeBuffer, int32(int32(int32(8))*int32((int32(uint16(uint16(len(m.GetText())))+uint16(uint16(1)))-int32(int32(1)))))), codegen.WithEncoding("UTF-8")); err != nil {
+	if err := WriteSimpleField[string](ctx, "text", m.GetText(), WriteString(writeBuffer, int32(int32(int32(8))*int32((int32(uint16(uint16(len(m.GetText())))+uint16(uint16(1)))-int32(int32(1))))))); err != nil {
 		return errors.Wrap(err, "Error serializing 'text' field")
 	}
 

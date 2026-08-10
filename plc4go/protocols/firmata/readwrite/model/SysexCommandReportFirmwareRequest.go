@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _SysexCommandReportFirmwareRequestBuilder struct {
 
 	parentBuilder *_SysexCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SysexCommandReportFirmwareRequestBuilder) = (*_SysexCommandReportFirmwareRequestBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_SysexCommandReportFirmwareRequestBuilder) WithMandatoryFields() SysexC
 }
 
 func (b *_SysexCommandReportFirmwareRequestBuilder) Build() (SysexCommandReportFirmwareRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SysexCommandReportFirmwareRequest.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_SysexCommandReportFirmwareRequestBuilder) buildForSysexCommand() (Syse
 
 func (b *_SysexCommandReportFirmwareRequestBuilder) DeepCopy() any {
 	_copy := b.CreateSysexCommandReportFirmwareRequestBuilder().(*_SysexCommandReportFirmwareRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastSysexCommandReportFirmwareRequest(structType any) SysexCommandReportFir
 	return nil
 }
 
-func (m *_SysexCommandReportFirmwareRequest) GetTypeName() string {
+func (m *_SysexCommandReportFirmwareRequest) GetPlx4xTypeName() string {
 	return "SysexCommandReportFirmwareRequest"
 }
 

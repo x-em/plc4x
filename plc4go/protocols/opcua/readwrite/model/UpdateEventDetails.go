@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -125,7 +127,7 @@ type _UpdateEventDetailsBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (UpdateEventDetailsBuilder) = (*_UpdateEventDetailsBuilder)(nil)
@@ -149,10 +151,7 @@ func (b *_UpdateEventDetailsBuilder) WithNodeIdBuilder(builderSupplier func(Node
 	var err error
 	b.NodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -172,10 +171,7 @@ func (b *_UpdateEventDetailsBuilder) WithFilterBuilder(builderSupplier func(Even
 	var err error
 	b.Filter, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "EventFilterBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "EventFilterBuilder failed"))
 	}
 	return b
 }
@@ -187,19 +183,13 @@ func (b *_UpdateEventDetailsBuilder) WithEventData(eventData ...HistoryEventFiel
 
 func (b *_UpdateEventDetailsBuilder) Build() (UpdateEventDetails, error) {
 	if b.NodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'nodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'nodeId' not set"))
 	}
 	if b.Filter == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'filter' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'filter' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._UpdateEventDetails.deepCopy(), nil
 }
@@ -225,8 +215,8 @@ func (b *_UpdateEventDetailsBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_UpdateEventDetailsBuilder) DeepCopy() any {
 	_copy := b.CreateUpdateEventDetailsBuilder().(*_UpdateEventDetailsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +289,7 @@ func CastUpdateEventDetails(structType any) UpdateEventDetails {
 	return nil
 }
 
-func (m *_UpdateEventDetails) GetTypeName() string {
+func (m *_UpdateEventDetails) GetPlx4xTypeName() string {
 	return "UpdateEventDetails"
 }
 
@@ -322,9 +312,7 @@ func (m *_UpdateEventDetails) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.EventData) > 0 {
 		for _curItem, element := range m.EventData {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.EventData), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -346,31 +334,31 @@ func (m *_UpdateEventDetails) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	nodeId, err := ReadSimpleField[NodeId](ctx, "nodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	nodeId, err := ReadSimpleField[NodeId](ctx, "nodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeId' field"))
 	}
 	m.NodeId = nodeId
 
-	performInsertReplace, err := ReadEnumField[PerformUpdateType](ctx, "performInsertReplace", "PerformUpdateType", ReadEnum(PerformUpdateTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	performInsertReplace, err := ReadEnumField[PerformUpdateType](ctx, "performInsertReplace", "PerformUpdateType", ReadEnum(PerformUpdateTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'performInsertReplace' field"))
 	}
 	m.PerformInsertReplace = performInsertReplace
 
-	filter, err := ReadSimpleField[EventFilter](ctx, "filter", ReadComplex[EventFilter](ExtensionObjectDefinitionParseWithBufferProducer[EventFilter]((int32)(int32(727))), readBuffer))
+	filter, err := ReadSimpleField[EventFilter](ctx, "filter", ReadComplex[EventFilter](ExtensionObjectDefinitionParseWithBufferProducer[EventFilter]((int32)(int32(727))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'filter' field"))
 	}
 	m.Filter = filter
 
-	noOfEventData, err := ReadImplicitField[int32](ctx, "noOfEventData", ReadSignedInt(readBuffer, uint8(32)))
+	noOfEventData, err := ReadImplicitField[int32](ctx, "noOfEventData", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfEventData' field"))
 	}
 	_ = noOfEventData
 
-	eventData, err := ReadCountArrayField[HistoryEventFieldList](ctx, "eventData", ReadComplex[HistoryEventFieldList](ExtensionObjectDefinitionParseWithBufferProducer[HistoryEventFieldList]((int32)(int32(922))), readBuffer), uint64(noOfEventData))
+	eventData, err := ReadCountArrayField[HistoryEventFieldList](ctx, "eventData", ReadComplex[HistoryEventFieldList](ExtensionObjectDefinitionParseWithBufferProducer[HistoryEventFieldList]((int32)(int32(922))), readBuffer), uint64(noOfEventData), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'eventData' field"))
 	}
@@ -401,23 +389,23 @@ func (m *_UpdateEventDetails) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for UpdateEventDetails")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodeId' field")
 		}
 
-		if err := WriteSimpleEnumField[PerformUpdateType](ctx, "performInsertReplace", "PerformUpdateType", m.GetPerformInsertReplace(), WriteEnum[PerformUpdateType, uint32](PerformUpdateType.GetValue, PerformUpdateType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[PerformUpdateType](ctx, "performInsertReplace", "PerformUpdateType", m.GetPerformInsertReplace(), WriteEnum[PerformUpdateType, uint32](PerformUpdateType.GetValue, PerformUpdateType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'performInsertReplace' field")
 		}
 
-		if err := WriteSimpleField[EventFilter](ctx, "filter", m.GetFilter(), WriteComplex[EventFilter](writeBuffer)); err != nil {
+		if err := WriteSimpleField[EventFilter](ctx, "filter", m.GetFilter(), WriteComplex[EventFilter](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'filter' field")
 		}
 		noOfEventData := int32(utils.InlineIf(bool((m.GetEventData()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetEventData()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfEventData", noOfEventData, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfEventData", noOfEventData, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfEventData' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "eventData", m.GetEventData(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "eventData", m.GetEventData(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'eventData' field")
 		}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -95,7 +96,7 @@ func NewTransportTypeBuilder() TransportTypeBuilder {
 type _TransportTypeBuilder struct {
 	*_TransportType
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TransportTypeBuilder) = (*_TransportTypeBuilder)(nil)
@@ -120,8 +121,8 @@ func (b *_TransportTypeBuilder) WithClassTransport(classTransport uint8) Transpo
 }
 
 func (b *_TransportTypeBuilder) Build() (TransportType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TransportType.deepCopy(), nil
 }
@@ -136,8 +137,8 @@ func (b *_TransportTypeBuilder) MustBuild() TransportType {
 
 func (b *_TransportTypeBuilder) DeepCopy() any {
 	_copy := b.CreateTransportTypeBuilder().(*_TransportTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -188,7 +189,7 @@ func CastTransportType(structType any) TransportType {
 	return nil
 }
 
-func (m *_TransportType) GetTypeName() string {
+func (m *_TransportType) GetPlx4xTypeName() string {
 	return "TransportType"
 }
 
@@ -222,7 +223,7 @@ func TransportTypeParseWithBufferProducer() func(ctx context.Context, readBuffer
 }
 
 func TransportTypeParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (TransportType, error) {
-	v, err := (&_TransportType{}).parse(ctx, readBuffer)
+	v, err := (new(_TransportType)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -99,7 +100,7 @@ type _BACnetLogDataLogDataEntryAnyValueBuilder struct {
 
 	parentBuilder *_BACnetLogDataLogDataEntryBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetLogDataLogDataEntryAnyValueBuilder) = (*_BACnetLogDataLogDataEntryAnyValueBuilder)(nil)
@@ -123,17 +124,14 @@ func (b *_BACnetLogDataLogDataEntryAnyValueBuilder) WithOptionalAnyValueBuilder(
 	var err error
 	b.AnyValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetLogDataLogDataEntryAnyValueBuilder) Build() (BACnetLogDataLogDataEntryAnyValue, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetLogDataLogDataEntryAnyValue.deepCopy(), nil
 }
@@ -159,8 +157,8 @@ func (b *_BACnetLogDataLogDataEntryAnyValueBuilder) buildForBACnetLogDataLogData
 
 func (b *_BACnetLogDataLogDataEntryAnyValueBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetLogDataLogDataEntryAnyValueBuilder().(*_BACnetLogDataLogDataEntryAnyValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -217,7 +215,7 @@ func CastBACnetLogDataLogDataEntryAnyValue(structType any) BACnetLogDataLogDataE
 	return nil
 }
 
-func (m *_BACnetLogDataLogDataEntryAnyValue) GetTypeName() string {
+func (m *_BACnetLogDataLogDataEntryAnyValue) GetPlx4xTypeName() string {
 	return "BACnetLogDataLogDataEntryAnyValue"
 }
 
@@ -282,7 +280,7 @@ func (m *_BACnetLogDataLogDataEntryAnyValue) SerializeWithWriteBuffer(ctx contex
 			return errors.Wrap(pushErr, "Error pushing for BACnetLogDataLogDataEntryAnyValue")
 		}
 
-		if err := WriteOptionalField[BACnetConstructedData](ctx, "anyValue", GetRef(m.GetAnyValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetConstructedData](ctx, "anyValue", new(m.GetAnyValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'anyValue' field")
 		}
 

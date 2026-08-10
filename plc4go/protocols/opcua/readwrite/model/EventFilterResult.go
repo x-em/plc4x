@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -114,7 +116,7 @@ type _EventFilterResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EventFilterResultBuilder) = (*_EventFilterResultBuilder)(nil)
@@ -148,23 +150,17 @@ func (b *_EventFilterResultBuilder) WithWhereClauseResultBuilder(builderSupplier
 	var err error
 	b.WhereClauseResult, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ContentFilterResultBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ContentFilterResultBuilder failed"))
 	}
 	return b
 }
 
 func (b *_EventFilterResultBuilder) Build() (EventFilterResult, error) {
 	if b.WhereClauseResult == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'whereClauseResult' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'whereClauseResult' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EventFilterResult.deepCopy(), nil
 }
@@ -190,8 +186,8 @@ func (b *_EventFilterResultBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_EventFilterResultBuilder) DeepCopy() any {
 	_copy := b.CreateEventFilterResultBuilder().(*_EventFilterResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -260,7 +256,7 @@ func CastEventFilterResult(structType any) EventFilterResult {
 	return nil
 }
 
-func (m *_EventFilterResult) GetTypeName() string {
+func (m *_EventFilterResult) GetPlx4xTypeName() string {
 	return "EventFilterResult"
 }
 
@@ -274,9 +270,7 @@ func (m *_EventFilterResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.SelectClauseResults) > 0 {
 		for _curItem, element := range m.SelectClauseResults {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.SelectClauseResults), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -287,9 +281,7 @@ func (m *_EventFilterResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.SelectClauseDiagnosticInfos) > 0 {
 		for _curItem, element := range m.SelectClauseDiagnosticInfos {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.SelectClauseDiagnosticInfos), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -314,31 +306,31 @@ func (m *_EventFilterResult) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfSelectClauseResults, err := ReadImplicitField[int32](ctx, "noOfSelectClauseResults", ReadSignedInt(readBuffer, uint8(32)))
+	noOfSelectClauseResults, err := ReadImplicitField[int32](ctx, "noOfSelectClauseResults", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfSelectClauseResults' field"))
 	}
 	_ = noOfSelectClauseResults
 
-	selectClauseResults, err := ReadCountArrayField[StatusCode](ctx, "selectClauseResults", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfSelectClauseResults))
+	selectClauseResults, err := ReadCountArrayField[StatusCode](ctx, "selectClauseResults", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfSelectClauseResults), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'selectClauseResults' field"))
 	}
 	m.SelectClauseResults = selectClauseResults
 
-	noOfSelectClauseDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfSelectClauseDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)))
+	noOfSelectClauseDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfSelectClauseDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfSelectClauseDiagnosticInfos' field"))
 	}
 	_ = noOfSelectClauseDiagnosticInfos
 
-	selectClauseDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "selectClauseDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfSelectClauseDiagnosticInfos))
+	selectClauseDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "selectClauseDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfSelectClauseDiagnosticInfos), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'selectClauseDiagnosticInfos' field"))
 	}
 	m.SelectClauseDiagnosticInfos = selectClauseDiagnosticInfos
 
-	whereClauseResult, err := ReadSimpleField[ContentFilterResult](ctx, "whereClauseResult", ReadComplex[ContentFilterResult](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilterResult]((int32)(int32(609))), readBuffer))
+	whereClauseResult, err := ReadSimpleField[ContentFilterResult](ctx, "whereClauseResult", ReadComplex[ContentFilterResult](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilterResult]((int32)(int32(609))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'whereClauseResult' field"))
 	}
@@ -369,23 +361,23 @@ func (m *_EventFilterResult) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for EventFilterResult")
 		}
 		noOfSelectClauseResults := int32(utils.InlineIf(bool((m.GetSelectClauseResults()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetSelectClauseResults()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfSelectClauseResults", noOfSelectClauseResults, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfSelectClauseResults", noOfSelectClauseResults, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfSelectClauseResults' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "selectClauseResults", m.GetSelectClauseResults(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "selectClauseResults", m.GetSelectClauseResults(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'selectClauseResults' field")
 		}
 		noOfSelectClauseDiagnosticInfos := int32(utils.InlineIf(bool((m.GetSelectClauseDiagnosticInfos()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetSelectClauseDiagnosticInfos()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfSelectClauseDiagnosticInfos", noOfSelectClauseDiagnosticInfos, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfSelectClauseDiagnosticInfos", noOfSelectClauseDiagnosticInfos, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfSelectClauseDiagnosticInfos' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "selectClauseDiagnosticInfos", m.GetSelectClauseDiagnosticInfos(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "selectClauseDiagnosticInfos", m.GetSelectClauseDiagnosticInfos(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'selectClauseDiagnosticInfos' field")
 		}
 
-		if err := WriteSimpleField[ContentFilterResult](ctx, "whereClauseResult", m.GetWhereClauseResult(), WriteComplex[ContentFilterResult](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ContentFilterResult](ctx, "whereClauseResult", m.GetWhereClauseResult(), WriteComplex[ContentFilterResult](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'whereClauseResult' field")
 		}
 

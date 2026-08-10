@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _UnregisterNodesRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (UnregisterNodesRequestBuilder) = (*_UnregisterNodesRequestBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_UnregisterNodesRequestBuilder) WithRequestHeaderBuilder(builderSupplie
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_UnregisterNodesRequestBuilder) WithNodesToUnregister(nodesToUnregister
 
 func (b *_UnregisterNodesRequestBuilder) Build() (UnregisterNodesRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._UnregisterNodesRequest.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_UnregisterNodesRequestBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_UnregisterNodesRequestBuilder) DeepCopy() any {
 	_copy := b.CreateUnregisterNodesRequestBuilder().(*_UnregisterNodesRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastUnregisterNodesRequest(structType any) UnregisterNodesRequest {
 	return nil
 }
 
-func (m *_UnregisterNodesRequest) GetTypeName() string {
+func (m *_UnregisterNodesRequest) GetPlx4xTypeName() string {
 	return "UnregisterNodesRequest"
 }
 
@@ -262,9 +258,7 @@ func (m *_UnregisterNodesRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.NodesToUnregister) > 0 {
 		for _curItem, element := range m.NodesToUnregister {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.NodesToUnregister), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_UnregisterNodesRequest) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	noOfNodesToUnregister, err := ReadImplicitField[int32](ctx, "noOfNodesToUnregister", ReadSignedInt(readBuffer, uint8(32)))
+	noOfNodesToUnregister, err := ReadImplicitField[int32](ctx, "noOfNodesToUnregister", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfNodesToUnregister' field"))
 	}
 	_ = noOfNodesToUnregister
 
-	nodesToUnregister, err := ReadCountArrayField[NodeId](ctx, "nodesToUnregister", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), uint64(noOfNodesToUnregister))
+	nodesToUnregister, err := ReadCountArrayField[NodeId](ctx, "nodesToUnregister", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), uint64(noOfNodesToUnregister), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodesToUnregister' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_UnregisterNodesRequest) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for UnregisterNodesRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 		noOfNodesToUnregister := int32(utils.InlineIf(bool((m.GetNodesToUnregister()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetNodesToUnregister()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfNodesToUnregister", noOfNodesToUnregister, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfNodesToUnregister", noOfNodesToUnregister, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfNodesToUnregister' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "nodesToUnregister", m.GetNodesToUnregister(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "nodesToUnregister", m.GetNodesToUnregister(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodesToUnregister' field")
 		}
 

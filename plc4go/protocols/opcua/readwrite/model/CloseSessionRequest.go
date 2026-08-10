@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -110,7 +112,7 @@ type _CloseSessionRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CloseSessionRequestBuilder) = (*_CloseSessionRequestBuilder)(nil)
@@ -134,10 +136,7 @@ func (b *_CloseSessionRequestBuilder) WithRequestHeaderBuilder(builderSupplier f
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -149,13 +148,10 @@ func (b *_CloseSessionRequestBuilder) WithDeleteSubscriptions(deleteSubscription
 
 func (b *_CloseSessionRequestBuilder) Build() (CloseSessionRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CloseSessionRequest.deepCopy(), nil
 }
@@ -181,8 +177,8 @@ func (b *_CloseSessionRequestBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_CloseSessionRequestBuilder) DeepCopy() any {
 	_copy := b.CreateCloseSessionRequestBuilder().(*_CloseSessionRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -247,7 +243,7 @@ func CastCloseSessionRequest(structType any) CloseSessionRequest {
 	return nil
 }
 
-func (m *_CloseSessionRequest) GetTypeName() string {
+func (m *_CloseSessionRequest) GetPlx4xTypeName() string {
 	return "CloseSessionRequest"
 }
 
@@ -281,19 +277,19 @@ func (m *_CloseSessionRequest) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	deleteSubscriptions, err := ReadSimpleField(ctx, "deleteSubscriptions", ReadBoolean(readBuffer))
+	deleteSubscriptions, err := ReadSimpleField(ctx, "deleteSubscriptions", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deleteSubscriptions' field"))
 	}
@@ -324,15 +320,15 @@ func (m *_CloseSessionRequest) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for CloseSessionRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "deleteSubscriptions", m.GetDeleteSubscriptions(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "deleteSubscriptions", m.GetDeleteSubscriptions(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'deleteSubscriptions' field")
 		}
 

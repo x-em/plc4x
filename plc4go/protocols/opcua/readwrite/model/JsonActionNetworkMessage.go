@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -175,7 +177,7 @@ type _JsonActionNetworkMessageBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (JsonActionNetworkMessageBuilder) = (*_JsonActionNetworkMessageBuilder)(nil)
@@ -199,10 +201,7 @@ func (b *_JsonActionNetworkMessageBuilder) WithMessageIdBuilder(builderSupplier 
 	var err error
 	b.MessageId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -217,10 +216,7 @@ func (b *_JsonActionNetworkMessageBuilder) WithMessageTypeBuilder(builderSupplie
 	var err error
 	b.MessageType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -235,10 +231,7 @@ func (b *_JsonActionNetworkMessageBuilder) WithPublisherIdBuilder(builderSupplie
 	var err error
 	b.PublisherId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -258,10 +251,7 @@ func (b *_JsonActionNetworkMessageBuilder) WithResponseAddressBuilder(builderSup
 	var err error
 	b.ResponseAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -276,10 +266,7 @@ func (b *_JsonActionNetworkMessageBuilder) WithCorrelationDataBuilder(builderSup
 	var err error
 	b.CorrelationData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -294,10 +281,7 @@ func (b *_JsonActionNetworkMessageBuilder) WithRequestorIdBuilder(builderSupplie
 	var err error
 	b.RequestorId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -314,43 +298,25 @@ func (b *_JsonActionNetworkMessageBuilder) WithMessages(messages ...ExtensionObj
 
 func (b *_JsonActionNetworkMessageBuilder) Build() (JsonActionNetworkMessage, error) {
 	if b.MessageId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'messageId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'messageId' not set"))
 	}
 	if b.MessageType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'messageType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'messageType' not set"))
 	}
 	if b.PublisherId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'publisherId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'publisherId' not set"))
 	}
 	if b.ResponseAddress == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'responseAddress' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'responseAddress' not set"))
 	}
 	if b.CorrelationData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'correlationData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'correlationData' not set"))
 	}
 	if b.RequestorId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestorId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestorId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._JsonActionNetworkMessage.deepCopy(), nil
 }
@@ -376,8 +342,8 @@ func (b *_JsonActionNetworkMessageBuilder) buildForExtensionObjectDefinition() (
 
 func (b *_JsonActionNetworkMessageBuilder) DeepCopy() any {
 	_copy := b.CreateJsonActionNetworkMessageBuilder().(*_JsonActionNetworkMessageBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -470,7 +436,7 @@ func CastJsonActionNetworkMessage(structType any) JsonActionNetworkMessage {
 	return nil
 }
 
-func (m *_JsonActionNetworkMessage) GetTypeName() string {
+func (m *_JsonActionNetworkMessage) GetPlx4xTypeName() string {
 	return "JsonActionNetworkMessage"
 }
 
@@ -508,9 +474,7 @@ func (m *_JsonActionNetworkMessage) GetLengthInBits(ctx context.Context) uint16 
 	if len(m.Messages) > 0 {
 		for _curItem, element := range m.Messages {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Messages), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -532,61 +496,61 @@ func (m *_JsonActionNetworkMessage) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	messageId, err := ReadSimpleField[PascalString](ctx, "messageId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	messageId, err := ReadSimpleField[PascalString](ctx, "messageId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageId' field"))
 	}
 	m.MessageId = messageId
 
-	messageType, err := ReadSimpleField[PascalString](ctx, "messageType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	messageType, err := ReadSimpleField[PascalString](ctx, "messageType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageType' field"))
 	}
 	m.MessageType = messageType
 
-	publisherId, err := ReadSimpleField[PascalString](ctx, "publisherId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	publisherId, err := ReadSimpleField[PascalString](ctx, "publisherId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'publisherId' field"))
 	}
 	m.PublisherId = publisherId
 
-	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)))
+	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timestamp' field"))
 	}
 	m.Timestamp = timestamp
 
-	responseAddress, err := ReadSimpleField[PascalString](ctx, "responseAddress", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	responseAddress, err := ReadSimpleField[PascalString](ctx, "responseAddress", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'responseAddress' field"))
 	}
 	m.ResponseAddress = responseAddress
 
-	correlationData, err := ReadSimpleField[PascalByteString](ctx, "correlationData", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	correlationData, err := ReadSimpleField[PascalByteString](ctx, "correlationData", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'correlationData' field"))
 	}
 	m.CorrelationData = correlationData
 
-	requestorId, err := ReadSimpleField[PascalString](ctx, "requestorId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	requestorId, err := ReadSimpleField[PascalString](ctx, "requestorId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestorId' field"))
 	}
 	m.RequestorId = requestorId
 
-	timeoutHint, err := ReadSimpleField(ctx, "timeoutHint", ReadDouble(readBuffer, uint8(64)))
+	timeoutHint, err := ReadSimpleField(ctx, "timeoutHint", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timeoutHint' field"))
 	}
 	m.TimeoutHint = timeoutHint
 
-	noOfMessages, err := ReadImplicitField[int32](ctx, "noOfMessages", ReadSignedInt(readBuffer, uint8(32)))
+	noOfMessages, err := ReadImplicitField[int32](ctx, "noOfMessages", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfMessages' field"))
 	}
 	_ = noOfMessages
 
-	messages, err := ReadCountArrayField[ExtensionObject](ctx, "messages", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfMessages))
+	messages, err := ReadCountArrayField[ExtensionObject](ctx, "messages", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfMessages), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messages' field"))
 	}
@@ -617,43 +581,43 @@ func (m *_JsonActionNetworkMessage) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for JsonActionNetworkMessage")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "messageId", m.GetMessageId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "messageId", m.GetMessageId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "messageType", m.GetMessageType(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "messageType", m.GetMessageType(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageType' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "publisherId", m.GetPublisherId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "publisherId", m.GetPublisherId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'publisherId' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timestamp' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "responseAddress", m.GetResponseAddress(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "responseAddress", m.GetResponseAddress(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'responseAddress' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "correlationData", m.GetCorrelationData(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "correlationData", m.GetCorrelationData(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'correlationData' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "requestorId", m.GetRequestorId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "requestorId", m.GetRequestorId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestorId' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "timeoutHint", m.GetTimeoutHint(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "timeoutHint", m.GetTimeoutHint(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timeoutHint' field")
 		}
 		noOfMessages := int32(utils.InlineIf(bool((m.GetMessages()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetMessages()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfMessages", noOfMessages, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfMessages", noOfMessages, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfMessages' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "messages", m.GetMessages(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "messages", m.GetMessages(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messages' field")
 		}
 

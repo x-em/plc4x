@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _HistoryUpdateRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (HistoryUpdateRequestBuilder) = (*_HistoryUpdateRequestBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_HistoryUpdateRequestBuilder) WithRequestHeaderBuilder(builderSupplier 
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_HistoryUpdateRequestBuilder) WithHistoryUpdateDetails(historyUpdateDet
 
 func (b *_HistoryUpdateRequestBuilder) Build() (HistoryUpdateRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._HistoryUpdateRequest.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_HistoryUpdateRequestBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_HistoryUpdateRequestBuilder) DeepCopy() any {
 	_copy := b.CreateHistoryUpdateRequestBuilder().(*_HistoryUpdateRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastHistoryUpdateRequest(structType any) HistoryUpdateRequest {
 	return nil
 }
 
-func (m *_HistoryUpdateRequest) GetTypeName() string {
+func (m *_HistoryUpdateRequest) GetPlx4xTypeName() string {
 	return "HistoryUpdateRequest"
 }
 
@@ -262,9 +258,7 @@ func (m *_HistoryUpdateRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.HistoryUpdateDetails) > 0 {
 		for _curItem, element := range m.HistoryUpdateDetails {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.HistoryUpdateDetails), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_HistoryUpdateRequest) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	noOfHistoryUpdateDetails, err := ReadImplicitField[int32](ctx, "noOfHistoryUpdateDetails", ReadSignedInt(readBuffer, uint8(32)))
+	noOfHistoryUpdateDetails, err := ReadImplicitField[int32](ctx, "noOfHistoryUpdateDetails", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfHistoryUpdateDetails' field"))
 	}
 	_ = noOfHistoryUpdateDetails
 
-	historyUpdateDetails, err := ReadCountArrayField[ExtensionObject](ctx, "historyUpdateDetails", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfHistoryUpdateDetails))
+	historyUpdateDetails, err := ReadCountArrayField[ExtensionObject](ctx, "historyUpdateDetails", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfHistoryUpdateDetails), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'historyUpdateDetails' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_HistoryUpdateRequest) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for HistoryUpdateRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 		noOfHistoryUpdateDetails := int32(utils.InlineIf(bool((m.GetHistoryUpdateDetails()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetHistoryUpdateDetails()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfHistoryUpdateDetails", noOfHistoryUpdateDetails, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfHistoryUpdateDetails", noOfHistoryUpdateDetails, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfHistoryUpdateDetails' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "historyUpdateDetails", m.GetHistoryUpdateDetails(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "historyUpdateDetails", m.GetHistoryUpdateDetails(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'historyUpdateDetails' field")
 		}
 

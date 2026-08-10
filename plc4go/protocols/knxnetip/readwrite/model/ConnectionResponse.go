@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -121,7 +122,7 @@ type _ConnectionResponseBuilder struct {
 
 	parentBuilder *_KnxNetIpMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ConnectionResponseBuilder) = (*_ConnectionResponseBuilder)(nil)
@@ -155,10 +156,7 @@ func (b *_ConnectionResponseBuilder) WithOptionalHpaiDataEndpointBuilder(builder
 	var err error
 	b.HpaiDataEndpoint, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HPAIDataEndpointBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HPAIDataEndpointBuilder failed"))
 	}
 	return b
 }
@@ -173,17 +171,14 @@ func (b *_ConnectionResponseBuilder) WithOptionalConnectionResponseDataBlockBuil
 	var err error
 	b.ConnectionResponseDataBlock, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ConnectionResponseDataBlockBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ConnectionResponseDataBlockBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ConnectionResponseBuilder) Build() (ConnectionResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ConnectionResponse.deepCopy(), nil
 }
@@ -209,8 +204,8 @@ func (b *_ConnectionResponseBuilder) buildForKnxNetIpMessage() (KnxNetIpMessage,
 
 func (b *_ConnectionResponseBuilder) DeepCopy() any {
 	_copy := b.CreateConnectionResponseBuilder().(*_ConnectionResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -283,7 +278,7 @@ func CastConnectionResponse(structType any) ConnectionResponse {
 	return nil
 }
 
-func (m *_ConnectionResponse) GetTypeName() string {
+func (m *_ConnectionResponse) GetPlx4xTypeName() string {
 	return "ConnectionResponse"
 }
 
@@ -324,20 +319,20 @@ func (m *_ConnectionResponse) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	communicationChannelId, err := ReadSimpleField(ctx, "communicationChannelId", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithByteOrder(binary.BigEndian))
+	communicationChannelId, err := ReadSimpleField(ctx, "communicationChannelId", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'communicationChannelId' field"))
 	}
 	m.CommunicationChannelId = communicationChannelId
 
-	status, err := ReadEnumField[Status](ctx, "status", "Status", ReadEnum(StatusByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithByteOrder(binary.BigEndian))
+	status, err := ReadEnumField[Status](ctx, "status", "Status", ReadEnum(StatusByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'status' field"))
 	}
 	m.Status = status
 
 	var hpaiDataEndpoint HPAIDataEndpoint
-	_hpaiDataEndpoint, err := ReadOptionalField[HPAIDataEndpoint](ctx, "hpaiDataEndpoint", ReadComplex[HPAIDataEndpoint](HPAIDataEndpointParseWithBuffer, readBuffer), bool((status) == (Status_NO_ERROR)), codegen.WithByteOrder(binary.BigEndian))
+	_hpaiDataEndpoint, err := ReadOptionalField[HPAIDataEndpoint](ctx, "hpaiDataEndpoint", ReadComplex[HPAIDataEndpoint](HPAIDataEndpointParseWithBuffer, readBuffer), bool((status) == (Status_NO_ERROR)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'hpaiDataEndpoint' field"))
 	}
@@ -347,7 +342,7 @@ func (m *_ConnectionResponse) parse(ctx context.Context, readBuffer utils.ReadBu
 	}
 
 	var connectionResponseDataBlock ConnectionResponseDataBlock
-	_connectionResponseDataBlock, err := ReadOptionalField[ConnectionResponseDataBlock](ctx, "connectionResponseDataBlock", ReadComplex[ConnectionResponseDataBlock](ConnectionResponseDataBlockParseWithBuffer, readBuffer), bool((status) == (Status_NO_ERROR)), codegen.WithByteOrder(binary.BigEndian))
+	_connectionResponseDataBlock, err := ReadOptionalField[ConnectionResponseDataBlock](ctx, "connectionResponseDataBlock", ReadComplex[ConnectionResponseDataBlock](ConnectionResponseDataBlockParseWithBuffer, readBuffer), bool((status) == (Status_NO_ERROR)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'connectionResponseDataBlock' field"))
 	}
@@ -381,19 +376,19 @@ func (m *_ConnectionResponse) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for ConnectionResponse")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "communicationChannelId", m.GetCommunicationChannelId(), WriteUnsignedByte(writeBuffer, 8), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "communicationChannelId", m.GetCommunicationChannelId(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'communicationChannelId' field")
 		}
 
-		if err := WriteSimpleEnumField[Status](ctx, "status", "Status", m.GetStatus(), WriteEnum[Status, uint8](Status.GetValue, Status.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleEnumField[Status](ctx, "status", "Status", m.GetStatus(), WriteEnum[Status, uint8](Status.GetValue, Status.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'status' field")
 		}
 
-		if err := WriteOptionalField[HPAIDataEndpoint](ctx, "hpaiDataEndpoint", GetRef(m.GetHpaiDataEndpoint()), WriteComplex[HPAIDataEndpoint](writeBuffer), true, codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteOptionalField[HPAIDataEndpoint](ctx, "hpaiDataEndpoint", new(m.GetHpaiDataEndpoint()), WriteComplex[HPAIDataEndpoint](writeBuffer), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'hpaiDataEndpoint' field")
 		}
 
-		if err := WriteOptionalField[ConnectionResponseDataBlock](ctx, "connectionResponseDataBlock", GetRef(m.GetConnectionResponseDataBlock()), WriteComplex[ConnectionResponseDataBlock](writeBuffer), true, codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteOptionalField[ConnectionResponseDataBlock](ctx, "connectionResponseDataBlock", new(m.GetConnectionResponseDataBlock()), WriteComplex[ConnectionResponseDataBlock](writeBuffer), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'connectionResponseDataBlock' field")
 		}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ type _ModbusPDUReadFileRecordResponseBuilder struct {
 
 	parentBuilder *_ModbusPDUBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ModbusPDUReadFileRecordResponseBuilder) = (*_ModbusPDUReadFileRecordResponseBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_ModbusPDUReadFileRecordResponseBuilder) WithItems(items ...ModbusPDURe
 }
 
 func (b *_ModbusPDUReadFileRecordResponseBuilder) Build() (ModbusPDUReadFileRecordResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ModbusPDUReadFileRecordResponse.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_ModbusPDUReadFileRecordResponseBuilder) buildForModbusPDU() (ModbusPDU
 
 func (b *_ModbusPDUReadFileRecordResponseBuilder) DeepCopy() any {
 	_copy := b.CreateModbusPDUReadFileRecordResponseBuilder().(*_ModbusPDUReadFileRecordResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -214,7 +215,7 @@ func CastModbusPDUReadFileRecordResponse(structType any) ModbusPDUReadFileRecord
 	return nil
 }
 
-func (m *_ModbusPDUReadFileRecordResponse) GetTypeName() string {
+func (m *_ModbusPDUReadFileRecordResponse) GetPlx4xTypeName() string {
 	return "ModbusPDUReadFileRecordResponse"
 }
 

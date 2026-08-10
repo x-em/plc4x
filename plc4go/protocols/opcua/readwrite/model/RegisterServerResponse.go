@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +104,7 @@ type _RegisterServerResponseBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RegisterServerResponseBuilder) = (*_RegisterServerResponseBuilder)(nil)
@@ -126,23 +128,17 @@ func (b *_RegisterServerResponseBuilder) WithResponseHeaderBuilder(builderSuppli
 	var err error
 	b.ResponseHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ResponseHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ResponseHeaderBuilder failed"))
 	}
 	return b
 }
 
 func (b *_RegisterServerResponseBuilder) Build() (RegisterServerResponse, error) {
 	if b.ResponseHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'responseHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'responseHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RegisterServerResponse.deepCopy(), nil
 }
@@ -168,8 +164,8 @@ func (b *_RegisterServerResponseBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_RegisterServerResponseBuilder) DeepCopy() any {
 	_copy := b.CreateRegisterServerResponseBuilder().(*_RegisterServerResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +226,7 @@ func CastRegisterServerResponse(structType any) RegisterServerResponse {
 	return nil
 }
 
-func (m *_RegisterServerResponse) GetTypeName() string {
+func (m *_RegisterServerResponse) GetPlx4xTypeName() string {
 	return "RegisterServerResponse"
 }
 
@@ -258,7 +254,7 @@ func (m *_RegisterServerResponse) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer))
+	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'responseHeader' field"))
 	}
@@ -289,7 +285,7 @@ func (m *_RegisterServerResponse) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for RegisterServerResponse")
 		}
 
-		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'responseHeader' field")
 		}
 

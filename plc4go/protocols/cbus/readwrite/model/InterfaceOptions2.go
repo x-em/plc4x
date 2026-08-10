@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +100,7 @@ func NewInterfaceOptions2Builder() InterfaceOptions2Builder {
 type _InterfaceOptions2Builder struct {
 	*_InterfaceOptions2
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (InterfaceOptions2Builder) = (*_InterfaceOptions2Builder)(nil)
@@ -117,8 +120,8 @@ func (b *_InterfaceOptions2Builder) WithClockGen(clockGen bool) InterfaceOptions
 }
 
 func (b *_InterfaceOptions2Builder) Build() (InterfaceOptions2, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._InterfaceOptions2.deepCopy(), nil
 }
@@ -133,8 +136,8 @@ func (b *_InterfaceOptions2Builder) MustBuild() InterfaceOptions2 {
 
 func (b *_InterfaceOptions2Builder) DeepCopy() any {
 	_copy := b.CreateInterfaceOptions2Builder().(*_InterfaceOptions2Builder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -181,7 +184,7 @@ func CastInterfaceOptions2(structType any) InterfaceOptions2 {
 	return nil
 }
 
-func (m *_InterfaceOptions2) GetTypeName() string {
+func (m *_InterfaceOptions2) GetPlx4xTypeName() string {
 	return "InterfaceOptions2"
 }
 
@@ -220,7 +223,7 @@ func (m *_InterfaceOptions2) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func InterfaceOptions2Parse(ctx context.Context, theBytes []byte) (InterfaceOptions2, error) {
-	return InterfaceOptions2ParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return InterfaceOptions2ParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func InterfaceOptions2ParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (InterfaceOptions2, error) {
@@ -230,7 +233,7 @@ func InterfaceOptions2ParseWithBufferProducer() func(ctx context.Context, readBu
 }
 
 func InterfaceOptions2ParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (InterfaceOptions2, error) {
-	v, err := (&_InterfaceOptions2{}).parse(ctx, readBuffer)
+	v, err := (new(_InterfaceOptions2)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -246,49 +249,49 @@ func (m *_InterfaceOptions2) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	burden, err := ReadSimpleField(ctx, "burden", ReadBoolean(readBuffer))
+	burden, err := ReadSimpleField(ctx, "burden", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'burden' field"))
 	}
 	m.Burden = burden
 
-	reservedField1, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField1, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField1 = reservedField1
 
-	reservedField2, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField2, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField2 = reservedField2
 
-	reservedField3, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField3, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField3 = reservedField3
 
-	reservedField4, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField4, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField4 = reservedField4
 
-	reservedField5, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField5, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField5 = reservedField5
 
-	clockGen, err := ReadSimpleField(ctx, "clockGen", ReadBoolean(readBuffer))
+	clockGen, err := ReadSimpleField(ctx, "clockGen", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clockGen' field"))
 	}
@@ -302,7 +305,7 @@ func (m *_InterfaceOptions2) parse(ctx context.Context, readBuffer utils.ReadBuf
 }
 
 func (m *_InterfaceOptions2) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -318,35 +321,35 @@ func (m *_InterfaceOptions2) SerializeWithWriteBuffer(ctx context.Context, write
 		return errors.Wrap(pushErr, "Error pushing for InterfaceOptions2")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "burden", m.GetBurden(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "burden", m.GetBurden(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'burden' field")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 2")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 3")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 4")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 5")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 6")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "clockGen", m.GetClockGen(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "clockGen", m.GetClockGen(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'clockGen' field")
 	}
 

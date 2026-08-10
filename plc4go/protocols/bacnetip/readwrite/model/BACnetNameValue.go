@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ func NewBACnetNameValueBuilder() BACnetNameValueBuilder {
 type _BACnetNameValueBuilder struct {
 	*_BACnetNameValue
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetNameValueBuilder) = (*_BACnetNameValueBuilder)(nil)
@@ -116,10 +117,7 @@ func (b *_BACnetNameValueBuilder) WithNameBuilder(builderSupplier func(BACnetCon
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagCharacterStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagCharacterStringBuilder failed"))
 	}
 	return b
 }
@@ -134,23 +132,17 @@ func (b *_BACnetNameValueBuilder) WithOptionalValueBuilder(builderSupplier func(
 	var err error
 	b.Value, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetNameValueBuilder) Build() (BACnetNameValue, error) {
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetNameValue.deepCopy(), nil
 }
@@ -165,8 +157,8 @@ func (b *_BACnetNameValueBuilder) MustBuild() BACnetNameValue {
 
 func (b *_BACnetNameValueBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetNameValueBuilder().(*_BACnetNameValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -213,7 +205,7 @@ func CastBACnetNameValue(structType any) BACnetNameValue {
 	return nil
 }
 
-func (m *_BACnetNameValue) GetTypeName() string {
+func (m *_BACnetNameValue) GetPlx4xTypeName() string {
 	return "BACnetNameValue"
 }
 
@@ -246,7 +238,7 @@ func BACnetNameValueParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func BACnetNameValueParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetNameValue, error) {
-	v, err := (&_BACnetNameValue{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetNameValue)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +298,7 @@ func (m *_BACnetNameValue) SerializeWithWriteBuffer(ctx context.Context, writeBu
 		return errors.Wrap(err, "Error serializing 'name' field")
 	}
 
-	if err := WriteOptionalField[BACnetConstructedData](ctx, "value", GetRef(m.GetValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetConstructedData](ctx, "value", new(m.GetValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'value' field")
 	}
 

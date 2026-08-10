@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -37,6 +38,7 @@ import (
 const S7PayloadUserDataItemCpuFunctionAlarmAckRequest_FUNCTIONID uint8 = 0x09
 
 // S7PayloadUserDataItemCpuFunctionAlarmAckRequest is the corresponding interface of S7PayloadUserDataItemCpuFunctionAlarmAckRequest
+// ALARM_ACK Acknowledgment of alarms
 type S7PayloadUserDataItemCpuFunctionAlarmAckRequest interface {
 	fmt.Stringer
 	utils.LengthAware
@@ -100,7 +102,7 @@ type _S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder struct {
 
 	parentBuilder *_S7PayloadUserDataItemBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder) = (*_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder)(nil)
@@ -120,8 +122,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder) WithMessageObj
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder) Build() (S7PayloadUserDataItemCpuFunctionAlarmAckRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7PayloadUserDataItemCpuFunctionAlarmAckRequest.deepCopy(), nil
 }
@@ -147,8 +149,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder) buildForS7Payl
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder) DeepCopy() any {
 	_copy := b.CreateS7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder().(*_S7PayloadUserDataItemCpuFunctionAlarmAckRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +232,7 @@ func CastS7PayloadUserDataItemCpuFunctionAlarmAckRequest(structType any) S7Paylo
 	return nil
 }
 
-func (m *_S7PayloadUserDataItemCpuFunctionAlarmAckRequest) GetTypeName() string {
+func (m *_S7PayloadUserDataItemCpuFunctionAlarmAckRequest) GetPlx4xTypeName() string {
 	return "S7PayloadUserDataItemCpuFunctionAlarmAckRequest"
 }
 
@@ -247,9 +249,7 @@ func (m *_S7PayloadUserDataItemCpuFunctionAlarmAckRequest) GetLengthInBits(ctx c
 	if len(m.MessageObjects) > 0 {
 		for _curItem, element := range m.MessageObjects {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.MessageObjects), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

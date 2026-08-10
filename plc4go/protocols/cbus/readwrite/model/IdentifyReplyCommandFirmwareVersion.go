@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ IdentifyReplyCommandFirmwareVersion = (*_IdentifyReplyCommandFirmwareVersi
 var _ IdentifyReplyCommandRequirements = (*_IdentifyReplyCommandFirmwareVersion)(nil)
 
 // NewIdentifyReplyCommandFirmwareVersion factory function for _IdentifyReplyCommandFirmwareVersion
-func NewIdentifyReplyCommandFirmwareVersion(firmwareVersion string, numBytes uint8) *_IdentifyReplyCommandFirmwareVersion {
+func NewIdentifyReplyCommandFirmwareVersion(firmwareVersion string) *_IdentifyReplyCommandFirmwareVersion {
 	_result := &_IdentifyReplyCommandFirmwareVersion{
-		IdentifyReplyCommandContract: NewIdentifyReplyCommand(numBytes),
+		IdentifyReplyCommandContract: NewIdentifyReplyCommand(),
 		FirmwareVersion:              firmwareVersion,
 	}
 	_result.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = _result
@@ -97,7 +100,7 @@ type _IdentifyReplyCommandFirmwareVersionBuilder struct {
 
 	parentBuilder *_IdentifyReplyCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IdentifyReplyCommandFirmwareVersionBuilder) = (*_IdentifyReplyCommandFirmwareVersionBuilder)(nil)
@@ -117,8 +120,8 @@ func (b *_IdentifyReplyCommandFirmwareVersionBuilder) WithFirmwareVersion(firmwa
 }
 
 func (b *_IdentifyReplyCommandFirmwareVersionBuilder) Build() (IdentifyReplyCommandFirmwareVersion, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IdentifyReplyCommandFirmwareVersion.deepCopy(), nil
 }
@@ -144,8 +147,8 @@ func (b *_IdentifyReplyCommandFirmwareVersionBuilder) buildForIdentifyReplyComma
 
 func (b *_IdentifyReplyCommandFirmwareVersionBuilder) DeepCopy() any {
 	_copy := b.CreateIdentifyReplyCommandFirmwareVersionBuilder().(*_IdentifyReplyCommandFirmwareVersionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +209,7 @@ func CastIdentifyReplyCommandFirmwareVersion(structType any) IdentifyReplyComman
 	return nil
 }
 
-func (m *_IdentifyReplyCommandFirmwareVersion) GetTypeName() string {
+func (m *_IdentifyReplyCommandFirmwareVersion) GetPlx4xTypeName() string {
 	return "IdentifyReplyCommandFirmwareVersion"
 }
 
@@ -234,7 +237,7 @@ func (m *_IdentifyReplyCommandFirmwareVersion) parse(ctx context.Context, readBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	firmwareVersion, err := ReadSimpleField(ctx, "firmwareVersion", ReadString(readBuffer, uint32(64)))
+	firmwareVersion, err := ReadSimpleField(ctx, "firmwareVersion", ReadString(readBuffer, uint32(64)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'firmwareVersion' field"))
 	}
@@ -248,7 +251,7 @@ func (m *_IdentifyReplyCommandFirmwareVersion) parse(ctx context.Context, readBu
 }
 
 func (m *_IdentifyReplyCommandFirmwareVersion) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -265,7 +268,7 @@ func (m *_IdentifyReplyCommandFirmwareVersion) SerializeWithWriteBuffer(ctx cont
 			return errors.Wrap(pushErr, "Error pushing for IdentifyReplyCommandFirmwareVersion")
 		}
 
-		if err := WriteSimpleField[string](ctx, "firmwareVersion", m.GetFirmwareVersion(), WriteString(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[string](ctx, "firmwareVersion", m.GetFirmwareVersion(), WriteString(writeBuffer, 64), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'firmwareVersion' field")
 		}
 

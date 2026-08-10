@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -64,7 +65,7 @@ var _ BACnetConfirmedServiceRequestConfirmedPrivateTransfer = (*_BACnetConfirmed
 var _ BACnetConfirmedServiceRequestRequirements = (*_BACnetConfirmedServiceRequestConfirmedPrivateTransfer)(nil)
 
 // NewBACnetConfirmedServiceRequestConfirmedPrivateTransfer factory function for _BACnetConfirmedServiceRequestConfirmedPrivateTransfer
-func NewBACnetConfirmedServiceRequestConfirmedPrivateTransfer(vendorId BACnetVendorIdTagged, serviceNumber BACnetContextTagUnsignedInteger, serviceParameters BACnetConstructedData, serviceRequestLength uint32) *_BACnetConfirmedServiceRequestConfirmedPrivateTransfer {
+func NewBACnetConfirmedServiceRequestConfirmedPrivateTransfer(serviceRequestLength uint32, vendorId BACnetVendorIdTagged, serviceNumber BACnetContextTagUnsignedInteger, serviceParameters BACnetConstructedData) *_BACnetConfirmedServiceRequestConfirmedPrivateTransfer {
 	if vendorId == nil {
 		panic("vendorId of type BACnetVendorIdTagged for BACnetConfirmedServiceRequestConfirmedPrivateTransfer must not be nil")
 	}
@@ -121,7 +122,7 @@ type _BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder struct {
 
 	parentBuilder *_BACnetConfirmedServiceRequestBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder) = (*_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder)(nil)
@@ -145,10 +146,7 @@ func (b *_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder) WithVend
 	var err error
 	b.VendorId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetVendorIdTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetVendorIdTaggedBuilder failed"))
 	}
 	return b
 }
@@ -163,10 +161,7 @@ func (b *_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder) WithServ
 	var err error
 	b.ServiceNumber, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -181,29 +176,20 @@ func (b *_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder) WithOpti
 	var err error
 	b.ServiceParameters, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder) Build() (BACnetConfirmedServiceRequestConfirmedPrivateTransfer, error) {
 	if b.VendorId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'vendorId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'vendorId' not set"))
 	}
 	if b.ServiceNumber == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'serviceNumber' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'serviceNumber' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConfirmedServiceRequestConfirmedPrivateTransfer.deepCopy(), nil
 }
@@ -229,8 +215,8 @@ func (b *_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder) buildFor
 
 func (b *_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder().(*_BACnetConfirmedServiceRequestConfirmedPrivateTransferBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +285,7 @@ func CastBACnetConfirmedServiceRequestConfirmedPrivateTransfer(structType any) B
 	return nil
 }
 
-func (m *_BACnetConfirmedServiceRequestConfirmedPrivateTransfer) GetTypeName() string {
+func (m *_BACnetConfirmedServiceRequestConfirmedPrivateTransfer) GetPlx4xTypeName() string {
 	return "BACnetConfirmedServiceRequestConfirmedPrivateTransfer"
 }
 
@@ -390,7 +376,7 @@ func (m *_BACnetConfirmedServiceRequestConfirmedPrivateTransfer) SerializeWithWr
 			return errors.Wrap(err, "Error serializing 'serviceNumber' field")
 		}
 
-		if err := WriteOptionalField[BACnetConstructedData](ctx, "serviceParameters", GetRef(m.GetServiceParameters()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetConstructedData](ctx, "serviceParameters", new(m.GetServiceParameters()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'serviceParameters' field")
 		}
 

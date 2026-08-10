@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -64,9 +67,9 @@ var _ RequestSmartConnectShortcut = (*_RequestSmartConnectShortcut)(nil)
 var _ RequestRequirements = (*_RequestSmartConnectShortcut)(nil)
 
 // NewRequestSmartConnectShortcut factory function for _RequestSmartConnectShortcut
-func NewRequestSmartConnectShortcut(peekedByte RequestType, startingCR *RequestType, resetMode *RequestType, secondPeek RequestType, termination RequestTermination, pipePeek RequestType, secondPipe *byte, cBusOptions CBusOptions) *_RequestSmartConnectShortcut {
+func NewRequestSmartConnectShortcut(peekedByte RequestType, startingCR *RequestType, resetMode *RequestType, secondPeek RequestType, termination RequestTermination, pipePeek RequestType, secondPipe *byte) *_RequestSmartConnectShortcut {
 	_result := &_RequestSmartConnectShortcut{
-		RequestContract: NewRequest(peekedByte, startingCR, resetMode, secondPeek, termination, cBusOptions),
+		RequestContract: NewRequest(peekedByte, startingCR, resetMode, secondPeek, termination),
 		PipePeek:        pipePeek,
 		SecondPipe:      secondPipe,
 	}
@@ -106,7 +109,7 @@ type _RequestSmartConnectShortcutBuilder struct {
 
 	parentBuilder *_RequestBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RequestSmartConnectShortcutBuilder) = (*_RequestSmartConnectShortcutBuilder)(nil)
@@ -131,8 +134,8 @@ func (b *_RequestSmartConnectShortcutBuilder) WithOptionalSecondPipe(secondPipe 
 }
 
 func (b *_RequestSmartConnectShortcutBuilder) Build() (RequestSmartConnectShortcut, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RequestSmartConnectShortcut.deepCopy(), nil
 }
@@ -158,8 +161,8 @@ func (b *_RequestSmartConnectShortcutBuilder) buildForRequest() (Request, error)
 
 func (b *_RequestSmartConnectShortcutBuilder) DeepCopy() any {
 	_copy := b.CreateRequestSmartConnectShortcutBuilder().(*_RequestSmartConnectShortcutBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -233,7 +236,7 @@ func CastRequestSmartConnectShortcut(structType any) RequestSmartConnectShortcut
 	return nil
 }
 
-func (m *_RequestSmartConnectShortcut) GetTypeName() string {
+func (m *_RequestSmartConnectShortcut) GetPlx4xTypeName() string {
 	return "RequestSmartConnectShortcut"
 }
 
@@ -266,20 +269,20 @@ func (m *_RequestSmartConnectShortcut) parse(ctx context.Context, readBuffer uti
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	pipe, err := ReadConstField[byte](ctx, "pipe", ReadByte(readBuffer, 8), RequestSmartConnectShortcut_PIPE)
+	pipe, err := ReadConstField[byte](ctx, "pipe", ReadByte(readBuffer, 8), RequestSmartConnectShortcut_PIPE, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'pipe' field"))
 	}
 	_ = pipe
 
-	pipePeek, err := ReadPeekField[RequestType](ctx, "pipePeek", ReadEnum(RequestTypeByValue, ReadUnsignedByte(readBuffer, uint8(8))), 0)
+	pipePeek, err := ReadPeekField[RequestType](ctx, "pipePeek", ReadEnum(RequestTypeByValue, ReadUnsignedByte(readBuffer, uint8(8))), 0, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'pipePeek' field"))
 	}
 	m.PipePeek = pipePeek
 
 	var secondPipe *byte
-	secondPipe, err = ReadOptionalField[byte](ctx, "secondPipe", ReadByte(readBuffer, 8), bool((pipePeek) == (RequestType_SMART_CONNECT_SHORTCUT)))
+	secondPipe, err = ReadOptionalField[byte](ctx, "secondPipe", ReadByte(readBuffer, 8), bool((pipePeek) == (RequestType_SMART_CONNECT_SHORTCUT)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'secondPipe' field"))
 	}
@@ -293,7 +296,7 @@ func (m *_RequestSmartConnectShortcut) parse(ctx context.Context, readBuffer uti
 }
 
 func (m *_RequestSmartConnectShortcut) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -310,11 +313,11 @@ func (m *_RequestSmartConnectShortcut) SerializeWithWriteBuffer(ctx context.Cont
 			return errors.Wrap(pushErr, "Error pushing for RequestSmartConnectShortcut")
 		}
 
-		if err := WriteConstField(ctx, "pipe", RequestSmartConnectShortcut_PIPE, WriteByte(writeBuffer, 8)); err != nil {
+		if err := WriteConstField(ctx, "pipe", RequestSmartConnectShortcut_PIPE, WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'pipe' field")
 		}
 
-		if err := WriteOptionalField[byte](ctx, "secondPipe", m.GetSecondPipe(), WriteByte(writeBuffer, 8), true); err != nil {
+		if err := WriteOptionalField[byte](ctx, "secondPipe", m.GetSecondPipe(), WriteByte(writeBuffer, 8), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'secondPipe' field")
 		}
 

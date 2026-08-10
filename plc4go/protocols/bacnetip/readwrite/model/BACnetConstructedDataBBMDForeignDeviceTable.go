@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataBBMDForeignDeviceTable = (*_BACnetConstructedDataBBMD
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataBBMDForeignDeviceTable)(nil)
 
 // NewBACnetConstructedDataBBMDForeignDeviceTable factory function for _BACnetConstructedDataBBMDForeignDeviceTable
-func NewBACnetConstructedDataBBMDForeignDeviceTable(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, bbmdForeignDeviceTable []BACnetBDTEntry, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataBBMDForeignDeviceTable {
+func NewBACnetConstructedDataBBMDForeignDeviceTable(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, bbmdForeignDeviceTable []BACnetBDTEntry) *_BACnetConstructedDataBBMDForeignDeviceTable {
 	_result := &_BACnetConstructedDataBBMDForeignDeviceTable{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		BbmdForeignDeviceTable:        bbmdForeignDeviceTable,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataBBMDForeignDeviceTableBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataBBMDForeignDeviceTableBuilder) = (*_BACnetConstructedDataBBMDForeignDeviceTableBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataBBMDForeignDeviceTableBuilder) WithBbmdForeignDev
 }
 
 func (b *_BACnetConstructedDataBBMDForeignDeviceTableBuilder) Build() (BACnetConstructedDataBBMDForeignDeviceTable, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataBBMDForeignDeviceTable.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataBBMDForeignDeviceTableBuilder) buildForBACnetCons
 
 func (b *_BACnetConstructedDataBBMDForeignDeviceTableBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataBBMDForeignDeviceTableBuilder().(*_BACnetConstructedDataBBMDForeignDeviceTableBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataBBMDForeignDeviceTable(structType any) BACnetConst
 	return nil
 }
 
-func (m *_BACnetConstructedDataBBMDForeignDeviceTable) GetTypeName() string {
+func (m *_BACnetConstructedDataBBMDForeignDeviceTable) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataBBMDForeignDeviceTable"
 }
 

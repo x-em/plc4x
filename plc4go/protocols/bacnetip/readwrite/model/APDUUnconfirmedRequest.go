@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ APDUUnconfirmedRequest = (*_APDUUnconfirmedRequest)(nil)
 var _ APDURequirements = (*_APDUUnconfirmedRequest)(nil)
 
 // NewAPDUUnconfirmedRequest factory function for _APDUUnconfirmedRequest
-func NewAPDUUnconfirmedRequest(serviceRequest BACnetUnconfirmedServiceRequest, apduLength uint16) *_APDUUnconfirmedRequest {
+func NewAPDUUnconfirmedRequest(serviceRequest BACnetUnconfirmedServiceRequest) *_APDUUnconfirmedRequest {
 	if serviceRequest == nil {
 		panic("serviceRequest of type BACnetUnconfirmedServiceRequest for APDUUnconfirmedRequest must not be nil")
 	}
 	_result := &_APDUUnconfirmedRequest{
-		APDUContract:   NewAPDU(apduLength),
+		APDUContract:   NewAPDU(),
 		ServiceRequest: serviceRequest,
 	}
 	_result.APDUContract.(*_APDU)._SubType = _result
@@ -104,7 +105,7 @@ type _APDUUnconfirmedRequestBuilder struct {
 
 	parentBuilder *_APDUBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (APDUUnconfirmedRequestBuilder) = (*_APDUUnconfirmedRequestBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_APDUUnconfirmedRequestBuilder) WithServiceRequestBuilder(builderSuppli
 	var err error
 	b.ServiceRequest, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetUnconfirmedServiceRequestBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetUnconfirmedServiceRequestBuilder failed"))
 	}
 	return b
 }
 
 func (b *_APDUUnconfirmedRequestBuilder) Build() (APDUUnconfirmedRequest, error) {
 	if b.ServiceRequest == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'serviceRequest' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'serviceRequest' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._APDUUnconfirmedRequest.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_APDUUnconfirmedRequestBuilder) buildForAPDU() (APDU, error) {
 
 func (b *_APDUUnconfirmedRequestBuilder) DeepCopy() any {
 	_copy := b.CreateAPDUUnconfirmedRequestBuilder().(*_APDUUnconfirmedRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -232,7 +227,7 @@ func CastAPDUUnconfirmedRequest(structType any) APDUUnconfirmedRequest {
 	return nil
 }
 
-func (m *_APDUUnconfirmedRequest) GetTypeName() string {
+func (m *_APDUUnconfirmedRequest) GetPlx4xTypeName() string {
 	return "APDUUnconfirmedRequest"
 }
 

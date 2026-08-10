@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,7 +54,7 @@ var _ AdsInvalidResponse = (*_AdsInvalidResponse)(nil)
 var _ AmsPacketRequirements = (*_AdsInvalidResponse)(nil)
 
 // NewAdsInvalidResponse factory function for _AdsInvalidResponse
-func NewAdsInvalidResponse(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32) *_AdsInvalidResponse {
+func NewAdsInvalidResponse(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32) *_AdsInvalidResponse {
 	_result := &_AdsInvalidResponse{
 		AmsPacketContract: NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 	}
@@ -89,7 +90,7 @@ type _AdsInvalidResponseBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsInvalidResponseBuilder) = (*_AdsInvalidResponseBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_AdsInvalidResponseBuilder) WithMandatoryFields() AdsInvalidResponseBui
 }
 
 func (b *_AdsInvalidResponseBuilder) Build() (AdsInvalidResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsInvalidResponse.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_AdsInvalidResponseBuilder) buildForAmsPacket() (AmsPacket, error) {
 
 func (b *_AdsInvalidResponseBuilder) DeepCopy() any {
 	_copy := b.CreateAdsInvalidResponseBuilder().(*_AdsInvalidResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastAdsInvalidResponse(structType any) AdsInvalidResponse {
 	return nil
 }
 
-func (m *_AdsInvalidResponse) GetTypeName() string {
+func (m *_AdsInvalidResponse) GetPlx4xTypeName() string {
 	return "AdsInvalidResponse"
 }
 

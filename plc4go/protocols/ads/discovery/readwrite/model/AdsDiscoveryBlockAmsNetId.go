@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -105,7 +106,7 @@ type _AdsDiscoveryBlockAmsNetIdBuilder struct {
 
 	parentBuilder *_AdsDiscoveryBlockBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDiscoveryBlockAmsNetIdBuilder) = (*_AdsDiscoveryBlockAmsNetIdBuilder)(nil)
@@ -129,23 +130,17 @@ func (b *_AdsDiscoveryBlockAmsNetIdBuilder) WithAmsNetIdBuilder(builderSupplier 
 	var err error
 	b.AmsNetId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "AmsNetIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "AmsNetIdBuilder failed"))
 	}
 	return b
 }
 
 func (b *_AdsDiscoveryBlockAmsNetIdBuilder) Build() (AdsDiscoveryBlockAmsNetId, error) {
 	if b.AmsNetId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'amsNetId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'amsNetId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDiscoveryBlockAmsNetId.deepCopy(), nil
 }
@@ -171,8 +166,8 @@ func (b *_AdsDiscoveryBlockAmsNetIdBuilder) buildForAdsDiscoveryBlock() (AdsDisc
 
 func (b *_AdsDiscoveryBlockAmsNetIdBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDiscoveryBlockAmsNetIdBuilder().(*_AdsDiscoveryBlockAmsNetIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -246,7 +241,7 @@ func CastAdsDiscoveryBlockAmsNetId(structType any) AdsDiscoveryBlockAmsNetId {
 	return nil
 }
 
-func (m *_AdsDiscoveryBlockAmsNetId) GetTypeName() string {
+func (m *_AdsDiscoveryBlockAmsNetId) GetPlx4xTypeName() string {
 	return "AdsDiscoveryBlockAmsNetId"
 }
 

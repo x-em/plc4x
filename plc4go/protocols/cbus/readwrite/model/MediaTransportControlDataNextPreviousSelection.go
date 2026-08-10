@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -101,7 +102,7 @@ type _MediaTransportControlDataNextPreviousSelectionBuilder struct {
 
 	parentBuilder *_MediaTransportControlDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MediaTransportControlDataNextPreviousSelectionBuilder) = (*_MediaTransportControlDataNextPreviousSelectionBuilder)(nil)
@@ -121,8 +122,8 @@ func (b *_MediaTransportControlDataNextPreviousSelectionBuilder) WithOperation(o
 }
 
 func (b *_MediaTransportControlDataNextPreviousSelectionBuilder) Build() (MediaTransportControlDataNextPreviousSelection, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MediaTransportControlDataNextPreviousSelection.deepCopy(), nil
 }
@@ -148,8 +149,8 @@ func (b *_MediaTransportControlDataNextPreviousSelectionBuilder) buildForMediaTr
 
 func (b *_MediaTransportControlDataNextPreviousSelectionBuilder) DeepCopy() any {
 	_copy := b.CreateMediaTransportControlDataNextPreviousSelectionBuilder().(*_MediaTransportControlDataNextPreviousSelectionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -227,7 +228,7 @@ func CastMediaTransportControlDataNextPreviousSelection(structType any) MediaTra
 	return nil
 }
 
-func (m *_MediaTransportControlDataNextPreviousSelection) GetTypeName() string {
+func (m *_MediaTransportControlDataNextPreviousSelection) GetPlx4xTypeName() string {
 	return "MediaTransportControlDataNextPreviousSelection"
 }
 

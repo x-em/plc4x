@@ -138,7 +138,6 @@ pipeline {
             steps {
                 echo 'Checking Code Quality on SonarCloud'
                 withCredentials([string(credentialsId: 'chris-sonarcloud-token', variable: 'SONAR_TOKEN')]) {
-                    //sh './mvnw -B -P${JENKINS_PROFILE},skip-prerequisite-check,with-python,with-proxies sonar:sonar ${SONARCLOUD_PARAMS} -Dsonar.login=${SONAR_TOKEN}'
                     sh './mvnw -B -P${JENKINS_PROFILE},skip-prerequisite-check,with-c,with-go,with-java,with-python sonar:sonar ${SONARCLOUD_PARAMS} -Dsonar.token=${SONAR_TOKEN}'
                 }
             }
@@ -201,24 +200,16 @@ pipeline {
                     }
                     steps {
                         echo 'Building Site'
+                        // Maven 4 no longer resolves modules of the current project from remote
+                        // repositories when they are excluded from the reactor via -pl, so the
+                        // driver modules (and their upstream modules) need to be built and
+                        // installed first. Everything not needed for the artifacts themselves
+                        // (tests, coverage, rat, javadoc, sources) is skipped for speed.
+                        sh './mvnw -P${JENKINS_PROFILE},with-java,skip-prerequisite-check install -pl :plc4j-driver-all -am -DskipTests -Djacoco.skip=true -Drat.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true'
                         // Generate the driver documentation.
                         sh './mvnw -P${JENKINS_PROFILE},with-java,skip-prerequisite-check site -X -pl :plc4j-driver-all'
                         // Build the actual website.
                         sh './mvnw -P${JENKINS_PROFILE},skip-prerequisite-check site -X -pl . -pl website'
-                    }
-                }
-                stage('Stage site') {
-                    when {
-                        branch 'develop'
-                    }
-                    steps {
-                        echo 'Staging Site'
-                        // Clean up the site directory.
-                        dir("target/staging") {
-                            deleteDir()
-                        }
-                        // Build a directory containing the aggregated website.
-                        sh './mvnw -B -P${JENKINS_PROFILE},skip-prerequisite-check site:stage -pl .'
                     }
                 }
                 stage('Deploy site') {
@@ -227,15 +218,8 @@ pipeline {
                     }
                     steps {
                         echo 'Deploying Site'
-                        // Unstash the previously stashed site.
-                        //unstash 'plc4x-site'
                         // Publish the site with the scm-publish plugin.
                         sh './mvnw -f jenkins.pom -X -P deploy-site scm-publish:publish-scm'
-
-                        // Clean up the snapshots directory (freeing up more space after deploying).
-                        dir("target/staging") {
-                            deleteDir()
-                        }
                     }
                 }
             }

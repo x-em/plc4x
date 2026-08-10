@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,6 +44,7 @@ type SALDataHvacActuator interface {
 	utils.Copyable
 	SALData
 	// GetHvacActuatorData returns HvacActuatorData (property field)
+	// Note: the documentation states that the data for hvac actuator uses LightingData
 	GetHvacActuatorData() LightingData
 	// IsSALDataHvacActuator is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsSALDataHvacActuator()
@@ -102,7 +106,7 @@ type _SALDataHvacActuatorBuilder struct {
 
 	parentBuilder *_SALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SALDataHvacActuatorBuilder) = (*_SALDataHvacActuatorBuilder)(nil)
@@ -126,23 +130,17 @@ func (b *_SALDataHvacActuatorBuilder) WithHvacActuatorDataBuilder(builderSupplie
 	var err error
 	b.HvacActuatorData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LightingDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LightingDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SALDataHvacActuatorBuilder) Build() (SALDataHvacActuator, error) {
 	if b.HvacActuatorData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'hvacActuatorData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'hvacActuatorData' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SALDataHvacActuator.deepCopy(), nil
 }
@@ -168,8 +166,8 @@ func (b *_SALDataHvacActuatorBuilder) buildForSALData() (SALData, error) {
 
 func (b *_SALDataHvacActuatorBuilder) DeepCopy() any {
 	_copy := b.CreateSALDataHvacActuatorBuilder().(*_SALDataHvacActuatorBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +228,7 @@ func CastSALDataHvacActuator(structType any) SALDataHvacActuator {
 	return nil
 }
 
-func (m *_SALDataHvacActuator) GetTypeName() string {
+func (m *_SALDataHvacActuator) GetPlx4xTypeName() string {
 	return "SALDataHvacActuator"
 }
 
@@ -258,7 +256,7 @@ func (m *_SALDataHvacActuator) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	hvacActuatorData, err := ReadSimpleField[LightingData](ctx, "hvacActuatorData", ReadComplex[LightingData](LightingDataParseWithBuffer, readBuffer))
+	hvacActuatorData, err := ReadSimpleField[LightingData](ctx, "hvacActuatorData", ReadComplex[LightingData](LightingDataParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'hvacActuatorData' field"))
 	}
@@ -272,7 +270,7 @@ func (m *_SALDataHvacActuator) parse(ctx context.Context, readBuffer utils.ReadB
 }
 
 func (m *_SALDataHvacActuator) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -289,7 +287,7 @@ func (m *_SALDataHvacActuator) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for SALDataHvacActuator")
 		}
 
-		if err := WriteSimpleField[LightingData](ctx, "hvacActuatorData", m.GetHvacActuatorData(), WriteComplex[LightingData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LightingData](ctx, "hvacActuatorData", m.GetHvacActuatorData(), WriteComplex[LightingData](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'hvacActuatorData' field")
 		}
 

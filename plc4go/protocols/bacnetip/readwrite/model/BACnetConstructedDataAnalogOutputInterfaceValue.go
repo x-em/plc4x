@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataAnalogOutputInterfaceValue = (*_BACnetConstructedData
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataAnalogOutputInterfaceValue)(nil)
 
 // NewBACnetConstructedDataAnalogOutputInterfaceValue factory function for _BACnetConstructedDataAnalogOutputInterfaceValue
-func NewBACnetConstructedDataAnalogOutputInterfaceValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, interfaceValue BACnetOptionalREAL, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataAnalogOutputInterfaceValue {
+func NewBACnetConstructedDataAnalogOutputInterfaceValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, interfaceValue BACnetOptionalREAL) *_BACnetConstructedDataAnalogOutputInterfaceValue {
 	if interfaceValue == nil {
 		panic("interfaceValue of type BACnetOptionalREAL for BACnetConstructedDataAnalogOutputInterfaceValue must not be nil")
 	}
 	_result := &_BACnetConstructedDataAnalogOutputInterfaceValue{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		InterfaceValue:                interfaceValue,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataAnalogOutputInterfaceValueBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataAnalogOutputInterfaceValueBuilder) = (*_BACnetConstructedDataAnalogOutputInterfaceValueBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataAnalogOutputInterfaceValueBuilder) WithInterfaceV
 	var err error
 	b.InterfaceValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetOptionalREALBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetOptionalREALBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataAnalogOutputInterfaceValueBuilder) Build() (BACnetConstructedDataAnalogOutputInterfaceValue, error) {
 	if b.InterfaceValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'interfaceValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'interfaceValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataAnalogOutputInterfaceValue.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataAnalogOutputInterfaceValueBuilder) buildForBACnet
 
 func (b *_BACnetConstructedDataAnalogOutputInterfaceValueBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataAnalogOutputInterfaceValueBuilder().(*_BACnetConstructedDataAnalogOutputInterfaceValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataAnalogOutputInterfaceValue(structType any) BACnetC
 	return nil
 }
 
-func (m *_BACnetConstructedDataAnalogOutputInterfaceValue) GetTypeName() string {
+func (m *_BACnetConstructedDataAnalogOutputInterfaceValue) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataAnalogOutputInterfaceValue"
 }
 

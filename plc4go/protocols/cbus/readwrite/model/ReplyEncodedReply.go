@@ -21,12 +21,15 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -39,6 +42,8 @@ type ReplyEncodedReply interface {
 	utils.Serializable
 	utils.Copyable
 	Reply
+	// GetCBusOptions returns CBusOptions (property field)
+	GetCBusOptions() CBusOptions
 	// GetEncodedReply returns EncodedReply (property field)
 	GetEncodedReply() EncodedReply
 	// GetChksum returns Chksum (property field)
@@ -56,6 +61,7 @@ type ReplyEncodedReply interface {
 // _ReplyEncodedReply is the data-structure of this message
 type _ReplyEncodedReply struct {
 	ReplyContract
+	CBusOptions  CBusOptions
 	EncodedReply EncodedReply
 	Chksum       Checksum
 }
@@ -64,9 +70,10 @@ var _ ReplyEncodedReply = (*_ReplyEncodedReply)(nil)
 var _ ReplyRequirements = (*_ReplyEncodedReply)(nil)
 
 // NewReplyEncodedReply factory function for _ReplyEncodedReply
-func NewReplyEncodedReply(peekedByte byte, encodedReply EncodedReply, chksum Checksum, cBusOptions CBusOptions, requestContext RequestContext) *_ReplyEncodedReply {
+func NewReplyEncodedReply(peekedByte byte, cBusOptions CBusOptions, encodedReply EncodedReply, chksum Checksum) *_ReplyEncodedReply {
 	_result := &_ReplyEncodedReply{
-		ReplyContract: NewReply(peekedByte, cBusOptions, requestContext),
+		ReplyContract: NewReply(peekedByte),
+		CBusOptions:   cBusOptions,
 		EncodedReply:  encodedReply,
 		Chksum:        chksum,
 	}
@@ -83,7 +90,11 @@ func NewReplyEncodedReply(peekedByte byte, encodedReply EncodedReply, chksum Che
 type ReplyEncodedReplyBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
-	WithMandatoryFields(encodedReply EncodedReply, chksum Checksum) ReplyEncodedReplyBuilder
+	WithMandatoryFields(cBusOptions CBusOptions, encodedReply EncodedReply, chksum Checksum) ReplyEncodedReplyBuilder
+	// WithCBusOptions adds CBusOptions (property field)
+	WithCBusOptions(CBusOptions) ReplyEncodedReplyBuilder
+	// WithCBusOptionsBuilder adds CBusOptions (property field) which is build by the builder
+	WithCBusOptionsBuilder(func(CBusOptionsBuilder) CBusOptionsBuilder) ReplyEncodedReplyBuilder
 	// WithEncodedReply adds EncodedReply (property field)
 	WithEncodedReply(EncodedReply) ReplyEncodedReplyBuilder
 	// WithEncodedReplyBuilder adds EncodedReply (property field) which is build by the builder
@@ -110,7 +121,7 @@ type _ReplyEncodedReplyBuilder struct {
 
 	parentBuilder *_ReplyBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ReplyEncodedReplyBuilder) = (*_ReplyEncodedReplyBuilder)(nil)
@@ -120,8 +131,23 @@ func (b *_ReplyEncodedReplyBuilder) setParent(contract ReplyContract) {
 	contract.(*_Reply)._SubType = b._ReplyEncodedReply
 }
 
-func (b *_ReplyEncodedReplyBuilder) WithMandatoryFields(encodedReply EncodedReply, chksum Checksum) ReplyEncodedReplyBuilder {
-	return b.WithEncodedReply(encodedReply).WithChksum(chksum)
+func (b *_ReplyEncodedReplyBuilder) WithMandatoryFields(cBusOptions CBusOptions, encodedReply EncodedReply, chksum Checksum) ReplyEncodedReplyBuilder {
+	return b.WithCBusOptions(cBusOptions).WithEncodedReply(encodedReply).WithChksum(chksum)
+}
+
+func (b *_ReplyEncodedReplyBuilder) WithCBusOptions(cBusOptions CBusOptions) ReplyEncodedReplyBuilder {
+	b.CBusOptions = cBusOptions
+	return b
+}
+
+func (b *_ReplyEncodedReplyBuilder) WithCBusOptionsBuilder(builderSupplier func(CBusOptionsBuilder) CBusOptionsBuilder) ReplyEncodedReplyBuilder {
+	builder := builderSupplier(b.CBusOptions.CreateCBusOptionsBuilder())
+	var err error
+	b.CBusOptions, err = builder.Build()
+	if err != nil {
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "CBusOptionsBuilder failed"))
+	}
+	return b
 }
 
 func (b *_ReplyEncodedReplyBuilder) WithEncodedReply(encodedReply EncodedReply) ReplyEncodedReplyBuilder {
@@ -134,10 +160,7 @@ func (b *_ReplyEncodedReplyBuilder) WithEncodedReplyBuilder(builderSupplier func
 	var err error
 	b.EncodedReply, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "EncodedReplyBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "EncodedReplyBuilder failed"))
 	}
 	return b
 }
@@ -152,29 +175,23 @@ func (b *_ReplyEncodedReplyBuilder) WithChksumBuilder(builderSupplier func(Check
 	var err error
 	b.Chksum, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ChecksumBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ChecksumBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ReplyEncodedReplyBuilder) Build() (ReplyEncodedReply, error) {
+	if b.CBusOptions == nil {
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'cBusOptions' not set"))
+	}
 	if b.EncodedReply == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'encodedReply' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'encodedReply' not set"))
 	}
 	if b.Chksum == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'chksum' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'chksum' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ReplyEncodedReply.deepCopy(), nil
 }
@@ -200,8 +217,8 @@ func (b *_ReplyEncodedReplyBuilder) buildForReply() (Reply, error) {
 
 func (b *_ReplyEncodedReplyBuilder) DeepCopy() any {
 	_copy := b.CreateReplyEncodedReplyBuilder().(*_ReplyEncodedReplyBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -237,6 +254,10 @@ func (m *_ReplyEncodedReply) GetParent() ReplyContract {
 ///////////////////////////////////////////////////////////
 /////////////////////// Accessors for property fields.
 ///////////////////////
+
+func (m *_ReplyEncodedReply) GetCBusOptions() CBusOptions {
+	return m.CBusOptions
+}
 
 func (m *_ReplyEncodedReply) GetEncodedReply() EncodedReply {
 	return m.EncodedReply
@@ -283,7 +304,7 @@ func CastReplyEncodedReply(structType any) ReplyEncodedReply {
 	return nil
 }
 
-func (m *_ReplyEncodedReply) GetTypeName() string {
+func (m *_ReplyEncodedReply) GetPlx4xTypeName() string {
 	return "ReplyEncodedReply"
 }
 
@@ -317,26 +338,27 @@ func (m *_ReplyEncodedReply) parse(ctx context.Context, readBuffer utils.ReadBuf
 	}
 	currentPos := positionAware.GetPos()
 	_ = currentPos
+	m.CBusOptions = cBusOptions
 
-	encodedReply, err := ReadManualField[EncodedReply](ctx, "encodedReply", readBuffer, EnsureType[EncodedReply](ReadEncodedReply(ctx, readBuffer, cBusOptions, requestContext, cBusOptions.GetSrchk())))
+	encodedReply, err := ReadManualField[EncodedReply](ctx, "encodedReply", readBuffer, EnsureType[EncodedReply](ReadEncodedReply(ctx, readBuffer, cBusOptions, requestContext, cBusOptions.GetSrchk())), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'encodedReply' field"))
 	}
 	m.EncodedReply = encodedReply
 
-	encodedReplyDecoded, err := ReadVirtualField[EncodedReply](ctx, "encodedReplyDecoded", (*EncodedReply)(nil), encodedReply)
+	encodedReplyDecoded, err := ReadVirtualField[EncodedReply](ctx, "encodedReplyDecoded", (*EncodedReply)(nil), encodedReply, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'encodedReplyDecoded' field"))
 	}
 	_ = encodedReplyDecoded
 
-	chksum, err := ReadManualField[Checksum](ctx, "chksum", readBuffer, EnsureType[Checksum](ReadAndValidateChecksum(ctx, readBuffer, encodedReply, cBusOptions.GetSrchk())))
+	chksum, err := ReadManualField[Checksum](ctx, "chksum", readBuffer, EnsureType[Checksum](ReadAndValidateChecksum(ctx, readBuffer, encodedReply, cBusOptions.GetSrchk())), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'chksum' field"))
 	}
 	m.Chksum = chksum
 
-	chksumDecoded, err := ReadVirtualField[Checksum](ctx, "chksumDecoded", (*Checksum)(nil), chksum)
+	chksumDecoded, err := ReadVirtualField[Checksum](ctx, "chksumDecoded", (*Checksum)(nil), chksum, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'chksumDecoded' field"))
 	}
@@ -350,7 +372,7 @@ func (m *_ReplyEncodedReply) parse(ctx context.Context, readBuffer utils.ReadBuf
 }
 
 func (m *_ReplyEncodedReply) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -367,7 +389,7 @@ func (m *_ReplyEncodedReply) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for ReplyEncodedReply")
 		}
 
-		if err := WriteManualField[EncodedReply](ctx, "encodedReply", func(ctx context.Context) error { return WriteEncodedReply(ctx, writeBuffer, m.GetEncodedReply()) }, writeBuffer); err != nil {
+		if err := WriteManualField[EncodedReply](ctx, "encodedReply", func(ctx context.Context) error { return WriteEncodedReply(ctx, writeBuffer, m.GetEncodedReply()) }, writeBuffer, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'encodedReply' field")
 		}
 		// Virtual field
@@ -379,7 +401,7 @@ func (m *_ReplyEncodedReply) SerializeWithWriteBuffer(ctx context.Context, write
 
 		if err := WriteManualField[Checksum](ctx, "chksum", func(ctx context.Context) error {
 			return CalculateChecksum(ctx, writeBuffer, m.GetEncodedReply(), m.GetCBusOptions().GetSrchk())
-		}, writeBuffer); err != nil {
+		}, writeBuffer, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'chksum' field")
 		}
 		// Virtual field
@@ -409,6 +431,7 @@ func (m *_ReplyEncodedReply) deepCopy() *_ReplyEncodedReply {
 	}
 	_ReplyEncodedReplyCopy := &_ReplyEncodedReply{
 		m.ReplyContract.(*_Reply).deepCopy(),
+		utils.DeepCopy[CBusOptions](m.CBusOptions),
 		utils.DeepCopy[EncodedReply](m.EncodedReply),
 		utils.DeepCopy[Checksum](m.Chksum),
 	}

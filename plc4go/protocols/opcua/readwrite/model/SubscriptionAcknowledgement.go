@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +105,7 @@ type _SubscriptionAcknowledgementBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SubscriptionAcknowledgementBuilder) = (*_SubscriptionAcknowledgementBuilder)(nil)
@@ -128,8 +130,8 @@ func (b *_SubscriptionAcknowledgementBuilder) WithSequenceNumber(sequenceNumber 
 }
 
 func (b *_SubscriptionAcknowledgementBuilder) Build() (SubscriptionAcknowledgement, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SubscriptionAcknowledgement.deepCopy(), nil
 }
@@ -155,8 +157,8 @@ func (b *_SubscriptionAcknowledgementBuilder) buildForExtensionObjectDefinition(
 
 func (b *_SubscriptionAcknowledgementBuilder) DeepCopy() any {
 	_copy := b.CreateSubscriptionAcknowledgementBuilder().(*_SubscriptionAcknowledgementBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +223,7 @@ func CastSubscriptionAcknowledgement(structType any) SubscriptionAcknowledgement
 	return nil
 }
 
-func (m *_SubscriptionAcknowledgement) GetTypeName() string {
+func (m *_SubscriptionAcknowledgement) GetPlx4xTypeName() string {
 	return "SubscriptionAcknowledgement"
 }
 
@@ -252,13 +254,13 @@ func (m *_SubscriptionAcknowledgement) parse(ctx context.Context, readBuffer uti
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	subscriptionId, err := ReadSimpleField(ctx, "subscriptionId", ReadUnsignedInt(readBuffer, uint8(32)))
+	subscriptionId, err := ReadSimpleField(ctx, "subscriptionId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'subscriptionId' field"))
 	}
 	m.SubscriptionId = subscriptionId
 
-	sequenceNumber, err := ReadSimpleField(ctx, "sequenceNumber", ReadUnsignedInt(readBuffer, uint8(32)))
+	sequenceNumber, err := ReadSimpleField(ctx, "sequenceNumber", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'sequenceNumber' field"))
 	}
@@ -289,11 +291,11 @@ func (m *_SubscriptionAcknowledgement) SerializeWithWriteBuffer(ctx context.Cont
 			return errors.Wrap(pushErr, "Error pushing for SubscriptionAcknowledgement")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "subscriptionId", m.GetSubscriptionId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "subscriptionId", m.GetSubscriptionId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'subscriptionId' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "sequenceNumber", m.GetSequenceNumber(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "sequenceNumber", m.GetSequenceNumber(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'sequenceNumber' field")
 		}
 

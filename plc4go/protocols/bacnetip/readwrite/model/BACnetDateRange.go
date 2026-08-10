@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -100,7 +101,7 @@ func NewBACnetDateRangeBuilder() BACnetDateRangeBuilder {
 type _BACnetDateRangeBuilder struct {
 	*_BACnetDateRange
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetDateRangeBuilder) = (*_BACnetDateRangeBuilder)(nil)
@@ -119,10 +120,7 @@ func (b *_BACnetDateRangeBuilder) WithStartDateBuilder(builderSupplier func(BACn
 	var err error
 	b.StartDate, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagDateBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagDateBuilder failed"))
 	}
 	return b
 }
@@ -137,29 +135,20 @@ func (b *_BACnetDateRangeBuilder) WithEndDateBuilder(builderSupplier func(BACnet
 	var err error
 	b.EndDate, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagDateBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagDateBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetDateRangeBuilder) Build() (BACnetDateRange, error) {
 	if b.StartDate == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'startDate' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'startDate' not set"))
 	}
 	if b.EndDate == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'endDate' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'endDate' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetDateRange.deepCopy(), nil
 }
@@ -174,8 +163,8 @@ func (b *_BACnetDateRangeBuilder) MustBuild() BACnetDateRange {
 
 func (b *_BACnetDateRangeBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetDateRangeBuilder().(*_BACnetDateRangeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -222,7 +211,7 @@ func CastBACnetDateRange(structType any) BACnetDateRange {
 	return nil
 }
 
-func (m *_BACnetDateRange) GetTypeName() string {
+func (m *_BACnetDateRange) GetPlx4xTypeName() string {
 	return "BACnetDateRange"
 }
 
@@ -253,7 +242,7 @@ func BACnetDateRangeParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func BACnetDateRangeParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetDateRange, error) {
-	v, err := (&_BACnetDateRange{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetDateRange)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

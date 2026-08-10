@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,12 +59,12 @@ var _ NLMSetMasterKey = (*_NLMSetMasterKey)(nil)
 var _ NLMRequirements = (*_NLMSetMasterKey)(nil)
 
 // NewNLMSetMasterKey factory function for _NLMSetMasterKey
-func NewNLMSetMasterKey(key NLMUpdateKeyUpdateKeyEntry, apduLength uint16) *_NLMSetMasterKey {
+func NewNLMSetMasterKey(key NLMUpdateKeyUpdateKeyEntry) *_NLMSetMasterKey {
 	if key == nil {
 		panic("key of type NLMUpdateKeyUpdateKeyEntry for NLMSetMasterKey must not be nil")
 	}
 	_result := &_NLMSetMasterKey{
-		NLMContract: NewNLM(apduLength),
+		NLMContract: NewNLM(),
 		Key:         key,
 	}
 	_result.NLMContract.(*_NLM)._SubType = _result
@@ -102,7 +103,7 @@ type _NLMSetMasterKeyBuilder struct {
 
 	parentBuilder *_NLMBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NLMSetMasterKeyBuilder) = (*_NLMSetMasterKeyBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_NLMSetMasterKeyBuilder) WithKeyBuilder(builderSupplier func(NLMUpdateK
 	var err error
 	b.Key, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NLMUpdateKeyUpdateKeyEntryBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NLMUpdateKeyUpdateKeyEntryBuilder failed"))
 	}
 	return b
 }
 
 func (b *_NLMSetMasterKeyBuilder) Build() (NLMSetMasterKey, error) {
 	if b.Key == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'key' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'key' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NLMSetMasterKey.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_NLMSetMasterKeyBuilder) buildForNLM() (NLM, error) {
 
 func (b *_NLMSetMasterKeyBuilder) DeepCopy() any {
 	_copy := b.CreateNLMSetMasterKeyBuilder().(*_NLMSetMasterKeyBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +225,7 @@ func CastNLMSetMasterKey(structType any) NLMSetMasterKey {
 	return nil
 }
 
-func (m *_NLMSetMasterKey) GetTypeName() string {
+func (m *_NLMSetMasterKey) GetPlx4xTypeName() string {
 	return "NLMSetMasterKey"
 }
 

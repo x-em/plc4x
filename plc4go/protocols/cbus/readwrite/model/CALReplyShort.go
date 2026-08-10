@@ -21,11 +21,13 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +55,9 @@ var _ CALReplyShort = (*_CALReplyShort)(nil)
 var _ CALReplyRequirements = (*_CALReplyShort)(nil)
 
 // NewCALReplyShort factory function for _CALReplyShort
-func NewCALReplyShort(calType byte, calData CALData, cBusOptions CBusOptions, requestContext RequestContext) *_CALReplyShort {
+func NewCALReplyShort(calType byte, calData CALData) *_CALReplyShort {
 	_result := &_CALReplyShort{
-		CALReplyContract: NewCALReply(calType, calData, cBusOptions, requestContext),
+		CALReplyContract: NewCALReply(calType, calData),
 	}
 	_result.CALReplyContract.(*_CALReply)._SubType = _result
 	return _result
@@ -89,7 +91,7 @@ type _CALReplyShortBuilder struct {
 
 	parentBuilder *_CALReplyBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CALReplyShortBuilder) = (*_CALReplyShortBuilder)(nil)
@@ -104,8 +106,8 @@ func (b *_CALReplyShortBuilder) WithMandatoryFields() CALReplyShortBuilder {
 }
 
 func (b *_CALReplyShortBuilder) Build() (CALReplyShort, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CALReplyShort.deepCopy(), nil
 }
@@ -131,8 +133,8 @@ func (b *_CALReplyShortBuilder) buildForCALReply() (CALReply, error) {
 
 func (b *_CALReplyShortBuilder) DeepCopy() any {
 	_copy := b.CreateCALReplyShortBuilder().(*_CALReplyShortBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -175,7 +177,7 @@ func CastCALReplyShort(structType any) CALReplyShort {
 	return nil
 }
 
-func (m *_CALReplyShort) GetTypeName() string {
+func (m *_CALReplyShort) GetPlx4xTypeName() string {
 	return "CALReplyShort"
 }
 
@@ -208,7 +210,7 @@ func (m *_CALReplyShort) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 }
 
 func (m *_CALReplyShort) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}

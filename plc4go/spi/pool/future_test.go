@@ -26,8 +26,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/apache/plc4x/plc4go/spi/errors"
 )
 
 func Test_future_AwaitCompletion(t *testing.T) {
@@ -42,7 +43,7 @@ func Test_future_AwaitCompletion(t *testing.T) {
 	}{
 		{
 			name: "completes with error",
-			args: args{ctx: context.TODO()},
+			args: args{ctx: t.Context()},
 			completer: func(wg *sync.WaitGroup, f *future) {
 				defer wg.Done()
 				f.Cancel(false, errors.New("Uh oh"))
@@ -51,7 +52,7 @@ func Test_future_AwaitCompletion(t *testing.T) {
 		},
 		{
 			name: "completes regular",
-			args: args{ctx: context.TODO()},
+			args: args{ctx: t.Context()},
 			completer: func(wg *sync.WaitGroup, f *future) {
 				defer wg.Done()
 				time.Sleep(30 * time.Millisecond)
@@ -62,7 +63,7 @@ func Test_future_AwaitCompletion(t *testing.T) {
 		{
 			name: "completes not int time",
 			args: args{ctx: func() context.Context {
-				deadline, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Millisecond))
+				deadline, cancel := context.WithDeadline(t.Context(), time.Now().Add(30*time.Millisecond))
 				t.Cleanup(cancel)
 				return deadline
 			}()},
@@ -74,7 +75,7 @@ func Test_future_AwaitCompletion(t *testing.T) {
 		},
 		{
 			name: "completes canceled without error",
-			args: args{ctx: context.TODO()},
+			args: args{ctx: t.Context()},
 			completer: func(wg *sync.WaitGroup, f *future) {
 				defer wg.Done()
 				time.Sleep(300 * time.Millisecond)
@@ -87,7 +88,7 @@ func Test_future_AwaitCompletion(t *testing.T) {
 		},
 		{
 			name: "completes canceled with particular error",
-			args: args{ctx: context.TODO()},
+			args: args{ctx: t.Context()},
 			completer: func(wg *sync.WaitGroup, f *future) {
 				defer wg.Done()
 				time.Sleep(300 * time.Millisecond)

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewImageGIFBuilder() ImageGIFBuilder {
 type _ImageGIFBuilder struct {
 	*_ImageGIF
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ImageGIFBuilder) = (*_ImageGIFBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_ImageGIFBuilder) WithMandatoryFields() ImageGIFBuilder {
 }
 
 func (b *_ImageGIFBuilder) Build() (ImageGIF, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ImageGIF.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_ImageGIFBuilder) MustBuild() ImageGIF {
 
 func (b *_ImageGIFBuilder) DeepCopy() any {
 	_copy := b.CreateImageGIFBuilder().(*_ImageGIFBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastImageGIF(structType any) ImageGIF {
 	return nil
 }
 
-func (m *_ImageGIF) GetTypeName() string {
+func (m *_ImageGIF) GetPlx4xTypeName() string {
 	return "ImageGIF"
 }
 
@@ -159,7 +160,7 @@ func ImageGIFParseWithBufferProducer() func(ctx context.Context, readBuffer util
 }
 
 func ImageGIFParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (ImageGIF, error) {
-	v, err := (&_ImageGIF{}).parse(ctx, readBuffer)
+	v, err := (new(_ImageGIF)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

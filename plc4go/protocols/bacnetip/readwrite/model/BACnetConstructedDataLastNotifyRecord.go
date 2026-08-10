@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataLastNotifyRecord = (*_BACnetConstructedDataLastNotify
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLastNotifyRecord)(nil)
 
 // NewBACnetConstructedDataLastNotifyRecord factory function for _BACnetConstructedDataLastNotifyRecord
-func NewBACnetConstructedDataLastNotifyRecord(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lastNotifyRecord BACnetApplicationTagUnsignedInteger, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLastNotifyRecord {
+func NewBACnetConstructedDataLastNotifyRecord(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lastNotifyRecord BACnetApplicationTagUnsignedInteger) *_BACnetConstructedDataLastNotifyRecord {
 	if lastNotifyRecord == nil {
 		panic("lastNotifyRecord of type BACnetApplicationTagUnsignedInteger for BACnetConstructedDataLastNotifyRecord must not be nil")
 	}
 	_result := &_BACnetConstructedDataLastNotifyRecord{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		LastNotifyRecord:              lastNotifyRecord,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataLastNotifyRecordBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLastNotifyRecordBuilder) = (*_BACnetConstructedDataLastNotifyRecordBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataLastNotifyRecordBuilder) WithLastNotifyRecordBuil
 	var err error
 	b.LastNotifyRecord, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataLastNotifyRecordBuilder) Build() (BACnetConstructedDataLastNotifyRecord, error) {
 	if b.LastNotifyRecord == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'lastNotifyRecord' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'lastNotifyRecord' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLastNotifyRecord.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataLastNotifyRecordBuilder) buildForBACnetConstructe
 
 func (b *_BACnetConstructedDataLastNotifyRecordBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLastNotifyRecordBuilder().(*_BACnetConstructedDataLastNotifyRecordBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataLastNotifyRecord(structType any) BACnetConstructed
 	return nil
 }
 
-func (m *_BACnetConstructedDataLastNotifyRecord) GetTypeName() string {
+func (m *_BACnetConstructedDataLastNotifyRecord) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLastNotifyRecord"
 }
 

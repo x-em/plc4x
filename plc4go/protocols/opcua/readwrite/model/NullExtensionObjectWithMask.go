@@ -21,12 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -56,9 +58,9 @@ var _ NullExtensionObjectWithMask = (*_NullExtensionObjectWithMask)(nil)
 var _ ExtensionObjectWithMaskRequirements = (*_NullExtensionObjectWithMask)(nil)
 
 // NewNullExtensionObjectWithMask factory function for _NullExtensionObjectWithMask
-func NewNullExtensionObjectWithMask(typeId ExpandedNodeId, encodingMask ExtensionObjectEncodingMask, extensionId int32, includeEncodingMask bool) *_NullExtensionObjectWithMask {
+func NewNullExtensionObjectWithMask(typeId ExpandedNodeId, encodingMask ExtensionObjectEncodingMask) *_NullExtensionObjectWithMask {
 	_result := &_NullExtensionObjectWithMask{
-		ExtensionObjectWithMaskContract: NewExtensionObjectWithMask(typeId, encodingMask, extensionId),
+		ExtensionObjectWithMaskContract: NewExtensionObjectWithMask(typeId, encodingMask),
 	}
 	_result.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask)._SubType = _result
 	return _result
@@ -92,7 +94,7 @@ type _NullExtensionObjectWithMaskBuilder struct {
 
 	parentBuilder *_ExtensionObjectWithMaskBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NullExtensionObjectWithMaskBuilder) = (*_NullExtensionObjectWithMaskBuilder)(nil)
@@ -107,8 +109,8 @@ func (b *_NullExtensionObjectWithMaskBuilder) WithMandatoryFields() NullExtensio
 }
 
 func (b *_NullExtensionObjectWithMaskBuilder) Build() (NullExtensionObjectWithMask, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NullExtensionObjectWithMask.deepCopy(), nil
 }
@@ -134,8 +136,8 @@ func (b *_NullExtensionObjectWithMaskBuilder) buildForExtensionObjectWithMask() 
 
 func (b *_NullExtensionObjectWithMaskBuilder) DeepCopy() any {
 	_copy := b.CreateNullExtensionObjectWithMaskBuilder().(*_NullExtensionObjectWithMaskBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -157,14 +159,6 @@ func (b *_NullExtensionObjectWithMask) CreateNullExtensionObjectWithMaskBuilder(
 ///////////////////////////////////////////////////////////
 /////////////////////// Accessors for discriminator values.
 ///////////////////////
-
-func (m *_NullExtensionObjectWithMask) GetEncodingMaskXmlBody() bool {
-	return bool(false)
-}
-
-func (m *_NullExtensionObjectWithMask) GetEncodingMaskBinaryBody() bool {
-	return bool(false)
-}
 
 ///////////////////////
 ///////////////////////
@@ -202,7 +196,7 @@ func CastNullExtensionObjectWithMask(structType any) NullExtensionObjectWithMask
 	return nil
 }
 
-func (m *_NullExtensionObjectWithMask) GetTypeName() string {
+func (m *_NullExtensionObjectWithMask) GetPlx4xTypeName() string {
 	return "NullExtensionObjectWithMask"
 }
 
@@ -218,7 +212,7 @@ func (m *_NullExtensionObjectWithMask) GetLengthInBytes(ctx context.Context) uin
 	return m.GetLengthInBits(ctx) / 8
 }
 
-func (m *_NullExtensionObjectWithMask) parse(ctx context.Context, readBuffer utils.ReadBuffer, parent *_ExtensionObjectWithMask, extensionId int32, includeEncodingMask bool) (__nullExtensionObjectWithMask NullExtensionObjectWithMask, err error) {
+func (m *_NullExtensionObjectWithMask) parse(ctx context.Context, readBuffer utils.ReadBuffer, parent *_ExtensionObjectWithMask, extensionId int32, standardEncoding bool, includeEncodingMask bool) (__nullExtensionObjectWithMask NullExtensionObjectWithMask, err error) {
 	m.ExtensionObjectWithMaskContract = parent
 	parent._SubType = m
 	positionAware := readBuffer
@@ -229,7 +223,7 @@ func (m *_NullExtensionObjectWithMask) parse(ctx context.Context, readBuffer uti
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	body, err := ReadVirtualField[ExtensionObjectDefinition](ctx, "body", (*ExtensionObjectDefinition)(nil), nil)
+	body, err := ReadVirtualField[ExtensionObjectDefinition](ctx, "body", (*ExtensionObjectDefinition)(nil), nil, codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'body' field"))
 	}

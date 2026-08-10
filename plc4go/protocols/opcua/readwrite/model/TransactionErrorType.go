@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -124,7 +126,7 @@ type _TransactionErrorTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TransactionErrorTypeBuilder) = (*_TransactionErrorTypeBuilder)(nil)
@@ -148,10 +150,7 @@ func (b *_TransactionErrorTypeBuilder) WithTargetIdBuilder(builderSupplier func(
 	var err error
 	b.TargetId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -166,10 +165,7 @@ func (b *_TransactionErrorTypeBuilder) WithErrorBuilder(builderSupplier func(Sta
 	var err error
 	b.Error, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -184,35 +180,23 @@ func (b *_TransactionErrorTypeBuilder) WithMessageBuilder(builderSupplier func(L
 	var err error
 	b.Message, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LocalizedTextBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LocalizedTextBuilder failed"))
 	}
 	return b
 }
 
 func (b *_TransactionErrorTypeBuilder) Build() (TransactionErrorType, error) {
 	if b.TargetId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'targetId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'targetId' not set"))
 	}
 	if b.Error == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'error' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'error' not set"))
 	}
 	if b.Message == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'message' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'message' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TransactionErrorType.deepCopy(), nil
 }
@@ -238,8 +222,8 @@ func (b *_TransactionErrorTypeBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_TransactionErrorTypeBuilder) DeepCopy() any {
 	_copy := b.CreateTransactionErrorTypeBuilder().(*_TransactionErrorTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -308,7 +292,7 @@ func CastTransactionErrorType(structType any) TransactionErrorType {
 	return nil
 }
 
-func (m *_TransactionErrorType) GetTypeName() string {
+func (m *_TransactionErrorType) GetPlx4xTypeName() string {
 	return "TransactionErrorType"
 }
 
@@ -342,19 +326,19 @@ func (m *_TransactionErrorType) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	targetId, err := ReadSimpleField[NodeId](ctx, "targetId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	targetId, err := ReadSimpleField[NodeId](ctx, "targetId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetId' field"))
 	}
 	m.TargetId = targetId
 
-	error, err := ReadSimpleField[StatusCode](ctx, "error", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	error, err := ReadSimpleField[StatusCode](ctx, "error", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'error' field"))
 	}
 	m.Error = error
 
-	message, err := ReadSimpleField[LocalizedText](ctx, "message", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer))
+	message, err := ReadSimpleField[LocalizedText](ctx, "message", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'message' field"))
 	}
@@ -385,15 +369,15 @@ func (m *_TransactionErrorType) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for TransactionErrorType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "targetId", m.GetTargetId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "targetId", m.GetTargetId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetId' field")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "error", m.GetError(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "error", m.GetError(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'error' field")
 		}
 
-		if err := WriteSimpleField[LocalizedText](ctx, "message", m.GetMessage(), WriteComplex[LocalizedText](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LocalizedText](ctx, "message", m.GetMessage(), WriteComplex[LocalizedText](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'message' field")
 		}
 

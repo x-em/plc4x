@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _UnionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (UnionBuilder) = (*_UnionBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_UnionBuilder) WithMandatoryFields() UnionBuilder {
 }
 
 func (b *_UnionBuilder) Build() (Union, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._Union.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_UnionBuilder) buildForExtensionObjectDefinition() (ExtensionObjectDefi
 
 func (b *_UnionBuilder) DeepCopy() any {
 	_copy := b.CreateUnionBuilder().(*_UnionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastUnion(structType any) Union {
 	return nil
 }
 
-func (m *_Union) GetTypeName() string {
+func (m *_Union) GetPlx4xTypeName() string {
 	return "Union"
 }
 

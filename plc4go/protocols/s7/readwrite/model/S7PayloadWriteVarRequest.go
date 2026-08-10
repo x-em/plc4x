@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ S7PayloadWriteVarRequest = (*_S7PayloadWriteVarRequest)(nil)
 var _ S7PayloadRequirements = (*_S7PayloadWriteVarRequest)(nil)
 
 // NewS7PayloadWriteVarRequest factory function for _S7PayloadWriteVarRequest
-func NewS7PayloadWriteVarRequest(items []S7VarPayloadDataItem, parameter S7Parameter) *_S7PayloadWriteVarRequest {
+func NewS7PayloadWriteVarRequest(items []S7VarPayloadDataItem) *_S7PayloadWriteVarRequest {
 	_result := &_S7PayloadWriteVarRequest{
-		S7PayloadContract: NewS7Payload(parameter),
+		S7PayloadContract: NewS7Payload(),
 		Items:             items,
 	}
 	_result.S7PayloadContract.(*_S7Payload)._SubType = _result
@@ -97,7 +98,7 @@ type _S7PayloadWriteVarRequestBuilder struct {
 
 	parentBuilder *_S7PayloadBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7PayloadWriteVarRequestBuilder) = (*_S7PayloadWriteVarRequestBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_S7PayloadWriteVarRequestBuilder) WithItems(items ...S7VarPayloadDataIt
 }
 
 func (b *_S7PayloadWriteVarRequestBuilder) Build() (S7PayloadWriteVarRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7PayloadWriteVarRequest.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_S7PayloadWriteVarRequestBuilder) buildForS7Payload() (S7Payload, error
 
 func (b *_S7PayloadWriteVarRequestBuilder) DeepCopy() any {
 	_copy := b.CreateS7PayloadWriteVarRequestBuilder().(*_S7PayloadWriteVarRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastS7PayloadWriteVarRequest(structType any) S7PayloadWriteVarRequest {
 	return nil
 }
 
-func (m *_S7PayloadWriteVarRequest) GetTypeName() string {
+func (m *_S7PayloadWriteVarRequest) GetPlx4xTypeName() string {
 	return "S7PayloadWriteVarRequest"
 }
 
@@ -221,9 +222,7 @@ func (m *_S7PayloadWriteVarRequest) GetLengthInBits(ctx context.Context) uint16 
 	if len(m.Items) > 0 {
 		for _curItem, element := range m.Items {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Items), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

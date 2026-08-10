@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -139,7 +141,7 @@ type _QuantityDimensionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (QuantityDimensionBuilder) = (*_QuantityDimensionBuilder)(nil)
@@ -194,8 +196,8 @@ func (b *_QuantityDimensionBuilder) WithDimensionlessExponent(dimensionlessExpon
 }
 
 func (b *_QuantityDimensionBuilder) Build() (QuantityDimension, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._QuantityDimension.deepCopy(), nil
 }
@@ -221,8 +223,8 @@ func (b *_QuantityDimensionBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_QuantityDimensionBuilder) DeepCopy() any {
 	_copy := b.CreateQuantityDimensionBuilder().(*_QuantityDimensionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -311,7 +313,7 @@ func CastQuantityDimension(structType any) QuantityDimension {
 	return nil
 }
 
-func (m *_QuantityDimension) GetTypeName() string {
+func (m *_QuantityDimension) GetPlx4xTypeName() string {
 	return "QuantityDimension"
 }
 
@@ -360,49 +362,49 @@ func (m *_QuantityDimension) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	massExponent, err := ReadSimpleField(ctx, "massExponent", ReadSignedByte(readBuffer, uint8(8)))
+	massExponent, err := ReadSimpleField(ctx, "massExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'massExponent' field"))
 	}
 	m.MassExponent = massExponent
 
-	lengthExponent, err := ReadSimpleField(ctx, "lengthExponent", ReadSignedByte(readBuffer, uint8(8)))
+	lengthExponent, err := ReadSimpleField(ctx, "lengthExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lengthExponent' field"))
 	}
 	m.LengthExponent = lengthExponent
 
-	timeExponent, err := ReadSimpleField(ctx, "timeExponent", ReadSignedByte(readBuffer, uint8(8)))
+	timeExponent, err := ReadSimpleField(ctx, "timeExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timeExponent' field"))
 	}
 	m.TimeExponent = timeExponent
 
-	electricCurrentExponent, err := ReadSimpleField(ctx, "electricCurrentExponent", ReadSignedByte(readBuffer, uint8(8)))
+	electricCurrentExponent, err := ReadSimpleField(ctx, "electricCurrentExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'electricCurrentExponent' field"))
 	}
 	m.ElectricCurrentExponent = electricCurrentExponent
 
-	amountOfSubstanceExponent, err := ReadSimpleField(ctx, "amountOfSubstanceExponent", ReadSignedByte(readBuffer, uint8(8)))
+	amountOfSubstanceExponent, err := ReadSimpleField(ctx, "amountOfSubstanceExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'amountOfSubstanceExponent' field"))
 	}
 	m.AmountOfSubstanceExponent = amountOfSubstanceExponent
 
-	luminousIntensityExponent, err := ReadSimpleField(ctx, "luminousIntensityExponent", ReadSignedByte(readBuffer, uint8(8)))
+	luminousIntensityExponent, err := ReadSimpleField(ctx, "luminousIntensityExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'luminousIntensityExponent' field"))
 	}
 	m.LuminousIntensityExponent = luminousIntensityExponent
 
-	absoluteTemperatureExponent, err := ReadSimpleField(ctx, "absoluteTemperatureExponent", ReadSignedByte(readBuffer, uint8(8)))
+	absoluteTemperatureExponent, err := ReadSimpleField(ctx, "absoluteTemperatureExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'absoluteTemperatureExponent' field"))
 	}
 	m.AbsoluteTemperatureExponent = absoluteTemperatureExponent
 
-	dimensionlessExponent, err := ReadSimpleField(ctx, "dimensionlessExponent", ReadSignedByte(readBuffer, uint8(8)))
+	dimensionlessExponent, err := ReadSimpleField(ctx, "dimensionlessExponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dimensionlessExponent' field"))
 	}
@@ -433,35 +435,35 @@ func (m *_QuantityDimension) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for QuantityDimension")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "massExponent", m.GetMassExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "massExponent", m.GetMassExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'massExponent' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "lengthExponent", m.GetLengthExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "lengthExponent", m.GetLengthExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lengthExponent' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "timeExponent", m.GetTimeExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "timeExponent", m.GetTimeExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timeExponent' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "electricCurrentExponent", m.GetElectricCurrentExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "electricCurrentExponent", m.GetElectricCurrentExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'electricCurrentExponent' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "amountOfSubstanceExponent", m.GetAmountOfSubstanceExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "amountOfSubstanceExponent", m.GetAmountOfSubstanceExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'amountOfSubstanceExponent' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "luminousIntensityExponent", m.GetLuminousIntensityExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "luminousIntensityExponent", m.GetLuminousIntensityExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'luminousIntensityExponent' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "absoluteTemperatureExponent", m.GetAbsoluteTemperatureExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "absoluteTemperatureExponent", m.GetAbsoluteTemperatureExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'absoluteTemperatureExponent' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "dimensionlessExponent", m.GetDimensionlessExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "dimensionlessExponent", m.GetDimensionlessExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dimensionlessExponent' field")
 		}
 

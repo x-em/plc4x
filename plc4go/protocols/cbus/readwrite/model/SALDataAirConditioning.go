@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +105,7 @@ type _SALDataAirConditioningBuilder struct {
 
 	parentBuilder *_SALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SALDataAirConditioningBuilder) = (*_SALDataAirConditioningBuilder)(nil)
@@ -126,23 +129,17 @@ func (b *_SALDataAirConditioningBuilder) WithAirConditioningDataBuilder(builderS
 	var err error
 	b.AirConditioningData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "AirConditioningDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "AirConditioningDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SALDataAirConditioningBuilder) Build() (SALDataAirConditioning, error) {
 	if b.AirConditioningData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'airConditioningData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'airConditioningData' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SALDataAirConditioning.deepCopy(), nil
 }
@@ -168,8 +165,8 @@ func (b *_SALDataAirConditioningBuilder) buildForSALData() (SALData, error) {
 
 func (b *_SALDataAirConditioningBuilder) DeepCopy() any {
 	_copy := b.CreateSALDataAirConditioningBuilder().(*_SALDataAirConditioningBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +227,7 @@ func CastSALDataAirConditioning(structType any) SALDataAirConditioning {
 	return nil
 }
 
-func (m *_SALDataAirConditioning) GetTypeName() string {
+func (m *_SALDataAirConditioning) GetPlx4xTypeName() string {
 	return "SALDataAirConditioning"
 }
 
@@ -258,7 +255,7 @@ func (m *_SALDataAirConditioning) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	airConditioningData, err := ReadSimpleField[AirConditioningData](ctx, "airConditioningData", ReadComplex[AirConditioningData](AirConditioningDataParseWithBuffer, readBuffer))
+	airConditioningData, err := ReadSimpleField[AirConditioningData](ctx, "airConditioningData", ReadComplex[AirConditioningData](AirConditioningDataParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'airConditioningData' field"))
 	}
@@ -272,7 +269,7 @@ func (m *_SALDataAirConditioning) parse(ctx context.Context, readBuffer utils.Re
 }
 
 func (m *_SALDataAirConditioning) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -289,7 +286,7 @@ func (m *_SALDataAirConditioning) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for SALDataAirConditioning")
 		}
 
-		if err := WriteSimpleField[AirConditioningData](ctx, "airConditioningData", m.GetAirConditioningData(), WriteComplex[AirConditioningData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[AirConditioningData](ctx, "airConditioningData", m.GetAirConditioningData(), WriteComplex[AirConditioningData](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'airConditioningData' field")
 		}
 

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewTrimmedStringBuilder() TrimmedStringBuilder {
 type _TrimmedStringBuilder struct {
 	*_TrimmedString
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TrimmedStringBuilder) = (*_TrimmedStringBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_TrimmedStringBuilder) WithMandatoryFields() TrimmedStringBuilder {
 }
 
 func (b *_TrimmedStringBuilder) Build() (TrimmedString, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TrimmedString.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_TrimmedStringBuilder) MustBuild() TrimmedString {
 
 func (b *_TrimmedStringBuilder) DeepCopy() any {
 	_copy := b.CreateTrimmedStringBuilder().(*_TrimmedStringBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastTrimmedString(structType any) TrimmedString {
 	return nil
 }
 
-func (m *_TrimmedString) GetTypeName() string {
+func (m *_TrimmedString) GetPlx4xTypeName() string {
 	return "TrimmedString"
 }
 
@@ -159,7 +160,7 @@ func TrimmedStringParseWithBufferProducer() func(ctx context.Context, readBuffer
 }
 
 func TrimmedStringParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (TrimmedString, error) {
-	v, err := (&_TrimmedString{}).parse(ctx, readBuffer)
+	v, err := (new(_TrimmedString)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

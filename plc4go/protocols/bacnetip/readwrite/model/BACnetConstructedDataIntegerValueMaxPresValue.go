@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataIntegerValueMaxPresValue = (*_BACnetConstructedDataIn
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataIntegerValueMaxPresValue)(nil)
 
 // NewBACnetConstructedDataIntegerValueMaxPresValue factory function for _BACnetConstructedDataIntegerValueMaxPresValue
-func NewBACnetConstructedDataIntegerValueMaxPresValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, maxPresValue BACnetApplicationTagSignedInteger, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataIntegerValueMaxPresValue {
+func NewBACnetConstructedDataIntegerValueMaxPresValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, maxPresValue BACnetApplicationTagSignedInteger) *_BACnetConstructedDataIntegerValueMaxPresValue {
 	if maxPresValue == nil {
 		panic("maxPresValue of type BACnetApplicationTagSignedInteger for BACnetConstructedDataIntegerValueMaxPresValue must not be nil")
 	}
 	_result := &_BACnetConstructedDataIntegerValueMaxPresValue{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		MaxPresValue:                  maxPresValue,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataIntegerValueMaxPresValueBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataIntegerValueMaxPresValueBuilder) = (*_BACnetConstructedDataIntegerValueMaxPresValueBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataIntegerValueMaxPresValueBuilder) WithMaxPresValue
 	var err error
 	b.MaxPresValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagSignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagSignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataIntegerValueMaxPresValueBuilder) Build() (BACnetConstructedDataIntegerValueMaxPresValue, error) {
 	if b.MaxPresValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'maxPresValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'maxPresValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataIntegerValueMaxPresValue.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataIntegerValueMaxPresValueBuilder) buildForBACnetCo
 
 func (b *_BACnetConstructedDataIntegerValueMaxPresValueBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataIntegerValueMaxPresValueBuilder().(*_BACnetConstructedDataIntegerValueMaxPresValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataIntegerValueMaxPresValue(structType any) BACnetCon
 	return nil
 }
 
-func (m *_BACnetConstructedDataIntegerValueMaxPresValue) GetTypeName() string {
+func (m *_BACnetConstructedDataIntegerValueMaxPresValue) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataIntegerValueMaxPresValue"
 }
 

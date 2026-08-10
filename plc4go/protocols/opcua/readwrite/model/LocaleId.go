@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewLocaleIdBuilder() LocaleIdBuilder {
 type _LocaleIdBuilder struct {
 	*_LocaleId
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (LocaleIdBuilder) = (*_LocaleIdBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_LocaleIdBuilder) WithMandatoryFields() LocaleIdBuilder {
 }
 
 func (b *_LocaleIdBuilder) Build() (LocaleId, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._LocaleId.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_LocaleIdBuilder) MustBuild() LocaleId {
 
 func (b *_LocaleIdBuilder) DeepCopy() any {
 	_copy := b.CreateLocaleIdBuilder().(*_LocaleIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastLocaleId(structType any) LocaleId {
 	return nil
 }
 
-func (m *_LocaleId) GetTypeName() string {
+func (m *_LocaleId) GetPlx4xTypeName() string {
 	return "LocaleId"
 }
 
@@ -159,7 +160,7 @@ func LocaleIdParseWithBufferProducer() func(ctx context.Context, readBuffer util
 }
 
 func LocaleIdParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (LocaleId, error) {
-	v, err := (&_LocaleId{}).parse(ctx, readBuffer)
+	v, err := (new(_LocaleId)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

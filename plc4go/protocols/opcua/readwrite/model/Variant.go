@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -56,7 +57,7 @@ type VariantContract interface {
 	// GetNoOfArrayDimensions returns NoOfArrayDimensions (property field)
 	GetNoOfArrayDimensions() *int32
 	// GetArrayDimensions returns ArrayDimensions (property field)
-	GetArrayDimensions() []bool
+	GetArrayDimensions() []int32
 	// IsVariant is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsVariant()
 	// CreateBuilder creates a VariantBuilder
@@ -82,13 +83,13 @@ type _Variant struct {
 	ArrayLengthSpecified     bool
 	ArrayDimensionsSpecified bool
 	NoOfArrayDimensions      *int32
-	ArrayDimensions          []bool
+	ArrayDimensions          []int32
 }
 
 var _ VariantContract = (*_Variant)(nil)
 
 // NewVariant factory function for _Variant
-func NewVariant(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool) *_Variant {
+func NewVariant(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32) *_Variant {
 	return &_Variant{ArrayLengthSpecified: arrayLengthSpecified, ArrayDimensionsSpecified: arrayDimensionsSpecified, NoOfArrayDimensions: noOfArrayDimensions, ArrayDimensions: arrayDimensions}
 }
 
@@ -101,7 +102,7 @@ func NewVariant(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfAr
 type VariantBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
-	WithMandatoryFields(arrayLengthSpecified bool, arrayDimensionsSpecified bool, arrayDimensions []bool) VariantBuilder
+	WithMandatoryFields(arrayLengthSpecified bool, arrayDimensionsSpecified bool, arrayDimensions []int32) VariantBuilder
 	// WithArrayLengthSpecified adds ArrayLengthSpecified (property field)
 	WithArrayLengthSpecified(bool) VariantBuilder
 	// WithArrayDimensionsSpecified adds ArrayDimensionsSpecified (property field)
@@ -109,7 +110,7 @@ type VariantBuilder interface {
 	// WithNoOfArrayDimensions adds NoOfArrayDimensions (property field)
 	WithOptionalNoOfArrayDimensions(int32) VariantBuilder
 	// WithArrayDimensions adds ArrayDimensions (property field)
-	WithArrayDimensions(...bool) VariantBuilder
+	WithArrayDimensions(...int32) VariantBuilder
 	// AsVariantNull converts this build to a subType of Variant. It is always possible to return to current builder using Done()
 	AsVariantNull() VariantNullBuilder
 	// AsVariantBoolean converts this build to a subType of Variant. It is always possible to return to current builder using Done()
@@ -188,12 +189,12 @@ type _VariantBuilder struct {
 
 	childBuilder _VariantChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantBuilder) = (*_VariantBuilder)(nil)
 
-func (b *_VariantBuilder) WithMandatoryFields(arrayLengthSpecified bool, arrayDimensionsSpecified bool, arrayDimensions []bool) VariantBuilder {
+func (b *_VariantBuilder) WithMandatoryFields(arrayLengthSpecified bool, arrayDimensionsSpecified bool, arrayDimensions []int32) VariantBuilder {
 	return b.WithArrayLengthSpecified(arrayLengthSpecified).WithArrayDimensionsSpecified(arrayDimensionsSpecified).WithArrayDimensions(arrayDimensions...)
 }
 
@@ -212,14 +213,14 @@ func (b *_VariantBuilder) WithOptionalNoOfArrayDimensions(noOfArrayDimensions in
 	return b
 }
 
-func (b *_VariantBuilder) WithArrayDimensions(arrayDimensions ...bool) VariantBuilder {
+func (b *_VariantBuilder) WithArrayDimensions(arrayDimensions ...int32) VariantBuilder {
 	b.ArrayDimensions = arrayDimensions
 	return b
 }
 
 func (b *_VariantBuilder) PartialBuild() (VariantContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._Variant.deepCopy(), nil
 }
@@ -516,8 +517,8 @@ func (b *_VariantBuilder) DeepCopy() any {
 	_copy := b.CreateVariantBuilder().(*_VariantBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_VariantChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -552,7 +553,7 @@ func (m *_Variant) GetNoOfArrayDimensions() *int32 {
 	return m.NoOfArrayDimensions
 }
 
-func (m *_Variant) GetArrayDimensions() []bool {
+func (m *_Variant) GetArrayDimensions() []int32 {
 	return m.ArrayDimensions
 }
 
@@ -572,7 +573,7 @@ func CastVariant(structType any) Variant {
 	return nil
 }
 
-func (m *_Variant) GetTypeName() string {
+func (m *_Variant) GetPlx4xTypeName() string {
 	return "Variant"
 }
 
@@ -594,7 +595,7 @@ func (m *_Variant) getLengthInBits(ctx context.Context) uint16 {
 
 	// Array field
 	if len(m.ArrayDimensions) > 0 {
-		lengthInBits += 1 * uint16(len(m.ArrayDimensions))
+		lengthInBits += 32 * uint16(len(m.ArrayDimensions))
 	}
 
 	return lengthInBits
@@ -624,7 +625,7 @@ func VariantParseWithBufferProducer[T Variant]() func(ctx context.Context, readB
 }
 
 func VariantParseWithBuffer[T Variant](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_Variant{}).parse(ctx, readBuffer)
+	v, err := (new(_Variant)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err
@@ -781,7 +782,7 @@ func (m *_Variant) parse(ctx context.Context, readBuffer utils.ReadBuffer) (__va
 	}
 	m.NoOfArrayDimensions = noOfArrayDimensions
 
-	arrayDimensions, err := ReadCountArrayField[bool](ctx, "arrayDimensions", ReadBoolean(readBuffer), uint64(utils.InlineIf(bool((noOfArrayDimensions) == (nil)), func() any { return int32(int32(0)) }, func() any { return int32((*noOfArrayDimensions)) }).(int32)))
+	arrayDimensions, err := ReadCountArrayField[int32](ctx, "arrayDimensions", ReadSignedInt(readBuffer, uint8(32)), uint64(utils.InlineIf(bool((noOfArrayDimensions) == (nil)), func() any { return int32(int32(0)) }, func() any { return int32((*noOfArrayDimensions)) }).(int32)))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'arrayDimensions' field"))
 	}
@@ -827,7 +828,7 @@ func (pm *_Variant) serializeParent(ctx context.Context, writeBuffer utils.Write
 		return errors.Wrap(err, "Error serializing 'noOfArrayDimensions' field")
 	}
 
-	if err := WriteSimpleTypeArrayField(ctx, "arrayDimensions", m.GetArrayDimensions(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleTypeArrayField(ctx, "arrayDimensions", m.GetArrayDimensions(), WriteSignedInt(writeBuffer, 32)); err != nil {
 		return errors.Wrap(err, "Error serializing 'arrayDimensions' field")
 	}
 
@@ -852,7 +853,7 @@ func (m *_Variant) deepCopy() *_Variant {
 		m.ArrayLengthSpecified,
 		m.ArrayDimensionsSpecified,
 		utils.CopyPtr[int32](m.NoOfArrayDimensions),
-		utils.DeepCopySlice[bool, bool](m.ArrayDimensions),
+		utils.DeepCopySlice[int32, int32](m.ArrayDimensions),
 	}
 	return _VariantCopy
 }

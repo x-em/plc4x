@@ -22,11 +22,12 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -90,7 +91,7 @@ type _CIPEncapsulationConnectionRequestBuilder struct {
 
 	parentBuilder *_CIPEncapsulationPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CIPEncapsulationConnectionRequestBuilder) = (*_CIPEncapsulationConnectionRequestBuilder)(nil)
@@ -105,8 +106,8 @@ func (b *_CIPEncapsulationConnectionRequestBuilder) WithMandatoryFields() CIPEnc
 }
 
 func (b *_CIPEncapsulationConnectionRequestBuilder) Build() (CIPEncapsulationConnectionRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CIPEncapsulationConnectionRequest.deepCopy(), nil
 }
@@ -132,8 +133,8 @@ func (b *_CIPEncapsulationConnectionRequestBuilder) buildForCIPEncapsulationPack
 
 func (b *_CIPEncapsulationConnectionRequestBuilder) DeepCopy() any {
 	_copy := b.CreateCIPEncapsulationConnectionRequestBuilder().(*_CIPEncapsulationConnectionRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -180,7 +181,7 @@ func CastCIPEncapsulationConnectionRequest(structType any) CIPEncapsulationConne
 	return nil
 }
 
-func (m *_CIPEncapsulationConnectionRequest) GetTypeName() string {
+func (m *_CIPEncapsulationConnectionRequest) GetPlx4xTypeName() string {
 	return "CIPEncapsulationConnectionRequest"
 }
 

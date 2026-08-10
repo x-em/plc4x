@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -111,7 +112,7 @@ type _MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder struct 
 
 	parentBuilder *_MediaTransportControlDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) = (*_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder)(nil)
@@ -136,8 +137,8 @@ func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) Wi
 }
 
 func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) Build() (MediaTransportControlDataEnumerateCategoriesSelectionTracks, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MediaTransportControlDataEnumerateCategoriesSelectionTracks.deepCopy(), nil
 }
@@ -163,8 +164,8 @@ func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) bu
 
 func (b *_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder) DeepCopy() any {
 	_copy := b.CreateMediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder().(*_MediaTransportControlDataEnumerateCategoriesSelectionTracksBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -258,7 +259,7 @@ func CastMediaTransportControlDataEnumerateCategoriesSelectionTracks(structType 
 	return nil
 }
 
-func (m *_MediaTransportControlDataEnumerateCategoriesSelectionTracks) GetTypeName() string {
+func (m *_MediaTransportControlDataEnumerateCategoriesSelectionTracks) GetPlx4xTypeName() string {
 	return "MediaTransportControlDataEnumerateCategoriesSelectionTracks"
 }
 

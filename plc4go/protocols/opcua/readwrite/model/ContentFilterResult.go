@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +105,7 @@ type _ContentFilterResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ContentFilterResultBuilder) = (*_ContentFilterResultBuilder)(nil)
@@ -128,8 +130,8 @@ func (b *_ContentFilterResultBuilder) WithElementDiagnosticInfos(elementDiagnost
 }
 
 func (b *_ContentFilterResultBuilder) Build() (ContentFilterResult, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ContentFilterResult.deepCopy(), nil
 }
@@ -155,8 +157,8 @@ func (b *_ContentFilterResultBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_ContentFilterResultBuilder) DeepCopy() any {
 	_copy := b.CreateContentFilterResultBuilder().(*_ContentFilterResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +223,7 @@ func CastContentFilterResult(structType any) ContentFilterResult {
 	return nil
 }
 
-func (m *_ContentFilterResult) GetTypeName() string {
+func (m *_ContentFilterResult) GetPlx4xTypeName() string {
 	return "ContentFilterResult"
 }
 
@@ -235,9 +237,7 @@ func (m *_ContentFilterResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.ElementResults) > 0 {
 		for _curItem, element := range m.ElementResults {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ElementResults), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -248,9 +248,7 @@ func (m *_ContentFilterResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.ElementDiagnosticInfos) > 0 {
 		for _curItem, element := range m.ElementDiagnosticInfos {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ElementDiagnosticInfos), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -272,25 +270,25 @@ func (m *_ContentFilterResult) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfElementResults, err := ReadImplicitField[int32](ctx, "noOfElementResults", ReadSignedInt(readBuffer, uint8(32)))
+	noOfElementResults, err := ReadImplicitField[int32](ctx, "noOfElementResults", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfElementResults' field"))
 	}
 	_ = noOfElementResults
 
-	elementResults, err := ReadCountArrayField[ContentFilterElementResult](ctx, "elementResults", ReadComplex[ContentFilterElementResult](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilterElementResult]((int32)(int32(606))), readBuffer), uint64(noOfElementResults))
+	elementResults, err := ReadCountArrayField[ContentFilterElementResult](ctx, "elementResults", ReadComplex[ContentFilterElementResult](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilterElementResult]((int32)(int32(606))), readBuffer), uint64(noOfElementResults), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'elementResults' field"))
 	}
 	m.ElementResults = elementResults
 
-	noOfElementDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfElementDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)))
+	noOfElementDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfElementDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfElementDiagnosticInfos' field"))
 	}
 	_ = noOfElementDiagnosticInfos
 
-	elementDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "elementDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfElementDiagnosticInfos))
+	elementDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "elementDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfElementDiagnosticInfos), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'elementDiagnosticInfos' field"))
 	}
@@ -321,19 +319,19 @@ func (m *_ContentFilterResult) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for ContentFilterResult")
 		}
 		noOfElementResults := int32(utils.InlineIf(bool((m.GetElementResults()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetElementResults()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfElementResults", noOfElementResults, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfElementResults", noOfElementResults, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfElementResults' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "elementResults", m.GetElementResults(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "elementResults", m.GetElementResults(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'elementResults' field")
 		}
 		noOfElementDiagnosticInfos := int32(utils.InlineIf(bool((m.GetElementDiagnosticInfos()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetElementDiagnosticInfos()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfElementDiagnosticInfos", noOfElementDiagnosticInfos, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfElementDiagnosticInfos", noOfElementDiagnosticInfos, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfElementDiagnosticInfos' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "elementDiagnosticInfos", m.GetElementDiagnosticInfos(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "elementDiagnosticInfos", m.GetElementDiagnosticInfos(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'elementDiagnosticInfos' field")
 		}
 

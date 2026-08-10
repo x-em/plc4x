@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -154,7 +155,7 @@ type _BACnetApplicationTagBuilder struct {
 
 	childBuilder _BACnetApplicationTagChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetApplicationTagBuilder) = (*_BACnetApplicationTagBuilder)(nil)
@@ -173,23 +174,17 @@ func (b *_BACnetApplicationTagBuilder) WithHeaderBuilder(builderSupplier func(BA
 	var err error
 	b.Header, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetTagHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetTagHeaderBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetApplicationTagBuilder) PartialBuild() (BACnetApplicationTagContract, error) {
 	if b.Header == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'header' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'header' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetApplicationTag.deepCopy(), nil
 }
@@ -356,8 +351,8 @@ func (b *_BACnetApplicationTagBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetApplicationTagBuilder().(*_BACnetApplicationTagBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_BACnetApplicationTagChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -423,7 +418,7 @@ func CastBACnetApplicationTag(structType any) BACnetApplicationTag {
 	return nil
 }
 
-func (m *_BACnetApplicationTag) GetTypeName() string {
+func (m *_BACnetApplicationTag) GetPlx4xTypeName() string {
 	return "BACnetApplicationTag"
 }
 
@@ -464,7 +459,7 @@ func BACnetApplicationTagParseWithBufferProducer[T BACnetApplicationTag]() func(
 }
 
 func BACnetApplicationTagParseWithBuffer[T BACnetApplicationTag](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_BACnetApplicationTag{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetApplicationTag)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

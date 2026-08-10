@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataZoneMembers = (*_BACnetConstructedDataZoneMembers)(ni
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataZoneMembers)(nil)
 
 // NewBACnetConstructedDataZoneMembers factory function for _BACnetConstructedDataZoneMembers
-func NewBACnetConstructedDataZoneMembers(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, members []BACnetDeviceObjectReference, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataZoneMembers {
+func NewBACnetConstructedDataZoneMembers(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, members []BACnetDeviceObjectReference) *_BACnetConstructedDataZoneMembers {
 	_result := &_BACnetConstructedDataZoneMembers{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		Members:                       members,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataZoneMembersBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataZoneMembersBuilder) = (*_BACnetConstructedDataZoneMembersBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataZoneMembersBuilder) WithMembers(members ...BACnet
 }
 
 func (b *_BACnetConstructedDataZoneMembersBuilder) Build() (BACnetConstructedDataZoneMembers, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataZoneMembers.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataZoneMembersBuilder) buildForBACnetConstructedData
 
 func (b *_BACnetConstructedDataZoneMembersBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataZoneMembersBuilder().(*_BACnetConstructedDataZoneMembersBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataZoneMembers(structType any) BACnetConstructedDataZ
 	return nil
 }
 
-func (m *_BACnetConstructedDataZoneMembers) GetTypeName() string {
+func (m *_BACnetConstructedDataZoneMembers) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataZoneMembers"
 }
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -125,7 +127,7 @@ type _PriorityMappingEntryTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PriorityMappingEntryTypeBuilder) = (*_PriorityMappingEntryTypeBuilder)(nil)
@@ -149,10 +151,7 @@ func (b *_PriorityMappingEntryTypeBuilder) WithMappingUriBuilder(builderSupplier
 	var err error
 	b.MappingUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -167,10 +166,7 @@ func (b *_PriorityMappingEntryTypeBuilder) WithPriorityLabelBuilder(builderSuppl
 	var err error
 	b.PriorityLabel, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -187,19 +183,13 @@ func (b *_PriorityMappingEntryTypeBuilder) WithPriorityValue_DSCP(priorityValue_
 
 func (b *_PriorityMappingEntryTypeBuilder) Build() (PriorityMappingEntryType, error) {
 	if b.MappingUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'mappingUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'mappingUri' not set"))
 	}
 	if b.PriorityLabel == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'priorityLabel' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'priorityLabel' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PriorityMappingEntryType.deepCopy(), nil
 }
@@ -225,8 +215,8 @@ func (b *_PriorityMappingEntryTypeBuilder) buildForExtensionObjectDefinition() (
 
 func (b *_PriorityMappingEntryTypeBuilder) DeepCopy() any {
 	_copy := b.CreatePriorityMappingEntryTypeBuilder().(*_PriorityMappingEntryTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +289,7 @@ func CastPriorityMappingEntryType(structType any) PriorityMappingEntryType {
 	return nil
 }
 
-func (m *_PriorityMappingEntryType) GetTypeName() string {
+func (m *_PriorityMappingEntryType) GetPlx4xTypeName() string {
 	return "PriorityMappingEntryType"
 }
 
@@ -336,25 +326,25 @@ func (m *_PriorityMappingEntryType) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	mappingUri, err := ReadSimpleField[PascalString](ctx, "mappingUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	mappingUri, err := ReadSimpleField[PascalString](ctx, "mappingUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'mappingUri' field"))
 	}
 	m.MappingUri = mappingUri
 
-	priorityLabel, err := ReadSimpleField[PascalString](ctx, "priorityLabel", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	priorityLabel, err := ReadSimpleField[PascalString](ctx, "priorityLabel", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'priorityLabel' field"))
 	}
 	m.PriorityLabel = priorityLabel
 
-	priorityValue_PCP, err := ReadSimpleField(ctx, "priorityValue_PCP", ReadUnsignedByte(readBuffer, uint8(8)))
+	priorityValue_PCP, err := ReadSimpleField(ctx, "priorityValue_PCP", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'priorityValue_PCP' field"))
 	}
 	m.PriorityValue_PCP = priorityValue_PCP
 
-	priorityValue_DSCP, err := ReadSimpleField(ctx, "priorityValue_DSCP", ReadUnsignedInt(readBuffer, uint8(32)))
+	priorityValue_DSCP, err := ReadSimpleField(ctx, "priorityValue_DSCP", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'priorityValue_DSCP' field"))
 	}
@@ -385,19 +375,19 @@ func (m *_PriorityMappingEntryType) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for PriorityMappingEntryType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "mappingUri", m.GetMappingUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "mappingUri", m.GetMappingUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'mappingUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "priorityLabel", m.GetPriorityLabel(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "priorityLabel", m.GetPriorityLabel(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'priorityLabel' field")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "priorityValue_PCP", m.GetPriorityValue_PCP(), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "priorityValue_PCP", m.GetPriorityValue_PCP(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'priorityValue_PCP' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "priorityValue_DSCP", m.GetPriorityValue_DSCP(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "priorityValue_DSCP", m.GetPriorityValue_DSCP(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'priorityValue_DSCP' field")
 		}
 

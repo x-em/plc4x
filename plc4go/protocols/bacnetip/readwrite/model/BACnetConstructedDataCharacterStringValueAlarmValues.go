@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -45,6 +46,7 @@ type BACnetConstructedDataCharacterStringValueAlarmValues interface {
 	// GetAlarmValues returns AlarmValues (property field)
 	GetAlarmValues() []BACnetOptionalCharacterString
 	// GetZero returns Zero (virtual field)
+	// TODO: uint 64 ---> big int in java == boom
 	GetZero() uint64
 	// IsBACnetConstructedDataCharacterStringValueAlarmValues is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsBACnetConstructedDataCharacterStringValueAlarmValues()
@@ -63,9 +65,9 @@ var _ BACnetConstructedDataCharacterStringValueAlarmValues = (*_BACnetConstructe
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataCharacterStringValueAlarmValues)(nil)
 
 // NewBACnetConstructedDataCharacterStringValueAlarmValues factory function for _BACnetConstructedDataCharacterStringValueAlarmValues
-func NewBACnetConstructedDataCharacterStringValueAlarmValues(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, alarmValues []BACnetOptionalCharacterString, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataCharacterStringValueAlarmValues {
+func NewBACnetConstructedDataCharacterStringValueAlarmValues(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, alarmValues []BACnetOptionalCharacterString) *_BACnetConstructedDataCharacterStringValueAlarmValues {
 	_result := &_BACnetConstructedDataCharacterStringValueAlarmValues{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		NumberOfDataElements:          numberOfDataElements,
 		AlarmValues:                   alarmValues,
 	}
@@ -107,7 +109,7 @@ type _BACnetConstructedDataCharacterStringValueAlarmValuesBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataCharacterStringValueAlarmValuesBuilder) = (*_BACnetConstructedDataCharacterStringValueAlarmValuesBuilder)(nil)
@@ -131,10 +133,7 @@ func (b *_BACnetConstructedDataCharacterStringValueAlarmValuesBuilder) WithOptio
 	var err error
 	b.NumberOfDataElements, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -145,8 +144,8 @@ func (b *_BACnetConstructedDataCharacterStringValueAlarmValuesBuilder) WithAlarm
 }
 
 func (b *_BACnetConstructedDataCharacterStringValueAlarmValuesBuilder) Build() (BACnetConstructedDataCharacterStringValueAlarmValues, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataCharacterStringValueAlarmValues.deepCopy(), nil
 }
@@ -172,8 +171,8 @@ func (b *_BACnetConstructedDataCharacterStringValueAlarmValuesBuilder) buildForB
 
 func (b *_BACnetConstructedDataCharacterStringValueAlarmValuesBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataCharacterStringValueAlarmValuesBuilder().(*_BACnetConstructedDataCharacterStringValueAlarmValuesBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -259,7 +258,7 @@ func CastBACnetConstructedDataCharacterStringValueAlarmValues(structType any) BA
 	return nil
 }
 
-func (m *_BACnetConstructedDataCharacterStringValueAlarmValues) GetTypeName() string {
+func (m *_BACnetConstructedDataCharacterStringValueAlarmValues) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataCharacterStringValueAlarmValues"
 }
 
@@ -351,7 +350,7 @@ func (m *_BACnetConstructedDataCharacterStringValueAlarmValues) SerializeWithWri
 			return errors.Wrap(_zeroErr, "Error serializing 'zero' field")
 		}
 
-		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", GetRef(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", new(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'numberOfDataElements' field")
 		}
 

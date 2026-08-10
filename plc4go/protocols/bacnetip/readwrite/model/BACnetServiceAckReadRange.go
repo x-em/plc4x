@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -76,7 +77,7 @@ var _ BACnetServiceAckReadRange = (*_BACnetServiceAckReadRange)(nil)
 var _ BACnetServiceAckRequirements = (*_BACnetServiceAckReadRange)(nil)
 
 // NewBACnetServiceAckReadRange factory function for _BACnetServiceAckReadRange
-func NewBACnetServiceAckReadRange(objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged, propertyArrayIndex BACnetContextTagUnsignedInteger, resultFlags BACnetResultFlagsTagged, itemCount BACnetContextTagUnsignedInteger, itemData BACnetConstructedData, firstSequenceNumber BACnetContextTagUnsignedInteger, serviceAckLength uint32) *_BACnetServiceAckReadRange {
+func NewBACnetServiceAckReadRange(serviceAckLength uint32, objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged, propertyArrayIndex BACnetContextTagUnsignedInteger, resultFlags BACnetResultFlagsTagged, itemCount BACnetContextTagUnsignedInteger, itemData BACnetConstructedData, firstSequenceNumber BACnetContextTagUnsignedInteger) *_BACnetServiceAckReadRange {
 	if objectIdentifier == nil {
 		panic("objectIdentifier of type BACnetContextTagObjectIdentifier for BACnetServiceAckReadRange must not be nil")
 	}
@@ -159,7 +160,7 @@ type _BACnetServiceAckReadRangeBuilder struct {
 
 	parentBuilder *_BACnetServiceAckBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetServiceAckReadRangeBuilder) = (*_BACnetServiceAckReadRangeBuilder)(nil)
@@ -183,10 +184,7 @@ func (b *_BACnetServiceAckReadRangeBuilder) WithObjectIdentifierBuilder(builderS
 	var err error
 	b.ObjectIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
 	}
 	return b
 }
@@ -201,10 +199,7 @@ func (b *_BACnetServiceAckReadRangeBuilder) WithPropertyIdentifierBuilder(builde
 	var err error
 	b.PropertyIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
 	}
 	return b
 }
@@ -219,10 +214,7 @@ func (b *_BACnetServiceAckReadRangeBuilder) WithOptionalPropertyArrayIndexBuilde
 	var err error
 	b.PropertyArrayIndex, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -237,10 +229,7 @@ func (b *_BACnetServiceAckReadRangeBuilder) WithResultFlagsBuilder(builderSuppli
 	var err error
 	b.ResultFlags, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetResultFlagsTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetResultFlagsTaggedBuilder failed"))
 	}
 	return b
 }
@@ -255,10 +244,7 @@ func (b *_BACnetServiceAckReadRangeBuilder) WithItemCountBuilder(builderSupplier
 	var err error
 	b.ItemCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -273,10 +259,7 @@ func (b *_BACnetServiceAckReadRangeBuilder) WithOptionalItemDataBuilder(builderS
 	var err error
 	b.ItemData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
 	}
 	return b
 }
@@ -291,41 +274,26 @@ func (b *_BACnetServiceAckReadRangeBuilder) WithOptionalFirstSequenceNumberBuild
 	var err error
 	b.FirstSequenceNumber, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetServiceAckReadRangeBuilder) Build() (BACnetServiceAckReadRange, error) {
 	if b.ObjectIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'objectIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'objectIdentifier' not set"))
 	}
 	if b.PropertyIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'propertyIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'propertyIdentifier' not set"))
 	}
 	if b.ResultFlags == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'resultFlags' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'resultFlags' not set"))
 	}
 	if b.ItemCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'itemCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'itemCount' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetServiceAckReadRange.deepCopy(), nil
 }
@@ -351,8 +319,8 @@ func (b *_BACnetServiceAckReadRangeBuilder) buildForBACnetServiceAck() (BACnetSe
 
 func (b *_BACnetServiceAckReadRangeBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetServiceAckReadRangeBuilder().(*_BACnetServiceAckReadRangeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -437,7 +405,7 @@ func CastBACnetServiceAckReadRange(structType any) BACnetServiceAckReadRange {
 	return nil
 }
 
-func (m *_BACnetServiceAckReadRange) GetTypeName() string {
+func (m *_BACnetServiceAckReadRange) GetPlx4xTypeName() string {
 	return "BACnetServiceAckReadRange"
 }
 
@@ -576,7 +544,7 @@ func (m *_BACnetServiceAckReadRange) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(err, "Error serializing 'propertyIdentifier' field")
 		}
 
-		if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "propertyArrayIndex", GetRef(m.GetPropertyArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "propertyArrayIndex", new(m.GetPropertyArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'propertyArrayIndex' field")
 		}
 
@@ -588,11 +556,11 @@ func (m *_BACnetServiceAckReadRange) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(err, "Error serializing 'itemCount' field")
 		}
 
-		if err := WriteOptionalField[BACnetConstructedData](ctx, "itemData", GetRef(m.GetItemData()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetConstructedData](ctx, "itemData", new(m.GetItemData()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'itemData' field")
 		}
 
-		if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "firstSequenceNumber", GetRef(m.GetFirstSequenceNumber()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "firstSequenceNumber", new(m.GetFirstSequenceNumber()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'firstSequenceNumber' field")
 		}
 

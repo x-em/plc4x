@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -84,7 +87,7 @@ func NewPowerUpBuilder() PowerUpBuilder {
 type _PowerUpBuilder struct {
 	*_PowerUp
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PowerUpBuilder) = (*_PowerUpBuilder)(nil)
@@ -94,8 +97,8 @@ func (b *_PowerUpBuilder) WithMandatoryFields() PowerUpBuilder {
 }
 
 func (b *_PowerUpBuilder) Build() (PowerUp, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PowerUp.deepCopy(), nil
 }
@@ -110,8 +113,8 @@ func (b *_PowerUpBuilder) MustBuild() PowerUp {
 
 func (b *_PowerUpBuilder) DeepCopy() any {
 	_copy := b.CreatePowerUpBuilder().(*_PowerUpBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -158,7 +161,7 @@ func CastPowerUp(structType any) PowerUp {
 	return nil
 }
 
-func (m *_PowerUp) GetTypeName() string {
+func (m *_PowerUp) GetPlx4xTypeName() string {
 	return "PowerUp"
 }
 
@@ -179,7 +182,7 @@ func (m *_PowerUp) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func PowerUpParse(ctx context.Context, theBytes []byte) (PowerUp, error) {
-	return PowerUpParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return PowerUpParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func PowerUpParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (PowerUp, error) {
@@ -189,7 +192,7 @@ func PowerUpParseWithBufferProducer() func(ctx context.Context, readBuffer utils
 }
 
 func PowerUpParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (PowerUp, error) {
-	v, err := (&_PowerUp{}).parse(ctx, readBuffer)
+	v, err := (new(_PowerUp)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -205,13 +208,13 @@ func (m *_PowerUp) parse(ctx context.Context, readBuffer utils.ReadBuffer) (__po
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	powerUpIndicator1, err := ReadConstField[byte](ctx, "powerUpIndicator1", ReadByte(readBuffer, 8), PowerUp_POWERUPINDICATOR1)
+	powerUpIndicator1, err := ReadConstField[byte](ctx, "powerUpIndicator1", ReadByte(readBuffer, 8), PowerUp_POWERUPINDICATOR1, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'powerUpIndicator1' field"))
 	}
 	_ = powerUpIndicator1
 
-	powerUpIndicator2, err := ReadConstField[byte](ctx, "powerUpIndicator2", ReadByte(readBuffer, 8), PowerUp_POWERUPINDICATOR2)
+	powerUpIndicator2, err := ReadConstField[byte](ctx, "powerUpIndicator2", ReadByte(readBuffer, 8), PowerUp_POWERUPINDICATOR2, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'powerUpIndicator2' field"))
 	}
@@ -225,7 +228,7 @@ func (m *_PowerUp) parse(ctx context.Context, readBuffer utils.ReadBuffer) (__po
 }
 
 func (m *_PowerUp) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -241,11 +244,11 @@ func (m *_PowerUp) SerializeWithWriteBuffer(ctx context.Context, writeBuffer uti
 		return errors.Wrap(pushErr, "Error pushing for PowerUp")
 	}
 
-	if err := WriteConstField(ctx, "powerUpIndicator1", PowerUp_POWERUPINDICATOR1, WriteByte(writeBuffer, 8)); err != nil {
+	if err := WriteConstField(ctx, "powerUpIndicator1", PowerUp_POWERUPINDICATOR1, WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'powerUpIndicator1' field")
 	}
 
-	if err := WriteConstField(ctx, "powerUpIndicator2", PowerUp_POWERUPINDICATOR2, WriteByte(writeBuffer, 8)); err != nil {
+	if err := WriteConstField(ctx, "powerUpIndicator2", PowerUp_POWERUPINDICATOR2, WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'powerUpIndicator2' field")
 	}
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -124,7 +126,7 @@ type _StructureDescriptionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (StructureDescriptionBuilder) = (*_StructureDescriptionBuilder)(nil)
@@ -148,10 +150,7 @@ func (b *_StructureDescriptionBuilder) WithDataTypeIdBuilder(builderSupplier fun
 	var err error
 	b.DataTypeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -166,10 +165,7 @@ func (b *_StructureDescriptionBuilder) WithNameBuilder(builderSupplier func(Qual
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "QualifiedNameBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "QualifiedNameBuilder failed"))
 	}
 	return b
 }
@@ -184,35 +180,23 @@ func (b *_StructureDescriptionBuilder) WithStructureDefinitionBuilder(builderSup
 	var err error
 	b.StructureDefinition, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StructureDefinitionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StructureDefinitionBuilder failed"))
 	}
 	return b
 }
 
 func (b *_StructureDescriptionBuilder) Build() (StructureDescription, error) {
 	if b.DataTypeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataTypeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataTypeId' not set"))
 	}
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
 	if b.StructureDefinition == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'structureDefinition' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'structureDefinition' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._StructureDescription.deepCopy(), nil
 }
@@ -238,8 +222,8 @@ func (b *_StructureDescriptionBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_StructureDescriptionBuilder) DeepCopy() any {
 	_copy := b.CreateStructureDescriptionBuilder().(*_StructureDescriptionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -308,7 +292,7 @@ func CastStructureDescription(structType any) StructureDescription {
 	return nil
 }
 
-func (m *_StructureDescription) GetTypeName() string {
+func (m *_StructureDescription) GetPlx4xTypeName() string {
 	return "StructureDescription"
 }
 
@@ -342,19 +326,19 @@ func (m *_StructureDescription) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	dataTypeId, err := ReadSimpleField[NodeId](ctx, "dataTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	dataTypeId, err := ReadSimpleField[NodeId](ctx, "dataTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataTypeId' field"))
 	}
 	m.DataTypeId = dataTypeId
 
-	name, err := ReadSimpleField[QualifiedName](ctx, "name", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer))
+	name, err := ReadSimpleField[QualifiedName](ctx, "name", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'name' field"))
 	}
 	m.Name = name
 
-	structureDefinition, err := ReadSimpleField[StructureDefinition](ctx, "structureDefinition", ReadComplex[StructureDefinition](ExtensionObjectDefinitionParseWithBufferProducer[StructureDefinition]((int32)(int32(101))), readBuffer))
+	structureDefinition, err := ReadSimpleField[StructureDefinition](ctx, "structureDefinition", ReadComplex[StructureDefinition](ExtensionObjectDefinitionParseWithBufferProducer[StructureDefinition]((int32)(int32(101))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'structureDefinition' field"))
 	}
@@ -385,15 +369,15 @@ func (m *_StructureDescription) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for StructureDescription")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "dataTypeId", m.GetDataTypeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "dataTypeId", m.GetDataTypeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataTypeId' field")
 		}
 
-		if err := WriteSimpleField[QualifiedName](ctx, "name", m.GetName(), WriteComplex[QualifiedName](writeBuffer)); err != nil {
+		if err := WriteSimpleField[QualifiedName](ctx, "name", m.GetName(), WriteComplex[QualifiedName](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'name' field")
 		}
 
-		if err := WriteSimpleField[StructureDefinition](ctx, "structureDefinition", m.GetStructureDefinition(), WriteComplex[StructureDefinition](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StructureDefinition](ctx, "structureDefinition", m.GetStructureDefinition(), WriteComplex[StructureDefinition](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'structureDefinition' field")
 		}
 

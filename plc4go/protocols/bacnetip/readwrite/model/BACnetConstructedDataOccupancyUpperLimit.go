@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataOccupancyUpperLimit = (*_BACnetConstructedDataOccupan
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataOccupancyUpperLimit)(nil)
 
 // NewBACnetConstructedDataOccupancyUpperLimit factory function for _BACnetConstructedDataOccupancyUpperLimit
-func NewBACnetConstructedDataOccupancyUpperLimit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, occupancyUpperLimit BACnetApplicationTagUnsignedInteger, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataOccupancyUpperLimit {
+func NewBACnetConstructedDataOccupancyUpperLimit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, occupancyUpperLimit BACnetApplicationTagUnsignedInteger) *_BACnetConstructedDataOccupancyUpperLimit {
 	if occupancyUpperLimit == nil {
 		panic("occupancyUpperLimit of type BACnetApplicationTagUnsignedInteger for BACnetConstructedDataOccupancyUpperLimit must not be nil")
 	}
 	_result := &_BACnetConstructedDataOccupancyUpperLimit{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		OccupancyUpperLimit:           occupancyUpperLimit,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataOccupancyUpperLimitBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataOccupancyUpperLimitBuilder) = (*_BACnetConstructedDataOccupancyUpperLimitBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataOccupancyUpperLimitBuilder) WithOccupancyUpperLim
 	var err error
 	b.OccupancyUpperLimit, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataOccupancyUpperLimitBuilder) Build() (BACnetConstructedDataOccupancyUpperLimit, error) {
 	if b.OccupancyUpperLimit == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'occupancyUpperLimit' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'occupancyUpperLimit' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataOccupancyUpperLimit.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataOccupancyUpperLimitBuilder) buildForBACnetConstru
 
 func (b *_BACnetConstructedDataOccupancyUpperLimitBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataOccupancyUpperLimitBuilder().(*_BACnetConstructedDataOccupancyUpperLimitBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataOccupancyUpperLimit(structType any) BACnetConstruc
 	return nil
 }
 
-func (m *_BACnetConstructedDataOccupancyUpperLimit) GetTypeName() string {
+func (m *_BACnetConstructedDataOccupancyUpperLimit) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataOccupancyUpperLimit"
 }
 

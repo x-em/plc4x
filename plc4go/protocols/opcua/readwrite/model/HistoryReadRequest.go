@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -133,7 +135,7 @@ type _HistoryReadRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (HistoryReadRequestBuilder) = (*_HistoryReadRequestBuilder)(nil)
@@ -157,10 +159,7 @@ func (b *_HistoryReadRequestBuilder) WithRequestHeaderBuilder(builderSupplier fu
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -175,10 +174,7 @@ func (b *_HistoryReadRequestBuilder) WithHistoryReadDetailsBuilder(builderSuppli
 	var err error
 	b.HistoryReadDetails, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -200,19 +196,13 @@ func (b *_HistoryReadRequestBuilder) WithNodesToRead(nodesToRead ...HistoryReadV
 
 func (b *_HistoryReadRequestBuilder) Build() (HistoryReadRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
 	if b.HistoryReadDetails == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'historyReadDetails' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'historyReadDetails' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._HistoryReadRequest.deepCopy(), nil
 }
@@ -238,8 +228,8 @@ func (b *_HistoryReadRequestBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_HistoryReadRequestBuilder) DeepCopy() any {
 	_copy := b.CreateHistoryReadRequestBuilder().(*_HistoryReadRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -316,7 +306,7 @@ func CastHistoryReadRequest(structType any) HistoryReadRequest {
 	return nil
 }
 
-func (m *_HistoryReadRequest) GetTypeName() string {
+func (m *_HistoryReadRequest) GetPlx4xTypeName() string {
 	return "HistoryReadRequest"
 }
 
@@ -345,9 +335,7 @@ func (m *_HistoryReadRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.NodesToRead) > 0 {
 		for _curItem, element := range m.NodesToRead {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.NodesToRead), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -369,43 +357,43 @@ func (m *_HistoryReadRequest) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	historyReadDetails, err := ReadSimpleField[ExtensionObject](ctx, "historyReadDetails", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	historyReadDetails, err := ReadSimpleField[ExtensionObject](ctx, "historyReadDetails", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'historyReadDetails' field"))
 	}
 	m.HistoryReadDetails = historyReadDetails
 
-	timestampsToReturn, err := ReadEnumField[TimestampsToReturn](ctx, "timestampsToReturn", "TimestampsToReturn", ReadEnum(TimestampsToReturnByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	timestampsToReturn, err := ReadEnumField[TimestampsToReturn](ctx, "timestampsToReturn", "TimestampsToReturn", ReadEnum(TimestampsToReturnByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timestampsToReturn' field"))
 	}
 	m.TimestampsToReturn = timestampsToReturn
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	releaseContinuationPoints, err := ReadSimpleField(ctx, "releaseContinuationPoints", ReadBoolean(readBuffer))
+	releaseContinuationPoints, err := ReadSimpleField(ctx, "releaseContinuationPoints", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'releaseContinuationPoints' field"))
 	}
 	m.ReleaseContinuationPoints = releaseContinuationPoints
 
-	noOfNodesToRead, err := ReadImplicitField[int32](ctx, "noOfNodesToRead", ReadSignedInt(readBuffer, uint8(32)))
+	noOfNodesToRead, err := ReadImplicitField[int32](ctx, "noOfNodesToRead", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfNodesToRead' field"))
 	}
 	_ = noOfNodesToRead
 
-	nodesToRead, err := ReadCountArrayField[HistoryReadValueId](ctx, "nodesToRead", ReadComplex[HistoryReadValueId](ExtensionObjectDefinitionParseWithBufferProducer[HistoryReadValueId]((int32)(int32(637))), readBuffer), uint64(noOfNodesToRead))
+	nodesToRead, err := ReadCountArrayField[HistoryReadValueId](ctx, "nodesToRead", ReadComplex[HistoryReadValueId](ExtensionObjectDefinitionParseWithBufferProducer[HistoryReadValueId]((int32)(int32(637))), readBuffer), uint64(noOfNodesToRead), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodesToRead' field"))
 	}
@@ -436,31 +424,31 @@ func (m *_HistoryReadRequest) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for HistoryReadRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "historyReadDetails", m.GetHistoryReadDetails(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "historyReadDetails", m.GetHistoryReadDetails(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'historyReadDetails' field")
 		}
 
-		if err := WriteSimpleEnumField[TimestampsToReturn](ctx, "timestampsToReturn", "TimestampsToReturn", m.GetTimestampsToReturn(), WriteEnum[TimestampsToReturn, uint32](TimestampsToReturn.GetValue, TimestampsToReturn.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[TimestampsToReturn](ctx, "timestampsToReturn", "TimestampsToReturn", m.GetTimestampsToReturn(), WriteEnum[TimestampsToReturn, uint32](TimestampsToReturn.GetValue, TimestampsToReturn.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timestampsToReturn' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "releaseContinuationPoints", m.GetReleaseContinuationPoints(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "releaseContinuationPoints", m.GetReleaseContinuationPoints(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'releaseContinuationPoints' field")
 		}
 		noOfNodesToRead := int32(utils.InlineIf(bool((m.GetNodesToRead()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetNodesToRead()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfNodesToRead", noOfNodesToRead, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfNodesToRead", noOfNodesToRead, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfNodesToRead' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "nodesToRead", m.GetNodesToRead(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "nodesToRead", m.GetNodesToRead(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodesToRead' field")
 		}
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -141,7 +143,7 @@ type _BrokerDataSetReaderTransportDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BrokerDataSetReaderTransportDataTypeBuilder) = (*_BrokerDataSetReaderTransportDataTypeBuilder)(nil)
@@ -165,10 +167,7 @@ func (b *_BrokerDataSetReaderTransportDataTypeBuilder) WithQueueNameBuilder(buil
 	var err error
 	b.QueueName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -183,10 +182,7 @@ func (b *_BrokerDataSetReaderTransportDataTypeBuilder) WithResourceUriBuilder(bu
 	var err error
 	b.ResourceUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -201,10 +197,7 @@ func (b *_BrokerDataSetReaderTransportDataTypeBuilder) WithAuthenticationProfile
 	var err error
 	b.AuthenticationProfileUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -224,41 +217,26 @@ func (b *_BrokerDataSetReaderTransportDataTypeBuilder) WithMetaDataQueueNameBuil
 	var err error
 	b.MetaDataQueueName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BrokerDataSetReaderTransportDataTypeBuilder) Build() (BrokerDataSetReaderTransportDataType, error) {
 	if b.QueueName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'queueName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'queueName' not set"))
 	}
 	if b.ResourceUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'resourceUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'resourceUri' not set"))
 	}
 	if b.AuthenticationProfileUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'authenticationProfileUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'authenticationProfileUri' not set"))
 	}
 	if b.MetaDataQueueName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'metaDataQueueName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'metaDataQueueName' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BrokerDataSetReaderTransportDataType.deepCopy(), nil
 }
@@ -284,8 +262,8 @@ func (b *_BrokerDataSetReaderTransportDataTypeBuilder) buildForExtensionObjectDe
 
 func (b *_BrokerDataSetReaderTransportDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateBrokerDataSetReaderTransportDataTypeBuilder().(*_BrokerDataSetReaderTransportDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -362,7 +340,7 @@ func CastBrokerDataSetReaderTransportDataType(structType any) BrokerDataSetReade
 	return nil
 }
 
-func (m *_BrokerDataSetReaderTransportDataType) GetTypeName() string {
+func (m *_BrokerDataSetReaderTransportDataType) GetPlx4xTypeName() string {
 	return "BrokerDataSetReaderTransportDataType"
 }
 
@@ -402,31 +380,31 @@ func (m *_BrokerDataSetReaderTransportDataType) parse(ctx context.Context, readB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	queueName, err := ReadSimpleField[PascalString](ctx, "queueName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	queueName, err := ReadSimpleField[PascalString](ctx, "queueName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'queueName' field"))
 	}
 	m.QueueName = queueName
 
-	resourceUri, err := ReadSimpleField[PascalString](ctx, "resourceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	resourceUri, err := ReadSimpleField[PascalString](ctx, "resourceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'resourceUri' field"))
 	}
 	m.ResourceUri = resourceUri
 
-	authenticationProfileUri, err := ReadSimpleField[PascalString](ctx, "authenticationProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	authenticationProfileUri, err := ReadSimpleField[PascalString](ctx, "authenticationProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'authenticationProfileUri' field"))
 	}
 	m.AuthenticationProfileUri = authenticationProfileUri
 
-	requestedDeliveryGuarantee, err := ReadEnumField[BrokerTransportQualityOfService](ctx, "requestedDeliveryGuarantee", "BrokerTransportQualityOfService", ReadEnum(BrokerTransportQualityOfServiceByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	requestedDeliveryGuarantee, err := ReadEnumField[BrokerTransportQualityOfService](ctx, "requestedDeliveryGuarantee", "BrokerTransportQualityOfService", ReadEnum(BrokerTransportQualityOfServiceByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestedDeliveryGuarantee' field"))
 	}
 	m.RequestedDeliveryGuarantee = requestedDeliveryGuarantee
 
-	metaDataQueueName, err := ReadSimpleField[PascalString](ctx, "metaDataQueueName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	metaDataQueueName, err := ReadSimpleField[PascalString](ctx, "metaDataQueueName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'metaDataQueueName' field"))
 	}
@@ -457,23 +435,23 @@ func (m *_BrokerDataSetReaderTransportDataType) SerializeWithWriteBuffer(ctx con
 			return errors.Wrap(pushErr, "Error pushing for BrokerDataSetReaderTransportDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "queueName", m.GetQueueName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "queueName", m.GetQueueName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'queueName' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "resourceUri", m.GetResourceUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "resourceUri", m.GetResourceUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'resourceUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "authenticationProfileUri", m.GetAuthenticationProfileUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "authenticationProfileUri", m.GetAuthenticationProfileUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'authenticationProfileUri' field")
 		}
 
-		if err := WriteSimpleEnumField[BrokerTransportQualityOfService](ctx, "requestedDeliveryGuarantee", "BrokerTransportQualityOfService", m.GetRequestedDeliveryGuarantee(), WriteEnum[BrokerTransportQualityOfService, uint32](BrokerTransportQualityOfService.GetValue, BrokerTransportQualityOfService.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[BrokerTransportQualityOfService](ctx, "requestedDeliveryGuarantee", "BrokerTransportQualityOfService", m.GetRequestedDeliveryGuarantee(), WriteEnum[BrokerTransportQualityOfService, uint32](BrokerTransportQualityOfService.GetValue, BrokerTransportQualityOfService.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestedDeliveryGuarantee' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "metaDataQueueName", m.GetMetaDataQueueName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "metaDataQueueName", m.GetMetaDataQueueName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'metaDataQueueName' field")
 		}
 

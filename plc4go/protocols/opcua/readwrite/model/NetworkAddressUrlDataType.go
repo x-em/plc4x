@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _NetworkAddressUrlDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NetworkAddressUrlDataTypeBuilder) = (*_NetworkAddressUrlDataTypeBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_NetworkAddressUrlDataTypeBuilder) WithNetworkInterfaceBuilder(builderS
 	var err error
 	b.NetworkInterface, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_NetworkAddressUrlDataTypeBuilder) WithUrlBuilder(builderSupplier func(
 	var err error
 	b.Url, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_NetworkAddressUrlDataTypeBuilder) Build() (NetworkAddressUrlDataType, error) {
 	if b.NetworkInterface == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'networkInterface' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'networkInterface' not set"))
 	}
 	if b.Url == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'url' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'url' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NetworkAddressUrlDataType.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_NetworkAddressUrlDataTypeBuilder) buildForExtensionObjectDefinition() 
 
 func (b *_NetworkAddressUrlDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateNetworkAddressUrlDataTypeBuilder().(*_NetworkAddressUrlDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastNetworkAddressUrlDataType(structType any) NetworkAddressUrlDataType {
 	return nil
 }
 
-func (m *_NetworkAddressUrlDataType) GetTypeName() string {
+func (m *_NetworkAddressUrlDataType) GetPlx4xTypeName() string {
 	return "NetworkAddressUrlDataType"
 }
 
@@ -300,13 +290,13 @@ func (m *_NetworkAddressUrlDataType) parse(ctx context.Context, readBuffer utils
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	networkInterface, err := ReadSimpleField[PascalString](ctx, "networkInterface", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	networkInterface, err := ReadSimpleField[PascalString](ctx, "networkInterface", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'networkInterface' field"))
 	}
 	m.NetworkInterface = networkInterface
 
-	url, err := ReadSimpleField[PascalString](ctx, "url", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	url, err := ReadSimpleField[PascalString](ctx, "url", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'url' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_NetworkAddressUrlDataType) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(pushErr, "Error pushing for NetworkAddressUrlDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "networkInterface", m.GetNetworkInterface(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "networkInterface", m.GetNetworkInterface(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'networkInterface' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "url", m.GetUrl(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "url", m.GetUrl(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'url' field")
 		}
 

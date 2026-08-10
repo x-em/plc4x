@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -158,7 +160,7 @@ type _FieldTargetDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (FieldTargetDataTypeBuilder) = (*_FieldTargetDataTypeBuilder)(nil)
@@ -182,10 +184,7 @@ func (b *_FieldTargetDataTypeBuilder) WithDataSetFieldIdBuilder(builderSupplier 
 	var err error
 	b.DataSetFieldId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "GuidValueBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "GuidValueBuilder failed"))
 	}
 	return b
 }
@@ -200,10 +199,7 @@ func (b *_FieldTargetDataTypeBuilder) WithReceiverIndexRangeBuilder(builderSuppl
 	var err error
 	b.ReceiverIndexRange, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -218,10 +214,7 @@ func (b *_FieldTargetDataTypeBuilder) WithTargetNodeIdBuilder(builderSupplier fu
 	var err error
 	b.TargetNodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -241,10 +234,7 @@ func (b *_FieldTargetDataTypeBuilder) WithWriteIndexRangeBuilder(builderSupplier
 	var err error
 	b.WriteIndexRange, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -264,47 +254,29 @@ func (b *_FieldTargetDataTypeBuilder) WithOverrideValueBuilder(builderSupplier f
 	var err error
 	b.OverrideValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "VariantBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "VariantBuilder failed"))
 	}
 	return b
 }
 
 func (b *_FieldTargetDataTypeBuilder) Build() (FieldTargetDataType, error) {
 	if b.DataSetFieldId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataSetFieldId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataSetFieldId' not set"))
 	}
 	if b.ReceiverIndexRange == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'receiverIndexRange' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'receiverIndexRange' not set"))
 	}
 	if b.TargetNodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'targetNodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'targetNodeId' not set"))
 	}
 	if b.WriteIndexRange == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'writeIndexRange' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'writeIndexRange' not set"))
 	}
 	if b.OverrideValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'overrideValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'overrideValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._FieldTargetDataType.deepCopy(), nil
 }
@@ -330,8 +302,8 @@ func (b *_FieldTargetDataTypeBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_FieldTargetDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateFieldTargetDataTypeBuilder().(*_FieldTargetDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -416,7 +388,7 @@ func CastFieldTargetDataType(structType any) FieldTargetDataType {
 	return nil
 }
 
-func (m *_FieldTargetDataType) GetTypeName() string {
+func (m *_FieldTargetDataType) GetPlx4xTypeName() string {
 	return "FieldTargetDataType"
 }
 
@@ -462,43 +434,43 @@ func (m *_FieldTargetDataType) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	dataSetFieldId, err := ReadSimpleField[GuidValue](ctx, "dataSetFieldId", ReadComplex[GuidValue](GuidValueParseWithBuffer, readBuffer))
+	dataSetFieldId, err := ReadSimpleField[GuidValue](ctx, "dataSetFieldId", ReadComplex[GuidValue](GuidValueParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetFieldId' field"))
 	}
 	m.DataSetFieldId = dataSetFieldId
 
-	receiverIndexRange, err := ReadSimpleField[PascalString](ctx, "receiverIndexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	receiverIndexRange, err := ReadSimpleField[PascalString](ctx, "receiverIndexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'receiverIndexRange' field"))
 	}
 	m.ReceiverIndexRange = receiverIndexRange
 
-	targetNodeId, err := ReadSimpleField[NodeId](ctx, "targetNodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	targetNodeId, err := ReadSimpleField[NodeId](ctx, "targetNodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetNodeId' field"))
 	}
 	m.TargetNodeId = targetNodeId
 
-	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)))
+	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'attributeId' field"))
 	}
 	m.AttributeId = attributeId
 
-	writeIndexRange, err := ReadSimpleField[PascalString](ctx, "writeIndexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	writeIndexRange, err := ReadSimpleField[PascalString](ctx, "writeIndexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'writeIndexRange' field"))
 	}
 	m.WriteIndexRange = writeIndexRange
 
-	overrideValueHandling, err := ReadEnumField[OverrideValueHandling](ctx, "overrideValueHandling", "OverrideValueHandling", ReadEnum(OverrideValueHandlingByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	overrideValueHandling, err := ReadEnumField[OverrideValueHandling](ctx, "overrideValueHandling", "OverrideValueHandling", ReadEnum(OverrideValueHandlingByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'overrideValueHandling' field"))
 	}
 	m.OverrideValueHandling = overrideValueHandling
 
-	overrideValue, err := ReadSimpleField[Variant](ctx, "overrideValue", ReadComplex[Variant](VariantParseWithBuffer, readBuffer))
+	overrideValue, err := ReadSimpleField[Variant](ctx, "overrideValue", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'overrideValue' field"))
 	}
@@ -529,31 +501,31 @@ func (m *_FieldTargetDataType) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for FieldTargetDataType")
 		}
 
-		if err := WriteSimpleField[GuidValue](ctx, "dataSetFieldId", m.GetDataSetFieldId(), WriteComplex[GuidValue](writeBuffer)); err != nil {
+		if err := WriteSimpleField[GuidValue](ctx, "dataSetFieldId", m.GetDataSetFieldId(), WriteComplex[GuidValue](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetFieldId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "receiverIndexRange", m.GetReceiverIndexRange(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "receiverIndexRange", m.GetReceiverIndexRange(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'receiverIndexRange' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "targetNodeId", m.GetTargetNodeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "targetNodeId", m.GetTargetNodeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetNodeId' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'attributeId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "writeIndexRange", m.GetWriteIndexRange(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "writeIndexRange", m.GetWriteIndexRange(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'writeIndexRange' field")
 		}
 
-		if err := WriteSimpleEnumField[OverrideValueHandling](ctx, "overrideValueHandling", "OverrideValueHandling", m.GetOverrideValueHandling(), WriteEnum[OverrideValueHandling, uint32](OverrideValueHandling.GetValue, OverrideValueHandling.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[OverrideValueHandling](ctx, "overrideValueHandling", "OverrideValueHandling", m.GetOverrideValueHandling(), WriteEnum[OverrideValueHandling, uint32](OverrideValueHandling.GetValue, OverrideValueHandling.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'overrideValueHandling' field")
 		}
 
-		if err := WriteSimpleField[Variant](ctx, "overrideValue", m.GetOverrideValue(), WriteComplex[Variant](writeBuffer)); err != nil {
+		if err := WriteSimpleField[Variant](ctx, "overrideValue", m.GetOverrideValue(), WriteComplex[Variant](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'overrideValue' field")
 		}
 

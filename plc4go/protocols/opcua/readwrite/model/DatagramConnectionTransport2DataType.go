@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -131,7 +133,7 @@ type _DatagramConnectionTransport2DataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DatagramConnectionTransport2DataTypeBuilder) = (*_DatagramConnectionTransport2DataTypeBuilder)(nil)
@@ -155,10 +157,7 @@ func (b *_DatagramConnectionTransport2DataTypeBuilder) WithDiscoveryAddressBuild
 	var err error
 	b.DiscoveryAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -183,10 +182,7 @@ func (b *_DatagramConnectionTransport2DataTypeBuilder) WithQosCategoryBuilder(bu
 	var err error
 	b.QosCategory, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -198,19 +194,13 @@ func (b *_DatagramConnectionTransport2DataTypeBuilder) WithDatagramQos(datagramQ
 
 func (b *_DatagramConnectionTransport2DataTypeBuilder) Build() (DatagramConnectionTransport2DataType, error) {
 	if b.DiscoveryAddress == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'discoveryAddress' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'discoveryAddress' not set"))
 	}
 	if b.QosCategory == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'qosCategory' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'qosCategory' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DatagramConnectionTransport2DataType.deepCopy(), nil
 }
@@ -236,8 +226,8 @@ func (b *_DatagramConnectionTransport2DataTypeBuilder) buildForExtensionObjectDe
 
 func (b *_DatagramConnectionTransport2DataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateDatagramConnectionTransport2DataTypeBuilder().(*_DatagramConnectionTransport2DataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -314,7 +304,7 @@ func CastDatagramConnectionTransport2DataType(structType any) DatagramConnection
 	return nil
 }
 
-func (m *_DatagramConnectionTransport2DataType) GetTypeName() string {
+func (m *_DatagramConnectionTransport2DataType) GetPlx4xTypeName() string {
 	return "DatagramConnectionTransport2DataType"
 }
 
@@ -340,9 +330,7 @@ func (m *_DatagramConnectionTransport2DataType) GetLengthInBits(ctx context.Cont
 	if len(m.DatagramQos) > 0 {
 		for _curItem, element := range m.DatagramQos {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DatagramQos), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -364,37 +352,37 @@ func (m *_DatagramConnectionTransport2DataType) parse(ctx context.Context, readB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	discoveryAddress, err := ReadSimpleField[ExtensionObject](ctx, "discoveryAddress", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	discoveryAddress, err := ReadSimpleField[ExtensionObject](ctx, "discoveryAddress", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discoveryAddress' field"))
 	}
 	m.DiscoveryAddress = discoveryAddress
 
-	discoveryAnnounceRate, err := ReadSimpleField(ctx, "discoveryAnnounceRate", ReadUnsignedInt(readBuffer, uint8(32)))
+	discoveryAnnounceRate, err := ReadSimpleField(ctx, "discoveryAnnounceRate", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discoveryAnnounceRate' field"))
 	}
 	m.DiscoveryAnnounceRate = discoveryAnnounceRate
 
-	discoveryMaxMessageSize, err := ReadSimpleField(ctx, "discoveryMaxMessageSize", ReadUnsignedInt(readBuffer, uint8(32)))
+	discoveryMaxMessageSize, err := ReadSimpleField(ctx, "discoveryMaxMessageSize", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discoveryMaxMessageSize' field"))
 	}
 	m.DiscoveryMaxMessageSize = discoveryMaxMessageSize
 
-	qosCategory, err := ReadSimpleField[PascalString](ctx, "qosCategory", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	qosCategory, err := ReadSimpleField[PascalString](ctx, "qosCategory", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'qosCategory' field"))
 	}
 	m.QosCategory = qosCategory
 
-	noOfDatagramQos, err := ReadImplicitField[int32](ctx, "noOfDatagramQos", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDatagramQos, err := ReadImplicitField[int32](ctx, "noOfDatagramQos", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDatagramQos' field"))
 	}
 	_ = noOfDatagramQos
 
-	datagramQos, err := ReadCountArrayField[ExtensionObject](ctx, "datagramQos", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfDatagramQos))
+	datagramQos, err := ReadCountArrayField[ExtensionObject](ctx, "datagramQos", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfDatagramQos), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'datagramQos' field"))
 	}
@@ -425,27 +413,27 @@ func (m *_DatagramConnectionTransport2DataType) SerializeWithWriteBuffer(ctx con
 			return errors.Wrap(pushErr, "Error pushing for DatagramConnectionTransport2DataType")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "discoveryAddress", m.GetDiscoveryAddress(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "discoveryAddress", m.GetDiscoveryAddress(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discoveryAddress' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "discoveryAnnounceRate", m.GetDiscoveryAnnounceRate(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "discoveryAnnounceRate", m.GetDiscoveryAnnounceRate(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discoveryAnnounceRate' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "discoveryMaxMessageSize", m.GetDiscoveryMaxMessageSize(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "discoveryMaxMessageSize", m.GetDiscoveryMaxMessageSize(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discoveryMaxMessageSize' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "qosCategory", m.GetQosCategory(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "qosCategory", m.GetQosCategory(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'qosCategory' field")
 		}
 		noOfDatagramQos := int32(utils.InlineIf(bool((m.GetDatagramQos()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDatagramQos()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDatagramQos", noOfDatagramQos, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDatagramQos", noOfDatagramQos, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDatagramQos' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "datagramQos", m.GetDatagramQos(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "datagramQos", m.GetDatagramQos(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'datagramQos' field")
 		}
 

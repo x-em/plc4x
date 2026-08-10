@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _EventNotificationListBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EventNotificationListBuilder) = (*_EventNotificationListBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_EventNotificationListBuilder) WithEvents(events ...EventFieldList) Eve
 }
 
 func (b *_EventNotificationListBuilder) Build() (EventNotificationList, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EventNotificationList.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_EventNotificationListBuilder) buildForExtensionObjectDefinition() (Ext
 
 func (b *_EventNotificationListBuilder) DeepCopy() any {
 	_copy := b.CreateEventNotificationListBuilder().(*_EventNotificationListBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastEventNotificationList(structType any) EventNotificationList {
 	return nil
 }
 
-func (m *_EventNotificationList) GetTypeName() string {
+func (m *_EventNotificationList) GetPlx4xTypeName() string {
 	return "EventNotificationList"
 }
 
@@ -220,9 +222,7 @@ func (m *_EventNotificationList) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Events) > 0 {
 		for _curItem, element := range m.Events {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Events), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -244,13 +244,13 @@ func (m *_EventNotificationList) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfEvents, err := ReadImplicitField[int32](ctx, "noOfEvents", ReadSignedInt(readBuffer, uint8(32)))
+	noOfEvents, err := ReadImplicitField[int32](ctx, "noOfEvents", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfEvents' field"))
 	}
 	_ = noOfEvents
 
-	events, err := ReadCountArrayField[EventFieldList](ctx, "events", ReadComplex[EventFieldList](ExtensionObjectDefinitionParseWithBufferProducer[EventFieldList]((int32)(int32(919))), readBuffer), uint64(noOfEvents))
+	events, err := ReadCountArrayField[EventFieldList](ctx, "events", ReadComplex[EventFieldList](ExtensionObjectDefinitionParseWithBufferProducer[EventFieldList]((int32)(int32(919))), readBuffer), uint64(noOfEvents), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'events' field"))
 	}
@@ -281,11 +281,11 @@ func (m *_EventNotificationList) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for EventNotificationList")
 		}
 		noOfEvents := int32(utils.InlineIf(bool((m.GetEvents()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetEvents()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfEvents", noOfEvents, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfEvents", noOfEvents, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfEvents' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "events", m.GetEvents(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "events", m.GetEvents(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'events' field")
 		}
 

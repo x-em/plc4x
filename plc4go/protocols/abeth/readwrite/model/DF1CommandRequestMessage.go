@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +105,7 @@ type _DF1CommandRequestMessageBuilder struct {
 
 	parentBuilder *_DF1RequestMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DF1CommandRequestMessageBuilder) = (*_DF1CommandRequestMessageBuilder)(nil)
@@ -126,23 +129,17 @@ func (b *_DF1CommandRequestMessageBuilder) WithCommandBuilder(builderSupplier fu
 	var err error
 	b.Command, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DF1RequestCommandBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DF1RequestCommandBuilder failed"))
 	}
 	return b
 }
 
 func (b *_DF1CommandRequestMessageBuilder) Build() (DF1CommandRequestMessage, error) {
 	if b.Command == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'command' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'command' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DF1CommandRequestMessage.deepCopy(), nil
 }
@@ -168,8 +165,8 @@ func (b *_DF1CommandRequestMessageBuilder) buildForDF1RequestMessage() (DF1Reque
 
 func (b *_DF1CommandRequestMessageBuilder) DeepCopy() any {
 	_copy := b.CreateDF1CommandRequestMessageBuilder().(*_DF1CommandRequestMessageBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +227,7 @@ func CastDF1CommandRequestMessage(structType any) DF1CommandRequestMessage {
 	return nil
 }
 
-func (m *_DF1CommandRequestMessage) GetTypeName() string {
+func (m *_DF1CommandRequestMessage) GetPlx4xTypeName() string {
 	return "DF1CommandRequestMessage"
 }
 
@@ -258,7 +255,7 @@ func (m *_DF1CommandRequestMessage) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	command, err := ReadSimpleField[DF1RequestCommand](ctx, "command", ReadComplex[DF1RequestCommand](DF1RequestCommandParseWithBuffer, readBuffer))
+	command, err := ReadSimpleField[DF1RequestCommand](ctx, "command", ReadComplex[DF1RequestCommand](DF1RequestCommandParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'command' field"))
 	}
@@ -272,7 +269,7 @@ func (m *_DF1CommandRequestMessage) parse(ctx context.Context, readBuffer utils.
 }
 
 func (m *_DF1CommandRequestMessage) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -289,7 +286,7 @@ func (m *_DF1CommandRequestMessage) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for DF1CommandRequestMessage")
 		}
 
-		if err := WriteSimpleField[DF1RequestCommand](ctx, "command", m.GetCommand(), WriteComplex[DF1RequestCommand](writeBuffer)); err != nil {
+		if err := WriteSimpleField[DF1RequestCommand](ctx, "command", m.GetCommand(), WriteComplex[DF1RequestCommand](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'command' field")
 		}
 

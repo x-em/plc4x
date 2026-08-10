@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -105,7 +106,7 @@ type _S7MessageObjectResponseBuilder struct {
 
 	parentBuilder *_S7DataAlarmMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7MessageObjectResponseBuilder) = (*_S7MessageObjectResponseBuilder)(nil)
@@ -130,8 +131,8 @@ func (b *_S7MessageObjectResponseBuilder) WithTransportSize(transportSize DataTr
 }
 
 func (b *_S7MessageObjectResponseBuilder) Build() (S7MessageObjectResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7MessageObjectResponse.deepCopy(), nil
 }
@@ -157,8 +158,8 @@ func (b *_S7MessageObjectResponseBuilder) buildForS7DataAlarmMessage() (S7DataAl
 
 func (b *_S7MessageObjectResponseBuilder) DeepCopy() any {
 	_copy := b.CreateS7MessageObjectResponseBuilder().(*_S7MessageObjectResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -223,7 +224,7 @@ func CastS7MessageObjectResponse(structType any) S7MessageObjectResponse {
 	return nil
 }
 
-func (m *_S7MessageObjectResponse) GetTypeName() string {
+func (m *_S7MessageObjectResponse) GetPlx4xTypeName() string {
 	return "S7MessageObjectResponse"
 }
 

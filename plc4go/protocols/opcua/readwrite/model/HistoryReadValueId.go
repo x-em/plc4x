@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -135,7 +137,7 @@ type _HistoryReadValueIdBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (HistoryReadValueIdBuilder) = (*_HistoryReadValueIdBuilder)(nil)
@@ -159,10 +161,7 @@ func (b *_HistoryReadValueIdBuilder) WithNodeIdBuilder(builderSupplier func(Node
 	var err error
 	b.NodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -177,10 +176,7 @@ func (b *_HistoryReadValueIdBuilder) WithIndexRangeBuilder(builderSupplier func(
 	var err error
 	b.IndexRange, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -195,10 +191,7 @@ func (b *_HistoryReadValueIdBuilder) WithDataEncodingBuilder(builderSupplier fun
 	var err error
 	b.DataEncoding, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "QualifiedNameBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "QualifiedNameBuilder failed"))
 	}
 	return b
 }
@@ -213,41 +206,26 @@ func (b *_HistoryReadValueIdBuilder) WithContinuationPointBuilder(builderSupplie
 	var err error
 	b.ContinuationPoint, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_HistoryReadValueIdBuilder) Build() (HistoryReadValueId, error) {
 	if b.NodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'nodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'nodeId' not set"))
 	}
 	if b.IndexRange == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'indexRange' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'indexRange' not set"))
 	}
 	if b.DataEncoding == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataEncoding' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataEncoding' not set"))
 	}
 	if b.ContinuationPoint == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'continuationPoint' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'continuationPoint' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._HistoryReadValueId.deepCopy(), nil
 }
@@ -273,8 +251,8 @@ func (b *_HistoryReadValueIdBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_HistoryReadValueIdBuilder) DeepCopy() any {
 	_copy := b.CreateHistoryReadValueIdBuilder().(*_HistoryReadValueIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -347,7 +325,7 @@ func CastHistoryReadValueId(structType any) HistoryReadValueId {
 	return nil
 }
 
-func (m *_HistoryReadValueId) GetTypeName() string {
+func (m *_HistoryReadValueId) GetPlx4xTypeName() string {
 	return "HistoryReadValueId"
 }
 
@@ -384,25 +362,25 @@ func (m *_HistoryReadValueId) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	nodeId, err := ReadSimpleField[NodeId](ctx, "nodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	nodeId, err := ReadSimpleField[NodeId](ctx, "nodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeId' field"))
 	}
 	m.NodeId = nodeId
 
-	indexRange, err := ReadSimpleField[PascalString](ctx, "indexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	indexRange, err := ReadSimpleField[PascalString](ctx, "indexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'indexRange' field"))
 	}
 	m.IndexRange = indexRange
 
-	dataEncoding, err := ReadSimpleField[QualifiedName](ctx, "dataEncoding", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer))
+	dataEncoding, err := ReadSimpleField[QualifiedName](ctx, "dataEncoding", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataEncoding' field"))
 	}
 	m.DataEncoding = dataEncoding
 
-	continuationPoint, err := ReadSimpleField[PascalByteString](ctx, "continuationPoint", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	continuationPoint, err := ReadSimpleField[PascalByteString](ctx, "continuationPoint", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'continuationPoint' field"))
 	}
@@ -433,19 +411,19 @@ func (m *_HistoryReadValueId) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for HistoryReadValueId")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodeId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "indexRange", m.GetIndexRange(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "indexRange", m.GetIndexRange(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'indexRange' field")
 		}
 
-		if err := WriteSimpleField[QualifiedName](ctx, "dataEncoding", m.GetDataEncoding(), WriteComplex[QualifiedName](writeBuffer)); err != nil {
+		if err := WriteSimpleField[QualifiedName](ctx, "dataEncoding", m.GetDataEncoding(), WriteComplex[QualifiedName](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataEncoding' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "continuationPoint", m.GetContinuationPoint(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "continuationPoint", m.GetContinuationPoint(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'continuationPoint' field")
 		}
 

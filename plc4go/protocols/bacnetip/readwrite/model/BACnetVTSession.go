@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -110,7 +111,7 @@ func NewBACnetVTSessionBuilder() BACnetVTSessionBuilder {
 type _BACnetVTSessionBuilder struct {
 	*_BACnetVTSession
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetVTSessionBuilder) = (*_BACnetVTSessionBuilder)(nil)
@@ -129,10 +130,7 @@ func (b *_BACnetVTSessionBuilder) WithLocalVtSessionIdBuilder(builderSupplier fu
 	var err error
 	b.LocalVtSessionId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -147,10 +145,7 @@ func (b *_BACnetVTSessionBuilder) WithRemoveVtSessionIdBuilder(builderSupplier f
 	var err error
 	b.RemoveVtSessionId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -165,35 +160,23 @@ func (b *_BACnetVTSessionBuilder) WithRemoteVtAddressBuilder(builderSupplier fun
 	var err error
 	b.RemoteVtAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetAddressBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetAddressBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetVTSessionBuilder) Build() (BACnetVTSession, error) {
 	if b.LocalVtSessionId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'localVtSessionId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'localVtSessionId' not set"))
 	}
 	if b.RemoveVtSessionId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'removeVtSessionId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'removeVtSessionId' not set"))
 	}
 	if b.RemoteVtAddress == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'remoteVtAddress' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'remoteVtAddress' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetVTSession.deepCopy(), nil
 }
@@ -208,8 +191,8 @@ func (b *_BACnetVTSessionBuilder) MustBuild() BACnetVTSession {
 
 func (b *_BACnetVTSessionBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetVTSessionBuilder().(*_BACnetVTSessionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -260,7 +243,7 @@ func CastBACnetVTSession(structType any) BACnetVTSession {
 	return nil
 }
 
-func (m *_BACnetVTSession) GetTypeName() string {
+func (m *_BACnetVTSession) GetPlx4xTypeName() string {
 	return "BACnetVTSession"
 }
 
@@ -294,7 +277,7 @@ func BACnetVTSessionParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func BACnetVTSessionParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetVTSession, error) {
-	v, err := (&_BACnetVTSession{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetVTSession)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

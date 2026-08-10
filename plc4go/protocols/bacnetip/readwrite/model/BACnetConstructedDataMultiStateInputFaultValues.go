@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataMultiStateInputFaultValues = (*_BACnetConstructedData
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataMultiStateInputFaultValues)(nil)
 
 // NewBACnetConstructedDataMultiStateInputFaultValues factory function for _BACnetConstructedDataMultiStateInputFaultValues
-func NewBACnetConstructedDataMultiStateInputFaultValues(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, faultValues []BACnetApplicationTagUnsignedInteger, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataMultiStateInputFaultValues {
+func NewBACnetConstructedDataMultiStateInputFaultValues(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, faultValues []BACnetApplicationTagUnsignedInteger) *_BACnetConstructedDataMultiStateInputFaultValues {
 	_result := &_BACnetConstructedDataMultiStateInputFaultValues{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		FaultValues:                   faultValues,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataMultiStateInputFaultValuesBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataMultiStateInputFaultValuesBuilder) = (*_BACnetConstructedDataMultiStateInputFaultValuesBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataMultiStateInputFaultValuesBuilder) WithFaultValue
 }
 
 func (b *_BACnetConstructedDataMultiStateInputFaultValuesBuilder) Build() (BACnetConstructedDataMultiStateInputFaultValues, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataMultiStateInputFaultValues.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataMultiStateInputFaultValuesBuilder) buildForBACnet
 
 func (b *_BACnetConstructedDataMultiStateInputFaultValuesBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataMultiStateInputFaultValuesBuilder().(*_BACnetConstructedDataMultiStateInputFaultValuesBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataMultiStateInputFaultValues(structType any) BACnetC
 	return nil
 }
 
-func (m *_BACnetConstructedDataMultiStateInputFaultValues) GetTypeName() string {
+func (m *_BACnetConstructedDataMultiStateInputFaultValues) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataMultiStateInputFaultValues"
 }
 

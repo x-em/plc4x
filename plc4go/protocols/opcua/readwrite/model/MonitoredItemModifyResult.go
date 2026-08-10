@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -125,7 +127,7 @@ type _MonitoredItemModifyResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MonitoredItemModifyResultBuilder) = (*_MonitoredItemModifyResultBuilder)(nil)
@@ -149,10 +151,7 @@ func (b *_MonitoredItemModifyResultBuilder) WithStatusCodeBuilder(builderSupplie
 	var err error
 	b.StatusCode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -177,29 +176,20 @@ func (b *_MonitoredItemModifyResultBuilder) WithFilterResultBuilder(builderSuppl
 	var err error
 	b.FilterResult, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
 
 func (b *_MonitoredItemModifyResultBuilder) Build() (MonitoredItemModifyResult, error) {
 	if b.StatusCode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'statusCode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'statusCode' not set"))
 	}
 	if b.FilterResult == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'filterResult' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'filterResult' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MonitoredItemModifyResult.deepCopy(), nil
 }
@@ -225,8 +215,8 @@ func (b *_MonitoredItemModifyResultBuilder) buildForExtensionObjectDefinition() 
 
 func (b *_MonitoredItemModifyResultBuilder) DeepCopy() any {
 	_copy := b.CreateMonitoredItemModifyResultBuilder().(*_MonitoredItemModifyResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +289,7 @@ func CastMonitoredItemModifyResult(structType any) MonitoredItemModifyResult {
 	return nil
 }
 
-func (m *_MonitoredItemModifyResult) GetTypeName() string {
+func (m *_MonitoredItemModifyResult) GetPlx4xTypeName() string {
 	return "MonitoredItemModifyResult"
 }
 
@@ -336,25 +326,25 @@ func (m *_MonitoredItemModifyResult) parse(ctx context.Context, readBuffer utils
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'statusCode' field"))
 	}
 	m.StatusCode = statusCode
 
-	revisedSamplingInterval, err := ReadSimpleField(ctx, "revisedSamplingInterval", ReadDouble(readBuffer, uint8(64)))
+	revisedSamplingInterval, err := ReadSimpleField(ctx, "revisedSamplingInterval", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'revisedSamplingInterval' field"))
 	}
 	m.RevisedSamplingInterval = revisedSamplingInterval
 
-	revisedQueueSize, err := ReadSimpleField(ctx, "revisedQueueSize", ReadUnsignedInt(readBuffer, uint8(32)))
+	revisedQueueSize, err := ReadSimpleField(ctx, "revisedQueueSize", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'revisedQueueSize' field"))
 	}
 	m.RevisedQueueSize = revisedQueueSize
 
-	filterResult, err := ReadSimpleField[ExtensionObject](ctx, "filterResult", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	filterResult, err := ReadSimpleField[ExtensionObject](ctx, "filterResult", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'filterResult' field"))
 	}
@@ -385,19 +375,19 @@ func (m *_MonitoredItemModifyResult) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(pushErr, "Error pushing for MonitoredItemModifyResult")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'statusCode' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "revisedSamplingInterval", m.GetRevisedSamplingInterval(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "revisedSamplingInterval", m.GetRevisedSamplingInterval(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'revisedSamplingInterval' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "revisedQueueSize", m.GetRevisedQueueSize(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "revisedQueueSize", m.GetRevisedQueueSize(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'revisedQueueSize' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "filterResult", m.GetFilterResult(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "filterResult", m.GetFilterResult(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'filterResult' field")
 		}
 

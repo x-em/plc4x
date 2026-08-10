@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataAccessEventTag = (*_BACnetConstructedDataAccessEventT
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataAccessEventTag)(nil)
 
 // NewBACnetConstructedDataAccessEventTag factory function for _BACnetConstructedDataAccessEventTag
-func NewBACnetConstructedDataAccessEventTag(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, accessEventTag BACnetApplicationTagUnsignedInteger, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataAccessEventTag {
+func NewBACnetConstructedDataAccessEventTag(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, accessEventTag BACnetApplicationTagUnsignedInteger) *_BACnetConstructedDataAccessEventTag {
 	if accessEventTag == nil {
 		panic("accessEventTag of type BACnetApplicationTagUnsignedInteger for BACnetConstructedDataAccessEventTag must not be nil")
 	}
 	_result := &_BACnetConstructedDataAccessEventTag{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		AccessEventTag:                accessEventTag,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataAccessEventTagBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataAccessEventTagBuilder) = (*_BACnetConstructedDataAccessEventTagBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataAccessEventTagBuilder) WithAccessEventTagBuilder(
 	var err error
 	b.AccessEventTag, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataAccessEventTagBuilder) Build() (BACnetConstructedDataAccessEventTag, error) {
 	if b.AccessEventTag == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'accessEventTag' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'accessEventTag' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataAccessEventTag.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataAccessEventTagBuilder) buildForBACnetConstructedD
 
 func (b *_BACnetConstructedDataAccessEventTagBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataAccessEventTagBuilder().(*_BACnetConstructedDataAccessEventTagBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataAccessEventTag(structType any) BACnetConstructedDa
 	return nil
 }
 
-func (m *_BACnetConstructedDataAccessEventTag) GetTypeName() string {
+func (m *_BACnetConstructedDataAccessEventTag) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataAccessEventTag"
 }
 

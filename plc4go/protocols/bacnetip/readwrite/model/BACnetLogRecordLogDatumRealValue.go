@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,12 +59,12 @@ var _ BACnetLogRecordLogDatumRealValue = (*_BACnetLogRecordLogDatumRealValue)(ni
 var _ BACnetLogRecordLogDatumRequirements = (*_BACnetLogRecordLogDatumRealValue)(nil)
 
 // NewBACnetLogRecordLogDatumRealValue factory function for _BACnetLogRecordLogDatumRealValue
-func NewBACnetLogRecordLogDatumRealValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, realValue BACnetContextTagReal, tagNumber uint8) *_BACnetLogRecordLogDatumRealValue {
+func NewBACnetLogRecordLogDatumRealValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, realValue BACnetContextTagReal) *_BACnetLogRecordLogDatumRealValue {
 	if realValue == nil {
 		panic("realValue of type BACnetContextTagReal for BACnetLogRecordLogDatumRealValue must not be nil")
 	}
 	_result := &_BACnetLogRecordLogDatumRealValue{
-		BACnetLogRecordLogDatumContract: NewBACnetLogRecordLogDatum(openingTag, peekedTagHeader, closingTag, tagNumber),
+		BACnetLogRecordLogDatumContract: NewBACnetLogRecordLogDatum(openingTag, peekedTagHeader, closingTag),
 		RealValue:                       realValue,
 	}
 	_result.BACnetLogRecordLogDatumContract.(*_BACnetLogRecordLogDatum)._SubType = _result
@@ -102,7 +103,7 @@ type _BACnetLogRecordLogDatumRealValueBuilder struct {
 
 	parentBuilder *_BACnetLogRecordLogDatumBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetLogRecordLogDatumRealValueBuilder) = (*_BACnetLogRecordLogDatumRealValueBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_BACnetLogRecordLogDatumRealValueBuilder) WithRealValueBuilder(builderS
 	var err error
 	b.RealValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagRealBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagRealBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetLogRecordLogDatumRealValueBuilder) Build() (BACnetLogRecordLogDatumRealValue, error) {
 	if b.RealValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'realValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'realValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetLogRecordLogDatumRealValue.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_BACnetLogRecordLogDatumRealValueBuilder) buildForBACnetLogRecordLogDat
 
 func (b *_BACnetLogRecordLogDatumRealValueBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetLogRecordLogDatumRealValueBuilder().(*_BACnetLogRecordLogDatumRealValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +221,7 @@ func CastBACnetLogRecordLogDatumRealValue(structType any) BACnetLogRecordLogDatu
 	return nil
 }
 
-func (m *_BACnetLogRecordLogDatumRealValue) GetTypeName() string {
+func (m *_BACnetLogRecordLogDatumRealValue) GetPlx4xTypeName() string {
 	return "BACnetLogRecordLogDatumRealValue"
 }
 

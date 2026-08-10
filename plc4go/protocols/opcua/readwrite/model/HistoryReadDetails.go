@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _HistoryReadDetailsBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (HistoryReadDetailsBuilder) = (*_HistoryReadDetailsBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_HistoryReadDetailsBuilder) WithMandatoryFields() HistoryReadDetailsBui
 }
 
 func (b *_HistoryReadDetailsBuilder) Build() (HistoryReadDetails, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._HistoryReadDetails.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_HistoryReadDetailsBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_HistoryReadDetailsBuilder) DeepCopy() any {
 	_copy := b.CreateHistoryReadDetailsBuilder().(*_HistoryReadDetailsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastHistoryReadDetails(structType any) HistoryReadDetails {
 	return nil
 }
 
-func (m *_HistoryReadDetails) GetTypeName() string {
+func (m *_HistoryReadDetails) GetPlx4xTypeName() string {
 	return "HistoryReadDetails"
 }
 

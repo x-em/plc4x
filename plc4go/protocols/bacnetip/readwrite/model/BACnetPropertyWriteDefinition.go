@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -59,19 +60,16 @@ type _BACnetPropertyWriteDefinition struct {
 	ArrayIndex         BACnetContextTagUnsignedInteger
 	PropertyValue      BACnetConstructedData
 	Priority           BACnetContextTagUnsignedInteger
-
-	// Arguments.
-	ObjectTypeArgument BACnetObjectType
 }
 
 var _ BACnetPropertyWriteDefinition = (*_BACnetPropertyWriteDefinition)(nil)
 
 // NewBACnetPropertyWriteDefinition factory function for _BACnetPropertyWriteDefinition
-func NewBACnetPropertyWriteDefinition(propertyIdentifier BACnetPropertyIdentifierTagged, arrayIndex BACnetContextTagUnsignedInteger, propertyValue BACnetConstructedData, priority BACnetContextTagUnsignedInteger, objectTypeArgument BACnetObjectType) *_BACnetPropertyWriteDefinition {
+func NewBACnetPropertyWriteDefinition(propertyIdentifier BACnetPropertyIdentifierTagged, arrayIndex BACnetContextTagUnsignedInteger, propertyValue BACnetConstructedData, priority BACnetContextTagUnsignedInteger) *_BACnetPropertyWriteDefinition {
 	if propertyIdentifier == nil {
 		panic("propertyIdentifier of type BACnetPropertyIdentifierTagged for BACnetPropertyWriteDefinition must not be nil")
 	}
-	return &_BACnetPropertyWriteDefinition{PropertyIdentifier: propertyIdentifier, ArrayIndex: arrayIndex, PropertyValue: propertyValue, Priority: priority, ObjectTypeArgument: objectTypeArgument}
+	return &_BACnetPropertyWriteDefinition{PropertyIdentifier: propertyIdentifier, ArrayIndex: arrayIndex, PropertyValue: propertyValue, Priority: priority}
 }
 
 ///////////////////////////////////////////////////////////
@@ -100,8 +98,6 @@ type BACnetPropertyWriteDefinitionBuilder interface {
 	WithOptionalPriority(BACnetContextTagUnsignedInteger) BACnetPropertyWriteDefinitionBuilder
 	// WithOptionalPriorityBuilder adds Priority (property field) which is build by the builder
 	WithOptionalPriorityBuilder(func(BACnetContextTagUnsignedIntegerBuilder) BACnetContextTagUnsignedIntegerBuilder) BACnetPropertyWriteDefinitionBuilder
-	// WithArgObjectTypeArgument sets a parser argument
-	WithArgObjectTypeArgument(BACnetObjectType) BACnetPropertyWriteDefinitionBuilder
 	// Build builds the BACnetPropertyWriteDefinition or returns an error if something is wrong
 	Build() (BACnetPropertyWriteDefinition, error)
 	// MustBuild does the same as Build but panics on error
@@ -116,7 +112,7 @@ func NewBACnetPropertyWriteDefinitionBuilder() BACnetPropertyWriteDefinitionBuil
 type _BACnetPropertyWriteDefinitionBuilder struct {
 	*_BACnetPropertyWriteDefinition
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetPropertyWriteDefinitionBuilder) = (*_BACnetPropertyWriteDefinitionBuilder)(nil)
@@ -135,10 +131,7 @@ func (b *_BACnetPropertyWriteDefinitionBuilder) WithPropertyIdentifierBuilder(bu
 	var err error
 	b.PropertyIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
 	}
 	return b
 }
@@ -153,10 +146,7 @@ func (b *_BACnetPropertyWriteDefinitionBuilder) WithOptionalArrayIndexBuilder(bu
 	var err error
 	b.ArrayIndex, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -171,10 +161,7 @@ func (b *_BACnetPropertyWriteDefinitionBuilder) WithOptionalPropertyValueBuilder
 	var err error
 	b.PropertyValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
 	}
 	return b
 }
@@ -189,28 +176,17 @@ func (b *_BACnetPropertyWriteDefinitionBuilder) WithOptionalPriorityBuilder(buil
 	var err error
 	b.Priority, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
-	return b
-}
-
-func (b *_BACnetPropertyWriteDefinitionBuilder) WithArgObjectTypeArgument(objectTypeArgument BACnetObjectType) BACnetPropertyWriteDefinitionBuilder {
-	b.ObjectTypeArgument = objectTypeArgument
 	return b
 }
 
 func (b *_BACnetPropertyWriteDefinitionBuilder) Build() (BACnetPropertyWriteDefinition, error) {
 	if b.PropertyIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'propertyIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'propertyIdentifier' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetPropertyWriteDefinition.deepCopy(), nil
 }
@@ -225,8 +201,8 @@ func (b *_BACnetPropertyWriteDefinitionBuilder) MustBuild() BACnetPropertyWriteD
 
 func (b *_BACnetPropertyWriteDefinitionBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetPropertyWriteDefinitionBuilder().(*_BACnetPropertyWriteDefinitionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -281,7 +257,7 @@ func CastBACnetPropertyWriteDefinition(structType any) BACnetPropertyWriteDefini
 	return nil
 }
 
-func (m *_BACnetPropertyWriteDefinition) GetTypeName() string {
+func (m *_BACnetPropertyWriteDefinition) GetPlx4xTypeName() string {
 	return "BACnetPropertyWriteDefinition"
 }
 
@@ -324,7 +300,7 @@ func BACnetPropertyWriteDefinitionParseWithBufferProducer(objectTypeArgument BAC
 }
 
 func BACnetPropertyWriteDefinitionParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer, objectTypeArgument BACnetObjectType) (BACnetPropertyWriteDefinition, error) {
-	v, err := (&_BACnetPropertyWriteDefinition{ObjectTypeArgument: objectTypeArgument}).parse(ctx, readBuffer, objectTypeArgument)
+	v, err := (new(_BACnetPropertyWriteDefinition)).parse(ctx, readBuffer, objectTypeArgument)
 	if err != nil {
 		return nil, err
 	}
@@ -404,15 +380,15 @@ func (m *_BACnetPropertyWriteDefinition) SerializeWithWriteBuffer(ctx context.Co
 		return errors.Wrap(err, "Error serializing 'propertyIdentifier' field")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "arrayIndex", GetRef(m.GetArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "arrayIndex", new(m.GetArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'arrayIndex' field")
 	}
 
-	if err := WriteOptionalField[BACnetConstructedData](ctx, "propertyValue", GetRef(m.GetPropertyValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetConstructedData](ctx, "propertyValue", new(m.GetPropertyValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'propertyValue' field")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "priority", GetRef(m.GetPriority()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "priority", new(m.GetPriority()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'priority' field")
 	}
 
@@ -421,16 +397,6 @@ func (m *_BACnetPropertyWriteDefinition) SerializeWithWriteBuffer(ctx context.Co
 	}
 	return nil
 }
-
-////
-// Arguments Getter
-
-func (m *_BACnetPropertyWriteDefinition) GetObjectTypeArgument() BACnetObjectType {
-	return m.ObjectTypeArgument
-}
-
-//
-////
 
 func (m *_BACnetPropertyWriteDefinition) IsBACnetPropertyWriteDefinition() {}
 
@@ -447,7 +413,6 @@ func (m *_BACnetPropertyWriteDefinition) deepCopy() *_BACnetPropertyWriteDefinit
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.ArrayIndex),
 		utils.DeepCopy[BACnetConstructedData](m.PropertyValue),
 		utils.DeepCopy[BACnetContextTagUnsignedInteger](m.Priority),
-		m.ObjectTypeArgument,
 	}
 	return _BACnetPropertyWriteDefinitionCopy
 }

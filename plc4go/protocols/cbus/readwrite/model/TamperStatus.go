@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -91,7 +92,7 @@ func NewTamperStatusBuilder() TamperStatusBuilder {
 type _TamperStatusBuilder struct {
 	*_TamperStatus
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TamperStatusBuilder) = (*_TamperStatusBuilder)(nil)
@@ -106,8 +107,8 @@ func (b *_TamperStatusBuilder) WithStatus(status uint8) TamperStatusBuilder {
 }
 
 func (b *_TamperStatusBuilder) Build() (TamperStatus, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TamperStatus.deepCopy(), nil
 }
@@ -122,8 +123,8 @@ func (b *_TamperStatusBuilder) MustBuild() TamperStatus {
 
 func (b *_TamperStatusBuilder) DeepCopy() any {
 	_copy := b.CreateTamperStatusBuilder().(*_TamperStatusBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -193,7 +194,7 @@ func CastTamperStatus(structType any) TamperStatus {
 	return nil
 }
 
-func (m *_TamperStatus) GetTypeName() string {
+func (m *_TamperStatus) GetPlx4xTypeName() string {
 	return "TamperStatus"
 }
 
@@ -227,7 +228,7 @@ func TamperStatusParseWithBufferProducer() func(ctx context.Context, readBuffer 
 }
 
 func TamperStatusParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (TamperStatus, error) {
-	v, err := (&_TamperStatus{}).parse(ctx, readBuffer)
+	v, err := (new(_TamperStatus)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

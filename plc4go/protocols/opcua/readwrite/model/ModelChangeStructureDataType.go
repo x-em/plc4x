@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +121,7 @@ type _ModelChangeStructureDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ModelChangeStructureDataTypeBuilder) = (*_ModelChangeStructureDataTypeBuilder)(nil)
@@ -143,10 +145,7 @@ func (b *_ModelChangeStructureDataTypeBuilder) WithAffectedBuilder(builderSuppli
 	var err error
 	b.Affected, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -161,10 +160,7 @@ func (b *_ModelChangeStructureDataTypeBuilder) WithAffectedTypeBuilder(builderSu
 	var err error
 	b.AffectedType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -176,19 +172,13 @@ func (b *_ModelChangeStructureDataTypeBuilder) WithVerb(verb uint8) ModelChangeS
 
 func (b *_ModelChangeStructureDataTypeBuilder) Build() (ModelChangeStructureDataType, error) {
 	if b.Affected == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'affected' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'affected' not set"))
 	}
 	if b.AffectedType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'affectedType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'affectedType' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ModelChangeStructureDataType.deepCopy(), nil
 }
@@ -214,8 +204,8 @@ func (b *_ModelChangeStructureDataTypeBuilder) buildForExtensionObjectDefinition
 
 func (b *_ModelChangeStructureDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateModelChangeStructureDataTypeBuilder().(*_ModelChangeStructureDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -284,7 +274,7 @@ func CastModelChangeStructureDataType(structType any) ModelChangeStructureDataTy
 	return nil
 }
 
-func (m *_ModelChangeStructureDataType) GetTypeName() string {
+func (m *_ModelChangeStructureDataType) GetPlx4xTypeName() string {
 	return "ModelChangeStructureDataType"
 }
 
@@ -318,19 +308,19 @@ func (m *_ModelChangeStructureDataType) parse(ctx context.Context, readBuffer ut
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	affected, err := ReadSimpleField[NodeId](ctx, "affected", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	affected, err := ReadSimpleField[NodeId](ctx, "affected", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'affected' field"))
 	}
 	m.Affected = affected
 
-	affectedType, err := ReadSimpleField[NodeId](ctx, "affectedType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	affectedType, err := ReadSimpleField[NodeId](ctx, "affectedType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'affectedType' field"))
 	}
 	m.AffectedType = affectedType
 
-	verb, err := ReadSimpleField(ctx, "verb", ReadUnsignedByte(readBuffer, uint8(8)))
+	verb, err := ReadSimpleField(ctx, "verb", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'verb' field"))
 	}
@@ -361,15 +351,15 @@ func (m *_ModelChangeStructureDataType) SerializeWithWriteBuffer(ctx context.Con
 			return errors.Wrap(pushErr, "Error pushing for ModelChangeStructureDataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "affected", m.GetAffected(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "affected", m.GetAffected(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'affected' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "affectedType", m.GetAffectedType(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "affectedType", m.GetAffectedType(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'affectedType' field")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "verb", m.GetVerb(), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "verb", m.GetVerb(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'verb' field")
 		}
 

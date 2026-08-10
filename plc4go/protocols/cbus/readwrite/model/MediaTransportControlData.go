@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -168,7 +169,7 @@ type _MediaTransportControlDataBuilder struct {
 
 	childBuilder _MediaTransportControlDataChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MediaTransportControlDataBuilder) = (*_MediaTransportControlDataBuilder)(nil)
@@ -188,8 +189,8 @@ func (b *_MediaTransportControlDataBuilder) WithMediaLinkGroup(mediaLinkGroup by
 }
 
 func (b *_MediaTransportControlDataBuilder) PartialBuild() (MediaTransportControlDataContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MediaTransportControlData.deepCopy(), nil
 }
@@ -436,8 +437,8 @@ func (b *_MediaTransportControlDataBuilder) DeepCopy() any {
 	_copy := b.CreateMediaTransportControlDataBuilder().(*_MediaTransportControlDataBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_MediaTransportControlDataChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -500,7 +501,7 @@ func CastMediaTransportControlData(structType any) MediaTransportControlData {
 	return nil
 }
 
-func (m *_MediaTransportControlData) GetTypeName() string {
+func (m *_MediaTransportControlData) GetPlx4xTypeName() string {
 	return "MediaTransportControlData"
 }
 
@@ -542,7 +543,7 @@ func MediaTransportControlDataParseWithBufferProducer[T MediaTransportControlDat
 }
 
 func MediaTransportControlDataParseWithBuffer[T MediaTransportControlData](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_MediaTransportControlData{}).parse(ctx, readBuffer)
+	v, err := (new(_MediaTransportControlData)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

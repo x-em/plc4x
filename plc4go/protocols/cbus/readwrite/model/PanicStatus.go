@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -91,7 +92,7 @@ func NewPanicStatusBuilder() PanicStatusBuilder {
 type _PanicStatusBuilder struct {
 	*_PanicStatus
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PanicStatusBuilder) = (*_PanicStatusBuilder)(nil)
@@ -106,8 +107,8 @@ func (b *_PanicStatusBuilder) WithStatus(status uint8) PanicStatusBuilder {
 }
 
 func (b *_PanicStatusBuilder) Build() (PanicStatus, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PanicStatus.deepCopy(), nil
 }
@@ -122,8 +123,8 @@ func (b *_PanicStatusBuilder) MustBuild() PanicStatus {
 
 func (b *_PanicStatusBuilder) DeepCopy() any {
 	_copy := b.CreatePanicStatusBuilder().(*_PanicStatusBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -193,7 +194,7 @@ func CastPanicStatus(structType any) PanicStatus {
 	return nil
 }
 
-func (m *_PanicStatus) GetTypeName() string {
+func (m *_PanicStatus) GetPlx4xTypeName() string {
 	return "PanicStatus"
 }
 
@@ -227,7 +228,7 @@ func PanicStatusParseWithBufferProducer() func(ctx context.Context, readBuffer u
 }
 
 func PanicStatusParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (PanicStatus, error) {
-	v, err := (&_PanicStatus{}).parse(ctx, readBuffer)
+	v, err := (new(_PanicStatus)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

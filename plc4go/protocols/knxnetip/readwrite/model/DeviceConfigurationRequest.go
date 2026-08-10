@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -57,16 +58,13 @@ type _DeviceConfigurationRequest struct {
 	KnxNetIpMessageContract
 	DeviceConfigurationRequestDataBlock DeviceConfigurationRequestDataBlock
 	Cemi                                CEMI
-
-	// Arguments.
-	TotalLength uint16
 }
 
 var _ DeviceConfigurationRequest = (*_DeviceConfigurationRequest)(nil)
 var _ KnxNetIpMessageRequirements = (*_DeviceConfigurationRequest)(nil)
 
 // NewDeviceConfigurationRequest factory function for _DeviceConfigurationRequest
-func NewDeviceConfigurationRequest(deviceConfigurationRequestDataBlock DeviceConfigurationRequestDataBlock, cemi CEMI, totalLength uint16) *_DeviceConfigurationRequest {
+func NewDeviceConfigurationRequest(deviceConfigurationRequestDataBlock DeviceConfigurationRequestDataBlock, cemi CEMI) *_DeviceConfigurationRequest {
 	if deviceConfigurationRequestDataBlock == nil {
 		panic("deviceConfigurationRequestDataBlock of type DeviceConfigurationRequestDataBlock for DeviceConfigurationRequest must not be nil")
 	}
@@ -100,8 +98,6 @@ type DeviceConfigurationRequestBuilder interface {
 	WithCemi(CEMI) DeviceConfigurationRequestBuilder
 	// WithCemiBuilder adds Cemi (property field) which is build by the builder
 	WithCemiBuilder(func(CEMIBuilder) CEMIBuilder) DeviceConfigurationRequestBuilder
-	// WithArgTotalLength sets a parser argument
-	WithArgTotalLength(uint16) DeviceConfigurationRequestBuilder
 	// Done is used to finish work on this child and return (or create one if none) to the parent builder
 	Done() KnxNetIpMessageBuilder
 	// Build builds the DeviceConfigurationRequest or returns an error if something is wrong
@@ -120,7 +116,7 @@ type _DeviceConfigurationRequestBuilder struct {
 
 	parentBuilder *_KnxNetIpMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DeviceConfigurationRequestBuilder) = (*_DeviceConfigurationRequestBuilder)(nil)
@@ -144,10 +140,7 @@ func (b *_DeviceConfigurationRequestBuilder) WithDeviceConfigurationRequestDataB
 	var err error
 	b.DeviceConfigurationRequestDataBlock, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DeviceConfigurationRequestDataBlockBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DeviceConfigurationRequestDataBlockBuilder failed"))
 	}
 	return b
 }
@@ -162,34 +155,20 @@ func (b *_DeviceConfigurationRequestBuilder) WithCemiBuilder(builderSupplier fun
 	var err error
 	b.Cemi, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "CEMIBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "CEMIBuilder failed"))
 	}
-	return b
-}
-
-func (b *_DeviceConfigurationRequestBuilder) WithArgTotalLength(totalLength uint16) DeviceConfigurationRequestBuilder {
-	b.TotalLength = totalLength
 	return b
 }
 
 func (b *_DeviceConfigurationRequestBuilder) Build() (DeviceConfigurationRequest, error) {
 	if b.DeviceConfigurationRequestDataBlock == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'deviceConfigurationRequestDataBlock' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'deviceConfigurationRequestDataBlock' not set"))
 	}
 	if b.Cemi == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'cemi' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'cemi' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DeviceConfigurationRequest.deepCopy(), nil
 }
@@ -215,8 +194,8 @@ func (b *_DeviceConfigurationRequestBuilder) buildForKnxNetIpMessage() (KnxNetIp
 
 func (b *_DeviceConfigurationRequestBuilder) DeepCopy() any {
 	_copy := b.CreateDeviceConfigurationRequestBuilder().(*_DeviceConfigurationRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -281,7 +260,7 @@ func CastDeviceConfigurationRequest(structType any) DeviceConfigurationRequest {
 	return nil
 }
 
-func (m *_DeviceConfigurationRequest) GetTypeName() string {
+func (m *_DeviceConfigurationRequest) GetPlx4xTypeName() string {
 	return "DeviceConfigurationRequest"
 }
 
@@ -312,13 +291,13 @@ func (m *_DeviceConfigurationRequest) parse(ctx context.Context, readBuffer util
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	deviceConfigurationRequestDataBlock, err := ReadSimpleField[DeviceConfigurationRequestDataBlock](ctx, "deviceConfigurationRequestDataBlock", ReadComplex[DeviceConfigurationRequestDataBlock](DeviceConfigurationRequestDataBlockParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	deviceConfigurationRequestDataBlock, err := ReadSimpleField[DeviceConfigurationRequestDataBlock](ctx, "deviceConfigurationRequestDataBlock", ReadComplex[DeviceConfigurationRequestDataBlock](DeviceConfigurationRequestDataBlockParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deviceConfigurationRequestDataBlock' field"))
 	}
 	m.DeviceConfigurationRequestDataBlock = deviceConfigurationRequestDataBlock
 
-	cemi, err := ReadSimpleField[CEMI](ctx, "cemi", ReadComplex[CEMI](CEMIParseWithBufferProducer[CEMI]((uint16)(uint16(totalLength)-uint16((uint16(uint16(6))+uint16(deviceConfigurationRequestDataBlock.GetLengthInBytes(ctx)))))), readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	cemi, err := ReadSimpleField[CEMI](ctx, "cemi", ReadComplex[CEMI](CEMIParseWithBufferProducer[CEMI]((uint16)(uint16(totalLength)-uint16((uint16(uint16(6))+uint16(deviceConfigurationRequestDataBlock.GetLengthInBytes(ctx)))))), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'cemi' field"))
 	}
@@ -349,11 +328,11 @@ func (m *_DeviceConfigurationRequest) SerializeWithWriteBuffer(ctx context.Conte
 			return errors.Wrap(pushErr, "Error pushing for DeviceConfigurationRequest")
 		}
 
-		if err := WriteSimpleField[DeviceConfigurationRequestDataBlock](ctx, "deviceConfigurationRequestDataBlock", m.GetDeviceConfigurationRequestDataBlock(), WriteComplex[DeviceConfigurationRequestDataBlock](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[DeviceConfigurationRequestDataBlock](ctx, "deviceConfigurationRequestDataBlock", m.GetDeviceConfigurationRequestDataBlock(), WriteComplex[DeviceConfigurationRequestDataBlock](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'deviceConfigurationRequestDataBlock' field")
 		}
 
-		if err := WriteSimpleField[CEMI](ctx, "cemi", m.GetCemi(), WriteComplex[CEMI](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[CEMI](ctx, "cemi", m.GetCemi(), WriteComplex[CEMI](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'cemi' field")
 		}
 
@@ -364,16 +343,6 @@ func (m *_DeviceConfigurationRequest) SerializeWithWriteBuffer(ctx context.Conte
 	}
 	return m.KnxNetIpMessageContract.(*_KnxNetIpMessage).serializeParent(ctx, writeBuffer, m, ser)
 }
-
-////
-// Arguments Getter
-
-func (m *_DeviceConfigurationRequest) GetTotalLength() uint16 {
-	return m.TotalLength
-}
-
-//
-////
 
 func (m *_DeviceConfigurationRequest) IsDeviceConfigurationRequest() {}
 
@@ -389,7 +358,6 @@ func (m *_DeviceConfigurationRequest) deepCopy() *_DeviceConfigurationRequest {
 		m.KnxNetIpMessageContract.(*_KnxNetIpMessage).deepCopy(),
 		utils.DeepCopy[DeviceConfigurationRequestDataBlock](m.DeviceConfigurationRequestDataBlock),
 		utils.DeepCopy[CEMI](m.Cemi),
-		m.TotalLength,
 	}
 	_DeviceConfigurationRequestCopy.KnxNetIpMessageContract.(*_KnxNetIpMessage)._SubType = m
 	return _DeviceConfigurationRequestCopy

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _EphemeralKeyTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EphemeralKeyTypeBuilder) = (*_EphemeralKeyTypeBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_EphemeralKeyTypeBuilder) WithPublicKeyBuilder(builderSupplier func(Pas
 	var err error
 	b.PublicKey, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_EphemeralKeyTypeBuilder) WithSignatureBuilder(builderSupplier func(Pas
 	var err error
 	b.Signature, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_EphemeralKeyTypeBuilder) Build() (EphemeralKeyType, error) {
 	if b.PublicKey == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'publicKey' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'publicKey' not set"))
 	}
 	if b.Signature == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'signature' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'signature' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EphemeralKeyType.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_EphemeralKeyTypeBuilder) buildForExtensionObjectDefinition() (Extensio
 
 func (b *_EphemeralKeyTypeBuilder) DeepCopy() any {
 	_copy := b.CreateEphemeralKeyTypeBuilder().(*_EphemeralKeyTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastEphemeralKeyType(structType any) EphemeralKeyType {
 	return nil
 }
 
-func (m *_EphemeralKeyType) GetTypeName() string {
+func (m *_EphemeralKeyType) GetPlx4xTypeName() string {
 	return "EphemeralKeyType"
 }
 
@@ -300,13 +290,13 @@ func (m *_EphemeralKeyType) parse(ctx context.Context, readBuffer utils.ReadBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	publicKey, err := ReadSimpleField[PascalByteString](ctx, "publicKey", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	publicKey, err := ReadSimpleField[PascalByteString](ctx, "publicKey", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'publicKey' field"))
 	}
 	m.PublicKey = publicKey
 
-	signature, err := ReadSimpleField[PascalByteString](ctx, "signature", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	signature, err := ReadSimpleField[PascalByteString](ctx, "signature", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'signature' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_EphemeralKeyType) SerializeWithWriteBuffer(ctx context.Context, writeB
 			return errors.Wrap(pushErr, "Error pushing for EphemeralKeyType")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "publicKey", m.GetPublicKey(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "publicKey", m.GetPublicKey(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'publicKey' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "signature", m.GetSignature(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "signature", m.GetSignature(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'signature' field")
 		}
 

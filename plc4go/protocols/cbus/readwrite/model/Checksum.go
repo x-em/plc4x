@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -85,7 +88,7 @@ func NewChecksumBuilder() ChecksumBuilder {
 type _ChecksumBuilder struct {
 	*_Checksum
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ChecksumBuilder) = (*_ChecksumBuilder)(nil)
@@ -100,8 +103,8 @@ func (b *_ChecksumBuilder) WithValue(value byte) ChecksumBuilder {
 }
 
 func (b *_ChecksumBuilder) Build() (Checksum, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._Checksum.deepCopy(), nil
 }
@@ -116,8 +119,8 @@ func (b *_ChecksumBuilder) MustBuild() Checksum {
 
 func (b *_ChecksumBuilder) DeepCopy() any {
 	_copy := b.CreateChecksumBuilder().(*_ChecksumBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -160,7 +163,7 @@ func CastChecksum(structType any) Checksum {
 	return nil
 }
 
-func (m *_Checksum) GetTypeName() string {
+func (m *_Checksum) GetPlx4xTypeName() string {
 	return "Checksum"
 }
 
@@ -178,7 +181,7 @@ func (m *_Checksum) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func ChecksumParse(ctx context.Context, theBytes []byte) (Checksum, error) {
-	return ChecksumParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return ChecksumParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func ChecksumParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (Checksum, error) {
@@ -188,7 +191,7 @@ func ChecksumParseWithBufferProducer() func(ctx context.Context, readBuffer util
 }
 
 func ChecksumParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (Checksum, error) {
-	v, err := (&_Checksum{}).parse(ctx, readBuffer)
+	v, err := (new(_Checksum)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +207,7 @@ func (m *_Checksum) parse(ctx context.Context, readBuffer utils.ReadBuffer) (__c
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	value, err := ReadSimpleField(ctx, "value", ReadByte(readBuffer, 8))
+	value, err := ReadSimpleField(ctx, "value", ReadByte(readBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'value' field"))
 	}
@@ -218,7 +221,7 @@ func (m *_Checksum) parse(ctx context.Context, readBuffer utils.ReadBuffer) (__c
 }
 
 func (m *_Checksum) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -234,7 +237,7 @@ func (m *_Checksum) SerializeWithWriteBuffer(ctx context.Context, writeBuffer ut
 		return errors.Wrap(pushErr, "Error pushing for Checksum")
 	}
 
-	if err := WriteSimpleField[byte](ctx, "value", m.GetValue(), WriteByte(writeBuffer, 8)); err != nil {
+	if err := WriteSimpleField[byte](ctx, "value", m.GetValue(), WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'value' field")
 	}
 

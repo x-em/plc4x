@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewAudioDataTypeBuilder() AudioDataTypeBuilder {
 type _AudioDataTypeBuilder struct {
 	*_AudioDataType
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AudioDataTypeBuilder) = (*_AudioDataTypeBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_AudioDataTypeBuilder) WithMandatoryFields() AudioDataTypeBuilder {
 }
 
 func (b *_AudioDataTypeBuilder) Build() (AudioDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AudioDataType.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_AudioDataTypeBuilder) MustBuild() AudioDataType {
 
 func (b *_AudioDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateAudioDataTypeBuilder().(*_AudioDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastAudioDataType(structType any) AudioDataType {
 	return nil
 }
 
-func (m *_AudioDataType) GetTypeName() string {
+func (m *_AudioDataType) GetPlx4xTypeName() string {
 	return "AudioDataType"
 }
 
@@ -159,7 +160,7 @@ func AudioDataTypeParseWithBufferProducer() func(ctx context.Context, readBuffer
 }
 
 func AudioDataTypeParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (AudioDataType, error) {
-	v, err := (&_AudioDataType{}).parse(ctx, readBuffer)
+	v, err := (new(_AudioDataType)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

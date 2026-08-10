@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataReasonForDisable = (*_BACnetConstructedDataReasonForD
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataReasonForDisable)(nil)
 
 // NewBACnetConstructedDataReasonForDisable factory function for _BACnetConstructedDataReasonForDisable
-func NewBACnetConstructedDataReasonForDisable(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, reasonForDisable []BACnetAccessCredentialDisableReasonTagged, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataReasonForDisable {
+func NewBACnetConstructedDataReasonForDisable(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, reasonForDisable []BACnetAccessCredentialDisableReasonTagged) *_BACnetConstructedDataReasonForDisable {
 	_result := &_BACnetConstructedDataReasonForDisable{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		ReasonForDisable:              reasonForDisable,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataReasonForDisableBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataReasonForDisableBuilder) = (*_BACnetConstructedDataReasonForDisableBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataReasonForDisableBuilder) WithReasonForDisable(rea
 }
 
 func (b *_BACnetConstructedDataReasonForDisableBuilder) Build() (BACnetConstructedDataReasonForDisable, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataReasonForDisable.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataReasonForDisableBuilder) buildForBACnetConstructe
 
 func (b *_BACnetConstructedDataReasonForDisableBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataReasonForDisableBuilder().(*_BACnetConstructedDataReasonForDisableBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataReasonForDisable(structType any) BACnetConstructed
 	return nil
 }
 
-func (m *_BACnetConstructedDataReasonForDisable) GetTypeName() string {
+func (m *_BACnetConstructedDataReasonForDisable) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataReasonForDisable"
 }
 

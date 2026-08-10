@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -94,7 +95,7 @@ func NewBACnetVMACEntryBuilder() BACnetVMACEntryBuilder {
 type _BACnetVMACEntryBuilder struct {
 	*_BACnetVMACEntry
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetVMACEntryBuilder) = (*_BACnetVMACEntryBuilder)(nil)
@@ -113,10 +114,7 @@ func (b *_BACnetVMACEntryBuilder) WithOptionalVirtualMacAddressBuilder(builderSu
 	var err error
 	b.VirtualMacAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagOctetStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagOctetStringBuilder failed"))
 	}
 	return b
 }
@@ -131,17 +129,14 @@ func (b *_BACnetVMACEntryBuilder) WithOptionalNativeMacAddressBuilder(builderSup
 	var err error
 	b.NativeMacAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagOctetStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagOctetStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetVMACEntryBuilder) Build() (BACnetVMACEntry, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetVMACEntry.deepCopy(), nil
 }
@@ -156,8 +151,8 @@ func (b *_BACnetVMACEntryBuilder) MustBuild() BACnetVMACEntry {
 
 func (b *_BACnetVMACEntryBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetVMACEntryBuilder().(*_BACnetVMACEntryBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -204,7 +199,7 @@ func CastBACnetVMACEntry(structType any) BACnetVMACEntry {
 	return nil
 }
 
-func (m *_BACnetVMACEntry) GetTypeName() string {
+func (m *_BACnetVMACEntry) GetPlx4xTypeName() string {
 	return "BACnetVMACEntry"
 }
 
@@ -239,7 +234,7 @@ func BACnetVMACEntryParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func BACnetVMACEntryParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetVMACEntry, error) {
-	v, err := (&_BACnetVMACEntry{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetVMACEntry)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -299,11 +294,11 @@ func (m *_BACnetVMACEntry) SerializeWithWriteBuffer(ctx context.Context, writeBu
 		return errors.Wrap(pushErr, "Error pushing for BACnetVMACEntry")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagOctetString](ctx, "virtualMacAddress", GetRef(m.GetVirtualMacAddress()), WriteComplex[BACnetContextTagOctetString](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagOctetString](ctx, "virtualMacAddress", new(m.GetVirtualMacAddress()), WriteComplex[BACnetContextTagOctetString](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'virtualMacAddress' field")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagOctetString](ctx, "nativeMacAddress", GetRef(m.GetNativeMacAddress()), WriteComplex[BACnetContextTagOctetString](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagOctetString](ctx, "nativeMacAddress", new(m.GetNativeMacAddress()), WriteComplex[BACnetContextTagOctetString](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'nativeMacAddress' field")
 	}
 

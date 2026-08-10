@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataFailedAttemptEvents = (*_BACnetConstructedDataFailedA
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataFailedAttemptEvents)(nil)
 
 // NewBACnetConstructedDataFailedAttemptEvents factory function for _BACnetConstructedDataFailedAttemptEvents
-func NewBACnetConstructedDataFailedAttemptEvents(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, failedAttemptEvents []BACnetAccessEventTagged, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataFailedAttemptEvents {
+func NewBACnetConstructedDataFailedAttemptEvents(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, failedAttemptEvents []BACnetAccessEventTagged) *_BACnetConstructedDataFailedAttemptEvents {
 	_result := &_BACnetConstructedDataFailedAttemptEvents{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		FailedAttemptEvents:           failedAttemptEvents,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataFailedAttemptEventsBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataFailedAttemptEventsBuilder) = (*_BACnetConstructedDataFailedAttemptEventsBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataFailedAttemptEventsBuilder) WithFailedAttemptEven
 }
 
 func (b *_BACnetConstructedDataFailedAttemptEventsBuilder) Build() (BACnetConstructedDataFailedAttemptEvents, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataFailedAttemptEvents.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataFailedAttemptEventsBuilder) buildForBACnetConstru
 
 func (b *_BACnetConstructedDataFailedAttemptEventsBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataFailedAttemptEventsBuilder().(*_BACnetConstructedDataFailedAttemptEventsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataFailedAttemptEvents(structType any) BACnetConstruc
 	return nil
 }
 
-func (m *_BACnetConstructedDataFailedAttemptEvents) GetTypeName() string {
+func (m *_BACnetConstructedDataFailedAttemptEvents) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataFailedAttemptEvents"
 }
 

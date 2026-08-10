@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ type _S7ParameterUserDataBuilder struct {
 
 	parentBuilder *_S7ParameterBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7ParameterUserDataBuilder) = (*_S7ParameterUserDataBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_S7ParameterUserDataBuilder) WithItems(items ...S7ParameterUserDataItem
 }
 
 func (b *_S7ParameterUserDataBuilder) Build() (S7ParameterUserData, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7ParameterUserData.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_S7ParameterUserDataBuilder) buildForS7Parameter() (S7Parameter, error)
 
 func (b *_S7ParameterUserDataBuilder) DeepCopy() any {
 	_copy := b.CreateS7ParameterUserDataBuilder().(*_S7ParameterUserDataBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastS7ParameterUserData(structType any) S7ParameterUserData {
 	return nil
 }
 
-func (m *_S7ParameterUserData) GetTypeName() string {
+func (m *_S7ParameterUserData) GetPlx4xTypeName() string {
 	return "S7ParameterUserData"
 }
 
@@ -224,9 +225,7 @@ func (m *_S7ParameterUserData) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Items) > 0 {
 		for _curItem, element := range m.Items {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Items), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

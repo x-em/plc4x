@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -67,7 +68,7 @@ var _ BACnetConfirmedServiceRequestRemoveListElement = (*_BACnetConfirmedService
 var _ BACnetConfirmedServiceRequestRequirements = (*_BACnetConfirmedServiceRequestRemoveListElement)(nil)
 
 // NewBACnetConfirmedServiceRequestRemoveListElement factory function for _BACnetConfirmedServiceRequestRemoveListElement
-func NewBACnetConfirmedServiceRequestRemoveListElement(objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged, arrayIndex BACnetContextTagUnsignedInteger, listOfElements BACnetConstructedData, serviceRequestLength uint32) *_BACnetConfirmedServiceRequestRemoveListElement {
+func NewBACnetConfirmedServiceRequestRemoveListElement(serviceRequestLength uint32, objectIdentifier BACnetContextTagObjectIdentifier, propertyIdentifier BACnetPropertyIdentifierTagged, arrayIndex BACnetContextTagUnsignedInteger, listOfElements BACnetConstructedData) *_BACnetConfirmedServiceRequestRemoveListElement {
 	if objectIdentifier == nil {
 		panic("objectIdentifier of type BACnetContextTagObjectIdentifier for BACnetConfirmedServiceRequestRemoveListElement must not be nil")
 	}
@@ -129,7 +130,7 @@ type _BACnetConfirmedServiceRequestRemoveListElementBuilder struct {
 
 	parentBuilder *_BACnetConfirmedServiceRequestBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConfirmedServiceRequestRemoveListElementBuilder) = (*_BACnetConfirmedServiceRequestRemoveListElementBuilder)(nil)
@@ -153,10 +154,7 @@ func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) WithObjectIdent
 	var err error
 	b.ObjectIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
 	}
 	return b
 }
@@ -171,10 +169,7 @@ func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) WithPropertyIde
 	var err error
 	b.PropertyIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
 	}
 	return b
 }
@@ -189,10 +184,7 @@ func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) WithOptionalArr
 	var err error
 	b.ArrayIndex, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -207,29 +199,20 @@ func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) WithOptionalLis
 	var err error
 	b.ListOfElements, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) Build() (BACnetConfirmedServiceRequestRemoveListElement, error) {
 	if b.ObjectIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'objectIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'objectIdentifier' not set"))
 	}
 	if b.PropertyIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'propertyIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'propertyIdentifier' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConfirmedServiceRequestRemoveListElement.deepCopy(), nil
 }
@@ -255,8 +238,8 @@ func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) buildForBACnetC
 
 func (b *_BACnetConfirmedServiceRequestRemoveListElementBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConfirmedServiceRequestRemoveListElementBuilder().(*_BACnetConfirmedServiceRequestRemoveListElementBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -329,7 +312,7 @@ func CastBACnetConfirmedServiceRequestRemoveListElement(structType any) BACnetCo
 	return nil
 }
 
-func (m *_BACnetConfirmedServiceRequestRemoveListElement) GetTypeName() string {
+func (m *_BACnetConfirmedServiceRequestRemoveListElement) GetPlx4xTypeName() string {
 	return "BACnetConfirmedServiceRequestRemoveListElement"
 }
 
@@ -435,11 +418,11 @@ func (m *_BACnetConfirmedServiceRequestRemoveListElement) SerializeWithWriteBuff
 			return errors.Wrap(err, "Error serializing 'propertyIdentifier' field")
 		}
 
-		if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "arrayIndex", GetRef(m.GetArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "arrayIndex", new(m.GetArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'arrayIndex' field")
 		}
 
-		if err := WriteOptionalField[BACnetConstructedData](ctx, "listOfElements", GetRef(m.GetListOfElements()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetConstructedData](ctx, "listOfElements", new(m.GetListOfElements()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'listOfElements' field")
 		}
 

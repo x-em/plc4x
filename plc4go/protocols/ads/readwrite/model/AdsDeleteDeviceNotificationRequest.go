@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,6 +42,7 @@ type AdsDeleteDeviceNotificationRequest interface {
 	utils.Copyable
 	AmsPacket
 	// GetNotificationHandle returns NotificationHandle (property field)
+	// 4 bytes	Handle of notification
 	GetNotificationHandle() uint32
 	// IsAdsDeleteDeviceNotificationRequest is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsAdsDeleteDeviceNotificationRequest()
@@ -58,7 +60,7 @@ var _ AdsDeleteDeviceNotificationRequest = (*_AdsDeleteDeviceNotificationRequest
 var _ AmsPacketRequirements = (*_AdsDeleteDeviceNotificationRequest)(nil)
 
 // NewAdsDeleteDeviceNotificationRequest factory function for _AdsDeleteDeviceNotificationRequest
-func NewAdsDeleteDeviceNotificationRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32, notificationHandle uint32) *_AdsDeleteDeviceNotificationRequest {
+func NewAdsDeleteDeviceNotificationRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32, notificationHandle uint32) *_AdsDeleteDeviceNotificationRequest {
 	_result := &_AdsDeleteDeviceNotificationRequest{
 		AmsPacketContract:  NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 		NotificationHandle: notificationHandle,
@@ -97,7 +99,7 @@ type _AdsDeleteDeviceNotificationRequestBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDeleteDeviceNotificationRequestBuilder) = (*_AdsDeleteDeviceNotificationRequestBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_AdsDeleteDeviceNotificationRequestBuilder) WithNotificationHandle(noti
 }
 
 func (b *_AdsDeleteDeviceNotificationRequestBuilder) Build() (AdsDeleteDeviceNotificationRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDeleteDeviceNotificationRequest.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_AdsDeleteDeviceNotificationRequestBuilder) buildForAmsPacket() (AmsPac
 
 func (b *_AdsDeleteDeviceNotificationRequestBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDeleteDeviceNotificationRequestBuilder().(*_AdsDeleteDeviceNotificationRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +212,7 @@ func CastAdsDeleteDeviceNotificationRequest(structType any) AdsDeleteDeviceNotif
 	return nil
 }
 
-func (m *_AdsDeleteDeviceNotificationRequest) GetTypeName() string {
+func (m *_AdsDeleteDeviceNotificationRequest) GetPlx4xTypeName() string {
 	return "AdsDeleteDeviceNotificationRequest"
 }
 

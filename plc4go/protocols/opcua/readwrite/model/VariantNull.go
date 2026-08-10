@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,7 +54,7 @@ var _ VariantNull = (*_VariantNull)(nil)
 var _ VariantRequirements = (*_VariantNull)(nil)
 
 // NewVariantNull factory function for _VariantNull
-func NewVariantNull(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool) *_VariantNull {
+func NewVariantNull(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32) *_VariantNull {
 	_result := &_VariantNull{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 	}
@@ -89,7 +90,7 @@ type _VariantNullBuilder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantNullBuilder) = (*_VariantNullBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_VariantNullBuilder) WithMandatoryFields() VariantNullBuilder {
 }
 
 func (b *_VariantNullBuilder) Build() (VariantNull, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantNull.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_VariantNullBuilder) buildForVariant() (Variant, error) {
 
 func (b *_VariantNullBuilder) DeepCopy() any {
 	_copy := b.CreateVariantNullBuilder().(*_VariantNullBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastVariantNull(structType any) VariantNull {
 	return nil
 }
 
-func (m *_VariantNull) GetTypeName() string {
+func (m *_VariantNull) GetPlx4xTypeName() string {
 	return "VariantNull"
 }
 

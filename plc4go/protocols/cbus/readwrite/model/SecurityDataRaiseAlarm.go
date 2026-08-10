@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _SecurityDataRaiseAlarmBuilder struct {
 
 	parentBuilder *_SecurityDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SecurityDataRaiseAlarmBuilder) = (*_SecurityDataRaiseAlarmBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_SecurityDataRaiseAlarmBuilder) WithMandatoryFields() SecurityDataRaise
 }
 
 func (b *_SecurityDataRaiseAlarmBuilder) Build() (SecurityDataRaiseAlarm, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SecurityDataRaiseAlarm.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_SecurityDataRaiseAlarmBuilder) buildForSecurityData() (SecurityData, e
 
 func (b *_SecurityDataRaiseAlarmBuilder) DeepCopy() any {
 	_copy := b.CreateSecurityDataRaiseAlarmBuilder().(*_SecurityDataRaiseAlarmBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -175,7 +176,7 @@ func CastSecurityDataRaiseAlarm(structType any) SecurityDataRaiseAlarm {
 	return nil
 }
 
-func (m *_SecurityDataRaiseAlarm) GetTypeName() string {
+func (m *_SecurityDataRaiseAlarm) GetPlx4xTypeName() string {
 	return "SecurityDataRaiseAlarm"
 }
 

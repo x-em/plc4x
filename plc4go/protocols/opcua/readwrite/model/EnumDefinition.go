@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _EnumDefinitionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EnumDefinitionBuilder) = (*_EnumDefinitionBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_EnumDefinitionBuilder) WithFields(fields ...EnumField) EnumDefinitionB
 }
 
 func (b *_EnumDefinitionBuilder) Build() (EnumDefinition, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EnumDefinition.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_EnumDefinitionBuilder) buildForExtensionObjectDefinition() (ExtensionO
 
 func (b *_EnumDefinitionBuilder) DeepCopy() any {
 	_copy := b.CreateEnumDefinitionBuilder().(*_EnumDefinitionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastEnumDefinition(structType any) EnumDefinition {
 	return nil
 }
 
-func (m *_EnumDefinition) GetTypeName() string {
+func (m *_EnumDefinition) GetPlx4xTypeName() string {
 	return "EnumDefinition"
 }
 
@@ -220,9 +222,7 @@ func (m *_EnumDefinition) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Fields) > 0 {
 		for _curItem, element := range m.Fields {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Fields), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -244,13 +244,13 @@ func (m *_EnumDefinition) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfFields, err := ReadImplicitField[int32](ctx, "noOfFields", ReadSignedInt(readBuffer, uint8(32)))
+	noOfFields, err := ReadImplicitField[int32](ctx, "noOfFields", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfFields' field"))
 	}
 	_ = noOfFields
 
-	fields, err := ReadCountArrayField[EnumField](ctx, "fields", ReadComplex[EnumField](ExtensionObjectDefinitionParseWithBufferProducer[EnumField]((int32)(int32(104))), readBuffer), uint64(noOfFields))
+	fields, err := ReadCountArrayField[EnumField](ctx, "fields", ReadComplex[EnumField](ExtensionObjectDefinitionParseWithBufferProducer[EnumField]((int32)(int32(104))), readBuffer), uint64(noOfFields), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'fields' field"))
 	}
@@ -281,11 +281,11 @@ func (m *_EnumDefinition) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for EnumDefinition")
 		}
 		noOfFields := int32(utils.InlineIf(bool((m.GetFields()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetFields()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfFields", noOfFields, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfFields", noOfFields, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfFields' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "fields", m.GetFields(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "fields", m.GetFields(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'fields' field")
 		}
 

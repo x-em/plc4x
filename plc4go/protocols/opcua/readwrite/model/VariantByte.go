@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,7 +62,7 @@ var _ VariantByte = (*_VariantByte)(nil)
 var _ VariantRequirements = (*_VariantByte)(nil)
 
 // NewVariantByte factory function for _VariantByte
-func NewVariantByte(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool, arrayLength *int32, value []uint8) *_VariantByte {
+func NewVariantByte(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32, arrayLength *int32, value []uint8) *_VariantByte {
 	_result := &_VariantByte{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 		ArrayLength:     arrayLength,
@@ -103,7 +104,7 @@ type _VariantByteBuilder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantByteBuilder) = (*_VariantByteBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_VariantByteBuilder) WithValue(value ...uint8) VariantByteBuilder {
 }
 
 func (b *_VariantByteBuilder) Build() (VariantByte, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantByte.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_VariantByteBuilder) buildForVariant() (Variant, error) {
 
 func (b *_VariantByteBuilder) DeepCopy() any {
 	_copy := b.CreateVariantByteBuilder().(*_VariantByteBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastVariantByte(structType any) VariantByte {
 	return nil
 }
 
-func (m *_VariantByte) GetTypeName() string {
+func (m *_VariantByte) GetPlx4xTypeName() string {
 	return "VariantByte"
 }
 

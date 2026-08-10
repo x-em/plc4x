@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -104,7 +105,7 @@ type _CIPEncapsulationReadRequestBuilder struct {
 
 	parentBuilder *_CIPEncapsulationPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CIPEncapsulationReadRequestBuilder) = (*_CIPEncapsulationReadRequestBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_CIPEncapsulationReadRequestBuilder) WithRequestBuilder(builderSupplier
 	var err error
 	b.Request, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DF1RequestMessageBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DF1RequestMessageBuilder failed"))
 	}
 	return b
 }
 
 func (b *_CIPEncapsulationReadRequestBuilder) Build() (CIPEncapsulationReadRequest, error) {
 	if b.Request == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'request' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'request' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CIPEncapsulationReadRequest.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_CIPEncapsulationReadRequestBuilder) buildForCIPEncapsulationPacket() (
 
 func (b *_CIPEncapsulationReadRequestBuilder) DeepCopy() any {
 	_copy := b.CreateCIPEncapsulationReadRequestBuilder().(*_CIPEncapsulationReadRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -232,7 +227,7 @@ func CastCIPEncapsulationReadRequest(structType any) CIPEncapsulationReadRequest
 	return nil
 }
 
-func (m *_CIPEncapsulationReadRequest) GetTypeName() string {
+func (m *_CIPEncapsulationReadRequest) GetPlx4xTypeName() string {
 	return "CIPEncapsulationReadRequest"
 }
 
@@ -260,7 +255,7 @@ func (m *_CIPEncapsulationReadRequest) parse(ctx context.Context, readBuffer uti
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	request, err := ReadSimpleField[DF1RequestMessage](ctx, "request", ReadComplex[DF1RequestMessage](DF1RequestMessageParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	request, err := ReadSimpleField[DF1RequestMessage](ctx, "request", ReadComplex[DF1RequestMessage](DF1RequestMessageParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'request' field"))
 	}
@@ -291,7 +286,7 @@ func (m *_CIPEncapsulationReadRequest) SerializeWithWriteBuffer(ctx context.Cont
 			return errors.Wrap(pushErr, "Error pushing for CIPEncapsulationReadRequest")
 		}
 
-		if err := WriteSimpleField[DF1RequestMessage](ctx, "request", m.GetRequest(), WriteComplex[DF1RequestMessage](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[DF1RequestMessage](ctx, "request", m.GetRequest(), WriteComplex[DF1RequestMessage](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'request' field")
 		}
 

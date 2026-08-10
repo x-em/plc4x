@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -128,7 +130,7 @@ type _MonitoringParametersBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MonitoringParametersBuilder) = (*_MonitoringParametersBuilder)(nil)
@@ -162,10 +164,7 @@ func (b *_MonitoringParametersBuilder) WithFilterBuilder(builderSupplier func(Ex
 	var err error
 	b.Filter, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -182,13 +181,10 @@ func (b *_MonitoringParametersBuilder) WithDiscardOldest(discardOldest bool) Mon
 
 func (b *_MonitoringParametersBuilder) Build() (MonitoringParameters, error) {
 	if b.Filter == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'filter' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'filter' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MonitoringParameters.deepCopy(), nil
 }
@@ -214,8 +210,8 @@ func (b *_MonitoringParametersBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_MonitoringParametersBuilder) DeepCopy() any {
 	_copy := b.CreateMonitoringParametersBuilder().(*_MonitoringParametersBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -292,7 +288,7 @@ func CastMonitoringParameters(structType any) MonitoringParameters {
 	return nil
 }
 
-func (m *_MonitoringParameters) GetTypeName() string {
+func (m *_MonitoringParameters) GetPlx4xTypeName() string {
 	return "MonitoringParameters"
 }
 
@@ -335,37 +331,37 @@ func (m *_MonitoringParameters) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	clientHandle, err := ReadSimpleField(ctx, "clientHandle", ReadUnsignedInt(readBuffer, uint8(32)))
+	clientHandle, err := ReadSimpleField(ctx, "clientHandle", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientHandle' field"))
 	}
 	m.ClientHandle = clientHandle
 
-	samplingInterval, err := ReadSimpleField(ctx, "samplingInterval", ReadDouble(readBuffer, uint8(64)))
+	samplingInterval, err := ReadSimpleField(ctx, "samplingInterval", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'samplingInterval' field"))
 	}
 	m.SamplingInterval = samplingInterval
 
-	filter, err := ReadSimpleField[ExtensionObject](ctx, "filter", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	filter, err := ReadSimpleField[ExtensionObject](ctx, "filter", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'filter' field"))
 	}
 	m.Filter = filter
 
-	queueSize, err := ReadSimpleField(ctx, "queueSize", ReadUnsignedInt(readBuffer, uint8(32)))
+	queueSize, err := ReadSimpleField(ctx, "queueSize", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'queueSize' field"))
 	}
 	m.QueueSize = queueSize
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	discardOldest, err := ReadSimpleField(ctx, "discardOldest", ReadBoolean(readBuffer))
+	discardOldest, err := ReadSimpleField(ctx, "discardOldest", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discardOldest' field"))
 	}
@@ -396,27 +392,27 @@ func (m *_MonitoringParameters) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for MonitoringParameters")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "clientHandle", m.GetClientHandle(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "clientHandle", m.GetClientHandle(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientHandle' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "samplingInterval", m.GetSamplingInterval(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "samplingInterval", m.GetSamplingInterval(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'samplingInterval' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "filter", m.GetFilter(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "filter", m.GetFilter(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'filter' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "queueSize", m.GetQueueSize(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "queueSize", m.GetQueueSize(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'queueSize' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "discardOldest", m.GetDiscardOldest(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "discardOldest", m.GetDiscardOldest(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discardOldest' field")
 		}
 

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ BACnetConstructedDataAnalogValueAll = (*_BACnetConstructedDataAnalogValueA
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataAnalogValueAll)(nil)
 
 // NewBACnetConstructedDataAnalogValueAll factory function for _BACnetConstructedDataAnalogValueAll
-func NewBACnetConstructedDataAnalogValueAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataAnalogValueAll {
+func NewBACnetConstructedDataAnalogValueAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag) *_BACnetConstructedDataAnalogValueAll {
 	_result := &_BACnetConstructedDataAnalogValueAll{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _BACnetConstructedDataAnalogValueAllBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataAnalogValueAllBuilder) = (*_BACnetConstructedDataAnalogValueAllBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_BACnetConstructedDataAnalogValueAllBuilder) WithMandatoryFields() BACn
 }
 
 func (b *_BACnetConstructedDataAnalogValueAllBuilder) Build() (BACnetConstructedDataAnalogValueAll, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataAnalogValueAll.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_BACnetConstructedDataAnalogValueAllBuilder) buildForBACnetConstructedD
 
 func (b *_BACnetConstructedDataAnalogValueAllBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataAnalogValueAllBuilder().(*_BACnetConstructedDataAnalogValueAllBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastBACnetConstructedDataAnalogValueAll(structType any) BACnetConstructedDa
 	return nil
 }
 
-func (m *_BACnetConstructedDataAnalogValueAll) GetTypeName() string {
+func (m *_BACnetConstructedDataAnalogValueAll) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataAnalogValueAll"
 }
 

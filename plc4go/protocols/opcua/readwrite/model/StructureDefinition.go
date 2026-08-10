@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -125,7 +127,7 @@ type _StructureDefinitionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (StructureDefinitionBuilder) = (*_StructureDefinitionBuilder)(nil)
@@ -149,10 +151,7 @@ func (b *_StructureDefinitionBuilder) WithDefaultEncodingIdBuilder(builderSuppli
 	var err error
 	b.DefaultEncodingId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -167,10 +166,7 @@ func (b *_StructureDefinitionBuilder) WithBaseDataTypeBuilder(builderSupplier fu
 	var err error
 	b.BaseDataType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -187,19 +183,13 @@ func (b *_StructureDefinitionBuilder) WithFields(fields ...StructureField) Struc
 
 func (b *_StructureDefinitionBuilder) Build() (StructureDefinition, error) {
 	if b.DefaultEncodingId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'defaultEncodingId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'defaultEncodingId' not set"))
 	}
 	if b.BaseDataType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'baseDataType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'baseDataType' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._StructureDefinition.deepCopy(), nil
 }
@@ -225,8 +215,8 @@ func (b *_StructureDefinitionBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_StructureDefinitionBuilder) DeepCopy() any {
 	_copy := b.CreateStructureDefinitionBuilder().(*_StructureDefinitionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +289,7 @@ func CastStructureDefinition(structType any) StructureDefinition {
 	return nil
 }
 
-func (m *_StructureDefinition) GetTypeName() string {
+func (m *_StructureDefinition) GetPlx4xTypeName() string {
 	return "StructureDefinition"
 }
 
@@ -322,9 +312,7 @@ func (m *_StructureDefinition) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Fields) > 0 {
 		for _curItem, element := range m.Fields {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Fields), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -346,31 +334,31 @@ func (m *_StructureDefinition) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	defaultEncodingId, err := ReadSimpleField[NodeId](ctx, "defaultEncodingId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	defaultEncodingId, err := ReadSimpleField[NodeId](ctx, "defaultEncodingId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'defaultEncodingId' field"))
 	}
 	m.DefaultEncodingId = defaultEncodingId
 
-	baseDataType, err := ReadSimpleField[NodeId](ctx, "baseDataType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	baseDataType, err := ReadSimpleField[NodeId](ctx, "baseDataType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'baseDataType' field"))
 	}
 	m.BaseDataType = baseDataType
 
-	structureType, err := ReadEnumField[StructureType](ctx, "structureType", "StructureType", ReadEnum(StructureTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	structureType, err := ReadEnumField[StructureType](ctx, "structureType", "StructureType", ReadEnum(StructureTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'structureType' field"))
 	}
 	m.StructureType = structureType
 
-	noOfFields, err := ReadImplicitField[int32](ctx, "noOfFields", ReadSignedInt(readBuffer, uint8(32)))
+	noOfFields, err := ReadImplicitField[int32](ctx, "noOfFields", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfFields' field"))
 	}
 	_ = noOfFields
 
-	fields, err := ReadCountArrayField[StructureField](ctx, "fields", ReadComplex[StructureField](ExtensionObjectDefinitionParseWithBufferProducer[StructureField]((int32)(int32(103))), readBuffer), uint64(noOfFields))
+	fields, err := ReadCountArrayField[StructureField](ctx, "fields", ReadComplex[StructureField](ExtensionObjectDefinitionParseWithBufferProducer[StructureField]((int32)(int32(103))), readBuffer), uint64(noOfFields), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'fields' field"))
 	}
@@ -401,23 +389,23 @@ func (m *_StructureDefinition) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for StructureDefinition")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "defaultEncodingId", m.GetDefaultEncodingId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "defaultEncodingId", m.GetDefaultEncodingId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'defaultEncodingId' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "baseDataType", m.GetBaseDataType(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "baseDataType", m.GetBaseDataType(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'baseDataType' field")
 		}
 
-		if err := WriteSimpleEnumField[StructureType](ctx, "structureType", "StructureType", m.GetStructureType(), WriteEnum[StructureType, uint32](StructureType.GetValue, StructureType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[StructureType](ctx, "structureType", "StructureType", m.GetStructureType(), WriteEnum[StructureType, uint32](StructureType.GetValue, StructureType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'structureType' field")
 		}
 		noOfFields := int32(utils.InlineIf(bool((m.GetFields()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetFields()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfFields", noOfFields, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfFields", noOfFields, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfFields' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "fields", m.GetFields(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "fields", m.GetFields(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'fields' field")
 		}
 

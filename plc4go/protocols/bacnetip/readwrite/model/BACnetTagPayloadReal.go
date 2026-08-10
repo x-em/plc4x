@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -85,7 +86,7 @@ func NewBACnetTagPayloadRealBuilder() BACnetTagPayloadRealBuilder {
 type _BACnetTagPayloadRealBuilder struct {
 	*_BACnetTagPayloadReal
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetTagPayloadRealBuilder) = (*_BACnetTagPayloadRealBuilder)(nil)
@@ -100,8 +101,8 @@ func (b *_BACnetTagPayloadRealBuilder) WithValue(value float32) BACnetTagPayload
 }
 
 func (b *_BACnetTagPayloadRealBuilder) Build() (BACnetTagPayloadReal, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetTagPayloadReal.deepCopy(), nil
 }
@@ -116,8 +117,8 @@ func (b *_BACnetTagPayloadRealBuilder) MustBuild() BACnetTagPayloadReal {
 
 func (b *_BACnetTagPayloadRealBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetTagPayloadRealBuilder().(*_BACnetTagPayloadRealBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -160,7 +161,7 @@ func CastBACnetTagPayloadReal(structType any) BACnetTagPayloadReal {
 	return nil
 }
 
-func (m *_BACnetTagPayloadReal) GetTypeName() string {
+func (m *_BACnetTagPayloadReal) GetPlx4xTypeName() string {
 	return "BACnetTagPayloadReal"
 }
 
@@ -188,7 +189,7 @@ func BACnetTagPayloadRealParseWithBufferProducer() func(ctx context.Context, rea
 }
 
 func BACnetTagPayloadRealParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetTagPayloadReal, error) {
-	v, err := (&_BACnetTagPayloadReal{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetTagPayloadReal)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

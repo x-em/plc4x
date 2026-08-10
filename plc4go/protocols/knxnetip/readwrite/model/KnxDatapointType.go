@@ -23,9 +23,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/pkg/api/values"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -39,7 +40,9 @@ type IKnxDatapointType interface {
 	utils.LengthAware
 	utils.Serializable
 	Number() uint16
+	PlcValueTpe() values.PlcValueType
 	Name() string
+	Id() string
 	DatapointMainType() KnxDatapointMainType
 }
 
@@ -332,70 +335,73 @@ const (
 	KnxDatapointType_DPT_AddInfoTypes                             KnxDatapointType = 285
 	KnxDatapointType_DPT_RF_ModeSelect                            KnxDatapointType = 286
 	KnxDatapointType_DPT_RF_FilterSelect                          KnxDatapointType = 287
-	KnxDatapointType_DPT_StatusGen                                KnxDatapointType = 288
-	KnxDatapointType_DPT_Device_Control                           KnxDatapointType = 289
-	KnxDatapointType_DPT_ForceSign                                KnxDatapointType = 290
-	KnxDatapointType_DPT_ForceSignCool                            KnxDatapointType = 291
-	KnxDatapointType_DPT_StatusRHC                                KnxDatapointType = 292
-	KnxDatapointType_DPT_StatusSDHWC                              KnxDatapointType = 293
-	KnxDatapointType_DPT_FuelTypeSet                              KnxDatapointType = 294
-	KnxDatapointType_DPT_StatusRCC                                KnxDatapointType = 295
-	KnxDatapointType_DPT_StatusAHU                                KnxDatapointType = 296
-	KnxDatapointType_DPT_CombinedStatus_RTSM                      KnxDatapointType = 297
-	KnxDatapointType_DPT_LightActuatorErrorInfo                   KnxDatapointType = 298
-	KnxDatapointType_DPT_RF_ModeInfo                              KnxDatapointType = 299
-	KnxDatapointType_DPT_RF_FilterInfo                            KnxDatapointType = 300
-	KnxDatapointType_DPT_Channel_Activation_8                     KnxDatapointType = 301
-	KnxDatapointType_DPT_StatusDHWC                               KnxDatapointType = 302
-	KnxDatapointType_DPT_StatusRHCC                               KnxDatapointType = 303
-	KnxDatapointType_DPT_CombinedStatus_HVA                       KnxDatapointType = 304
-	KnxDatapointType_DPT_CombinedStatus_RTC                       KnxDatapointType = 305
-	KnxDatapointType_DPT_Media                                    KnxDatapointType = 306
-	KnxDatapointType_DPT_Channel_Activation_16                    KnxDatapointType = 307
-	KnxDatapointType_DPT_OnOffAction                              KnxDatapointType = 308
-	KnxDatapointType_DPT_Alarm_Reaction                           KnxDatapointType = 309
-	KnxDatapointType_DPT_UpDown_Action                            KnxDatapointType = 310
-	KnxDatapointType_DPT_HVAC_PB_Action                           KnxDatapointType = 311
-	KnxDatapointType_DPT_DoubleNibble                             KnxDatapointType = 312
-	KnxDatapointType_DPT_SceneInfo                                KnxDatapointType = 313
-	KnxDatapointType_DPT_CombinedInfoOnOff                        KnxDatapointType = 314
-	KnxDatapointType_DPT_ActiveEnergy_V64                         KnxDatapointType = 315
-	KnxDatapointType_DPT_ApparentEnergy_V64                       KnxDatapointType = 316
-	KnxDatapointType_DPT_ReactiveEnergy_V64                       KnxDatapointType = 317
-	KnxDatapointType_DPT_Channel_Activation_24                    KnxDatapointType = 318
-	KnxDatapointType_DPT_HVACModeNext                             KnxDatapointType = 319
-	KnxDatapointType_DPT_DHWModeNext                              KnxDatapointType = 320
-	KnxDatapointType_DPT_OccModeNext                              KnxDatapointType = 321
-	KnxDatapointType_DPT_BuildingModeNext                         KnxDatapointType = 322
-	KnxDatapointType_DPT_StatusLightingActuator                   KnxDatapointType = 323
-	KnxDatapointType_DPT_Version                                  KnxDatapointType = 324
-	KnxDatapointType_DPT_AlarmInfo                                KnxDatapointType = 325
-	KnxDatapointType_DPT_TempRoomSetpSetF16_3                     KnxDatapointType = 326
-	KnxDatapointType_DPT_TempRoomSetpSetShiftF16_3                KnxDatapointType = 327
-	KnxDatapointType_DPT_Scaling_Speed                            KnxDatapointType = 328
-	KnxDatapointType_DPT_Scaling_Step_Time                        KnxDatapointType = 329
-	KnxDatapointType_DPT_MeteringValue                            KnxDatapointType = 330
-	KnxDatapointType_DPT_MBus_Address                             KnxDatapointType = 331
-	KnxDatapointType_DPT_Colour_RGB                               KnxDatapointType = 332
-	KnxDatapointType_DPT_LanguageCodeAlpha2_ASCII                 KnxDatapointType = 333
-	KnxDatapointType_DPT_Tariff_ActiveEnergy                      KnxDatapointType = 334
-	KnxDatapointType_DPT_Prioritised_Mode_Control                 KnxDatapointType = 335
-	KnxDatapointType_DPT_DALI_Control_Gear_Diagnostic             KnxDatapointType = 336
-	KnxDatapointType_DPT_DALI_Diagnostics                         KnxDatapointType = 337
-	KnxDatapointType_DPT_CombinedPosition                         KnxDatapointType = 338
-	KnxDatapointType_DPT_StatusSAB                                KnxDatapointType = 339
-	KnxDatapointType_DPT_Colour_xyY                               KnxDatapointType = 340
-	KnxDatapointType_DPT_Converter_Status                         KnxDatapointType = 341
-	KnxDatapointType_DPT_Converter_Test_Result                    KnxDatapointType = 342
-	KnxDatapointType_DPT_Battery_Info                             KnxDatapointType = 343
-	KnxDatapointType_DPT_Brightness_Colour_Temperature_Transition KnxDatapointType = 344
-	KnxDatapointType_DPT_Brightness_Colour_Temperature_Control    KnxDatapointType = 345
-	KnxDatapointType_DPT_Colour_RGBW                              KnxDatapointType = 346
-	KnxDatapointType_DPT_Relative_Control_RGBW                    KnxDatapointType = 347
-	KnxDatapointType_DPT_Relative_Control_RGB                     KnxDatapointType = 348
-	KnxDatapointType_DPT_GeographicalLocation                     KnxDatapointType = 349
-	KnxDatapointType_DPT_TempRoomSetpSetF16_4                     KnxDatapointType = 350
-	KnxDatapointType_DPT_TempRoomSetpSetShiftF16_4                KnxDatapointType = 351
+	KnxDatapointType_DPT_EVSEMode_1                               KnxDatapointType = 288
+	KnxDatapointType_DPT_EVSEMode_2                               KnxDatapointType = 289
+	KnxDatapointType_DPT_EVSEMode_3                               KnxDatapointType = 290
+	KnxDatapointType_DPT_StatusGen                                KnxDatapointType = 291
+	KnxDatapointType_DPT_Device_Control                           KnxDatapointType = 292
+	KnxDatapointType_DPT_ForceSign                                KnxDatapointType = 293
+	KnxDatapointType_DPT_ForceSignCool                            KnxDatapointType = 294
+	KnxDatapointType_DPT_StatusRHC                                KnxDatapointType = 295
+	KnxDatapointType_DPT_StatusSDHWC                              KnxDatapointType = 296
+	KnxDatapointType_DPT_FuelTypeSet                              KnxDatapointType = 297
+	KnxDatapointType_DPT_StatusRCC                                KnxDatapointType = 298
+	KnxDatapointType_DPT_StatusAHU                                KnxDatapointType = 299
+	KnxDatapointType_DPT_CombinedStatus_RTSM                      KnxDatapointType = 300
+	KnxDatapointType_DPT_LightActuatorErrorInfo                   KnxDatapointType = 301
+	KnxDatapointType_DPT_RF_ModeInfo                              KnxDatapointType = 302
+	KnxDatapointType_DPT_RF_FilterInfo                            KnxDatapointType = 303
+	KnxDatapointType_DPT_Channel_Activation_8                     KnxDatapointType = 304
+	KnxDatapointType_DPT_StatusDHWC                               KnxDatapointType = 305
+	KnxDatapointType_DPT_StatusRHCC                               KnxDatapointType = 306
+	KnxDatapointType_DPT_CombinedStatus_HVA                       KnxDatapointType = 307
+	KnxDatapointType_DPT_CombinedStatus_RTC                       KnxDatapointType = 308
+	KnxDatapointType_DPT_Media                                    KnxDatapointType = 309
+	KnxDatapointType_DPT_Channel_Activation_16                    KnxDatapointType = 310
+	KnxDatapointType_DPT_OnOffAction                              KnxDatapointType = 311
+	KnxDatapointType_DPT_Alarm_Reaction                           KnxDatapointType = 312
+	KnxDatapointType_DPT_UpDown_Action                            KnxDatapointType = 313
+	KnxDatapointType_DPT_HVAC_PB_Action                           KnxDatapointType = 314
+	KnxDatapointType_DPT_DoubleNibble                             KnxDatapointType = 315
+	KnxDatapointType_DPT_SceneInfo                                KnxDatapointType = 316
+	KnxDatapointType_DPT_CombinedInfoOnOff                        KnxDatapointType = 317
+	KnxDatapointType_DPT_ActiveEnergy_V64                         KnxDatapointType = 318
+	KnxDatapointType_DPT_ApparentEnergy_V64                       KnxDatapointType = 319
+	KnxDatapointType_DPT_ReactiveEnergy_V64                       KnxDatapointType = 320
+	KnxDatapointType_DPT_Channel_Activation_24                    KnxDatapointType = 321
+	KnxDatapointType_DPT_HVACModeNext                             KnxDatapointType = 322
+	KnxDatapointType_DPT_DHWModeNext                              KnxDatapointType = 323
+	KnxDatapointType_DPT_OccModeNext                              KnxDatapointType = 324
+	KnxDatapointType_DPT_BuildingModeNext                         KnxDatapointType = 325
+	KnxDatapointType_DPT_StatusLightingActuator                   KnxDatapointType = 326
+	KnxDatapointType_DPT_Version                                  KnxDatapointType = 327
+	KnxDatapointType_DPT_AlarmInfo                                KnxDatapointType = 328
+	KnxDatapointType_DPT_TempRoomSetpSetF16_3                     KnxDatapointType = 329
+	KnxDatapointType_DPT_TempRoomSetpSetShiftF16_3                KnxDatapointType = 330
+	KnxDatapointType_DPT_Scaling_Speed                            KnxDatapointType = 331
+	KnxDatapointType_DPT_Scaling_Step_Time                        KnxDatapointType = 332
+	KnxDatapointType_DPT_MeteringValue                            KnxDatapointType = 333
+	KnxDatapointType_DPT_MBus_Address                             KnxDatapointType = 334
+	KnxDatapointType_DPT_Colour_RGB                               KnxDatapointType = 335
+	KnxDatapointType_DPT_LanguageCodeAlpha2_ASCII                 KnxDatapointType = 336
+	KnxDatapointType_DPT_Tariff_ActiveEnergy                      KnxDatapointType = 337
+	KnxDatapointType_DPT_Prioritised_Mode_Control                 KnxDatapointType = 338
+	KnxDatapointType_DPT_DALI_Control_Gear_Diagnostic             KnxDatapointType = 339
+	KnxDatapointType_DPT_DALI_Diagnostics                         KnxDatapointType = 340
+	KnxDatapointType_DPT_CombinedPosition                         KnxDatapointType = 341
+	KnxDatapointType_DPT_StatusSAB                                KnxDatapointType = 342
+	KnxDatapointType_DPT_Colour_xyY                               KnxDatapointType = 343
+	KnxDatapointType_DPT_Converter_Status                         KnxDatapointType = 344
+	KnxDatapointType_DPT_Converter_Test_Result                    KnxDatapointType = 345
+	KnxDatapointType_DPT_Battery_Info                             KnxDatapointType = 346
+	KnxDatapointType_DPT_Brightness_Colour_Temperature_Transition KnxDatapointType = 347
+	KnxDatapointType_DPT_Brightness_Colour_Temperature_Control    KnxDatapointType = 348
+	KnxDatapointType_DPT_Colour_RGBW                              KnxDatapointType = 349
+	KnxDatapointType_DPT_Relative_Control_RGBW                    KnxDatapointType = 350
+	KnxDatapointType_DPT_Relative_Control_RGB                     KnxDatapointType = 351
+	KnxDatapointType_DPT_GeographicalLocation                     KnxDatapointType = 352
+	KnxDatapointType_DPT_TempRoomSetpSetF16_4                     KnxDatapointType = 353
+	KnxDatapointType_DPT_TempRoomSetpSetShiftF16_4                KnxDatapointType = 354
 )
 
 var KnxDatapointTypeValues []KnxDatapointType
@@ -691,6 +697,9 @@ func init() {
 		KnxDatapointType_DPT_AddInfoTypes,
 		KnxDatapointType_DPT_RF_ModeSelect,
 		KnxDatapointType_DPT_RF_FilterSelect,
+		KnxDatapointType_DPT_EVSEMode_1,
+		KnxDatapointType_DPT_EVSEMode_2,
+		KnxDatapointType_DPT_EVSEMode_3,
 		KnxDatapointType_DPT_StatusGen,
 		KnxDatapointType_DPT_Device_Control,
 		KnxDatapointType_DPT_ForceSign,
@@ -1602,11 +1611,11 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 288:
 		{ /* '288' */
-			return 1
+			return 1219
 		}
 	case 289:
 		{ /* '289' */
-			return 2
+			return 1220
 		}
 	case 29:
 		{ /* '29' */
@@ -1614,43 +1623,43 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 290:
 		{ /* '290' */
-			return 100
+			return 1221
 		}
 	case 291:
 		{ /* '291' */
-			return 101
+			return 1
 		}
 	case 292:
 		{ /* '292' */
-			return 102
+			return 2
 		}
 	case 293:
 		{ /* '293' */
-			return 103
+			return 100
 		}
 	case 294:
 		{ /* '294' */
-			return 104
+			return 101
 		}
 	case 295:
 		{ /* '295' */
-			return 105
+			return 102
 		}
 	case 296:
 		{ /* '296' */
-			return 106
+			return 103
 		}
 	case 297:
 		{ /* '297' */
-			return 107
+			return 104
 		}
 	case 298:
 		{ /* '298' */
-			return 601
+			return 105
 		}
 	case 299:
 		{ /* '299' */
-			return 1000
+			return 106
 		}
 	case 3:
 		{ /* '3' */
@@ -1662,43 +1671,43 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 300:
 		{ /* '300' */
-			return 1001
+			return 107
 		}
 	case 301:
 		{ /* '301' */
-			return 1010
+			return 601
 		}
 	case 302:
 		{ /* '302' */
-			return 100
+			return 1000
 		}
 	case 303:
 		{ /* '303' */
-			return 101
+			return 1001
 		}
 	case 304:
 		{ /* '304' */
-			return 102
+			return 1010
 		}
 	case 305:
 		{ /* '305' */
-			return 103
+			return 100
 		}
 	case 306:
 		{ /* '306' */
-			return 1000
+			return 101
 		}
 	case 307:
 		{ /* '307' */
-			return 1010
+			return 102
 		}
 	case 308:
 		{ /* '308' */
-			return 1
+			return 103
 		}
 	case 309:
 		{ /* '309' */
-			return 2
+			return 1000
 		}
 	case 31:
 		{ /* '31' */
@@ -1706,43 +1715,43 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 310:
 		{ /* '310' */
-			return 3
+			return 1010
 		}
 	case 311:
 		{ /* '311' */
-			return 102
+			return 1
 		}
 	case 312:
 		{ /* '312' */
-			return 1000
+			return 2
 		}
 	case 313:
 		{ /* '313' */
-			return 1
+			return 3
 		}
 	case 314:
 		{ /* '314' */
-			return 1
+			return 102
 		}
 	case 315:
 		{ /* '315' */
-			return 10
+			return 1000
 		}
 	case 316:
 		{ /* '316' */
-			return 11
+			return 1
 		}
 	case 317:
 		{ /* '317' */
-			return 12
+			return 1
 		}
 	case 318:
 		{ /* '318' */
-			return 1010
+			return 10
 		}
 	case 319:
 		{ /* '319' */
-			return 100
+			return 11
 		}
 	case 32:
 		{ /* '32' */
@@ -1750,35 +1759,35 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 320:
 		{ /* '320' */
-			return 102
+			return 12
 		}
 	case 321:
 		{ /* '321' */
-			return 104
+			return 1010
 		}
 	case 322:
 		{ /* '322' */
-			return 105
+			return 100
 		}
 	case 323:
 		{ /* '323' */
-			return 600
+			return 102
 		}
 	case 324:
 		{ /* '324' */
-			return 1
+			return 104
 		}
 	case 325:
 		{ /* '325' */
-			return 1
+			return 105
 		}
 	case 326:
 		{ /* '326' */
-			return 100
+			return 600
 		}
 	case 327:
 		{ /* '327' */
-			return 101
+			return 1
 		}
 	case 328:
 		{ /* '328' */
@@ -1786,7 +1795,7 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 329:
 		{ /* '329' */
-			return 2
+			return 100
 		}
 	case 33:
 		{ /* '33' */
@@ -1794,15 +1803,15 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 330:
 		{ /* '330' */
-			return 1
+			return 101
 		}
 	case 331:
 		{ /* '331' */
-			return 1000
+			return 1
 		}
 	case 332:
 		{ /* '332' */
-			return 600
+			return 2
 		}
 	case 333:
 		{ /* '333' */
@@ -1810,27 +1819,27 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 334:
 		{ /* '334' */
-			return 1
+			return 1000
 		}
 	case 335:
 		{ /* '335' */
-			return 1
+			return 600
 		}
 	case 336:
 		{ /* '336' */
-			return 600
+			return 1
 		}
 	case 337:
 		{ /* '337' */
-			return 600
+			return 1
 		}
 	case 338:
 		{ /* '338' */
-			return 800
+			return 1
 		}
 	case 339:
 		{ /* '339' */
-			return 800
+			return 600
 		}
 	case 34:
 		{ /* '34' */
@@ -1842,11 +1851,11 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 341:
 		{ /* '341' */
-			return 600
+			return 800
 		}
 	case 342:
 		{ /* '342' */
-			return 600
+			return 800
 		}
 	case 343:
 		{ /* '343' */
@@ -1874,7 +1883,7 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 349:
 		{ /* '349' */
-			return 1
+			return 600
 		}
 	case 35:
 		{ /* '35' */
@@ -1882,10 +1891,22 @@ func (e KnxDatapointType) Number() uint16 {
 		}
 	case 350:
 		{ /* '350' */
-			return 100
+			return 600
 		}
 	case 351:
 		{ /* '351' */
+			return 600
+		}
+	case 352:
+		{ /* '352' */
+			return 1
+		}
+	case 353:
+		{ /* '353' */
+			return 100
+		}
+	case 354:
+		{ /* '354' */
 			return 101
 		}
 	case 36:
@@ -2178,6 +2199,1444 @@ func (e KnxDatapointType) Number() uint16 {
 func KnxDatapointTypeFirstEnumForFieldNumber(value uint16) (enum KnxDatapointType, ok bool) {
 	for _, sizeValue := range KnxDatapointTypeValues {
 		if sizeValue.Number() == value {
+			return sizeValue, true
+		}
+	}
+	return 0, false
+}
+
+func (e KnxDatapointType) PlcValueTpe() values.PlcValueType {
+	switch e {
+	case 0:
+		{ /* '0' */
+			return values.Struct
+		}
+	case 1:
+		{ /* '1' */
+			return values.BOOL
+		}
+	case 10:
+		{ /* '10' */
+			return values.UDINT
+		}
+	case 100:
+		{ /* '100' */
+			return values.REAL
+		}
+	case 101:
+		{ /* '101' */
+			return values.REAL
+		}
+	case 102:
+		{ /* '102' */
+			return values.REAL
+		}
+	case 103:
+		{ /* '103' */
+			return values.REAL
+		}
+	case 104:
+		{ /* '104' */
+			return values.REAL
+		}
+	case 105:
+		{ /* '105' */
+			return values.REAL
+		}
+	case 106:
+		{ /* '106' */
+			return values.REAL
+		}
+	case 107:
+		{ /* '107' */
+			return values.REAL
+		}
+	case 108:
+		{ /* '108' */
+			return values.REAL
+		}
+	case 109:
+		{ /* '109' */
+			return values.REAL
+		}
+	case 11:
+		{ /* '11' */
+			return values.DINT
+		}
+	case 110:
+		{ /* '110' */
+			return values.REAL
+		}
+	case 111:
+		{ /* '111' */
+			return values.REAL
+		}
+	case 112:
+		{ /* '112' */
+			return values.REAL
+		}
+	case 113:
+		{ /* '113' */
+			return values.REAL
+		}
+	case 114:
+		{ /* '114' */
+			return values.REAL
+		}
+	case 115:
+		{ /* '115' */
+			return values.REAL
+		}
+	case 116:
+		{ /* '116' */
+			return values.REAL
+		}
+	case 117:
+		{ /* '117' */
+			return values.REAL
+		}
+	case 118:
+		{ /* '118' */
+			return values.REAL
+		}
+	case 119:
+		{ /* '119' */
+			return values.REAL
+		}
+	case 12:
+		{ /* '12' */
+			return values.ULINT
+		}
+	case 120:
+		{ /* '120' */
+			return values.REAL
+		}
+	case 121:
+		{ /* '121' */
+			return values.REAL
+		}
+	case 122:
+		{ /* '122' */
+			return values.Struct
+		}
+	case 123:
+		{ /* '123' */
+			return values.Struct
+		}
+	case 124:
+		{ /* '124' */
+			return values.UDINT
+		}
+	case 125:
+		{ /* '125' */
+			return values.UDINT
+		}
+	case 126:
+		{ /* '126' */
+			return values.UDINT
+		}
+	case 127:
+		{ /* '127' */
+			return values.UDINT
+		}
+	case 128:
+		{ /* '128' */
+			return values.UDINT
+		}
+	case 129:
+		{ /* '129' */
+			return values.UDINT
+		}
+	case 13:
+		{ /* '13' */
+			return values.LINT
+		}
+	case 130:
+		{ /* '130' */
+			return values.DINT
+		}
+	case 131:
+		{ /* '131' */
+			return values.DINT
+		}
+	case 132:
+		{ /* '132' */
+			return values.DINT
+		}
+	case 133:
+		{ /* '133' */
+			return values.DINT
+		}
+	case 134:
+		{ /* '134' */
+			return values.DINT
+		}
+	case 135:
+		{ /* '135' */
+			return values.DINT
+		}
+	case 136:
+		{ /* '136' */
+			return values.DINT
+		}
+	case 137:
+		{ /* '137' */
+			return values.DINT
+		}
+	case 138:
+		{ /* '138' */
+			return values.DINT
+		}
+	case 139:
+		{ /* '139' */
+			return values.DINT
+		}
+	case 14:
+		{ /* '14' */
+			return values.REAL
+		}
+	case 140:
+		{ /* '140' */
+			return values.DINT
+		}
+	case 141:
+		{ /* '141' */
+			return values.DINT
+		}
+	case 142:
+		{ /* '142' */
+			return values.REAL
+		}
+	case 143:
+		{ /* '143' */
+			return values.REAL
+		}
+	case 144:
+		{ /* '144' */
+			return values.REAL
+		}
+	case 145:
+		{ /* '145' */
+			return values.REAL
+		}
+	case 146:
+		{ /* '146' */
+			return values.REAL
+		}
+	case 147:
+		{ /* '147' */
+			return values.REAL
+		}
+	case 148:
+		{ /* '148' */
+			return values.REAL
+		}
+	case 149:
+		{ /* '149' */
+			return values.REAL
+		}
+	case 15:
+		{ /* '15' */
+			return values.LREAL
+		}
+	case 150:
+		{ /* '150' */
+			return values.REAL
+		}
+	case 151:
+		{ /* '151' */
+			return values.REAL
+		}
+	case 152:
+		{ /* '152' */
+			return values.REAL
+		}
+	case 153:
+		{ /* '153' */
+			return values.REAL
+		}
+	case 154:
+		{ /* '154' */
+			return values.REAL
+		}
+	case 155:
+		{ /* '155' */
+			return values.REAL
+		}
+	case 156:
+		{ /* '156' */
+			return values.REAL
+		}
+	case 157:
+		{ /* '157' */
+			return values.REAL
+		}
+	case 158:
+		{ /* '158' */
+			return values.REAL
+		}
+	case 159:
+		{ /* '159' */
+			return values.REAL
+		}
+	case 16:
+		{ /* '16' */
+			return values.CHAR
+		}
+	case 160:
+		{ /* '160' */
+			return values.REAL
+		}
+	case 161:
+		{ /* '161' */
+			return values.REAL
+		}
+	case 162:
+		{ /* '162' */
+			return values.REAL
+		}
+	case 163:
+		{ /* '163' */
+			return values.REAL
+		}
+	case 164:
+		{ /* '164' */
+			return values.REAL
+		}
+	case 165:
+		{ /* '165' */
+			return values.REAL
+		}
+	case 166:
+		{ /* '166' */
+			return values.REAL
+		}
+	case 167:
+		{ /* '167' */
+			return values.REAL
+		}
+	case 168:
+		{ /* '168' */
+			return values.REAL
+		}
+	case 169:
+		{ /* '169' */
+			return values.REAL
+		}
+	case 17:
+		{ /* '17' */
+			return values.WCHAR
+		}
+	case 170:
+		{ /* '170' */
+			return values.REAL
+		}
+	case 171:
+		{ /* '171' */
+			return values.REAL
+		}
+	case 172:
+		{ /* '172' */
+			return values.REAL
+		}
+	case 173:
+		{ /* '173' */
+			return values.REAL
+		}
+	case 174:
+		{ /* '174' */
+			return values.REAL
+		}
+	case 175:
+		{ /* '175' */
+			return values.REAL
+		}
+	case 176:
+		{ /* '176' */
+			return values.REAL
+		}
+	case 177:
+		{ /* '177' */
+			return values.REAL
+		}
+	case 178:
+		{ /* '178' */
+			return values.REAL
+		}
+	case 179:
+		{ /* '179' */
+			return values.REAL
+		}
+	case 18:
+		{ /* '18' */
+			return values.STRING
+		}
+	case 180:
+		{ /* '180' */
+			return values.REAL
+		}
+	case 181:
+		{ /* '181' */
+			return values.REAL
+		}
+	case 182:
+		{ /* '182' */
+			return values.REAL
+		}
+	case 183:
+		{ /* '183' */
+			return values.REAL
+		}
+	case 184:
+		{ /* '184' */
+			return values.REAL
+		}
+	case 185:
+		{ /* '185' */
+			return values.REAL
+		}
+	case 186:
+		{ /* '186' */
+			return values.REAL
+		}
+	case 187:
+		{ /* '187' */
+			return values.REAL
+		}
+	case 188:
+		{ /* '188' */
+			return values.REAL
+		}
+	case 189:
+		{ /* '189' */
+			return values.REAL
+		}
+	case 19:
+		{ /* '19' */
+			return values.WSTRING
+		}
+	case 190:
+		{ /* '190' */
+			return values.REAL
+		}
+	case 191:
+		{ /* '191' */
+			return values.REAL
+		}
+	case 192:
+		{ /* '192' */
+			return values.REAL
+		}
+	case 193:
+		{ /* '193' */
+			return values.REAL
+		}
+	case 194:
+		{ /* '194' */
+			return values.REAL
+		}
+	case 195:
+		{ /* '195' */
+			return values.REAL
+		}
+	case 196:
+		{ /* '196' */
+			return values.REAL
+		}
+	case 197:
+		{ /* '197' */
+			return values.REAL
+		}
+	case 198:
+		{ /* '198' */
+			return values.REAL
+		}
+	case 199:
+		{ /* '199' */
+			return values.REAL
+		}
+	case 2:
+		{ /* '2' */
+			return values.BYTE
+		}
+	case 20:
+		{ /* '20' */
+			return values.TIME
+		}
+	case 200:
+		{ /* '200' */
+			return values.REAL
+		}
+	case 201:
+		{ /* '201' */
+			return values.REAL
+		}
+	case 202:
+		{ /* '202' */
+			return values.REAL
+		}
+	case 203:
+		{ /* '203' */
+			return values.REAL
+		}
+	case 204:
+		{ /* '204' */
+			return values.REAL
+		}
+	case 205:
+		{ /* '205' */
+			return values.REAL
+		}
+	case 206:
+		{ /* '206' */
+			return values.REAL
+		}
+	case 207:
+		{ /* '207' */
+			return values.REAL
+		}
+	case 208:
+		{ /* '208' */
+			return values.REAL
+		}
+	case 209:
+		{ /* '209' */
+			return values.REAL
+		}
+	case 21:
+		{ /* '21' */
+			return values.LTIME
+		}
+	case 210:
+		{ /* '210' */
+			return values.REAL
+		}
+	case 211:
+		{ /* '211' */
+			return values.REAL
+		}
+	case 212:
+		{ /* '212' */
+			return values.REAL
+		}
+	case 213:
+		{ /* '213' */
+			return values.REAL
+		}
+	case 214:
+		{ /* '214' */
+			return values.REAL
+		}
+	case 215:
+		{ /* '215' */
+			return values.REAL
+		}
+	case 216:
+		{ /* '216' */
+			return values.REAL
+		}
+	case 217:
+		{ /* '217' */
+			return values.REAL
+		}
+	case 218:
+		{ /* '218' */
+			return values.REAL
+		}
+	case 219:
+		{ /* '219' */
+			return values.REAL
+		}
+	case 22:
+		{ /* '22' */
+			return values.DATE
+		}
+	case 220:
+		{ /* '220' */
+			return values.REAL
+		}
+	case 221:
+		{ /* '221' */
+			return values.REAL
+		}
+	case 222:
+		{ /* '222' */
+			return values.REAL
+		}
+	case 223:
+		{ /* '223' */
+			return values.REAL
+		}
+	case 224:
+		{ /* '224' */
+			return values.REAL
+		}
+	case 225:
+		{ /* '225' */
+			return values.Struct
+		}
+	case 226:
+		{ /* '226' */
+			return values.STRING
+		}
+	case 227:
+		{ /* '227' */
+			return values.STRING
+		}
+	case 228:
+		{ /* '228' */
+			return values.USINT
+		}
+	case 229:
+		{ /* '229' */
+			return values.Struct
+		}
+	case 23:
+		{ /* '23' */
+			return values.TIME_OF_DAY
+		}
+	case 230:
+		{ /* '230' */
+			return values.Struct
+		}
+	case 231:
+		{ /* '231' */
+			return values.USINT
+		}
+	case 232:
+		{ /* '232' */
+			return values.USINT
+		}
+	case 233:
+		{ /* '233' */
+			return values.USINT
+		}
+	case 234:
+		{ /* '234' */
+			return values.USINT
+		}
+	case 235:
+		{ /* '235' */
+			return values.USINT
+		}
+	case 236:
+		{ /* '236' */
+			return values.USINT
+		}
+	case 237:
+		{ /* '237' */
+			return values.USINT
+		}
+	case 238:
+		{ /* '238' */
+			return values.USINT
+		}
+	case 239:
+		{ /* '239' */
+			return values.USINT
+		}
+	case 24:
+		{ /* '24' */
+			return values.TIME_OF_DAY
+		}
+	case 240:
+		{ /* '240' */
+			return values.USINT
+		}
+	case 241:
+		{ /* '241' */
+			return values.USINT
+		}
+	case 242:
+		{ /* '242' */
+			return values.USINT
+		}
+	case 243:
+		{ /* '243' */
+			return values.USINT
+		}
+	case 244:
+		{ /* '244' */
+			return values.USINT
+		}
+	case 245:
+		{ /* '245' */
+			return values.USINT
+		}
+	case 246:
+		{ /* '246' */
+			return values.USINT
+		}
+	case 247:
+		{ /* '247' */
+			return values.USINT
+		}
+	case 248:
+		{ /* '248' */
+			return values.USINT
+		}
+	case 249:
+		{ /* '249' */
+			return values.USINT
+		}
+	case 25:
+		{ /* '25' */
+			return values.DATE_AND_TIME
+		}
+	case 250:
+		{ /* '250' */
+			return values.USINT
+		}
+	case 251:
+		{ /* '251' */
+			return values.USINT
+		}
+	case 252:
+		{ /* '252' */
+			return values.USINT
+		}
+	case 253:
+		{ /* '253' */
+			return values.USINT
+		}
+	case 254:
+		{ /* '254' */
+			return values.USINT
+		}
+	case 255:
+		{ /* '255' */
+			return values.USINT
+		}
+	case 256:
+		{ /* '256' */
+			return values.USINT
+		}
+	case 257:
+		{ /* '257' */
+			return values.USINT
+		}
+	case 258:
+		{ /* '258' */
+			return values.USINT
+		}
+	case 259:
+		{ /* '259' */
+			return values.USINT
+		}
+	case 26:
+		{ /* '26' */
+			return values.DATE_AND_TIME
+		}
+	case 260:
+		{ /* '260' */
+			return values.USINT
+		}
+	case 261:
+		{ /* '261' */
+			return values.USINT
+		}
+	case 262:
+		{ /* '262' */
+			return values.USINT
+		}
+	case 263:
+		{ /* '263' */
+			return values.USINT
+		}
+	case 264:
+		{ /* '264' */
+			return values.USINT
+		}
+	case 265:
+		{ /* '265' */
+			return values.USINT
+		}
+	case 266:
+		{ /* '266' */
+			return values.USINT
+		}
+	case 267:
+		{ /* '267' */
+			return values.USINT
+		}
+	case 268:
+		{ /* '268' */
+			return values.USINT
+		}
+	case 269:
+		{ /* '269' */
+			return values.USINT
+		}
+	case 27:
+		{ /* '27' */
+			return values.BOOL
+		}
+	case 270:
+		{ /* '270' */
+			return values.USINT
+		}
+	case 271:
+		{ /* '271' */
+			return values.USINT
+		}
+	case 272:
+		{ /* '272' */
+			return values.USINT
+		}
+	case 273:
+		{ /* '273' */
+			return values.USINT
+		}
+	case 274:
+		{ /* '274' */
+			return values.USINT
+		}
+	case 275:
+		{ /* '275' */
+			return values.USINT
+		}
+	case 276:
+		{ /* '276' */
+			return values.USINT
+		}
+	case 277:
+		{ /* '277' */
+			return values.USINT
+		}
+	case 278:
+		{ /* '278' */
+			return values.USINT
+		}
+	case 279:
+		{ /* '279' */
+			return values.USINT
+		}
+	case 28:
+		{ /* '28' */
+			return values.BOOL
+		}
+	case 280:
+		{ /* '280' */
+			return values.USINT
+		}
+	case 281:
+		{ /* '281' */
+			return values.USINT
+		}
+	case 282:
+		{ /* '282' */
+			return values.USINT
+		}
+	case 283:
+		{ /* '283' */
+			return values.USINT
+		}
+	case 284:
+		{ /* '284' */
+			return values.USINT
+		}
+	case 285:
+		{ /* '285' */
+			return values.USINT
+		}
+	case 286:
+		{ /* '286' */
+			return values.USINT
+		}
+	case 287:
+		{ /* '287' */
+			return values.USINT
+		}
+	case 288:
+		{ /* '288' */
+			return values.USINT
+		}
+	case 289:
+		{ /* '289' */
+			return values.USINT
+		}
+	case 29:
+		{ /* '29' */
+			return values.BOOL
+		}
+	case 290:
+		{ /* '290' */
+			return values.USINT
+		}
+	case 291:
+		{ /* '291' */
+			return values.Struct
+		}
+	case 292:
+		{ /* '292' */
+			return values.Struct
+		}
+	case 293:
+		{ /* '293' */
+			return values.Struct
+		}
+	case 294:
+		{ /* '294' */
+			return values.BOOL
+		}
+	case 295:
+		{ /* '295' */
+			return values.Struct
+		}
+	case 296:
+		{ /* '296' */
+			return values.Struct
+		}
+	case 297:
+		{ /* '297' */
+			return values.Struct
+		}
+	case 298:
+		{ /* '298' */
+			return values.BOOL
+		}
+	case 299:
+		{ /* '299' */
+			return values.Struct
+		}
+	case 3:
+		{ /* '3' */
+			return values.WORD
+		}
+	case 30:
+		{ /* '30' */
+			return values.BOOL
+		}
+	case 300:
+		{ /* '300' */
+			return values.Struct
+		}
+	case 301:
+		{ /* '301' */
+			return values.Struct
+		}
+	case 302:
+		{ /* '302' */
+			return values.Struct
+		}
+	case 303:
+		{ /* '303' */
+			return values.Struct
+		}
+	case 304:
+		{ /* '304' */
+			return values.Struct
+		}
+	case 305:
+		{ /* '305' */
+			return values.Struct
+		}
+	case 306:
+		{ /* '306' */
+			return values.Struct
+		}
+	case 307:
+		{ /* '307' */
+			return values.Struct
+		}
+	case 308:
+		{ /* '308' */
+			return values.Struct
+		}
+	case 309:
+		{ /* '309' */
+			return values.Struct
+		}
+	case 31:
+		{ /* '31' */
+			return values.BOOL
+		}
+	case 310:
+		{ /* '310' */
+			return values.Struct
+		}
+	case 311:
+		{ /* '311' */
+			return values.USINT
+		}
+	case 312:
+		{ /* '312' */
+			return values.USINT
+		}
+	case 313:
+		{ /* '313' */
+			return values.USINT
+		}
+	case 314:
+		{ /* '314' */
+			return values.USINT
+		}
+	case 315:
+		{ /* '315' */
+			return values.Struct
+		}
+	case 316:
+		{ /* '316' */
+			return values.Struct
+		}
+	case 317:
+		{ /* '317' */
+			return values.Struct
+		}
+	case 318:
+		{ /* '318' */
+			return values.LINT
+		}
+	case 319:
+		{ /* '319' */
+			return values.LINT
+		}
+	case 32:
+		{ /* '32' */
+			return values.BOOL
+		}
+	case 320:
+		{ /* '320' */
+			return values.LINT
+		}
+	case 321:
+		{ /* '321' */
+			return values.Struct
+		}
+	case 322:
+		{ /* '322' */
+			return values.Struct
+		}
+	case 323:
+		{ /* '323' */
+			return values.Struct
+		}
+	case 324:
+		{ /* '324' */
+			return values.Struct
+		}
+	case 325:
+		{ /* '325' */
+			return values.Struct
+		}
+	case 326:
+		{ /* '326' */
+			return values.Struct
+		}
+	case 327:
+		{ /* '327' */
+			return values.Struct
+		}
+	case 328:
+		{ /* '328' */
+			return values.Struct
+		}
+	case 329:
+		{ /* '329' */
+			return values.Struct
+		}
+	case 33:
+		{ /* '33' */
+			return values.BOOL
+		}
+	case 330:
+		{ /* '330' */
+			return values.Struct
+		}
+	case 331:
+		{ /* '331' */
+			return values.Struct
+		}
+	case 332:
+		{ /* '332' */
+			return values.Struct
+		}
+	case 333:
+		{ /* '333' */
+			return values.Struct
+		}
+	case 334:
+		{ /* '334' */
+			return values.Struct
+		}
+	case 335:
+		{ /* '335' */
+			return values.Struct
+		}
+	case 336:
+		{ /* '336' */
+			return values.STRING
+		}
+	case 337:
+		{ /* '337' */
+			return values.Struct
+		}
+	case 338:
+		{ /* '338' */
+			return values.Struct
+		}
+	case 339:
+		{ /* '339' */
+			return values.Struct
+		}
+	case 34:
+		{ /* '34' */
+			return values.BOOL
+		}
+	case 340:
+		{ /* '340' */
+			return values.Struct
+		}
+	case 341:
+		{ /* '341' */
+			return values.Struct
+		}
+	case 342:
+		{ /* '342' */
+			return values.Struct
+		}
+	case 343:
+		{ /* '343' */
+			return values.Struct
+		}
+	case 344:
+		{ /* '344' */
+			return values.Struct
+		}
+	case 345:
+		{ /* '345' */
+			return values.Struct
+		}
+	case 346:
+		{ /* '346' */
+			return values.Struct
+		}
+	case 347:
+		{ /* '347' */
+			return values.Struct
+		}
+	case 348:
+		{ /* '348' */
+			return values.Struct
+		}
+	case 349:
+		{ /* '349' */
+			return values.Struct
+		}
+	case 35:
+		{ /* '35' */
+			return values.BOOL
+		}
+	case 350:
+		{ /* '350' */
+			return values.Struct
+		}
+	case 351:
+		{ /* '351' */
+			return values.Struct
+		}
+	case 352:
+		{ /* '352' */
+			return values.Struct
+		}
+	case 353:
+		{ /* '353' */
+			return values.Struct
+		}
+	case 354:
+		{ /* '354' */
+			return values.Struct
+		}
+	case 36:
+		{ /* '36' */
+			return values.BOOL
+		}
+	case 37:
+		{ /* '37' */
+			return values.BOOL
+		}
+	case 38:
+		{ /* '38' */
+			return values.BOOL
+		}
+	case 39:
+		{ /* '39' */
+			return values.BOOL
+		}
+	case 4:
+		{ /* '4' */
+			return values.DWORD
+		}
+	case 40:
+		{ /* '40' */
+			return values.BOOL
+		}
+	case 41:
+		{ /* '41' */
+			return values.BOOL
+		}
+	case 42:
+		{ /* '42' */
+			return values.BOOL
+		}
+	case 43:
+		{ /* '43' */
+			return values.BOOL
+		}
+	case 44:
+		{ /* '44' */
+			return values.BOOL
+		}
+	case 45:
+		{ /* '45' */
+			return values.BOOL
+		}
+	case 46:
+		{ /* '46' */
+			return values.BOOL
+		}
+	case 47:
+		{ /* '47' */
+			return values.BOOL
+		}
+	case 48:
+		{ /* '48' */
+			return values.BOOL
+		}
+	case 49:
+		{ /* '49' */
+			return values.BOOL
+		}
+	case 5:
+		{ /* '5' */
+			return values.LWORD
+		}
+	case 50:
+		{ /* '50' */
+			return values.BOOL
+		}
+	case 51:
+		{ /* '51' */
+			return values.Struct
+		}
+	case 52:
+		{ /* '52' */
+			return values.Struct
+		}
+	case 53:
+		{ /* '53' */
+			return values.Struct
+		}
+	case 54:
+		{ /* '54' */
+			return values.Struct
+		}
+	case 55:
+		{ /* '55' */
+			return values.Struct
+		}
+	case 56:
+		{ /* '56' */
+			return values.Struct
+		}
+	case 57:
+		{ /* '57' */
+			return values.Struct
+		}
+	case 58:
+		{ /* '58' */
+			return values.Struct
+		}
+	case 59:
+		{ /* '59' */
+			return values.Struct
+		}
+	case 6:
+		{ /* '6' */
+			return values.USINT
+		}
+	case 60:
+		{ /* '60' */
+			return values.Struct
+		}
+	case 61:
+		{ /* '61' */
+			return values.Struct
+		}
+	case 62:
+		{ /* '62' */
+			return values.Struct
+		}
+	case 63:
+		{ /* '63' */
+			return values.Struct
+		}
+	case 64:
+		{ /* '64' */
+			return values.Struct
+		}
+	case 65:
+		{ /* '65' */
+			return values.STRING
+		}
+	case 66:
+		{ /* '66' */
+			return values.STRING
+		}
+	case 67:
+		{ /* '67' */
+			return values.USINT
+		}
+	case 68:
+		{ /* '68' */
+			return values.USINT
+		}
+	case 69:
+		{ /* '69' */
+			return values.USINT
+		}
+	case 7:
+		{ /* '7' */
+			return values.SINT
+		}
+	case 70:
+		{ /* '70' */
+			return values.USINT
+		}
+	case 71:
+		{ /* '71' */
+			return values.USINT
+		}
+	case 72:
+		{ /* '72' */
+			return values.USINT
+		}
+	case 73:
+		{ /* '73' */
+			return values.USINT
+		}
+	case 74:
+		{ /* '74' */
+			return values.SINT
+		}
+	case 75:
+		{ /* '75' */
+			return values.SINT
+		}
+	case 76:
+		{ /* '76' */
+			return values.Struct
+		}
+	case 77:
+		{ /* '77' */
+			return values.UINT
+		}
+	case 78:
+		{ /* '78' */
+			return values.UINT
+		}
+	case 79:
+		{ /* '79' */
+			return values.UINT
+		}
+	case 8:
+		{ /* '8' */
+			return values.UINT
+		}
+	case 80:
+		{ /* '80' */
+			return values.UINT
+		}
+	case 81:
+		{ /* '81' */
+			return values.UINT
+		}
+	case 82:
+		{ /* '82' */
+			return values.UINT
+		}
+	case 83:
+		{ /* '83' */
+			return values.UINT
+		}
+	case 84:
+		{ /* '84' */
+			return values.UINT
+		}
+	case 85:
+		{ /* '85' */
+			return values.UINT
+		}
+	case 86:
+		{ /* '86' */
+			return values.UINT
+		}
+	case 87:
+		{ /* '87' */
+			return values.UINT
+		}
+	case 88:
+		{ /* '88' */
+			return values.UINT
+		}
+	case 89:
+		{ /* '89' */
+			return values.INT
+		}
+	case 9:
+		{ /* '9' */
+			return values.INT
+		}
+	case 90:
+		{ /* '90' */
+			return values.INT
+		}
+	case 91:
+		{ /* '91' */
+			return values.INT
+		}
+	case 92:
+		{ /* '92' */
+			return values.INT
+		}
+	case 93:
+		{ /* '93' */
+			return values.INT
+		}
+	case 94:
+		{ /* '94' */
+			return values.INT
+		}
+	case 95:
+		{ /* '95' */
+			return values.INT
+		}
+	case 96:
+		{ /* '96' */
+			return values.INT
+		}
+	case 97:
+		{ /* '97' */
+			return values.INT
+		}
+	case 98:
+		{ /* '98' */
+			return values.INT
+		}
+	case 99:
+		{ /* '99' */
+			return values.REAL
+		}
+	default:
+		{
+			return 0
+		}
+	}
+}
+
+func KnxDatapointTypeFirstEnumForFieldPlcValueTpe(value values.PlcValueType) (enum KnxDatapointType, ok bool) {
+	for _, sizeValue := range KnxDatapointTypeValues {
+		if sizeValue.PlcValueTpe() == value {
 			return sizeValue, true
 		}
 	}
@@ -3028,11 +4487,11 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 288:
 		{ /* '288' */
-			return "general status"
+			return "Control Pilot State"
 		}
 	case 289:
 		{ /* '289' */
-			return "device control"
+			return "OCPP State"
 		}
 	case 29:
 		{ /* '29' */
@@ -3040,43 +4499,43 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 290:
 		{ /* '290' */
-			return "forcing signal"
+			return "EVSEErrorCode"
 		}
 	case 291:
 		{ /* '291' */
-			return "forcing signal cool"
+			return "general status"
 		}
 	case 292:
 		{ /* '292' */
-			return "room heating controller status"
+			return "device control"
 		}
 	case 293:
 		{ /* '293' */
-			return "solar DHW controller status"
+			return "forcing signal"
 		}
 	case 294:
 		{ /* '294' */
-			return "fuel type set"
+			return "forcing signal cool"
 		}
 	case 295:
 		{ /* '295' */
-			return "room cooling controller status"
+			return "room heating controller status"
 		}
 	case 296:
 		{ /* '296' */
-			return "ventilation controller status"
+			return "solar DHW controller status"
 		}
 	case 297:
 		{ /* '297' */
-			return "combined status RTSM"
+			return "fuel type set"
 		}
 	case 298:
 		{ /* '298' */
-			return "lighting actuator error information"
+			return "room cooling controller status"
 		}
 	case 299:
 		{ /* '299' */
-			return "RF communication mode info"
+			return "ventilation controller status"
 		}
 	case 3:
 		{ /* '3' */
@@ -3088,43 +4547,43 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 300:
 		{ /* '300' */
-			return "cEMI server supported RF filtering modes"
+			return "combined status RTSM"
 		}
 	case 301:
 		{ /* '301' */
-			return "channel activation for 8 channels"
+			return "lighting actuator error information"
 		}
 	case 302:
 		{ /* '302' */
-			return "DHW controller status"
+			return "RF communication mode info"
 		}
 	case 303:
 		{ /* '303' */
-			return "RHCC status"
+			return "cEMI server supported RF filtering modes"
 		}
 	case 304:
 		{ /* '304' */
-			return "combined status HVA"
+			return "channel activation for 8 channels"
 		}
 	case 305:
 		{ /* '305' */
-			return "combined status RTC"
+			return "DHW controller status"
 		}
 	case 306:
 		{ /* '306' */
-			return "media"
+			return "RHCC status"
 		}
 	case 307:
 		{ /* '307' */
-			return "channel activation for 16 channels"
+			return "combined status HVA"
 		}
 	case 308:
 		{ /* '308' */
-			return "on/off action"
+			return "combined status RTC"
 		}
 	case 309:
 		{ /* '309' */
-			return "alarm reaction"
+			return "media"
 		}
 	case 31:
 		{ /* '31' */
@@ -3132,43 +4591,43 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 310:
 		{ /* '310' */
-			return "up/down action"
+			return "channel activation for 16 channels"
 		}
 	case 311:
 		{ /* '311' */
-			return "HVAC push button action"
+			return "on/off action"
 		}
 	case 312:
 		{ /* '312' */
-			return "busy/nak repetitions"
+			return "alarm reaction"
 		}
 	case 313:
 		{ /* '313' */
-			return "scene information"
+			return "up/down action"
 		}
 	case 314:
 		{ /* '314' */
-			return "bit-combined info on/off"
+			return "HVAC push button action"
 		}
 	case 315:
 		{ /* '315' */
-			return "active energy (Wh)"
+			return "busy/nak repetitions"
 		}
 	case 316:
 		{ /* '316' */
-			return "apparent energy (VAh)"
+			return "scene information"
 		}
 	case 317:
 		{ /* '317' */
-			return "reactive energy (VARh)"
+			return "bit-combined info on/off"
 		}
 	case 318:
 		{ /* '318' */
-			return "activation state 0..23"
+			return "active energy (Wh)"
 		}
 	case 319:
 		{ /* '319' */
-			return "time delay & HVAC mode"
+			return "apparent energy (VAh)"
 		}
 	case 32:
 		{ /* '32' */
@@ -3176,43 +4635,43 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 320:
 		{ /* '320' */
-			return "time delay & DHW mode"
+			return "reactive energy (VARh)"
 		}
 	case 321:
 		{ /* '321' */
-			return "time delay & occupancy mode"
+			return "activation state 0..23"
 		}
 	case 322:
 		{ /* '322' */
-			return "time delay & building mode"
+			return "time delay & HVAC mode"
 		}
 	case 323:
 		{ /* '323' */
-			return "Status Lighting Actuator"
+			return "time delay & DHW mode"
 		}
 	case 324:
 		{ /* '324' */
-			return "DPT version"
+			return "time delay & occupancy mode"
 		}
 	case 325:
 		{ /* '325' */
-			return "alarm info"
+			return "time delay & building mode"
 		}
 	case 326:
 		{ /* '326' */
-			return "room temperature setpoint"
+			return "Status Lighting Actuator"
 		}
 	case 327:
 		{ /* '327' */
-			return "room temperature setpoint shift"
+			return "DPT version"
 		}
 	case 328:
 		{ /* '328' */
-			return "scaling speed"
+			return "alarm info"
 		}
 	case 329:
 		{ /* '329' */
-			return "scaling step time"
+			return "room temperature setpoint"
 		}
 	case 33:
 		{ /* '33' */
@@ -3220,43 +4679,43 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 330:
 		{ /* '330' */
-			return "metering value (value,encoding,cmd)"
+			return "room temperature setpoint shift"
 		}
 	case 331:
 		{ /* '331' */
-			return "MBus address"
+			return "scaling speed"
 		}
 	case 332:
 		{ /* '332' */
-			return "RGB value 3x(0..255)"
+			return "scaling step time"
 		}
 	case 333:
 		{ /* '333' */
-			return "language code (ASCII)"
+			return "metering value (value,encoding,cmd)"
 		}
 	case 334:
 		{ /* '334' */
-			return "electrical energy with tariff"
+			return "MBus address"
 		}
 	case 335:
 		{ /* '335' */
-			return "priority control"
+			return "RGB value 3x(0..255)"
 		}
 	case 336:
 		{ /* '336' */
-			return "diagnostic value"
+			return "language code (ASCII)"
 		}
 	case 337:
 		{ /* '337' */
-			return "diagnostic value"
+			return "electrical energy with tariff"
 		}
 	case 338:
 		{ /* '338' */
-			return "combined position"
+			return "priority control"
 		}
 	case 339:
 		{ /* '339' */
-			return "status sunblind & shutter actuator"
+			return "diagnostic value"
 		}
 	case 34:
 		{ /* '34' */
@@ -3264,43 +4723,43 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 340:
 		{ /* '340' */
-			return "colour xyY"
+			return "diagnostic value"
 		}
 	case 341:
 		{ /* '341' */
-			return "DALI converter status"
+			return "combined position"
 		}
 	case 342:
 		{ /* '342' */
-			return "DALI converter test result"
+			return "status sunblind & shutter actuator"
 		}
 	case 343:
 		{ /* '343' */
-			return "Battery Information"
+			return "colour xyY"
 		}
 	case 344:
 		{ /* '344' */
-			return "brightness colour temperature transition"
+			return "DALI converter status"
 		}
 	case 345:
 		{ /* '345' */
-			return "brightness colour temperature control"
+			return "DALI converter test result"
 		}
 	case 346:
 		{ /* '346' */
-			return "RGBW value 4x(0..100%)"
+			return "Battery Information"
 		}
 	case 347:
 		{ /* '347' */
-			return "RGBW relative control"
+			return "brightness colour temperature transition"
 		}
 	case 348:
 		{ /* '348' */
-			return "RGB relative control"
+			return "brightness colour temperature control"
 		}
 	case 349:
 		{ /* '349' */
-			return "geographical location (longitude and latitude) expressed in degrees"
+			return "RGBW value 4x(0..100%)"
 		}
 	case 35:
 		{ /* '35' */
@@ -3308,10 +4767,22 @@ func (e KnxDatapointType) Name() string {
 		}
 	case 350:
 		{ /* '350' */
-			return "Temperature setpoint setting for 4 HVAC Modes"
+			return "RGBW relative control"
 		}
 	case 351:
 		{ /* '351' */
+			return "RGB relative control"
+		}
+	case 352:
+		{ /* '352' */
+			return "geographical location (longitude and latitude) expressed in degrees"
+		}
+	case 353:
+		{ /* '353' */
+			return "Temperature setpoint setting for 4 HVAC Modes"
+		}
+	case 354:
+		{ /* '354' */
 			return "Temperature setpoint shift setting for 4 HVAC Modes"
 		}
 	case 36:
@@ -3604,6 +5075,1444 @@ func (e KnxDatapointType) Name() string {
 func KnxDatapointTypeFirstEnumForFieldName(value string) (enum KnxDatapointType, ok bool) {
 	for _, sizeValue := range KnxDatapointTypeValues {
 		if sizeValue.Name() == value {
+			return sizeValue, true
+		}
+	}
+	return 0, false
+}
+
+func (e KnxDatapointType) Id() string {
+	switch e {
+	case 0:
+		{ /* '0' */
+			return ""
+		}
+	case 1:
+		{ /* '1' */
+			return ""
+		}
+	case 10:
+		{ /* '10' */
+			return ""
+		}
+	case 100:
+		{ /* '100' */
+			return "DPST-9-2"
+		}
+	case 101:
+		{ /* '101' */
+			return "DPST-9-3"
+		}
+	case 102:
+		{ /* '102' */
+			return "DPST-9-4"
+		}
+	case 103:
+		{ /* '103' */
+			return "DPST-9-5"
+		}
+	case 104:
+		{ /* '104' */
+			return "DPST-9-6"
+		}
+	case 105:
+		{ /* '105' */
+			return "DPST-9-7"
+		}
+	case 106:
+		{ /* '106' */
+			return "DPST-9-8"
+		}
+	case 107:
+		{ /* '107' */
+			return "DPST-9-9"
+		}
+	case 108:
+		{ /* '108' */
+			return "DPST-9-10"
+		}
+	case 109:
+		{ /* '109' */
+			return "DPST-9-11"
+		}
+	case 11:
+		{ /* '11' */
+			return ""
+		}
+	case 110:
+		{ /* '110' */
+			return "DPST-9-20"
+		}
+	case 111:
+		{ /* '111' */
+			return "DPST-9-21"
+		}
+	case 112:
+		{ /* '112' */
+			return "DPST-9-22"
+		}
+	case 113:
+		{ /* '113' */
+			return "DPST-9-23"
+		}
+	case 114:
+		{ /* '114' */
+			return "DPST-9-24"
+		}
+	case 115:
+		{ /* '115' */
+			return "DPST-9-25"
+		}
+	case 116:
+		{ /* '116' */
+			return "DPST-9-26"
+		}
+	case 117:
+		{ /* '117' */
+			return "DPST-9-27"
+		}
+	case 118:
+		{ /* '118' */
+			return "DPST-9-28"
+		}
+	case 119:
+		{ /* '119' */
+			return "DPST-9-29"
+		}
+	case 12:
+		{ /* '12' */
+			return ""
+		}
+	case 120:
+		{ /* '120' */
+			return "DPST-9-30"
+		}
+	case 121:
+		{ /* '121' */
+			return "DPST-9-31"
+		}
+	case 122:
+		{ /* '122' */
+			return "DPST-10-1"
+		}
+	case 123:
+		{ /* '123' */
+			return "DPST-11-1"
+		}
+	case 124:
+		{ /* '124' */
+			return "DPST-12-1"
+		}
+	case 125:
+		{ /* '125' */
+			return "DPST-12-100"
+		}
+	case 126:
+		{ /* '126' */
+			return "DPST-12-101"
+		}
+	case 127:
+		{ /* '127' */
+			return "DPST-12-102"
+		}
+	case 128:
+		{ /* '128' */
+			return "DPST-12-1200"
+		}
+	case 129:
+		{ /* '129' */
+			return "DPST-12-1201"
+		}
+	case 13:
+		{ /* '13' */
+			return ""
+		}
+	case 130:
+		{ /* '130' */
+			return "DPST-13-1"
+		}
+	case 131:
+		{ /* '131' */
+			return "DPST-13-2"
+		}
+	case 132:
+		{ /* '132' */
+			return "DPST-13-10"
+		}
+	case 133:
+		{ /* '133' */
+			return "DPST-13-11"
+		}
+	case 134:
+		{ /* '134' */
+			return "DPST-13-12"
+		}
+	case 135:
+		{ /* '135' */
+			return "DPST-13-13"
+		}
+	case 136:
+		{ /* '136' */
+			return "DPST-13-14"
+		}
+	case 137:
+		{ /* '137' */
+			return "DPST-13-15"
+		}
+	case 138:
+		{ /* '138' */
+			return "DPST-13-16"
+		}
+	case 139:
+		{ /* '139' */
+			return "DPST-13-100"
+		}
+	case 14:
+		{ /* '14' */
+			return ""
+		}
+	case 140:
+		{ /* '140' */
+			return "DPST-13-1200"
+		}
+	case 141:
+		{ /* '141' */
+			return "DPST-13-1201"
+		}
+	case 142:
+		{ /* '142' */
+			return "DPST-14-0"
+		}
+	case 143:
+		{ /* '143' */
+			return "DPST-14-1"
+		}
+	case 144:
+		{ /* '144' */
+			return "DPST-14-2"
+		}
+	case 145:
+		{ /* '145' */
+			return "DPST-14-3"
+		}
+	case 146:
+		{ /* '146' */
+			return "DPST-14-4"
+		}
+	case 147:
+		{ /* '147' */
+			return "DPST-14-5"
+		}
+	case 148:
+		{ /* '148' */
+			return "DPST-14-6"
+		}
+	case 149:
+		{ /* '149' */
+			return "DPST-14-7"
+		}
+	case 15:
+		{ /* '15' */
+			return ""
+		}
+	case 150:
+		{ /* '150' */
+			return "DPST-14-8"
+		}
+	case 151:
+		{ /* '151' */
+			return "DPST-14-9"
+		}
+	case 152:
+		{ /* '152' */
+			return "DPST-14-10"
+		}
+	case 153:
+		{ /* '153' */
+			return "DPST-14-11"
+		}
+	case 154:
+		{ /* '154' */
+			return "DPST-14-12"
+		}
+	case 155:
+		{ /* '155' */
+			return "DPST-14-13"
+		}
+	case 156:
+		{ /* '156' */
+			return "DPST-14-14"
+		}
+	case 157:
+		{ /* '157' */
+			return "DPST-14-15"
+		}
+	case 158:
+		{ /* '158' */
+			return "DPST-14-16"
+		}
+	case 159:
+		{ /* '159' */
+			return "DPST-14-17"
+		}
+	case 16:
+		{ /* '16' */
+			return ""
+		}
+	case 160:
+		{ /* '160' */
+			return "DPST-14-18"
+		}
+	case 161:
+		{ /* '161' */
+			return "DPST-14-19"
+		}
+	case 162:
+		{ /* '162' */
+			return "DPST-14-20"
+		}
+	case 163:
+		{ /* '163' */
+			return "DPST-14-21"
+		}
+	case 164:
+		{ /* '164' */
+			return "DPST-14-22"
+		}
+	case 165:
+		{ /* '165' */
+			return "DPST-14-23"
+		}
+	case 166:
+		{ /* '166' */
+			return "DPST-14-24"
+		}
+	case 167:
+		{ /* '167' */
+			return "DPST-14-25"
+		}
+	case 168:
+		{ /* '168' */
+			return "DPST-14-26"
+		}
+	case 169:
+		{ /* '169' */
+			return "DPST-14-27"
+		}
+	case 17:
+		{ /* '17' */
+			return ""
+		}
+	case 170:
+		{ /* '170' */
+			return "DPST-14-28"
+		}
+	case 171:
+		{ /* '171' */
+			return "DPST-14-29"
+		}
+	case 172:
+		{ /* '172' */
+			return "DPST-14-30"
+		}
+	case 173:
+		{ /* '173' */
+			return "DPST-14-31"
+		}
+	case 174:
+		{ /* '174' */
+			return "DPST-14-32"
+		}
+	case 175:
+		{ /* '175' */
+			return "DPST-14-33"
+		}
+	case 176:
+		{ /* '176' */
+			return "DPST-14-34"
+		}
+	case 177:
+		{ /* '177' */
+			return "DPST-14-35"
+		}
+	case 178:
+		{ /* '178' */
+			return "DPST-14-36"
+		}
+	case 179:
+		{ /* '179' */
+			return "DPST-14-37"
+		}
+	case 18:
+		{ /* '18' */
+			return ""
+		}
+	case 180:
+		{ /* '180' */
+			return "DPST-14-38"
+		}
+	case 181:
+		{ /* '181' */
+			return "DPST-14-39"
+		}
+	case 182:
+		{ /* '182' */
+			return "DPST-14-40"
+		}
+	case 183:
+		{ /* '183' */
+			return "DPST-14-41"
+		}
+	case 184:
+		{ /* '184' */
+			return "DPST-14-42"
+		}
+	case 185:
+		{ /* '185' */
+			return "DPST-14-43"
+		}
+	case 186:
+		{ /* '186' */
+			return "DPST-14-44"
+		}
+	case 187:
+		{ /* '187' */
+			return "DPST-14-45"
+		}
+	case 188:
+		{ /* '188' */
+			return "DPST-14-46"
+		}
+	case 189:
+		{ /* '189' */
+			return "DPST-14-47"
+		}
+	case 19:
+		{ /* '19' */
+			return ""
+		}
+	case 190:
+		{ /* '190' */
+			return "DPST-14-48"
+		}
+	case 191:
+		{ /* '191' */
+			return "DPST-14-49"
+		}
+	case 192:
+		{ /* '192' */
+			return "DPST-14-50"
+		}
+	case 193:
+		{ /* '193' */
+			return "DPST-14-51"
+		}
+	case 194:
+		{ /* '194' */
+			return "DPST-14-52"
+		}
+	case 195:
+		{ /* '195' */
+			return "DPST-14-53"
+		}
+	case 196:
+		{ /* '196' */
+			return "DPST-14-54"
+		}
+	case 197:
+		{ /* '197' */
+			return "DPST-14-55"
+		}
+	case 198:
+		{ /* '198' */
+			return "DPST-14-56"
+		}
+	case 199:
+		{ /* '199' */
+			return "DPST-14-57"
+		}
+	case 2:
+		{ /* '2' */
+			return ""
+		}
+	case 20:
+		{ /* '20' */
+			return ""
+		}
+	case 200:
+		{ /* '200' */
+			return "DPST-14-58"
+		}
+	case 201:
+		{ /* '201' */
+			return "DPST-14-59"
+		}
+	case 202:
+		{ /* '202' */
+			return "DPST-14-60"
+		}
+	case 203:
+		{ /* '203' */
+			return "DPST-14-61"
+		}
+	case 204:
+		{ /* '204' */
+			return "DPST-14-62"
+		}
+	case 205:
+		{ /* '205' */
+			return "DPST-14-63"
+		}
+	case 206:
+		{ /* '206' */
+			return "DPST-14-64"
+		}
+	case 207:
+		{ /* '207' */
+			return "DPST-14-65"
+		}
+	case 208:
+		{ /* '208' */
+			return "DPST-14-66"
+		}
+	case 209:
+		{ /* '209' */
+			return "DPST-14-67"
+		}
+	case 21:
+		{ /* '21' */
+			return ""
+		}
+	case 210:
+		{ /* '210' */
+			return "DPST-14-68"
+		}
+	case 211:
+		{ /* '211' */
+			return "DPST-14-69"
+		}
+	case 212:
+		{ /* '212' */
+			return "DPST-14-70"
+		}
+	case 213:
+		{ /* '213' */
+			return "DPST-14-71"
+		}
+	case 214:
+		{ /* '214' */
+			return "DPST-14-72"
+		}
+	case 215:
+		{ /* '215' */
+			return "DPST-14-73"
+		}
+	case 216:
+		{ /* '216' */
+			return "DPST-14-74"
+		}
+	case 217:
+		{ /* '217' */
+			return "DPST-14-75"
+		}
+	case 218:
+		{ /* '218' */
+			return "DPST-14-76"
+		}
+	case 219:
+		{ /* '219' */
+			return "DPST-14-77"
+		}
+	case 22:
+		{ /* '22' */
+			return ""
+		}
+	case 220:
+		{ /* '220' */
+			return "DPST-14-78"
+		}
+	case 221:
+		{ /* '221' */
+			return "DPST-14-79"
+		}
+	case 222:
+		{ /* '222' */
+			return "DPST-14-80"
+		}
+	case 223:
+		{ /* '223' */
+			return "DPST-14-1200"
+		}
+	case 224:
+		{ /* '224' */
+			return "DPST-14-1201"
+		}
+	case 225:
+		{ /* '225' */
+			return "DPST-15-0"
+		}
+	case 226:
+		{ /* '226' */
+			return "DPST-16-0"
+		}
+	case 227:
+		{ /* '227' */
+			return "DPST-16-1"
+		}
+	case 228:
+		{ /* '228' */
+			return "DPST-17-1"
+		}
+	case 229:
+		{ /* '229' */
+			return "DPST-18-1"
+		}
+	case 23:
+		{ /* '23' */
+			return ""
+		}
+	case 230:
+		{ /* '230' */
+			return "DPST-19-1"
+		}
+	case 231:
+		{ /* '231' */
+			return "DPST-20-1"
+		}
+	case 232:
+		{ /* '232' */
+			return "DPST-20-2"
+		}
+	case 233:
+		{ /* '233' */
+			return "DPST-20-3"
+		}
+	case 234:
+		{ /* '234' */
+			return "DPST-20-4"
+		}
+	case 235:
+		{ /* '235' */
+			return "DPST-20-5"
+		}
+	case 236:
+		{ /* '236' */
+			return "DPST-20-6"
+		}
+	case 237:
+		{ /* '237' */
+			return "DPST-20-7"
+		}
+	case 238:
+		{ /* '238' */
+			return "DPST-20-8"
+		}
+	case 239:
+		{ /* '239' */
+			return "DPST-20-11"
+		}
+	case 24:
+		{ /* '24' */
+			return ""
+		}
+	case 240:
+		{ /* '240' */
+			return "DPST-20-12"
+		}
+	case 241:
+		{ /* '241' */
+			return "DPST-20-13"
+		}
+	case 242:
+		{ /* '242' */
+			return "DPST-20-14"
+		}
+	case 243:
+		{ /* '243' */
+			return "DPST-20-17"
+		}
+	case 244:
+		{ /* '244' */
+			return "DPST-20-20"
+		}
+	case 245:
+		{ /* '245' */
+			return "DPST-20-21"
+		}
+	case 246:
+		{ /* '246' */
+			return "DPST-20-22"
+		}
+	case 247:
+		{ /* '247' */
+			return "DPST-20-100"
+		}
+	case 248:
+		{ /* '248' */
+			return "DPST-20-101"
+		}
+	case 249:
+		{ /* '249' */
+			return "DPST-20-102"
+		}
+	case 25:
+		{ /* '25' */
+			return ""
+		}
+	case 250:
+		{ /* '250' */
+			return "DPST-20-103"
+		}
+	case 251:
+		{ /* '251' */
+			return "DPST-20-104"
+		}
+	case 252:
+		{ /* '252' */
+			return "DPST-20-105"
+		}
+	case 253:
+		{ /* '253' */
+			return "DPST-20-106"
+		}
+	case 254:
+		{ /* '254' */
+			return "DPST-20-107"
+		}
+	case 255:
+		{ /* '255' */
+			return "DPST-20-108"
+		}
+	case 256:
+		{ /* '256' */
+			return "DPST-20-109"
+		}
+	case 257:
+		{ /* '257' */
+			return "DPST-20-110"
+		}
+	case 258:
+		{ /* '258' */
+			return "DPST-20-111"
+		}
+	case 259:
+		{ /* '259' */
+			return "DPST-20-112"
+		}
+	case 26:
+		{ /* '26' */
+			return ""
+		}
+	case 260:
+		{ /* '260' */
+			return "DPST-20-113"
+		}
+	case 261:
+		{ /* '261' */
+			return "DPST-20-114"
+		}
+	case 262:
+		{ /* '262' */
+			return "DPST-20-115"
+		}
+	case 263:
+		{ /* '263' */
+			return "DPST-20-116"
+		}
+	case 264:
+		{ /* '264' */
+			return "DPST-20-120"
+		}
+	case 265:
+		{ /* '265' */
+			return "DPST-20-121"
+		}
+	case 266:
+		{ /* '266' */
+			return "DPST-20-122"
+		}
+	case 267:
+		{ /* '267' */
+			return "DPST-20-600"
+		}
+	case 268:
+		{ /* '268' */
+			return "DPST-20-601"
+		}
+	case 269:
+		{ /* '269' */
+			return "DPST-20-602"
+		}
+	case 27:
+		{ /* '27' */
+			return "DPST-1-1"
+		}
+	case 270:
+		{ /* '270' */
+			return "DPST-20-603"
+		}
+	case 271:
+		{ /* '271' */
+			return "DPST-20-604"
+		}
+	case 272:
+		{ /* '272' */
+			return "DPST-20-605"
+		}
+	case 273:
+		{ /* '273' */
+			return "DPST-20-606"
+		}
+	case 274:
+		{ /* '274' */
+			return "DPST-20-607"
+		}
+	case 275:
+		{ /* '275' */
+			return "DPST-20-608"
+		}
+	case 276:
+		{ /* '276' */
+			return "DPST-20-609"
+		}
+	case 277:
+		{ /* '277' */
+			return "DPST-20-610"
+		}
+	case 278:
+		{ /* '278' */
+			return "DPST-20-611"
+		}
+	case 279:
+		{ /* '279' */
+			return "DPST-20-612"
+		}
+	case 28:
+		{ /* '28' */
+			return "DPST-1-2"
+		}
+	case 280:
+		{ /* '280' */
+			return "DPST-20-801"
+		}
+	case 281:
+		{ /* '281' */
+			return "DPST-20-802"
+		}
+	case 282:
+		{ /* '282' */
+			return "DPST-20-803"
+		}
+	case 283:
+		{ /* '283' */
+			return "DPST-20-804"
+		}
+	case 284:
+		{ /* '284' */
+			return "DPST-20-1000"
+		}
+	case 285:
+		{ /* '285' */
+			return "DPST-20-1001"
+		}
+	case 286:
+		{ /* '286' */
+			return "DPST-20-1002"
+		}
+	case 287:
+		{ /* '287' */
+			return "DPST-20-1003"
+		}
+	case 288:
+		{ /* '288' */
+			return "DPST-20-1219"
+		}
+	case 289:
+		{ /* '289' */
+			return "DPST-20-1220"
+		}
+	case 29:
+		{ /* '29' */
+			return "DPST-1-3"
+		}
+	case 290:
+		{ /* '290' */
+			return "DPST-20-1221"
+		}
+	case 291:
+		{ /* '291' */
+			return "DPST-21-1"
+		}
+	case 292:
+		{ /* '292' */
+			return "DPST-21-2"
+		}
+	case 293:
+		{ /* '293' */
+			return "DPST-21-100"
+		}
+	case 294:
+		{ /* '294' */
+			return "DPST-21-101"
+		}
+	case 295:
+		{ /* '295' */
+			return "DPST-21-102"
+		}
+	case 296:
+		{ /* '296' */
+			return "DPST-21-103"
+		}
+	case 297:
+		{ /* '297' */
+			return "DPST-21-104"
+		}
+	case 298:
+		{ /* '298' */
+			return "DPST-21-105"
+		}
+	case 299:
+		{ /* '299' */
+			return "DPST-21-106"
+		}
+	case 3:
+		{ /* '3' */
+			return ""
+		}
+	case 30:
+		{ /* '30' */
+			return "DPST-1-4"
+		}
+	case 300:
+		{ /* '300' */
+			return "DPST-21-107"
+		}
+	case 301:
+		{ /* '301' */
+			return "DPST-21-601"
+		}
+	case 302:
+		{ /* '302' */
+			return "DPST-21-1000"
+		}
+	case 303:
+		{ /* '303' */
+			return "DPST-21-1001"
+		}
+	case 304:
+		{ /* '304' */
+			return "DPST-21-1010"
+		}
+	case 305:
+		{ /* '305' */
+			return "DPST-22-100"
+		}
+	case 306:
+		{ /* '306' */
+			return "DPST-22-101"
+		}
+	case 307:
+		{ /* '307' */
+			return "DPST-22-102"
+		}
+	case 308:
+		{ /* '308' */
+			return "DPST-22-103"
+		}
+	case 309:
+		{ /* '309' */
+			return "DPST-22-1000"
+		}
+	case 31:
+		{ /* '31' */
+			return "DPST-1-5"
+		}
+	case 310:
+		{ /* '310' */
+			return "DPST-22-1010"
+		}
+	case 311:
+		{ /* '311' */
+			return "DPST-23-1"
+		}
+	case 312:
+		{ /* '312' */
+			return "DPST-23-2"
+		}
+	case 313:
+		{ /* '313' */
+			return "DPST-23-3"
+		}
+	case 314:
+		{ /* '314' */
+			return "DPST-23-102"
+		}
+	case 315:
+		{ /* '315' */
+			return "DPST-25-1000"
+		}
+	case 316:
+		{ /* '316' */
+			return "DPST-26-1"
+		}
+	case 317:
+		{ /* '317' */
+			return "DPST-27-1"
+		}
+	case 318:
+		{ /* '318' */
+			return "DPST-29-10"
+		}
+	case 319:
+		{ /* '319' */
+			return "DPST-29-11"
+		}
+	case 32:
+		{ /* '32' */
+			return "DPST-1-6"
+		}
+	case 320:
+		{ /* '320' */
+			return "DPST-29-12"
+		}
+	case 321:
+		{ /* '321' */
+			return "DPST-30-1010"
+		}
+	case 322:
+		{ /* '322' */
+			return "DPST-206-100"
+		}
+	case 323:
+		{ /* '323' */
+			return "DPST-206-102"
+		}
+	case 324:
+		{ /* '324' */
+			return "DPST-206-104"
+		}
+	case 325:
+		{ /* '325' */
+			return "DPST-206-105"
+		}
+	case 326:
+		{ /* '326' */
+			return "DPST-207-600"
+		}
+	case 327:
+		{ /* '327' */
+			return "DPST-217-1"
+		}
+	case 328:
+		{ /* '328' */
+			return "DPST-219-1"
+		}
+	case 329:
+		{ /* '329' */
+			return "DPST-222-100"
+		}
+	case 33:
+		{ /* '33' */
+			return "DPST-1-7"
+		}
+	case 330:
+		{ /* '330' */
+			return "DPST-222-101"
+		}
+	case 331:
+		{ /* '331' */
+			return "DPST-225-1"
+		}
+	case 332:
+		{ /* '332' */
+			return "DPST-225-2"
+		}
+	case 333:
+		{ /* '333' */
+			return "DPST-229-1"
+		}
+	case 334:
+		{ /* '334' */
+			return "DPST-230-1000"
+		}
+	case 335:
+		{ /* '335' */
+			return "DPST-232-600"
+		}
+	case 336:
+		{ /* '336' */
+			return "DPST-234-1"
+		}
+	case 337:
+		{ /* '337' */
+			return "DPST-235-1"
+		}
+	case 338:
+		{ /* '338' */
+			return "DPST-236-1"
+		}
+	case 339:
+		{ /* '339' */
+			return "DPST-237-600"
+		}
+	case 34:
+		{ /* '34' */
+			return "DPST-1-8"
+		}
+	case 340:
+		{ /* '340' */
+			return "DPST-238-600"
+		}
+	case 341:
+		{ /* '341' */
+			return "DPST-240-800"
+		}
+	case 342:
+		{ /* '342' */
+			return "DPST-241-800"
+		}
+	case 343:
+		{ /* '343' */
+			return "DPST-242-600"
+		}
+	case 344:
+		{ /* '344' */
+			return "DPST-244-600"
+		}
+	case 345:
+		{ /* '345' */
+			return "DPST-245-600"
+		}
+	case 346:
+		{ /* '346' */
+			return "DPST-246-600"
+		}
+	case 347:
+		{ /* '347' */
+			return "DPST-249-600"
+		}
+	case 348:
+		{ /* '348' */
+			return "DPST-250-600"
+		}
+	case 349:
+		{ /* '349' */
+			return "DPST-251-600"
+		}
+	case 35:
+		{ /* '35' */
+			return "DPST-1-9"
+		}
+	case 350:
+		{ /* '350' */
+			return "DPST-252-600"
+		}
+	case 351:
+		{ /* '351' */
+			return "DPST-254-600"
+		}
+	case 352:
+		{ /* '352' */
+			return "DPST-255-1"
+		}
+	case 353:
+		{ /* '353' */
+			return "DPST-275-100"
+		}
+	case 354:
+		{ /* '354' */
+			return "DPST-275-101"
+		}
+	case 36:
+		{ /* '36' */
+			return "DPST-1-10"
+		}
+	case 37:
+		{ /* '37' */
+			return "DPST-1-11"
+		}
+	case 38:
+		{ /* '38' */
+			return "DPST-1-12"
+		}
+	case 39:
+		{ /* '39' */
+			return "DPST-1-13"
+		}
+	case 4:
+		{ /* '4' */
+			return ""
+		}
+	case 40:
+		{ /* '40' */
+			return "DPST-1-14"
+		}
+	case 41:
+		{ /* '41' */
+			return "DPST-1-15"
+		}
+	case 42:
+		{ /* '42' */
+			return "DPST-1-16"
+		}
+	case 43:
+		{ /* '43' */
+			return "DPST-1-17"
+		}
+	case 44:
+		{ /* '44' */
+			return "DPST-1-18"
+		}
+	case 45:
+		{ /* '45' */
+			return "DPST-1-19"
+		}
+	case 46:
+		{ /* '46' */
+			return "DPST-1-21"
+		}
+	case 47:
+		{ /* '47' */
+			return "DPST-1-22"
+		}
+	case 48:
+		{ /* '48' */
+			return "DPST-1-23"
+		}
+	case 49:
+		{ /* '49' */
+			return "DPST-1-24"
+		}
+	case 5:
+		{ /* '5' */
+			return ""
+		}
+	case 50:
+		{ /* '50' */
+			return "DPST-1-100"
+		}
+	case 51:
+		{ /* '51' */
+			return "DPST-2-1"
+		}
+	case 52:
+		{ /* '52' */
+			return "DPST-2-2"
+		}
+	case 53:
+		{ /* '53' */
+			return "DPST-2-3"
+		}
+	case 54:
+		{ /* '54' */
+			return "DPST-2-4"
+		}
+	case 55:
+		{ /* '55' */
+			return "DPST-2-5"
+		}
+	case 56:
+		{ /* '56' */
+			return "DPST-2-6"
+		}
+	case 57:
+		{ /* '57' */
+			return "DPST-2-7"
+		}
+	case 58:
+		{ /* '58' */
+			return "DPST-2-8"
+		}
+	case 59:
+		{ /* '59' */
+			return "DPST-2-9"
+		}
+	case 6:
+		{ /* '6' */
+			return ""
+		}
+	case 60:
+		{ /* '60' */
+			return "DPST-2-10"
+		}
+	case 61:
+		{ /* '61' */
+			return "DPST-2-11"
+		}
+	case 62:
+		{ /* '62' */
+			return "DPST-2-12"
+		}
+	case 63:
+		{ /* '63' */
+			return "DPST-3-7"
+		}
+	case 64:
+		{ /* '64' */
+			return "DPST-3-8"
+		}
+	case 65:
+		{ /* '65' */
+			return "DPST-4-1"
+		}
+	case 66:
+		{ /* '66' */
+			return "DPST-4-2"
+		}
+	case 67:
+		{ /* '67' */
+			return "DPST-5-1"
+		}
+	case 68:
+		{ /* '68' */
+			return "DPST-5-3"
+		}
+	case 69:
+		{ /* '69' */
+			return "DPST-5-4"
+		}
+	case 7:
+		{ /* '7' */
+			return ""
+		}
+	case 70:
+		{ /* '70' */
+			return "DPST-5-5"
+		}
+	case 71:
+		{ /* '71' */
+			return "DPST-5-6"
+		}
+	case 72:
+		{ /* '72' */
+			return "DPST-5-10"
+		}
+	case 73:
+		{ /* '73' */
+			return "DPST-5-100"
+		}
+	case 74:
+		{ /* '74' */
+			return "DPST-6-1"
+		}
+	case 75:
+		{ /* '75' */
+			return "DPST-6-10"
+		}
+	case 76:
+		{ /* '76' */
+			return "DPST-6-20"
+		}
+	case 77:
+		{ /* '77' */
+			return "DPST-7-1"
+		}
+	case 78:
+		{ /* '78' */
+			return "DPST-7-2"
+		}
+	case 79:
+		{ /* '79' */
+			return "DPST-7-3"
+		}
+	case 8:
+		{ /* '8' */
+			return ""
+		}
+	case 80:
+		{ /* '80' */
+			return "DPST-7-4"
+		}
+	case 81:
+		{ /* '81' */
+			return "DPST-7-5"
+		}
+	case 82:
+		{ /* '82' */
+			return "DPST-7-6"
+		}
+	case 83:
+		{ /* '83' */
+			return "DPST-7-7"
+		}
+	case 84:
+		{ /* '84' */
+			return "DPST-7-10"
+		}
+	case 85:
+		{ /* '85' */
+			return "DPST-7-11"
+		}
+	case 86:
+		{ /* '86' */
+			return "DPST-7-12"
+		}
+	case 87:
+		{ /* '87' */
+			return "DPST-7-13"
+		}
+	case 88:
+		{ /* '88' */
+			return "DPST-7-600"
+		}
+	case 89:
+		{ /* '89' */
+			return "DPST-8-1"
+		}
+	case 9:
+		{ /* '9' */
+			return ""
+		}
+	case 90:
+		{ /* '90' */
+			return "DPST-8-2"
+		}
+	case 91:
+		{ /* '91' */
+			return "DPST-8-3"
+		}
+	case 92:
+		{ /* '92' */
+			return "DPST-8-4"
+		}
+	case 93:
+		{ /* '93' */
+			return "DPST-8-5"
+		}
+	case 94:
+		{ /* '94' */
+			return "DPST-8-6"
+		}
+	case 95:
+		{ /* '95' */
+			return "DPST-8-7"
+		}
+	case 96:
+		{ /* '96' */
+			return "DPST-8-10"
+		}
+	case 97:
+		{ /* '97' */
+			return "DPST-8-11"
+		}
+	case 98:
+		{ /* '98' */
+			return "DPST-8-12"
+		}
+	case 99:
+		{ /* '99' */
+			return "DPST-9-1"
+		}
+	default:
+		{
+			return ""
+		}
+	}
+}
+
+func KnxDatapointTypeFirstEnumForFieldId(value string) (enum KnxDatapointType, ok bool) {
+	for _, sizeValue := range KnxDatapointTypeValues {
+		if sizeValue.Id() == value {
 			return sizeValue, true
 		}
 	}
@@ -4454,11 +7363,11 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 288:
 		{ /* '288' */
-			return KnxDatapointMainType_DPT_8_BIT_SET
+			return KnxDatapointMainType_DPT_1_BYTE
 		}
 	case 289:
 		{ /* '289' */
-			return KnxDatapointMainType_DPT_8_BIT_SET
+			return KnxDatapointMainType_DPT_1_BYTE
 		}
 	case 29:
 		{ /* '29' */
@@ -4466,7 +7375,7 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 290:
 		{ /* '290' */
-			return KnxDatapointMainType_DPT_8_BIT_SET
+			return KnxDatapointMainType_DPT_1_BYTE
 		}
 	case 291:
 		{ /* '291' */
@@ -4522,15 +7431,15 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 302:
 		{ /* '302' */
-			return KnxDatapointMainType_DPT_16_BIT_SET
+			return KnxDatapointMainType_DPT_8_BIT_SET
 		}
 	case 303:
 		{ /* '303' */
-			return KnxDatapointMainType_DPT_16_BIT_SET
+			return KnxDatapointMainType_DPT_8_BIT_SET
 		}
 	case 304:
 		{ /* '304' */
-			return KnxDatapointMainType_DPT_16_BIT_SET
+			return KnxDatapointMainType_DPT_8_BIT_SET
 		}
 	case 305:
 		{ /* '305' */
@@ -4546,11 +7455,11 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 308:
 		{ /* '308' */
-			return KnxDatapointMainType_DPT_2_BIT_SET
+			return KnxDatapointMainType_DPT_16_BIT_SET
 		}
 	case 309:
 		{ /* '309' */
-			return KnxDatapointMainType_DPT_2_BIT_SET
+			return KnxDatapointMainType_DPT_16_BIT_SET
 		}
 	case 31:
 		{ /* '31' */
@@ -4558,7 +7467,7 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 310:
 		{ /* '310' */
-			return KnxDatapointMainType_DPT_2_BIT_SET
+			return KnxDatapointMainType_DPT_16_BIT_SET
 		}
 	case 311:
 		{ /* '311' */
@@ -4566,35 +7475,35 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 312:
 		{ /* '312' */
-			return KnxDatapointMainType_DPT_2_NIBBLE_SET
+			return KnxDatapointMainType_DPT_2_BIT_SET
 		}
 	case 313:
 		{ /* '313' */
-			return KnxDatapointMainType_DPT_8_BIT_SET_2
+			return KnxDatapointMainType_DPT_2_BIT_SET
 		}
 	case 314:
 		{ /* '314' */
-			return KnxDatapointMainType_DPT_32_BIT_SET
+			return KnxDatapointMainType_DPT_2_BIT_SET
 		}
 	case 315:
 		{ /* '315' */
-			return KnxDatapointMainType_DPT_ELECTRICAL_ENERGY
+			return KnxDatapointMainType_DPT_2_NIBBLE_SET
 		}
 	case 316:
 		{ /* '316' */
-			return KnxDatapointMainType_DPT_ELECTRICAL_ENERGY
+			return KnxDatapointMainType_DPT_8_BIT_SET_2
 		}
 	case 317:
 		{ /* '317' */
-			return KnxDatapointMainType_DPT_ELECTRICAL_ENERGY
+			return KnxDatapointMainType_DPT_32_BIT_SET
 		}
 	case 318:
 		{ /* '318' */
-			return KnxDatapointMainType_DPT_24_TIMES_CHANNEL_ACTIVATION
+			return KnxDatapointMainType_DPT_ELECTRICAL_ENERGY
 		}
 	case 319:
 		{ /* '319' */
-			return KnxDatapointMainType_DPT_16_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
+			return KnxDatapointMainType_DPT_ELECTRICAL_ENERGY
 		}
 	case 32:
 		{ /* '32' */
@@ -4602,11 +7511,11 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 320:
 		{ /* '320' */
-			return KnxDatapointMainType_DPT_16_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
+			return KnxDatapointMainType_DPT_ELECTRICAL_ENERGY
 		}
 	case 321:
 		{ /* '321' */
-			return KnxDatapointMainType_DPT_16_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
+			return KnxDatapointMainType_DPT_24_TIMES_CHANNEL_ACTIVATION
 		}
 	case 322:
 		{ /* '322' */
@@ -4614,31 +7523,31 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 323:
 		{ /* '323' */
-			return KnxDatapointMainType_DPT_8_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
+			return KnxDatapointMainType_DPT_16_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
 		}
 	case 324:
 		{ /* '324' */
-			return KnxDatapointMainType_DPT_DATAPOINT_TYPE_VERSION
+			return KnxDatapointMainType_DPT_16_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
 		}
 	case 325:
 		{ /* '325' */
-			return KnxDatapointMainType_DPT_ALARM_INFO
+			return KnxDatapointMainType_DPT_16_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
 		}
 	case 326:
 		{ /* '326' */
-			return KnxDatapointMainType_DPT_3X_2_BYTE_FLOAT_VALUE
+			return KnxDatapointMainType_DPT_8_BIT_UNSIGNED_VALUE_AND_8_BIT_ENUM
 		}
 	case 327:
 		{ /* '327' */
-			return KnxDatapointMainType_DPT_3X_2_BYTE_FLOAT_VALUE
+			return KnxDatapointMainType_DPT_DATAPOINT_TYPE_VERSION
 		}
 	case 328:
 		{ /* '328' */
-			return KnxDatapointMainType_DPT_SCALING_SPEED
+			return KnxDatapointMainType_DPT_ALARM_INFO
 		}
 	case 329:
 		{ /* '329' */
-			return KnxDatapointMainType_DPT_SCALING_SPEED
+			return KnxDatapointMainType_DPT_3X_2_BYTE_FLOAT_VALUE
 		}
 	case 33:
 		{ /* '33' */
@@ -4646,43 +7555,43 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 330:
 		{ /* '330' */
-			return KnxDatapointMainType_DPT_4_1_1_BYTE_COMBINED_INFORMATION
+			return KnxDatapointMainType_DPT_3X_2_BYTE_FLOAT_VALUE
 		}
 	case 331:
 		{ /* '331' */
-			return KnxDatapointMainType_DPT_MBUS_ADDRESS
+			return KnxDatapointMainType_DPT_SCALING_SPEED
 		}
 	case 332:
 		{ /* '332' */
-			return KnxDatapointMainType_DPT_3_BYTE_COLOUR_RGB
+			return KnxDatapointMainType_DPT_SCALING_SPEED
 		}
 	case 333:
 		{ /* '333' */
-			return KnxDatapointMainType_DPT_LANGUAGE_CODE_ISO_639_1
+			return KnxDatapointMainType_DPT_4_1_1_BYTE_COMBINED_INFORMATION
 		}
 	case 334:
 		{ /* '334' */
-			return KnxDatapointMainType_DPT_SIGNED_VALUE_WITH_CLASSIFICATION_AND_VALIDITY
+			return KnxDatapointMainType_DPT_MBUS_ADDRESS
 		}
 	case 335:
 		{ /* '335' */
-			return KnxDatapointMainType_DPT_PRIORITISED_MODE_CONTROL
+			return KnxDatapointMainType_DPT_3_BYTE_COLOUR_RGB
 		}
 	case 336:
 		{ /* '336' */
-			return KnxDatapointMainType_DPT_CONFIGURATION_DIAGNOSTICS_16_BIT
+			return KnxDatapointMainType_DPT_LANGUAGE_CODE_ISO_639_1
 		}
 	case 337:
 		{ /* '337' */
-			return KnxDatapointMainType_DPT_CONFIGURATION_DIAGNOSTICS_8_BIT
+			return KnxDatapointMainType_DPT_SIGNED_VALUE_WITH_CLASSIFICATION_AND_VALIDITY
 		}
 	case 338:
 		{ /* '338' */
-			return KnxDatapointMainType_DPT_POSITIONS
+			return KnxDatapointMainType_DPT_PRIORITISED_MODE_CONTROL
 		}
 	case 339:
 		{ /* '339' */
-			return KnxDatapointMainType_DPT_STATUS_32_BIT
+			return KnxDatapointMainType_DPT_CONFIGURATION_DIAGNOSTICS_16_BIT
 		}
 	case 34:
 		{ /* '34' */
@@ -4690,43 +7599,43 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 340:
 		{ /* '340' */
-			return KnxDatapointMainType_DPT_STATUS_48_BIT
+			return KnxDatapointMainType_DPT_CONFIGURATION_DIAGNOSTICS_8_BIT
 		}
 	case 341:
 		{ /* '341' */
-			return KnxDatapointMainType_DPT_CONVERTER_STATUS
+			return KnxDatapointMainType_DPT_POSITIONS
 		}
 	case 342:
 		{ /* '342' */
-			return KnxDatapointMainType_DPT_CONVERTER_TEST_RESULT
+			return KnxDatapointMainType_DPT_STATUS_32_BIT
 		}
 	case 343:
 		{ /* '343' */
-			return KnxDatapointMainType_DPT_BATTERY_INFORMATION
+			return KnxDatapointMainType_DPT_STATUS_48_BIT
 		}
 	case 344:
 		{ /* '344' */
-			return KnxDatapointMainType_DPT_BRIGHTNESS_COLOUR_TEMPERATURE_TRANSITION
+			return KnxDatapointMainType_DPT_CONVERTER_STATUS
 		}
 	case 345:
 		{ /* '345' */
-			return KnxDatapointMainType_DPT_STATUS_24_BIT
+			return KnxDatapointMainType_DPT_CONVERTER_TEST_RESULT
 		}
 	case 346:
 		{ /* '346' */
-			return KnxDatapointMainType_DPT_COLOUR_RGBW
+			return KnxDatapointMainType_DPT_BATTERY_INFORMATION
 		}
 	case 347:
 		{ /* '347' */
-			return KnxDatapointMainType_DPT_RELATIVE_CONTROL_RGBW
+			return KnxDatapointMainType_DPT_BRIGHTNESS_COLOUR_TEMPERATURE_TRANSITION
 		}
 	case 348:
 		{ /* '348' */
-			return KnxDatapointMainType_DPT_RELATIVE_CONTROL_RGB
+			return KnxDatapointMainType_DPT_STATUS_24_BIT
 		}
 	case 349:
 		{ /* '349' */
-			return KnxDatapointMainType_DPT_F32F32
+			return KnxDatapointMainType_DPT_COLOUR_RGBW
 		}
 	case 35:
 		{ /* '35' */
@@ -4734,10 +7643,22 @@ func (e KnxDatapointType) DatapointMainType() KnxDatapointMainType {
 		}
 	case 350:
 		{ /* '350' */
-			return KnxDatapointMainType_DPT_F16F16F16F16
+			return KnxDatapointMainType_DPT_RELATIVE_CONTROL_RGBW
 		}
 	case 351:
 		{ /* '351' */
+			return KnxDatapointMainType_DPT_RELATIVE_CONTROL_RGB
+		}
+	case 352:
+		{ /* '352' */
+			return KnxDatapointMainType_DPT_F32F32
+		}
+	case 353:
+		{ /* '353' */
+			return KnxDatapointMainType_DPT_F16F16F16F16
+		}
+	case 354:
+		{ /* '354' */
 			return KnxDatapointMainType_DPT_F16F16F16F16
 		}
 	case 36:
@@ -5458,148 +8379,154 @@ func KnxDatapointTypeByValue(value uint32) (enum KnxDatapointType, ok bool) {
 	case 287:
 		return KnxDatapointType_DPT_RF_FilterSelect, true
 	case 288:
-		return KnxDatapointType_DPT_StatusGen, true
+		return KnxDatapointType_DPT_EVSEMode_1, true
 	case 289:
-		return KnxDatapointType_DPT_Device_Control, true
+		return KnxDatapointType_DPT_EVSEMode_2, true
 	case 29:
 		return KnxDatapointType_DPT_Enable, true
 	case 290:
-		return KnxDatapointType_DPT_ForceSign, true
+		return KnxDatapointType_DPT_EVSEMode_3, true
 	case 291:
-		return KnxDatapointType_DPT_ForceSignCool, true
+		return KnxDatapointType_DPT_StatusGen, true
 	case 292:
-		return KnxDatapointType_DPT_StatusRHC, true
+		return KnxDatapointType_DPT_Device_Control, true
 	case 293:
-		return KnxDatapointType_DPT_StatusSDHWC, true
+		return KnxDatapointType_DPT_ForceSign, true
 	case 294:
-		return KnxDatapointType_DPT_FuelTypeSet, true
+		return KnxDatapointType_DPT_ForceSignCool, true
 	case 295:
-		return KnxDatapointType_DPT_StatusRCC, true
+		return KnxDatapointType_DPT_StatusRHC, true
 	case 296:
-		return KnxDatapointType_DPT_StatusAHU, true
+		return KnxDatapointType_DPT_StatusSDHWC, true
 	case 297:
-		return KnxDatapointType_DPT_CombinedStatus_RTSM, true
+		return KnxDatapointType_DPT_FuelTypeSet, true
 	case 298:
-		return KnxDatapointType_DPT_LightActuatorErrorInfo, true
+		return KnxDatapointType_DPT_StatusRCC, true
 	case 299:
-		return KnxDatapointType_DPT_RF_ModeInfo, true
+		return KnxDatapointType_DPT_StatusAHU, true
 	case 3:
 		return KnxDatapointType_WORD, true
 	case 30:
 		return KnxDatapointType_DPT_Ramp, true
 	case 300:
-		return KnxDatapointType_DPT_RF_FilterInfo, true
+		return KnxDatapointType_DPT_CombinedStatus_RTSM, true
 	case 301:
-		return KnxDatapointType_DPT_Channel_Activation_8, true
+		return KnxDatapointType_DPT_LightActuatorErrorInfo, true
 	case 302:
-		return KnxDatapointType_DPT_StatusDHWC, true
+		return KnxDatapointType_DPT_RF_ModeInfo, true
 	case 303:
-		return KnxDatapointType_DPT_StatusRHCC, true
+		return KnxDatapointType_DPT_RF_FilterInfo, true
 	case 304:
-		return KnxDatapointType_DPT_CombinedStatus_HVA, true
+		return KnxDatapointType_DPT_Channel_Activation_8, true
 	case 305:
-		return KnxDatapointType_DPT_CombinedStatus_RTC, true
+		return KnxDatapointType_DPT_StatusDHWC, true
 	case 306:
-		return KnxDatapointType_DPT_Media, true
+		return KnxDatapointType_DPT_StatusRHCC, true
 	case 307:
-		return KnxDatapointType_DPT_Channel_Activation_16, true
+		return KnxDatapointType_DPT_CombinedStatus_HVA, true
 	case 308:
-		return KnxDatapointType_DPT_OnOffAction, true
+		return KnxDatapointType_DPT_CombinedStatus_RTC, true
 	case 309:
-		return KnxDatapointType_DPT_Alarm_Reaction, true
+		return KnxDatapointType_DPT_Media, true
 	case 31:
 		return KnxDatapointType_DPT_Alarm, true
 	case 310:
-		return KnxDatapointType_DPT_UpDown_Action, true
+		return KnxDatapointType_DPT_Channel_Activation_16, true
 	case 311:
-		return KnxDatapointType_DPT_HVAC_PB_Action, true
+		return KnxDatapointType_DPT_OnOffAction, true
 	case 312:
-		return KnxDatapointType_DPT_DoubleNibble, true
+		return KnxDatapointType_DPT_Alarm_Reaction, true
 	case 313:
-		return KnxDatapointType_DPT_SceneInfo, true
+		return KnxDatapointType_DPT_UpDown_Action, true
 	case 314:
-		return KnxDatapointType_DPT_CombinedInfoOnOff, true
+		return KnxDatapointType_DPT_HVAC_PB_Action, true
 	case 315:
-		return KnxDatapointType_DPT_ActiveEnergy_V64, true
+		return KnxDatapointType_DPT_DoubleNibble, true
 	case 316:
-		return KnxDatapointType_DPT_ApparentEnergy_V64, true
+		return KnxDatapointType_DPT_SceneInfo, true
 	case 317:
-		return KnxDatapointType_DPT_ReactiveEnergy_V64, true
+		return KnxDatapointType_DPT_CombinedInfoOnOff, true
 	case 318:
-		return KnxDatapointType_DPT_Channel_Activation_24, true
+		return KnxDatapointType_DPT_ActiveEnergy_V64, true
 	case 319:
-		return KnxDatapointType_DPT_HVACModeNext, true
+		return KnxDatapointType_DPT_ApparentEnergy_V64, true
 	case 32:
 		return KnxDatapointType_DPT_BinaryValue, true
 	case 320:
-		return KnxDatapointType_DPT_DHWModeNext, true
+		return KnxDatapointType_DPT_ReactiveEnergy_V64, true
 	case 321:
-		return KnxDatapointType_DPT_OccModeNext, true
+		return KnxDatapointType_DPT_Channel_Activation_24, true
 	case 322:
-		return KnxDatapointType_DPT_BuildingModeNext, true
+		return KnxDatapointType_DPT_HVACModeNext, true
 	case 323:
-		return KnxDatapointType_DPT_StatusLightingActuator, true
+		return KnxDatapointType_DPT_DHWModeNext, true
 	case 324:
-		return KnxDatapointType_DPT_Version, true
+		return KnxDatapointType_DPT_OccModeNext, true
 	case 325:
-		return KnxDatapointType_DPT_AlarmInfo, true
+		return KnxDatapointType_DPT_BuildingModeNext, true
 	case 326:
-		return KnxDatapointType_DPT_TempRoomSetpSetF16_3, true
+		return KnxDatapointType_DPT_StatusLightingActuator, true
 	case 327:
-		return KnxDatapointType_DPT_TempRoomSetpSetShiftF16_3, true
+		return KnxDatapointType_DPT_Version, true
 	case 328:
-		return KnxDatapointType_DPT_Scaling_Speed, true
+		return KnxDatapointType_DPT_AlarmInfo, true
 	case 329:
-		return KnxDatapointType_DPT_Scaling_Step_Time, true
+		return KnxDatapointType_DPT_TempRoomSetpSetF16_3, true
 	case 33:
 		return KnxDatapointType_DPT_Step, true
 	case 330:
-		return KnxDatapointType_DPT_MeteringValue, true
+		return KnxDatapointType_DPT_TempRoomSetpSetShiftF16_3, true
 	case 331:
-		return KnxDatapointType_DPT_MBus_Address, true
+		return KnxDatapointType_DPT_Scaling_Speed, true
 	case 332:
-		return KnxDatapointType_DPT_Colour_RGB, true
+		return KnxDatapointType_DPT_Scaling_Step_Time, true
 	case 333:
-		return KnxDatapointType_DPT_LanguageCodeAlpha2_ASCII, true
+		return KnxDatapointType_DPT_MeteringValue, true
 	case 334:
-		return KnxDatapointType_DPT_Tariff_ActiveEnergy, true
+		return KnxDatapointType_DPT_MBus_Address, true
 	case 335:
-		return KnxDatapointType_DPT_Prioritised_Mode_Control, true
+		return KnxDatapointType_DPT_Colour_RGB, true
 	case 336:
-		return KnxDatapointType_DPT_DALI_Control_Gear_Diagnostic, true
+		return KnxDatapointType_DPT_LanguageCodeAlpha2_ASCII, true
 	case 337:
-		return KnxDatapointType_DPT_DALI_Diagnostics, true
+		return KnxDatapointType_DPT_Tariff_ActiveEnergy, true
 	case 338:
-		return KnxDatapointType_DPT_CombinedPosition, true
+		return KnxDatapointType_DPT_Prioritised_Mode_Control, true
 	case 339:
-		return KnxDatapointType_DPT_StatusSAB, true
+		return KnxDatapointType_DPT_DALI_Control_Gear_Diagnostic, true
 	case 34:
 		return KnxDatapointType_DPT_UpDown, true
 	case 340:
-		return KnxDatapointType_DPT_Colour_xyY, true
+		return KnxDatapointType_DPT_DALI_Diagnostics, true
 	case 341:
-		return KnxDatapointType_DPT_Converter_Status, true
+		return KnxDatapointType_DPT_CombinedPosition, true
 	case 342:
-		return KnxDatapointType_DPT_Converter_Test_Result, true
+		return KnxDatapointType_DPT_StatusSAB, true
 	case 343:
-		return KnxDatapointType_DPT_Battery_Info, true
+		return KnxDatapointType_DPT_Colour_xyY, true
 	case 344:
-		return KnxDatapointType_DPT_Brightness_Colour_Temperature_Transition, true
+		return KnxDatapointType_DPT_Converter_Status, true
 	case 345:
-		return KnxDatapointType_DPT_Brightness_Colour_Temperature_Control, true
+		return KnxDatapointType_DPT_Converter_Test_Result, true
 	case 346:
-		return KnxDatapointType_DPT_Colour_RGBW, true
+		return KnxDatapointType_DPT_Battery_Info, true
 	case 347:
-		return KnxDatapointType_DPT_Relative_Control_RGBW, true
+		return KnxDatapointType_DPT_Brightness_Colour_Temperature_Transition, true
 	case 348:
-		return KnxDatapointType_DPT_Relative_Control_RGB, true
+		return KnxDatapointType_DPT_Brightness_Colour_Temperature_Control, true
 	case 349:
-		return KnxDatapointType_DPT_GeographicalLocation, true
+		return KnxDatapointType_DPT_Colour_RGBW, true
 	case 35:
 		return KnxDatapointType_DPT_OpenClose, true
 	case 350:
-		return KnxDatapointType_DPT_TempRoomSetpSetF16_4, true
+		return KnxDatapointType_DPT_Relative_Control_RGBW, true
 	case 351:
+		return KnxDatapointType_DPT_Relative_Control_RGB, true
+	case 352:
+		return KnxDatapointType_DPT_GeographicalLocation, true
+	case 353:
+		return KnxDatapointType_DPT_TempRoomSetpSetF16_4, true
+	case 354:
 		return KnxDatapointType_DPT_TempRoomSetpSetShiftF16_4, true
 	case 36:
 		return KnxDatapointType_DPT_Start, true
@@ -6167,12 +9094,18 @@ func KnxDatapointTypeByName(value string) (enum KnxDatapointType, ok bool) {
 		return KnxDatapointType_DPT_RF_ModeSelect, true
 	case "DPT_RF_FilterSelect":
 		return KnxDatapointType_DPT_RF_FilterSelect, true
+	case "DPT_EVSEMode_1":
+		return KnxDatapointType_DPT_EVSEMode_1, true
+	case "DPT_EVSEMode_2":
+		return KnxDatapointType_DPT_EVSEMode_2, true
+	case "DPT_Enable":
+		return KnxDatapointType_DPT_Enable, true
+	case "DPT_EVSEMode_3":
+		return KnxDatapointType_DPT_EVSEMode_3, true
 	case "DPT_StatusGen":
 		return KnxDatapointType_DPT_StatusGen, true
 	case "DPT_Device_Control":
 		return KnxDatapointType_DPT_Device_Control, true
-	case "DPT_Enable":
-		return KnxDatapointType_DPT_Enable, true
 	case "DPT_ForceSign":
 		return KnxDatapointType_DPT_ForceSign, true
 	case "DPT_ForceSignCool":
@@ -6187,16 +9120,16 @@ func KnxDatapointTypeByName(value string) (enum KnxDatapointType, ok bool) {
 		return KnxDatapointType_DPT_StatusRCC, true
 	case "DPT_StatusAHU":
 		return KnxDatapointType_DPT_StatusAHU, true
+	case "WORD":
+		return KnxDatapointType_WORD, true
+	case "DPT_Ramp":
+		return KnxDatapointType_DPT_Ramp, true
 	case "DPT_CombinedStatus_RTSM":
 		return KnxDatapointType_DPT_CombinedStatus_RTSM, true
 	case "DPT_LightActuatorErrorInfo":
 		return KnxDatapointType_DPT_LightActuatorErrorInfo, true
 	case "DPT_RF_ModeInfo":
 		return KnxDatapointType_DPT_RF_ModeInfo, true
-	case "WORD":
-		return KnxDatapointType_WORD, true
-	case "DPT_Ramp":
-		return KnxDatapointType_DPT_Ramp, true
 	case "DPT_RF_FilterInfo":
 		return KnxDatapointType_DPT_RF_FilterInfo, true
 	case "DPT_Channel_Activation_8":
@@ -6211,14 +9144,14 @@ func KnxDatapointTypeByName(value string) (enum KnxDatapointType, ok bool) {
 		return KnxDatapointType_DPT_CombinedStatus_RTC, true
 	case "DPT_Media":
 		return KnxDatapointType_DPT_Media, true
+	case "DPT_Alarm":
+		return KnxDatapointType_DPT_Alarm, true
 	case "DPT_Channel_Activation_16":
 		return KnxDatapointType_DPT_Channel_Activation_16, true
 	case "DPT_OnOffAction":
 		return KnxDatapointType_DPT_OnOffAction, true
 	case "DPT_Alarm_Reaction":
 		return KnxDatapointType_DPT_Alarm_Reaction, true
-	case "DPT_Alarm":
-		return KnxDatapointType_DPT_Alarm, true
 	case "DPT_UpDown_Action":
 		return KnxDatapointType_DPT_UpDown_Action, true
 	case "DPT_HVAC_PB_Action":
@@ -6233,14 +9166,14 @@ func KnxDatapointTypeByName(value string) (enum KnxDatapointType, ok bool) {
 		return KnxDatapointType_DPT_ActiveEnergy_V64, true
 	case "DPT_ApparentEnergy_V64":
 		return KnxDatapointType_DPT_ApparentEnergy_V64, true
+	case "DPT_BinaryValue":
+		return KnxDatapointType_DPT_BinaryValue, true
 	case "DPT_ReactiveEnergy_V64":
 		return KnxDatapointType_DPT_ReactiveEnergy_V64, true
 	case "DPT_Channel_Activation_24":
 		return KnxDatapointType_DPT_Channel_Activation_24, true
 	case "DPT_HVACModeNext":
 		return KnxDatapointType_DPT_HVACModeNext, true
-	case "DPT_BinaryValue":
-		return KnxDatapointType_DPT_BinaryValue, true
 	case "DPT_DHWModeNext":
 		return KnxDatapointType_DPT_DHWModeNext, true
 	case "DPT_OccModeNext":
@@ -6255,14 +9188,14 @@ func KnxDatapointTypeByName(value string) (enum KnxDatapointType, ok bool) {
 		return KnxDatapointType_DPT_AlarmInfo, true
 	case "DPT_TempRoomSetpSetF16_3":
 		return KnxDatapointType_DPT_TempRoomSetpSetF16_3, true
+	case "DPT_Step":
+		return KnxDatapointType_DPT_Step, true
 	case "DPT_TempRoomSetpSetShiftF16_3":
 		return KnxDatapointType_DPT_TempRoomSetpSetShiftF16_3, true
 	case "DPT_Scaling_Speed":
 		return KnxDatapointType_DPT_Scaling_Speed, true
 	case "DPT_Scaling_Step_Time":
 		return KnxDatapointType_DPT_Scaling_Step_Time, true
-	case "DPT_Step":
-		return KnxDatapointType_DPT_Step, true
 	case "DPT_MeteringValue":
 		return KnxDatapointType_DPT_MeteringValue, true
 	case "DPT_MBus_Address":
@@ -6277,14 +9210,14 @@ func KnxDatapointTypeByName(value string) (enum KnxDatapointType, ok bool) {
 		return KnxDatapointType_DPT_Prioritised_Mode_Control, true
 	case "DPT_DALI_Control_Gear_Diagnostic":
 		return KnxDatapointType_DPT_DALI_Control_Gear_Diagnostic, true
+	case "DPT_UpDown":
+		return KnxDatapointType_DPT_UpDown, true
 	case "DPT_DALI_Diagnostics":
 		return KnxDatapointType_DPT_DALI_Diagnostics, true
 	case "DPT_CombinedPosition":
 		return KnxDatapointType_DPT_CombinedPosition, true
 	case "DPT_StatusSAB":
 		return KnxDatapointType_DPT_StatusSAB, true
-	case "DPT_UpDown":
-		return KnxDatapointType_DPT_UpDown, true
 	case "DPT_Colour_xyY":
 		return KnxDatapointType_DPT_Colour_xyY, true
 	case "DPT_Converter_Status":
@@ -6299,14 +9232,14 @@ func KnxDatapointTypeByName(value string) (enum KnxDatapointType, ok bool) {
 		return KnxDatapointType_DPT_Brightness_Colour_Temperature_Control, true
 	case "DPT_Colour_RGBW":
 		return KnxDatapointType_DPT_Colour_RGBW, true
+	case "DPT_OpenClose":
+		return KnxDatapointType_DPT_OpenClose, true
 	case "DPT_Relative_Control_RGBW":
 		return KnxDatapointType_DPT_Relative_Control_RGBW, true
 	case "DPT_Relative_Control_RGB":
 		return KnxDatapointType_DPT_Relative_Control_RGB, true
 	case "DPT_GeographicalLocation":
 		return KnxDatapointType_DPT_GeographicalLocation, true
-	case "DPT_OpenClose":
-		return KnxDatapointType_DPT_OpenClose, true
 	case "DPT_TempRoomSetpSetF16_4":
 		return KnxDatapointType_DPT_TempRoomSetpSetF16_4, true
 	case "DPT_TempRoomSetpSetShiftF16_4":
@@ -6522,8 +9455,14 @@ func (e KnxDatapointType) GetValue() uint32 {
 func (e KnxDatapointType) GetNumber() uint16 {
 	return e.Number()
 }
+func (e KnxDatapointType) GetPlcValueTpe() values.PlcValueType {
+	return e.PlcValueTpe()
+}
 func (e KnxDatapointType) GetName() string {
 	return e.Name()
+}
+func (e KnxDatapointType) GetId() string {
+	return e.Id()
 }
 func (e KnxDatapointType) GetDatapointMainType() KnxDatapointMainType {
 	return e.DatapointMainType()
@@ -6952,12 +9891,18 @@ func (e KnxDatapointType) PLC4XEnumName() string {
 		return "DPT_RF_ModeSelect"
 	case KnxDatapointType_DPT_RF_FilterSelect:
 		return "DPT_RF_FilterSelect"
+	case KnxDatapointType_DPT_EVSEMode_1:
+		return "DPT_EVSEMode_1"
+	case KnxDatapointType_DPT_EVSEMode_2:
+		return "DPT_EVSEMode_2"
+	case KnxDatapointType_DPT_Enable:
+		return "DPT_Enable"
+	case KnxDatapointType_DPT_EVSEMode_3:
+		return "DPT_EVSEMode_3"
 	case KnxDatapointType_DPT_StatusGen:
 		return "DPT_StatusGen"
 	case KnxDatapointType_DPT_Device_Control:
 		return "DPT_Device_Control"
-	case KnxDatapointType_DPT_Enable:
-		return "DPT_Enable"
 	case KnxDatapointType_DPT_ForceSign:
 		return "DPT_ForceSign"
 	case KnxDatapointType_DPT_ForceSignCool:
@@ -6972,16 +9917,16 @@ func (e KnxDatapointType) PLC4XEnumName() string {
 		return "DPT_StatusRCC"
 	case KnxDatapointType_DPT_StatusAHU:
 		return "DPT_StatusAHU"
+	case KnxDatapointType_WORD:
+		return "WORD"
+	case KnxDatapointType_DPT_Ramp:
+		return "DPT_Ramp"
 	case KnxDatapointType_DPT_CombinedStatus_RTSM:
 		return "DPT_CombinedStatus_RTSM"
 	case KnxDatapointType_DPT_LightActuatorErrorInfo:
 		return "DPT_LightActuatorErrorInfo"
 	case KnxDatapointType_DPT_RF_ModeInfo:
 		return "DPT_RF_ModeInfo"
-	case KnxDatapointType_WORD:
-		return "WORD"
-	case KnxDatapointType_DPT_Ramp:
-		return "DPT_Ramp"
 	case KnxDatapointType_DPT_RF_FilterInfo:
 		return "DPT_RF_FilterInfo"
 	case KnxDatapointType_DPT_Channel_Activation_8:
@@ -6996,14 +9941,14 @@ func (e KnxDatapointType) PLC4XEnumName() string {
 		return "DPT_CombinedStatus_RTC"
 	case KnxDatapointType_DPT_Media:
 		return "DPT_Media"
+	case KnxDatapointType_DPT_Alarm:
+		return "DPT_Alarm"
 	case KnxDatapointType_DPT_Channel_Activation_16:
 		return "DPT_Channel_Activation_16"
 	case KnxDatapointType_DPT_OnOffAction:
 		return "DPT_OnOffAction"
 	case KnxDatapointType_DPT_Alarm_Reaction:
 		return "DPT_Alarm_Reaction"
-	case KnxDatapointType_DPT_Alarm:
-		return "DPT_Alarm"
 	case KnxDatapointType_DPT_UpDown_Action:
 		return "DPT_UpDown_Action"
 	case KnxDatapointType_DPT_HVAC_PB_Action:
@@ -7018,14 +9963,14 @@ func (e KnxDatapointType) PLC4XEnumName() string {
 		return "DPT_ActiveEnergy_V64"
 	case KnxDatapointType_DPT_ApparentEnergy_V64:
 		return "DPT_ApparentEnergy_V64"
+	case KnxDatapointType_DPT_BinaryValue:
+		return "DPT_BinaryValue"
 	case KnxDatapointType_DPT_ReactiveEnergy_V64:
 		return "DPT_ReactiveEnergy_V64"
 	case KnxDatapointType_DPT_Channel_Activation_24:
 		return "DPT_Channel_Activation_24"
 	case KnxDatapointType_DPT_HVACModeNext:
 		return "DPT_HVACModeNext"
-	case KnxDatapointType_DPT_BinaryValue:
-		return "DPT_BinaryValue"
 	case KnxDatapointType_DPT_DHWModeNext:
 		return "DPT_DHWModeNext"
 	case KnxDatapointType_DPT_OccModeNext:
@@ -7040,14 +9985,14 @@ func (e KnxDatapointType) PLC4XEnumName() string {
 		return "DPT_AlarmInfo"
 	case KnxDatapointType_DPT_TempRoomSetpSetF16_3:
 		return "DPT_TempRoomSetpSetF16_3"
+	case KnxDatapointType_DPT_Step:
+		return "DPT_Step"
 	case KnxDatapointType_DPT_TempRoomSetpSetShiftF16_3:
 		return "DPT_TempRoomSetpSetShiftF16_3"
 	case KnxDatapointType_DPT_Scaling_Speed:
 		return "DPT_Scaling_Speed"
 	case KnxDatapointType_DPT_Scaling_Step_Time:
 		return "DPT_Scaling_Step_Time"
-	case KnxDatapointType_DPT_Step:
-		return "DPT_Step"
 	case KnxDatapointType_DPT_MeteringValue:
 		return "DPT_MeteringValue"
 	case KnxDatapointType_DPT_MBus_Address:
@@ -7062,14 +10007,14 @@ func (e KnxDatapointType) PLC4XEnumName() string {
 		return "DPT_Prioritised_Mode_Control"
 	case KnxDatapointType_DPT_DALI_Control_Gear_Diagnostic:
 		return "DPT_DALI_Control_Gear_Diagnostic"
+	case KnxDatapointType_DPT_UpDown:
+		return "DPT_UpDown"
 	case KnxDatapointType_DPT_DALI_Diagnostics:
 		return "DPT_DALI_Diagnostics"
 	case KnxDatapointType_DPT_CombinedPosition:
 		return "DPT_CombinedPosition"
 	case KnxDatapointType_DPT_StatusSAB:
 		return "DPT_StatusSAB"
-	case KnxDatapointType_DPT_UpDown:
-		return "DPT_UpDown"
 	case KnxDatapointType_DPT_Colour_xyY:
 		return "DPT_Colour_xyY"
 	case KnxDatapointType_DPT_Converter_Status:
@@ -7084,14 +10029,14 @@ func (e KnxDatapointType) PLC4XEnumName() string {
 		return "DPT_Brightness_Colour_Temperature_Control"
 	case KnxDatapointType_DPT_Colour_RGBW:
 		return "DPT_Colour_RGBW"
+	case KnxDatapointType_DPT_OpenClose:
+		return "DPT_OpenClose"
 	case KnxDatapointType_DPT_Relative_Control_RGBW:
 		return "DPT_Relative_Control_RGBW"
 	case KnxDatapointType_DPT_Relative_Control_RGB:
 		return "DPT_Relative_Control_RGB"
 	case KnxDatapointType_DPT_GeographicalLocation:
 		return "DPT_GeographicalLocation"
-	case KnxDatapointType_DPT_OpenClose:
-		return "DPT_OpenClose"
 	case KnxDatapointType_DPT_TempRoomSetpSetF16_4:
 		return "DPT_TempRoomSetpSetF16_4"
 	case KnxDatapointType_DPT_TempRoomSetpSetShiftF16_4:

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataLastPriority = (*_BACnetConstructedDataLastPriority)(
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLastPriority)(nil)
 
 // NewBACnetConstructedDataLastPriority factory function for _BACnetConstructedDataLastPriority
-func NewBACnetConstructedDataLastPriority(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lastPriority BACnetApplicationTagUnsignedInteger, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLastPriority {
+func NewBACnetConstructedDataLastPriority(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lastPriority BACnetApplicationTagUnsignedInteger) *_BACnetConstructedDataLastPriority {
 	if lastPriority == nil {
 		panic("lastPriority of type BACnetApplicationTagUnsignedInteger for BACnetConstructedDataLastPriority must not be nil")
 	}
 	_result := &_BACnetConstructedDataLastPriority{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		LastPriority:                  lastPriority,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataLastPriorityBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLastPriorityBuilder) = (*_BACnetConstructedDataLastPriorityBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataLastPriorityBuilder) WithLastPriorityBuilder(buil
 	var err error
 	b.LastPriority, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataLastPriorityBuilder) Build() (BACnetConstructedDataLastPriority, error) {
 	if b.LastPriority == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'lastPriority' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'lastPriority' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLastPriority.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataLastPriorityBuilder) buildForBACnetConstructedDat
 
 func (b *_BACnetConstructedDataLastPriorityBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLastPriorityBuilder().(*_BACnetConstructedDataLastPriorityBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataLastPriority(structType any) BACnetConstructedData
 	return nil
 }
 
-func (m *_BACnetConstructedDataLastPriority) GetTypeName() string {
+func (m *_BACnetConstructedDataLastPriority) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLastPriority"
 }
 

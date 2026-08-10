@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +104,7 @@ type _LightingDataRampToLevelBuilder struct {
 
 	parentBuilder *_LightingDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (LightingDataRampToLevelBuilder) = (*_LightingDataRampToLevelBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_LightingDataRampToLevelBuilder) WithLevel(level byte) LightingDataRamp
 }
 
 func (b *_LightingDataRampToLevelBuilder) Build() (LightingDataRampToLevel, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._LightingDataRampToLevel.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_LightingDataRampToLevelBuilder) buildForLightingData() (LightingData, 
 
 func (b *_LightingDataRampToLevelBuilder) DeepCopy() any {
 	_copy := b.CreateLightingDataRampToLevelBuilder().(*_LightingDataRampToLevelBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -217,7 +218,7 @@ func CastLightingDataRampToLevel(structType any) LightingDataRampToLevel {
 	return nil
 }
 
-func (m *_LightingDataRampToLevel) GetTypeName() string {
+func (m *_LightingDataRampToLevel) GetPlx4xTypeName() string {
 	return "LightingDataRampToLevel"
 }
 

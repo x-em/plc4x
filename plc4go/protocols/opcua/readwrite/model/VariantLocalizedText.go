@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,7 +62,7 @@ var _ VariantLocalizedText = (*_VariantLocalizedText)(nil)
 var _ VariantRequirements = (*_VariantLocalizedText)(nil)
 
 // NewVariantLocalizedText factory function for _VariantLocalizedText
-func NewVariantLocalizedText(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool, arrayLength *int32, value []LocalizedText) *_VariantLocalizedText {
+func NewVariantLocalizedText(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32, arrayLength *int32, value []LocalizedText) *_VariantLocalizedText {
 	_result := &_VariantLocalizedText{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 		ArrayLength:     arrayLength,
@@ -103,7 +104,7 @@ type _VariantLocalizedTextBuilder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantLocalizedTextBuilder) = (*_VariantLocalizedTextBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_VariantLocalizedTextBuilder) WithValue(value ...LocalizedText) Variant
 }
 
 func (b *_VariantLocalizedTextBuilder) Build() (VariantLocalizedText, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantLocalizedText.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_VariantLocalizedTextBuilder) buildForVariant() (Variant, error) {
 
 func (b *_VariantLocalizedTextBuilder) DeepCopy() any {
 	_copy := b.CreateVariantLocalizedTextBuilder().(*_VariantLocalizedTextBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastVariantLocalizedText(structType any) VariantLocalizedText {
 	return nil
 }
 
-func (m *_VariantLocalizedText) GetTypeName() string {
+func (m *_VariantLocalizedText) GetPlx4xTypeName() string {
 	return "VariantLocalizedText"
 }
 
@@ -237,9 +238,7 @@ func (m *_VariantLocalizedText) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Value) > 0 {
 		for _curItem, element := range m.Value {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Value), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -90,7 +91,7 @@ func NewNumericNodeIdBuilder() NumericNodeIdBuilder {
 type _NumericNodeIdBuilder struct {
 	*_NumericNodeId
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NumericNodeIdBuilder) = (*_NumericNodeIdBuilder)(nil)
@@ -110,8 +111,8 @@ func (b *_NumericNodeIdBuilder) WithIdentifier(identifier uint32) NumericNodeIdB
 }
 
 func (b *_NumericNodeIdBuilder) Build() (NumericNodeId, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NumericNodeId.deepCopy(), nil
 }
@@ -126,8 +127,8 @@ func (b *_NumericNodeIdBuilder) MustBuild() NumericNodeId {
 
 func (b *_NumericNodeIdBuilder) DeepCopy() any {
 	_copy := b.CreateNumericNodeIdBuilder().(*_NumericNodeIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -174,7 +175,7 @@ func CastNumericNodeId(structType any) NumericNodeId {
 	return nil
 }
 
-func (m *_NumericNodeId) GetTypeName() string {
+func (m *_NumericNodeId) GetPlx4xTypeName() string {
 	return "NumericNodeId"
 }
 
@@ -205,7 +206,7 @@ func NumericNodeIdParseWithBufferProducer() func(ctx context.Context, readBuffer
 }
 
 func NumericNodeIdParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (NumericNodeId, error) {
-	v, err := (&_NumericNodeId{}).parse(ctx, readBuffer)
+	v, err := (new(_NumericNodeId)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

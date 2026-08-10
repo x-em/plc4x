@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,7 +62,7 @@ var _ VariantInt16 = (*_VariantInt16)(nil)
 var _ VariantRequirements = (*_VariantInt16)(nil)
 
 // NewVariantInt16 factory function for _VariantInt16
-func NewVariantInt16(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool, arrayLength *int32, value []int16) *_VariantInt16 {
+func NewVariantInt16(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32, arrayLength *int32, value []int16) *_VariantInt16 {
 	_result := &_VariantInt16{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 		ArrayLength:     arrayLength,
@@ -103,7 +104,7 @@ type _VariantInt16Builder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantInt16Builder) = (*_VariantInt16Builder)(nil)
@@ -128,8 +129,8 @@ func (b *_VariantInt16Builder) WithValue(value ...int16) VariantInt16Builder {
 }
 
 func (b *_VariantInt16Builder) Build() (VariantInt16, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantInt16.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_VariantInt16Builder) buildForVariant() (Variant, error) {
 
 func (b *_VariantInt16Builder) DeepCopy() any {
 	_copy := b.CreateVariantInt16Builder().(*_VariantInt16Builder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastVariantInt16(structType any) VariantInt16 {
 	return nil
 }
 
-func (m *_VariantInt16) GetTypeName() string {
+func (m *_VariantInt16) GetPlx4xTypeName() string {
 	return "VariantInt16"
 }
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -150,7 +152,7 @@ type _StructureFieldBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (StructureFieldBuilder) = (*_StructureFieldBuilder)(nil)
@@ -174,10 +176,7 @@ func (b *_StructureFieldBuilder) WithNameBuilder(builderSupplier func(PascalStri
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -192,10 +191,7 @@ func (b *_StructureFieldBuilder) WithDescriptionBuilder(builderSupplier func(Loc
 	var err error
 	b.Description, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LocalizedTextBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LocalizedTextBuilder failed"))
 	}
 	return b
 }
@@ -210,10 +206,7 @@ func (b *_StructureFieldBuilder) WithDataTypeBuilder(builderSupplier func(NodeId
 	var err error
 	b.DataType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -240,25 +233,16 @@ func (b *_StructureFieldBuilder) WithIsOptional(isOptional bool) StructureFieldB
 
 func (b *_StructureFieldBuilder) Build() (StructureField, error) {
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
 	if b.Description == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'description' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'description' not set"))
 	}
 	if b.DataType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataType' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._StructureField.deepCopy(), nil
 }
@@ -284,8 +268,8 @@ func (b *_StructureFieldBuilder) buildForExtensionObjectDefinition() (ExtensionO
 
 func (b *_StructureFieldBuilder) DeepCopy() any {
 	_copy := b.CreateStructureFieldBuilder().(*_StructureFieldBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -370,7 +354,7 @@ func CastStructureField(structType any) StructureField {
 	return nil
 }
 
-func (m *_StructureField) GetTypeName() string {
+func (m *_StructureField) GetPlx4xTypeName() string {
 	return "StructureField"
 }
 
@@ -424,55 +408,55 @@ func (m *_StructureField) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'name' field"))
 	}
 	m.Name = name
 
-	description, err := ReadSimpleField[LocalizedText](ctx, "description", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer))
+	description, err := ReadSimpleField[LocalizedText](ctx, "description", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'description' field"))
 	}
 	m.Description = description
 
-	dataType, err := ReadSimpleField[NodeId](ctx, "dataType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	dataType, err := ReadSimpleField[NodeId](ctx, "dataType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataType' field"))
 	}
 	m.DataType = dataType
 
-	valueRank, err := ReadSimpleField(ctx, "valueRank", ReadSignedInt(readBuffer, uint8(32)))
+	valueRank, err := ReadSimpleField(ctx, "valueRank", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'valueRank' field"))
 	}
 	m.ValueRank = valueRank
 
-	noOfArrayDimensions, err := ReadImplicitField[int32](ctx, "noOfArrayDimensions", ReadSignedInt(readBuffer, uint8(32)))
+	noOfArrayDimensions, err := ReadImplicitField[int32](ctx, "noOfArrayDimensions", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfArrayDimensions' field"))
 	}
 	_ = noOfArrayDimensions
 
-	arrayDimensions, err := ReadCountArrayField[uint32](ctx, "arrayDimensions", ReadUnsignedInt(readBuffer, uint8(32)), uint64(noOfArrayDimensions))
+	arrayDimensions, err := ReadCountArrayField[uint32](ctx, "arrayDimensions", ReadUnsignedInt(readBuffer, uint8(32)), uint64(noOfArrayDimensions), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'arrayDimensions' field"))
 	}
 	m.ArrayDimensions = arrayDimensions
 
-	maxStringLength, err := ReadSimpleField(ctx, "maxStringLength", ReadUnsignedInt(readBuffer, uint8(32)))
+	maxStringLength, err := ReadSimpleField(ctx, "maxStringLength", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'maxStringLength' field"))
 	}
 	m.MaxStringLength = maxStringLength
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	isOptional, err := ReadSimpleField(ctx, "isOptional", ReadBoolean(readBuffer))
+	isOptional, err := ReadSimpleField(ctx, "isOptional", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'isOptional' field"))
 	}
@@ -503,39 +487,39 @@ func (m *_StructureField) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for StructureField")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'name' field")
 		}
 
-		if err := WriteSimpleField[LocalizedText](ctx, "description", m.GetDescription(), WriteComplex[LocalizedText](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LocalizedText](ctx, "description", m.GetDescription(), WriteComplex[LocalizedText](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'description' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "dataType", m.GetDataType(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "dataType", m.GetDataType(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataType' field")
 		}
 
-		if err := WriteSimpleField[int32](ctx, "valueRank", m.GetValueRank(), WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[int32](ctx, "valueRank", m.GetValueRank(), WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'valueRank' field")
 		}
 		noOfArrayDimensions := int32(utils.InlineIf(bool((m.GetArrayDimensions()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetArrayDimensions()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfArrayDimensions", noOfArrayDimensions, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfArrayDimensions", noOfArrayDimensions, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfArrayDimensions' field")
 		}
 
-		if err := WriteSimpleTypeArrayField(ctx, "arrayDimensions", m.GetArrayDimensions(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleTypeArrayField(ctx, "arrayDimensions", m.GetArrayDimensions(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'arrayDimensions' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "maxStringLength", m.GetMaxStringLength(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "maxStringLength", m.GetMaxStringLength(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'maxStringLength' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "isOptional", m.GetIsOptional(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "isOptional", m.GetIsOptional(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'isOptional' field")
 		}
 

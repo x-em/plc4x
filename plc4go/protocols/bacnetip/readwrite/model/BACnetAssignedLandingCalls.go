@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -90,7 +91,7 @@ func NewBACnetAssignedLandingCallsBuilder() BACnetAssignedLandingCallsBuilder {
 type _BACnetAssignedLandingCallsBuilder struct {
 	*_BACnetAssignedLandingCalls
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetAssignedLandingCallsBuilder) = (*_BACnetAssignedLandingCallsBuilder)(nil)
@@ -109,23 +110,17 @@ func (b *_BACnetAssignedLandingCallsBuilder) WithLandingCallsBuilder(builderSupp
 	var err error
 	b.LandingCalls, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetAssignedLandingCallsLandingCallsListBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetAssignedLandingCallsLandingCallsListBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetAssignedLandingCallsBuilder) Build() (BACnetAssignedLandingCalls, error) {
 	if b.LandingCalls == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'landingCalls' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'landingCalls' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetAssignedLandingCalls.deepCopy(), nil
 }
@@ -140,8 +135,8 @@ func (b *_BACnetAssignedLandingCallsBuilder) MustBuild() BACnetAssignedLandingCa
 
 func (b *_BACnetAssignedLandingCallsBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetAssignedLandingCallsBuilder().(*_BACnetAssignedLandingCallsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -184,7 +179,7 @@ func CastBACnetAssignedLandingCalls(structType any) BACnetAssignedLandingCalls {
 	return nil
 }
 
-func (m *_BACnetAssignedLandingCalls) GetTypeName() string {
+func (m *_BACnetAssignedLandingCalls) GetPlx4xTypeName() string {
 	return "BACnetAssignedLandingCalls"
 }
 
@@ -212,7 +207,7 @@ func BACnetAssignedLandingCallsParseWithBufferProducer() func(ctx context.Contex
 }
 
 func BACnetAssignedLandingCallsParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetAssignedLandingCalls, error) {
-	v, err := (&_BACnetAssignedLandingCalls{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetAssignedLandingCalls)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

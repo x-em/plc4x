@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -45,6 +46,7 @@ type BACnetConstructedDataCarDoorStatus interface {
 	// GetCarDoorStatus returns CarDoorStatus (property field)
 	GetCarDoorStatus() []BACnetDoorStatusTagged
 	// GetZero returns Zero (virtual field)
+	// TODO: uint 64 ---> big int in java == boom
 	GetZero() uint64
 	// IsBACnetConstructedDataCarDoorStatus is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsBACnetConstructedDataCarDoorStatus()
@@ -63,9 +65,9 @@ var _ BACnetConstructedDataCarDoorStatus = (*_BACnetConstructedDataCarDoorStatus
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataCarDoorStatus)(nil)
 
 // NewBACnetConstructedDataCarDoorStatus factory function for _BACnetConstructedDataCarDoorStatus
-func NewBACnetConstructedDataCarDoorStatus(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, carDoorStatus []BACnetDoorStatusTagged, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataCarDoorStatus {
+func NewBACnetConstructedDataCarDoorStatus(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, carDoorStatus []BACnetDoorStatusTagged) *_BACnetConstructedDataCarDoorStatus {
 	_result := &_BACnetConstructedDataCarDoorStatus{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		NumberOfDataElements:          numberOfDataElements,
 		CarDoorStatus:                 carDoorStatus,
 	}
@@ -107,7 +109,7 @@ type _BACnetConstructedDataCarDoorStatusBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataCarDoorStatusBuilder) = (*_BACnetConstructedDataCarDoorStatusBuilder)(nil)
@@ -131,10 +133,7 @@ func (b *_BACnetConstructedDataCarDoorStatusBuilder) WithOptionalNumberOfDataEle
 	var err error
 	b.NumberOfDataElements, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -145,8 +144,8 @@ func (b *_BACnetConstructedDataCarDoorStatusBuilder) WithCarDoorStatus(carDoorSt
 }
 
 func (b *_BACnetConstructedDataCarDoorStatusBuilder) Build() (BACnetConstructedDataCarDoorStatus, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataCarDoorStatus.deepCopy(), nil
 }
@@ -172,8 +171,8 @@ func (b *_BACnetConstructedDataCarDoorStatusBuilder) buildForBACnetConstructedDa
 
 func (b *_BACnetConstructedDataCarDoorStatusBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataCarDoorStatusBuilder().(*_BACnetConstructedDataCarDoorStatusBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -259,7 +258,7 @@ func CastBACnetConstructedDataCarDoorStatus(structType any) BACnetConstructedDat
 	return nil
 }
 
-func (m *_BACnetConstructedDataCarDoorStatus) GetTypeName() string {
+func (m *_BACnetConstructedDataCarDoorStatus) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataCarDoorStatus"
 }
 
@@ -351,7 +350,7 @@ func (m *_BACnetConstructedDataCarDoorStatus) SerializeWithWriteBuffer(ctx conte
 			return errors.Wrap(_zeroErr, "Error serializing 'zero' field")
 		}
 
-		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", GetRef(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", new(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'numberOfDataElements' field")
 		}
 

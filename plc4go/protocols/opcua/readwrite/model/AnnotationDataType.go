@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -124,7 +126,7 @@ type _AnnotationDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AnnotationDataTypeBuilder) = (*_AnnotationDataTypeBuilder)(nil)
@@ -148,10 +150,7 @@ func (b *_AnnotationDataTypeBuilder) WithAnnotationBuilder(builderSupplier func(
 	var err error
 	b.Annotation, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -166,10 +165,7 @@ func (b *_AnnotationDataTypeBuilder) WithDisciplineBuilder(builderSupplier func(
 	var err error
 	b.Discipline, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -184,35 +180,23 @@ func (b *_AnnotationDataTypeBuilder) WithUriBuilder(builderSupplier func(PascalS
 	var err error
 	b.Uri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_AnnotationDataTypeBuilder) Build() (AnnotationDataType, error) {
 	if b.Annotation == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'annotation' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'annotation' not set"))
 	}
 	if b.Discipline == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'discipline' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'discipline' not set"))
 	}
 	if b.Uri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'uri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'uri' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AnnotationDataType.deepCopy(), nil
 }
@@ -238,8 +222,8 @@ func (b *_AnnotationDataTypeBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_AnnotationDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateAnnotationDataTypeBuilder().(*_AnnotationDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -308,7 +292,7 @@ func CastAnnotationDataType(structType any) AnnotationDataType {
 	return nil
 }
 
-func (m *_AnnotationDataType) GetTypeName() string {
+func (m *_AnnotationDataType) GetPlx4xTypeName() string {
 	return "AnnotationDataType"
 }
 
@@ -342,19 +326,19 @@ func (m *_AnnotationDataType) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	annotation, err := ReadSimpleField[PascalString](ctx, "annotation", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	annotation, err := ReadSimpleField[PascalString](ctx, "annotation", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'annotation' field"))
 	}
 	m.Annotation = annotation
 
-	discipline, err := ReadSimpleField[PascalString](ctx, "discipline", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	discipline, err := ReadSimpleField[PascalString](ctx, "discipline", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discipline' field"))
 	}
 	m.Discipline = discipline
 
-	uri, err := ReadSimpleField[PascalString](ctx, "uri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	uri, err := ReadSimpleField[PascalString](ctx, "uri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'uri' field"))
 	}
@@ -385,15 +369,15 @@ func (m *_AnnotationDataType) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for AnnotationDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "annotation", m.GetAnnotation(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "annotation", m.GetAnnotation(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'annotation' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "discipline", m.GetDiscipline(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "discipline", m.GetDiscipline(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discipline' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "uri", m.GetUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "uri", m.GetUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'uri' field")
 		}
 

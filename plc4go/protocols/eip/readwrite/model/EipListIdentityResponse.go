@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _EipListIdentityResponseBuilder struct {
 
 	parentBuilder *_EipPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EipListIdentityResponseBuilder) = (*_EipListIdentityResponseBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_EipListIdentityResponseBuilder) WithItems(items ...CommandSpecificData
 }
 
 func (b *_EipListIdentityResponseBuilder) Build() (EipListIdentityResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EipListIdentityResponse.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_EipListIdentityResponseBuilder) buildForEipPacket() (EipPacket, error)
 
 func (b *_EipListIdentityResponseBuilder) DeepCopy() any {
 	_copy := b.CreateEipListIdentityResponseBuilder().(*_EipListIdentityResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -214,7 +216,7 @@ func CastEipListIdentityResponse(structType any) EipListIdentityResponse {
 	return nil
 }
 
-func (m *_EipListIdentityResponse) GetTypeName() string {
+func (m *_EipListIdentityResponse) GetPlx4xTypeName() string {
 	return "EipListIdentityResponse"
 }
 
@@ -228,9 +230,7 @@ func (m *_EipListIdentityResponse) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Items) > 0 {
 		for _curItem, element := range m.Items {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Items), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -252,13 +252,13 @@ func (m *_EipListIdentityResponse) parse(ctx context.Context, readBuffer utils.R
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	itemCount, err := ReadImplicitField[uint16](ctx, "itemCount", ReadUnsignedShort(readBuffer, uint8(16)))
+	itemCount, err := ReadImplicitField[uint16](ctx, "itemCount", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'itemCount' field"))
 	}
 	_ = itemCount
 
-	items, err := ReadCountArrayField[CommandSpecificDataItem](ctx, "items", ReadComplex[CommandSpecificDataItem](CommandSpecificDataItemParseWithBuffer, readBuffer), uint64(itemCount))
+	items, err := ReadCountArrayField[CommandSpecificDataItem](ctx, "items", ReadComplex[CommandSpecificDataItem](CommandSpecificDataItemParseWithBuffer, readBuffer), uint64(itemCount), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'items' field"))
 	}
@@ -289,11 +289,11 @@ func (m *_EipListIdentityResponse) SerializeWithWriteBuffer(ctx context.Context,
 			return errors.Wrap(pushErr, "Error pushing for EipListIdentityResponse")
 		}
 		itemCount := uint16(uint16(len(m.GetItems())))
-		if err := WriteImplicitField(ctx, "itemCount", itemCount, WriteUnsignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteImplicitField(ctx, "itemCount", itemCount, WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'itemCount' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "items", m.GetItems(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "items", m.GetItems(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'items' field")
 		}
 

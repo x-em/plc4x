@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -147,7 +149,7 @@ type _JsonApplicationDescriptionMessageBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (JsonApplicationDescriptionMessageBuilder) = (*_JsonApplicationDescriptionMessageBuilder)(nil)
@@ -171,10 +173,7 @@ func (b *_JsonApplicationDescriptionMessageBuilder) WithMessageIdBuilder(builder
 	var err error
 	b.MessageId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -189,10 +188,7 @@ func (b *_JsonApplicationDescriptionMessageBuilder) WithMessageTypeBuilder(build
 	var err error
 	b.MessageType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -207,10 +203,7 @@ func (b *_JsonApplicationDescriptionMessageBuilder) WithPublisherIdBuilder(build
 	var err error
 	b.PublisherId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -230,10 +223,7 @@ func (b *_JsonApplicationDescriptionMessageBuilder) WithDescriptionBuilder(build
 	var err error
 	b.Description, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
 	}
 	return b
 }
@@ -245,31 +235,19 @@ func (b *_JsonApplicationDescriptionMessageBuilder) WithServerCapabilities(serve
 
 func (b *_JsonApplicationDescriptionMessageBuilder) Build() (JsonApplicationDescriptionMessage, error) {
 	if b.MessageId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'messageId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'messageId' not set"))
 	}
 	if b.MessageType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'messageType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'messageType' not set"))
 	}
 	if b.PublisherId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'publisherId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'publisherId' not set"))
 	}
 	if b.Description == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'description' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'description' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._JsonApplicationDescriptionMessage.deepCopy(), nil
 }
@@ -295,8 +273,8 @@ func (b *_JsonApplicationDescriptionMessageBuilder) buildForExtensionObjectDefin
 
 func (b *_JsonApplicationDescriptionMessageBuilder) DeepCopy() any {
 	_copy := b.CreateJsonApplicationDescriptionMessageBuilder().(*_JsonApplicationDescriptionMessageBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -377,7 +355,7 @@ func CastJsonApplicationDescriptionMessage(structType any) JsonApplicationDescri
 	return nil
 }
 
-func (m *_JsonApplicationDescriptionMessage) GetTypeName() string {
+func (m *_JsonApplicationDescriptionMessage) GetPlx4xTypeName() string {
 	return "JsonApplicationDescriptionMessage"
 }
 
@@ -406,9 +384,7 @@ func (m *_JsonApplicationDescriptionMessage) GetLengthInBits(ctx context.Context
 	if len(m.ServerCapabilities) > 0 {
 		for _curItem, element := range m.ServerCapabilities {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ServerCapabilities), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -430,43 +406,43 @@ func (m *_JsonApplicationDescriptionMessage) parse(ctx context.Context, readBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	messageId, err := ReadSimpleField[PascalString](ctx, "messageId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	messageId, err := ReadSimpleField[PascalString](ctx, "messageId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageId' field"))
 	}
 	m.MessageId = messageId
 
-	messageType, err := ReadSimpleField[PascalString](ctx, "messageType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	messageType, err := ReadSimpleField[PascalString](ctx, "messageType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageType' field"))
 	}
 	m.MessageType = messageType
 
-	publisherId, err := ReadSimpleField[PascalString](ctx, "publisherId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	publisherId, err := ReadSimpleField[PascalString](ctx, "publisherId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'publisherId' field"))
 	}
 	m.PublisherId = publisherId
 
-	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)))
+	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timestamp' field"))
 	}
 	m.Timestamp = timestamp
 
-	description, err := ReadSimpleField[ApplicationDescription](ctx, "description", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer))
+	description, err := ReadSimpleField[ApplicationDescription](ctx, "description", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'description' field"))
 	}
 	m.Description = description
 
-	noOfServerCapabilities, err := ReadImplicitField[int32](ctx, "noOfServerCapabilities", ReadSignedInt(readBuffer, uint8(32)))
+	noOfServerCapabilities, err := ReadImplicitField[int32](ctx, "noOfServerCapabilities", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfServerCapabilities' field"))
 	}
 	_ = noOfServerCapabilities
 
-	serverCapabilities, err := ReadCountArrayField[PascalString](ctx, "serverCapabilities", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfServerCapabilities))
+	serverCapabilities, err := ReadCountArrayField[PascalString](ctx, "serverCapabilities", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfServerCapabilities), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverCapabilities' field"))
 	}
@@ -497,31 +473,31 @@ func (m *_JsonApplicationDescriptionMessage) SerializeWithWriteBuffer(ctx contex
 			return errors.Wrap(pushErr, "Error pushing for JsonApplicationDescriptionMessage")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "messageId", m.GetMessageId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "messageId", m.GetMessageId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "messageType", m.GetMessageType(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "messageType", m.GetMessageType(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageType' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "publisherId", m.GetPublisherId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "publisherId", m.GetPublisherId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'publisherId' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timestamp' field")
 		}
 
-		if err := WriteSimpleField[ApplicationDescription](ctx, "description", m.GetDescription(), WriteComplex[ApplicationDescription](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ApplicationDescription](ctx, "description", m.GetDescription(), WriteComplex[ApplicationDescription](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'description' field")
 		}
 		noOfServerCapabilities := int32(utils.InlineIf(bool((m.GetServerCapabilities()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetServerCapabilities()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfServerCapabilities", noOfServerCapabilities, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfServerCapabilities", noOfServerCapabilities, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfServerCapabilities' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "serverCapabilities", m.GetServerCapabilities(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "serverCapabilities", m.GetServerCapabilities(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverCapabilities' field")
 		}
 

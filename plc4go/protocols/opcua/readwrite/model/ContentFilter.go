@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _ContentFilterBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ContentFilterBuilder) = (*_ContentFilterBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_ContentFilterBuilder) WithElements(elements ...ContentFilterElement) C
 }
 
 func (b *_ContentFilterBuilder) Build() (ContentFilter, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ContentFilter.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_ContentFilterBuilder) buildForExtensionObjectDefinition() (ExtensionOb
 
 func (b *_ContentFilterBuilder) DeepCopy() any {
 	_copy := b.CreateContentFilterBuilder().(*_ContentFilterBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastContentFilter(structType any) ContentFilter {
 	return nil
 }
 
-func (m *_ContentFilter) GetTypeName() string {
+func (m *_ContentFilter) GetPlx4xTypeName() string {
 	return "ContentFilter"
 }
 
@@ -220,9 +222,7 @@ func (m *_ContentFilter) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Elements) > 0 {
 		for _curItem, element := range m.Elements {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Elements), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -244,13 +244,13 @@ func (m *_ContentFilter) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfElements, err := ReadImplicitField[int32](ctx, "noOfElements", ReadSignedInt(readBuffer, uint8(32)))
+	noOfElements, err := ReadImplicitField[int32](ctx, "noOfElements", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfElements' field"))
 	}
 	_ = noOfElements
 
-	elements, err := ReadCountArrayField[ContentFilterElement](ctx, "elements", ReadComplex[ContentFilterElement](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilterElement]((int32)(int32(585))), readBuffer), uint64(noOfElements))
+	elements, err := ReadCountArrayField[ContentFilterElement](ctx, "elements", ReadComplex[ContentFilterElement](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilterElement]((int32)(int32(585))), readBuffer), uint64(noOfElements), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'elements' field"))
 	}
@@ -281,11 +281,11 @@ func (m *_ContentFilter) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 			return errors.Wrap(pushErr, "Error pushing for ContentFilter")
 		}
 		noOfElements := int32(utils.InlineIf(bool((m.GetElements()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetElements()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfElements", noOfElements, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfElements", noOfElements, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfElements' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "elements", m.GetElements(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "elements", m.GetElements(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'elements' field")
 		}
 

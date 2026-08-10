@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -100,7 +101,7 @@ func NewHPAIControlEndpointBuilder() HPAIControlEndpointBuilder {
 type _HPAIControlEndpointBuilder struct {
 	*_HPAIControlEndpoint
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (HPAIControlEndpointBuilder) = (*_HPAIControlEndpointBuilder)(nil)
@@ -124,10 +125,7 @@ func (b *_HPAIControlEndpointBuilder) WithIpAddressBuilder(builderSupplier func(
 	var err error
 	b.IpAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "IPAddressBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "IPAddressBuilder failed"))
 	}
 	return b
 }
@@ -139,13 +137,10 @@ func (b *_HPAIControlEndpointBuilder) WithIpPort(ipPort uint16) HPAIControlEndpo
 
 func (b *_HPAIControlEndpointBuilder) Build() (HPAIControlEndpoint, error) {
 	if b.IpAddress == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'ipAddress' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'ipAddress' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._HPAIControlEndpoint.deepCopy(), nil
 }
@@ -160,8 +155,8 @@ func (b *_HPAIControlEndpointBuilder) MustBuild() HPAIControlEndpoint {
 
 func (b *_HPAIControlEndpointBuilder) DeepCopy() any {
 	_copy := b.CreateHPAIControlEndpointBuilder().(*_HPAIControlEndpointBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -212,7 +207,7 @@ func CastHPAIControlEndpoint(structType any) HPAIControlEndpoint {
 	return nil
 }
 
-func (m *_HPAIControlEndpoint) GetTypeName() string {
+func (m *_HPAIControlEndpoint) GetPlx4xTypeName() string {
 	return "HPAIControlEndpoint"
 }
 
@@ -249,7 +244,7 @@ func HPAIControlEndpointParseWithBufferProducer() func(ctx context.Context, read
 }
 
 func HPAIControlEndpointParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (HPAIControlEndpoint, error) {
-	v, err := (&_HPAIControlEndpoint{}).parse(ctx, readBuffer)
+	v, err := (new(_HPAIControlEndpoint)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

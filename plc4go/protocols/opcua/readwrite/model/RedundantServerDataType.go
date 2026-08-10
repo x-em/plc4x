@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -114,7 +116,7 @@ type _RedundantServerDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RedundantServerDataTypeBuilder) = (*_RedundantServerDataTypeBuilder)(nil)
@@ -138,10 +140,7 @@ func (b *_RedundantServerDataTypeBuilder) WithServerIdBuilder(builderSupplier fu
 	var err error
 	b.ServerId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -158,13 +157,10 @@ func (b *_RedundantServerDataTypeBuilder) WithServerState(serverState ServerStat
 
 func (b *_RedundantServerDataTypeBuilder) Build() (RedundantServerDataType, error) {
 	if b.ServerId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'serverId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'serverId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RedundantServerDataType.deepCopy(), nil
 }
@@ -190,8 +186,8 @@ func (b *_RedundantServerDataTypeBuilder) buildForExtensionObjectDefinition() (E
 
 func (b *_RedundantServerDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateRedundantServerDataTypeBuilder().(*_RedundantServerDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -260,7 +256,7 @@ func CastRedundantServerDataType(structType any) RedundantServerDataType {
 	return nil
 }
 
-func (m *_RedundantServerDataType) GetTypeName() string {
+func (m *_RedundantServerDataType) GetPlx4xTypeName() string {
 	return "RedundantServerDataType"
 }
 
@@ -294,19 +290,19 @@ func (m *_RedundantServerDataType) parse(ctx context.Context, readBuffer utils.R
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	serverId, err := ReadSimpleField[PascalString](ctx, "serverId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	serverId, err := ReadSimpleField[PascalString](ctx, "serverId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverId' field"))
 	}
 	m.ServerId = serverId
 
-	serviceLevel, err := ReadSimpleField(ctx, "serviceLevel", ReadUnsignedByte(readBuffer, uint8(8)))
+	serviceLevel, err := ReadSimpleField(ctx, "serviceLevel", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serviceLevel' field"))
 	}
 	m.ServiceLevel = serviceLevel
 
-	serverState, err := ReadEnumField[ServerState](ctx, "serverState", "ServerState", ReadEnum(ServerStateByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	serverState, err := ReadEnumField[ServerState](ctx, "serverState", "ServerState", ReadEnum(ServerStateByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverState' field"))
 	}
@@ -337,15 +333,15 @@ func (m *_RedundantServerDataType) SerializeWithWriteBuffer(ctx context.Context,
 			return errors.Wrap(pushErr, "Error pushing for RedundantServerDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "serverId", m.GetServerId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "serverId", m.GetServerId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverId' field")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "serviceLevel", m.GetServiceLevel(), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "serviceLevel", m.GetServiceLevel(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serviceLevel' field")
 		}
 
-		if err := WriteSimpleEnumField[ServerState](ctx, "serverState", "ServerState", m.GetServerState(), WriteEnum[ServerState, uint32](ServerState.GetValue, ServerState.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[ServerState](ctx, "serverState", "ServerState", m.GetServerState(), WriteEnum[ServerState, uint32](ServerState.GetValue, ServerState.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverState' field")
 		}
 

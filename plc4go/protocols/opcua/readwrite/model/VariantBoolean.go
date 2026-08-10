@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,7 +62,7 @@ var _ VariantBoolean = (*_VariantBoolean)(nil)
 var _ VariantRequirements = (*_VariantBoolean)(nil)
 
 // NewVariantBoolean factory function for _VariantBoolean
-func NewVariantBoolean(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool, arrayLength *int32, value []byte) *_VariantBoolean {
+func NewVariantBoolean(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32, arrayLength *int32, value []byte) *_VariantBoolean {
 	_result := &_VariantBoolean{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 		ArrayLength:     arrayLength,
@@ -103,7 +104,7 @@ type _VariantBooleanBuilder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantBooleanBuilder) = (*_VariantBooleanBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_VariantBooleanBuilder) WithValue(value ...byte) VariantBooleanBuilder 
 }
 
 func (b *_VariantBooleanBuilder) Build() (VariantBoolean, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantBoolean.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_VariantBooleanBuilder) buildForVariant() (Variant, error) {
 
 func (b *_VariantBooleanBuilder) DeepCopy() any {
 	_copy := b.CreateVariantBooleanBuilder().(*_VariantBooleanBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastVariantBoolean(structType any) VariantBoolean {
 	return nil
 }
 
-func (m *_VariantBoolean) GetTypeName() string {
+func (m *_VariantBoolean) GetPlx4xTypeName() string {
 	return "VariantBoolean"
 }
 

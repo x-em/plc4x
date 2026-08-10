@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataUserExternalIdentifier = (*_BACnetConstructedDataUser
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataUserExternalIdentifier)(nil)
 
 // NewBACnetConstructedDataUserExternalIdentifier factory function for _BACnetConstructedDataUserExternalIdentifier
-func NewBACnetConstructedDataUserExternalIdentifier(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, userExternalIdentifier BACnetApplicationTagCharacterString, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataUserExternalIdentifier {
+func NewBACnetConstructedDataUserExternalIdentifier(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, userExternalIdentifier BACnetApplicationTagCharacterString) *_BACnetConstructedDataUserExternalIdentifier {
 	if userExternalIdentifier == nil {
 		panic("userExternalIdentifier of type BACnetApplicationTagCharacterString for BACnetConstructedDataUserExternalIdentifier must not be nil")
 	}
 	_result := &_BACnetConstructedDataUserExternalIdentifier{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		UserExternalIdentifier:        userExternalIdentifier,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataUserExternalIdentifierBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataUserExternalIdentifierBuilder) = (*_BACnetConstructedDataUserExternalIdentifierBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataUserExternalIdentifierBuilder) WithUserExternalId
 	var err error
 	b.UserExternalIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagCharacterStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagCharacterStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataUserExternalIdentifierBuilder) Build() (BACnetConstructedDataUserExternalIdentifier, error) {
 	if b.UserExternalIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'userExternalIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'userExternalIdentifier' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataUserExternalIdentifier.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataUserExternalIdentifierBuilder) buildForBACnetCons
 
 func (b *_BACnetConstructedDataUserExternalIdentifierBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataUserExternalIdentifierBuilder().(*_BACnetConstructedDataUserExternalIdentifierBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataUserExternalIdentifier(structType any) BACnetConst
 	return nil
 }
 
-func (m *_BACnetConstructedDataUserExternalIdentifier) GetTypeName() string {
+func (m *_BACnetConstructedDataUserExternalIdentifier) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataUserExternalIdentifier"
 }
 

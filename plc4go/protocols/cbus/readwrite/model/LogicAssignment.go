@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +116,7 @@ func NewLogicAssignmentBuilder() LogicAssignmentBuilder {
 type _LogicAssignmentBuilder struct {
 	*_LogicAssignment
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (LogicAssignmentBuilder) = (*_LogicAssignmentBuilder)(nil)
@@ -153,8 +156,8 @@ func (b *_LogicAssignmentBuilder) WithAssignedToGav13(assignedToGav13 bool) Logi
 }
 
 func (b *_LogicAssignmentBuilder) Build() (LogicAssignment, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._LogicAssignment.deepCopy(), nil
 }
@@ -169,8 +172,8 @@ func (b *_LogicAssignmentBuilder) MustBuild() LogicAssignment {
 
 func (b *_LogicAssignmentBuilder) DeepCopy() any {
 	_copy := b.CreateLogicAssignmentBuilder().(*_LogicAssignmentBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -233,7 +236,7 @@ func CastLogicAssignment(structType any) LogicAssignment {
 	return nil
 }
 
-func (m *_LogicAssignment) GetTypeName() string {
+func (m *_LogicAssignment) GetPlx4xTypeName() string {
 	return "LogicAssignment"
 }
 
@@ -272,7 +275,7 @@ func (m *_LogicAssignment) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func LogicAssignmentParse(ctx context.Context, theBytes []byte) (LogicAssignment, error) {
-	return LogicAssignmentParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return LogicAssignmentParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func LogicAssignmentParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (LogicAssignment, error) {
@@ -282,7 +285,7 @@ func LogicAssignmentParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func LogicAssignmentParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (LogicAssignment, error) {
-	v, err := (&_LogicAssignment{}).parse(ctx, readBuffer)
+	v, err := (new(_LogicAssignment)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -298,49 +301,49 @@ func (m *_LogicAssignment) parse(ctx context.Context, readBuffer utils.ReadBuffe
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	greaterOfOrLogic, err := ReadSimpleField(ctx, "greaterOfOrLogic", ReadBoolean(readBuffer))
+	greaterOfOrLogic, err := ReadSimpleField(ctx, "greaterOfOrLogic", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'greaterOfOrLogic' field"))
 	}
 	m.GreaterOfOrLogic = greaterOfOrLogic
 
-	reStrikeDelay, err := ReadSimpleField(ctx, "reStrikeDelay", ReadBoolean(readBuffer))
+	reStrikeDelay, err := ReadSimpleField(ctx, "reStrikeDelay", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'reStrikeDelay' field"))
 	}
 	m.ReStrikeDelay = reStrikeDelay
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	reservedField1, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false))
+	reservedField1, err := ReadReservedField(ctx, "reserved", ReadBoolean(readBuffer), bool(false), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField1 = reservedField1
 
-	assignedToGav16, err := ReadSimpleField(ctx, "assignedToGav16", ReadBoolean(readBuffer))
+	assignedToGav16, err := ReadSimpleField(ctx, "assignedToGav16", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'assignedToGav16' field"))
 	}
 	m.AssignedToGav16 = assignedToGav16
 
-	assignedToGav15, err := ReadSimpleField(ctx, "assignedToGav15", ReadBoolean(readBuffer))
+	assignedToGav15, err := ReadSimpleField(ctx, "assignedToGav15", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'assignedToGav15' field"))
 	}
 	m.AssignedToGav15 = assignedToGav15
 
-	assignedToGav14, err := ReadSimpleField(ctx, "assignedToGav14", ReadBoolean(readBuffer))
+	assignedToGav14, err := ReadSimpleField(ctx, "assignedToGav14", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'assignedToGav14' field"))
 	}
 	m.AssignedToGav14 = assignedToGav14
 
-	assignedToGav13, err := ReadSimpleField(ctx, "assignedToGav13", ReadBoolean(readBuffer))
+	assignedToGav13, err := ReadSimpleField(ctx, "assignedToGav13", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'assignedToGav13' field"))
 	}
@@ -354,7 +357,7 @@ func (m *_LogicAssignment) parse(ctx context.Context, readBuffer utils.ReadBuffe
 }
 
 func (m *_LogicAssignment) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -370,35 +373,35 @@ func (m *_LogicAssignment) SerializeWithWriteBuffer(ctx context.Context, writeBu
 		return errors.Wrap(pushErr, "Error pushing for LogicAssignment")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "greaterOfOrLogic", m.GetGreaterOfOrLogic(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "greaterOfOrLogic", m.GetGreaterOfOrLogic(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'greaterOfOrLogic' field")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "reStrikeDelay", m.GetReStrikeDelay(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "reStrikeDelay", m.GetReStrikeDelay(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reStrikeDelay' field")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 	}
 
-	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteReservedField[bool](ctx, "reserved", bool(false), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 2")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "assignedToGav16", m.GetAssignedToGav16(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "assignedToGav16", m.GetAssignedToGav16(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'assignedToGav16' field")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "assignedToGav15", m.GetAssignedToGav15(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "assignedToGav15", m.GetAssignedToGav15(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'assignedToGav15' field")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "assignedToGav14", m.GetAssignedToGav14(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "assignedToGav14", m.GetAssignedToGav14(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'assignedToGav14' field")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "assignedToGav13", m.GetAssignedToGav13(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "assignedToGav13", m.GetAssignedToGav13(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'assignedToGav13' field")
 	}
 

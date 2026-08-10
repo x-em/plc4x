@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _SignedSoftwareCertificateBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SignedSoftwareCertificateBuilder) = (*_SignedSoftwareCertificateBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_SignedSoftwareCertificateBuilder) WithCertificateDataBuilder(builderSu
 	var err error
 	b.CertificateData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_SignedSoftwareCertificateBuilder) WithSignatureBuilder(builderSupplier
 	var err error
 	b.Signature, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SignedSoftwareCertificateBuilder) Build() (SignedSoftwareCertificate, error) {
 	if b.CertificateData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'certificateData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'certificateData' not set"))
 	}
 	if b.Signature == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'signature' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'signature' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SignedSoftwareCertificate.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_SignedSoftwareCertificateBuilder) buildForExtensionObjectDefinition() 
 
 func (b *_SignedSoftwareCertificateBuilder) DeepCopy() any {
 	_copy := b.CreateSignedSoftwareCertificateBuilder().(*_SignedSoftwareCertificateBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastSignedSoftwareCertificate(structType any) SignedSoftwareCertificate {
 	return nil
 }
 
-func (m *_SignedSoftwareCertificate) GetTypeName() string {
+func (m *_SignedSoftwareCertificate) GetPlx4xTypeName() string {
 	return "SignedSoftwareCertificate"
 }
 
@@ -300,13 +290,13 @@ func (m *_SignedSoftwareCertificate) parse(ctx context.Context, readBuffer utils
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	certificateData, err := ReadSimpleField[PascalByteString](ctx, "certificateData", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	certificateData, err := ReadSimpleField[PascalByteString](ctx, "certificateData", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'certificateData' field"))
 	}
 	m.CertificateData = certificateData
 
-	signature, err := ReadSimpleField[PascalByteString](ctx, "signature", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	signature, err := ReadSimpleField[PascalByteString](ctx, "signature", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'signature' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_SignedSoftwareCertificate) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(pushErr, "Error pushing for SignedSoftwareCertificate")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "certificateData", m.GetCertificateData(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "certificateData", m.GetCertificateData(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'certificateData' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "signature", m.GetSignature(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "signature", m.GetSignature(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'signature' field")
 		}
 

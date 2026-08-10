@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +104,7 @@ type _S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder struct {
 
 	parentBuilder *_S7PayloadUserDataItemBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder) = (*_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder) Wit
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder) Build() (S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder) bui
 
 func (b *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder) DeepCopy() any {
 	_copy := b.CreateS7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder().(*_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -229,7 +230,7 @@ func CastS7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse(structType a
 	return nil
 }
 
-func (m *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse) GetTypeName() string {
+func (m *_S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse) GetPlx4xTypeName() string {
 	return "S7PayloadUserDataItemCpuFunctionMsgSubscriptionSysResponse"
 }
 

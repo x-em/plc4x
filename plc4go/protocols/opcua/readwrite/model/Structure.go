@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewStructureBuilder() StructureBuilder {
 type _StructureBuilder struct {
 	*_Structure
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (StructureBuilder) = (*_StructureBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_StructureBuilder) WithMandatoryFields() StructureBuilder {
 }
 
 func (b *_StructureBuilder) Build() (Structure, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._Structure.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_StructureBuilder) MustBuild() Structure {
 
 func (b *_StructureBuilder) DeepCopy() any {
 	_copy := b.CreateStructureBuilder().(*_StructureBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastStructure(structType any) Structure {
 	return nil
 }
 
-func (m *_Structure) GetTypeName() string {
+func (m *_Structure) GetPlx4xTypeName() string {
 	return "Structure"
 }
 
@@ -159,7 +160,7 @@ func StructureParseWithBufferProducer() func(ctx context.Context, readBuffer uti
 }
 
 func StructureParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (Structure, error) {
-	v, err := (&_Structure{}).parse(ctx, readBuffer)
+	v, err := (new(_Structure)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

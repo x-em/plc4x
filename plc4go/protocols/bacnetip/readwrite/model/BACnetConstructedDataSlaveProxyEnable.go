@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataSlaveProxyEnable = (*_BACnetConstructedDataSlaveProxy
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataSlaveProxyEnable)(nil)
 
 // NewBACnetConstructedDataSlaveProxyEnable factory function for _BACnetConstructedDataSlaveProxyEnable
-func NewBACnetConstructedDataSlaveProxyEnable(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, slaveProxyEnable BACnetApplicationTagBoolean, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataSlaveProxyEnable {
+func NewBACnetConstructedDataSlaveProxyEnable(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, slaveProxyEnable BACnetApplicationTagBoolean) *_BACnetConstructedDataSlaveProxyEnable {
 	if slaveProxyEnable == nil {
 		panic("slaveProxyEnable of type BACnetApplicationTagBoolean for BACnetConstructedDataSlaveProxyEnable must not be nil")
 	}
 	_result := &_BACnetConstructedDataSlaveProxyEnable{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		SlaveProxyEnable:              slaveProxyEnable,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataSlaveProxyEnableBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataSlaveProxyEnableBuilder) = (*_BACnetConstructedDataSlaveProxyEnableBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataSlaveProxyEnableBuilder) WithSlaveProxyEnableBuil
 	var err error
 	b.SlaveProxyEnable, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataSlaveProxyEnableBuilder) Build() (BACnetConstructedDataSlaveProxyEnable, error) {
 	if b.SlaveProxyEnable == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'slaveProxyEnable' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'slaveProxyEnable' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataSlaveProxyEnable.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataSlaveProxyEnableBuilder) buildForBACnetConstructe
 
 func (b *_BACnetConstructedDataSlaveProxyEnableBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataSlaveProxyEnableBuilder().(*_BACnetConstructedDataSlaveProxyEnableBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataSlaveProxyEnable(structType any) BACnetConstructed
 	return nil
 }
 
-func (m *_BACnetConstructedDataSlaveProxyEnable) GetTypeName() string {
+func (m *_BACnetConstructedDataSlaveProxyEnable) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataSlaveProxyEnable"
 }
 

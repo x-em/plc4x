@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +105,7 @@ type _ConfigurationVersionDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ConfigurationVersionDataTypeBuilder) = (*_ConfigurationVersionDataTypeBuilder)(nil)
@@ -128,8 +130,8 @@ func (b *_ConfigurationVersionDataTypeBuilder) WithMinorVersion(minorVersion uin
 }
 
 func (b *_ConfigurationVersionDataTypeBuilder) Build() (ConfigurationVersionDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ConfigurationVersionDataType.deepCopy(), nil
 }
@@ -155,8 +157,8 @@ func (b *_ConfigurationVersionDataTypeBuilder) buildForExtensionObjectDefinition
 
 func (b *_ConfigurationVersionDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateConfigurationVersionDataTypeBuilder().(*_ConfigurationVersionDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +223,7 @@ func CastConfigurationVersionDataType(structType any) ConfigurationVersionDataTy
 	return nil
 }
 
-func (m *_ConfigurationVersionDataType) GetTypeName() string {
+func (m *_ConfigurationVersionDataType) GetPlx4xTypeName() string {
 	return "ConfigurationVersionDataType"
 }
 
@@ -252,13 +254,13 @@ func (m *_ConfigurationVersionDataType) parse(ctx context.Context, readBuffer ut
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	majorVersion, err := ReadSimpleField(ctx, "majorVersion", ReadUnsignedInt(readBuffer, uint8(32)))
+	majorVersion, err := ReadSimpleField(ctx, "majorVersion", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'majorVersion' field"))
 	}
 	m.MajorVersion = majorVersion
 
-	minorVersion, err := ReadSimpleField(ctx, "minorVersion", ReadUnsignedInt(readBuffer, uint8(32)))
+	minorVersion, err := ReadSimpleField(ctx, "minorVersion", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'minorVersion' field"))
 	}
@@ -289,11 +291,11 @@ func (m *_ConfigurationVersionDataType) SerializeWithWriteBuffer(ctx context.Con
 			return errors.Wrap(pushErr, "Error pushing for ConfigurationVersionDataType")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "majorVersion", m.GetMajorVersion(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "majorVersion", m.GetMajorVersion(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'majorVersion' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "minorVersion", m.GetMinorVersion(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "minorVersion", m.GetMinorVersion(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'minorVersion' field")
 		}
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -120,7 +122,7 @@ type _ReadEventDetailsBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ReadEventDetailsBuilder) = (*_ReadEventDetailsBuilder)(nil)
@@ -159,23 +161,17 @@ func (b *_ReadEventDetailsBuilder) WithFilterBuilder(builderSupplier func(EventF
 	var err error
 	b.Filter, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "EventFilterBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "EventFilterBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ReadEventDetailsBuilder) Build() (ReadEventDetails, error) {
 	if b.Filter == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'filter' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'filter' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ReadEventDetails.deepCopy(), nil
 }
@@ -201,8 +197,8 @@ func (b *_ReadEventDetailsBuilder) buildForExtensionObjectDefinition() (Extensio
 
 func (b *_ReadEventDetailsBuilder) DeepCopy() any {
 	_copy := b.CreateReadEventDetailsBuilder().(*_ReadEventDetailsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -275,7 +271,7 @@ func CastReadEventDetails(structType any) ReadEventDetails {
 	return nil
 }
 
-func (m *_ReadEventDetails) GetTypeName() string {
+func (m *_ReadEventDetails) GetPlx4xTypeName() string {
 	return "ReadEventDetails"
 }
 
@@ -312,25 +308,25 @@ func (m *_ReadEventDetails) parse(ctx context.Context, readBuffer utils.ReadBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	numValuesPerNode, err := ReadSimpleField(ctx, "numValuesPerNode", ReadUnsignedInt(readBuffer, uint8(32)))
+	numValuesPerNode, err := ReadSimpleField(ctx, "numValuesPerNode", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'numValuesPerNode' field"))
 	}
 	m.NumValuesPerNode = numValuesPerNode
 
-	startTime, err := ReadSimpleField(ctx, "startTime", ReadSignedLong(readBuffer, uint8(64)))
+	startTime, err := ReadSimpleField(ctx, "startTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'startTime' field"))
 	}
 	m.StartTime = startTime
 
-	endTime, err := ReadSimpleField(ctx, "endTime", ReadSignedLong(readBuffer, uint8(64)))
+	endTime, err := ReadSimpleField(ctx, "endTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'endTime' field"))
 	}
 	m.EndTime = endTime
 
-	filter, err := ReadSimpleField[EventFilter](ctx, "filter", ReadComplex[EventFilter](ExtensionObjectDefinitionParseWithBufferProducer[EventFilter]((int32)(int32(727))), readBuffer))
+	filter, err := ReadSimpleField[EventFilter](ctx, "filter", ReadComplex[EventFilter](ExtensionObjectDefinitionParseWithBufferProducer[EventFilter]((int32)(int32(727))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'filter' field"))
 	}
@@ -361,19 +357,19 @@ func (m *_ReadEventDetails) SerializeWithWriteBuffer(ctx context.Context, writeB
 			return errors.Wrap(pushErr, "Error pushing for ReadEventDetails")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "numValuesPerNode", m.GetNumValuesPerNode(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "numValuesPerNode", m.GetNumValuesPerNode(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'numValuesPerNode' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "startTime", m.GetStartTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "startTime", m.GetStartTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'startTime' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "endTime", m.GetEndTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "endTime", m.GetEndTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'endTime' field")
 		}
 
-		if err := WriteSimpleField[EventFilter](ctx, "filter", m.GetFilter(), WriteComplex[EventFilter](writeBuffer)); err != nil {
+		if err := WriteSimpleField[EventFilter](ctx, "filter", m.GetFilter(), WriteComplex[EventFilter](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'filter' field")
 		}
 

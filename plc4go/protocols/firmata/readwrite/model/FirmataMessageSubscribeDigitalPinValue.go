@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -65,9 +66,9 @@ var _ FirmataMessageSubscribeDigitalPinValue = (*_FirmataMessageSubscribeDigital
 var _ FirmataMessageRequirements = (*_FirmataMessageSubscribeDigitalPinValue)(nil)
 
 // NewFirmataMessageSubscribeDigitalPinValue factory function for _FirmataMessageSubscribeDigitalPinValue
-func NewFirmataMessageSubscribeDigitalPinValue(pin uint8, enable bool, response bool) *_FirmataMessageSubscribeDigitalPinValue {
+func NewFirmataMessageSubscribeDigitalPinValue(pin uint8, enable bool) *_FirmataMessageSubscribeDigitalPinValue {
 	_result := &_FirmataMessageSubscribeDigitalPinValue{
-		FirmataMessageContract: NewFirmataMessage(response),
+		FirmataMessageContract: NewFirmataMessage(),
 		Pin:                    pin,
 		Enable:                 enable,
 	}
@@ -107,7 +108,7 @@ type _FirmataMessageSubscribeDigitalPinValueBuilder struct {
 
 	parentBuilder *_FirmataMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (FirmataMessageSubscribeDigitalPinValueBuilder) = (*_FirmataMessageSubscribeDigitalPinValueBuilder)(nil)
@@ -132,8 +133,8 @@ func (b *_FirmataMessageSubscribeDigitalPinValueBuilder) WithEnable(enable bool)
 }
 
 func (b *_FirmataMessageSubscribeDigitalPinValueBuilder) Build() (FirmataMessageSubscribeDigitalPinValue, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._FirmataMessageSubscribeDigitalPinValue.deepCopy(), nil
 }
@@ -159,8 +160,8 @@ func (b *_FirmataMessageSubscribeDigitalPinValueBuilder) buildForFirmataMessage(
 
 func (b *_FirmataMessageSubscribeDigitalPinValueBuilder) DeepCopy() any {
 	_copy := b.CreateFirmataMessageSubscribeDigitalPinValueBuilder().(*_FirmataMessageSubscribeDigitalPinValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -225,7 +226,7 @@ func CastFirmataMessageSubscribeDigitalPinValue(structType any) FirmataMessageSu
 	return nil
 }
 
-func (m *_FirmataMessageSubscribeDigitalPinValue) GetTypeName() string {
+func (m *_FirmataMessageSubscribeDigitalPinValue) GetPlx4xTypeName() string {
 	return "FirmataMessageSubscribeDigitalPinValue"
 }
 
@@ -259,19 +260,19 @@ func (m *_FirmataMessageSubscribeDigitalPinValue) parse(ctx context.Context, rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	pin, err := ReadSimpleField(ctx, "pin", ReadUnsignedByte(readBuffer, uint8(4)), codegen.WithByteOrder(binary.BigEndian))
+	pin, err := ReadSimpleField(ctx, "pin", ReadUnsignedByte(readBuffer, uint8(4)), codegen.WithEncoding("UTF16LE"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'pin' field"))
 	}
 	m.Pin = pin
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithByteOrder(binary.BigEndian))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF16LE"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	enable, err := ReadSimpleField(ctx, "enable", ReadBoolean(readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	enable, err := ReadSimpleField(ctx, "enable", ReadBoolean(readBuffer), codegen.WithEncoding("UTF16LE"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'enable' field"))
 	}
@@ -302,15 +303,15 @@ func (m *_FirmataMessageSubscribeDigitalPinValue) SerializeWithWriteBuffer(ctx c
 			return errors.Wrap(pushErr, "Error pushing for FirmataMessageSubscribeDigitalPinValue")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "pin", m.GetPin(), WriteUnsignedByte(writeBuffer, 4), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "pin", m.GetPin(), WriteUnsignedByte(writeBuffer, 4), codegen.WithEncoding("UTF16LE"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'pin' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF16LE"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "enable", m.GetEnable(), WriteBoolean(writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "enable", m.GetEnable(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF16LE"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'enable' field")
 		}
 

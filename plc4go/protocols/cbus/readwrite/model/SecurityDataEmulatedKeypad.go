@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +120,7 @@ type _SecurityDataEmulatedKeypadBuilder struct {
 
 	parentBuilder *_SecurityDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SecurityDataEmulatedKeypadBuilder) = (*_SecurityDataEmulatedKeypadBuilder)(nil)
@@ -139,8 +140,8 @@ func (b *_SecurityDataEmulatedKeypadBuilder) WithKey(key byte) SecurityDataEmula
 }
 
 func (b *_SecurityDataEmulatedKeypadBuilder) Build() (SecurityDataEmulatedKeypad, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SecurityDataEmulatedKeypad.deepCopy(), nil
 }
@@ -166,8 +167,8 @@ func (b *_SecurityDataEmulatedKeypadBuilder) buildForSecurityData() (SecurityDat
 
 func (b *_SecurityDataEmulatedKeypadBuilder) DeepCopy() any {
 	_copy := b.CreateSecurityDataEmulatedKeypadBuilder().(*_SecurityDataEmulatedKeypadBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +300,7 @@ func CastSecurityDataEmulatedKeypad(structType any) SecurityDataEmulatedKeypad {
 	return nil
 }
 
-func (m *_SecurityDataEmulatedKeypad) GetTypeName() string {
+func (m *_SecurityDataEmulatedKeypad) GetPlx4xTypeName() string {
 	return "SecurityDataEmulatedKeypad"
 }
 

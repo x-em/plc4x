@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -123,7 +124,7 @@ type _MeasurementDataBuilder struct {
 
 	childBuilder _MeasurementDataChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MeasurementDataBuilder) = (*_MeasurementDataBuilder)(nil)
@@ -138,8 +139,8 @@ func (b *_MeasurementDataBuilder) WithCommandTypeContainer(commandTypeContainer 
 }
 
 func (b *_MeasurementDataBuilder) PartialBuild() (MeasurementDataContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MeasurementData.deepCopy(), nil
 }
@@ -186,8 +187,8 @@ func (b *_MeasurementDataBuilder) DeepCopy() any {
 	_copy := b.CreateMeasurementDataBuilder().(*_MeasurementDataBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_MeasurementDataChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -246,7 +247,7 @@ func CastMeasurementData(structType any) MeasurementData {
 	return nil
 }
 
-func (m *_MeasurementData) GetTypeName() string {
+func (m *_MeasurementData) GetPlx4xTypeName() string {
 	return "MeasurementData"
 }
 
@@ -285,7 +286,7 @@ func MeasurementDataParseWithBufferProducer[T MeasurementData]() func(ctx contex
 }
 
 func MeasurementDataParseWithBuffer[T MeasurementData](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_MeasurementData{}).parse(ctx, readBuffer)
+	v, err := (new(_MeasurementData)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

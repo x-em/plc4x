@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,12 +61,12 @@ var _ CBusCommandPointToPointToMultiPoint = (*_CBusCommandPointToPointToMultiPoi
 var _ CBusCommandRequirements = (*_CBusCommandPointToPointToMultiPoint)(nil)
 
 // NewCBusCommandPointToPointToMultiPoint factory function for _CBusCommandPointToPointToMultiPoint
-func NewCBusCommandPointToPointToMultiPoint(header CBusHeader, command CBusPointToPointToMultiPointCommand, cBusOptions CBusOptions) *_CBusCommandPointToPointToMultiPoint {
+func NewCBusCommandPointToPointToMultiPoint(header CBusHeader, command CBusPointToPointToMultiPointCommand) *_CBusCommandPointToPointToMultiPoint {
 	if command == nil {
 		panic("command of type CBusPointToPointToMultiPointCommand for CBusCommandPointToPointToMultiPoint must not be nil")
 	}
 	_result := &_CBusCommandPointToPointToMultiPoint{
-		CBusCommandContract: NewCBusCommand(header, cBusOptions),
+		CBusCommandContract: NewCBusCommand(header),
 		Command:             command,
 	}
 	_result.CBusCommandContract.(*_CBusCommand)._SubType = _result
@@ -102,7 +105,7 @@ type _CBusCommandPointToPointToMultiPointBuilder struct {
 
 	parentBuilder *_CBusCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CBusCommandPointToPointToMultiPointBuilder) = (*_CBusCommandPointToPointToMultiPointBuilder)(nil)
@@ -126,23 +129,17 @@ func (b *_CBusCommandPointToPointToMultiPointBuilder) WithCommandBuilder(builder
 	var err error
 	b.Command, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "CBusPointToPointToMultiPointCommandBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "CBusPointToPointToMultiPointCommandBuilder failed"))
 	}
 	return b
 }
 
 func (b *_CBusCommandPointToPointToMultiPointBuilder) Build() (CBusCommandPointToPointToMultiPoint, error) {
 	if b.Command == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'command' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'command' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CBusCommandPointToPointToMultiPoint.deepCopy(), nil
 }
@@ -168,8 +165,8 @@ func (b *_CBusCommandPointToPointToMultiPointBuilder) buildForCBusCommand() (CBu
 
 func (b *_CBusCommandPointToPointToMultiPointBuilder) DeepCopy() any {
 	_copy := b.CreateCBusCommandPointToPointToMultiPointBuilder().(*_CBusCommandPointToPointToMultiPointBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +223,7 @@ func CastCBusCommandPointToPointToMultiPoint(structType any) CBusCommandPointToP
 	return nil
 }
 
-func (m *_CBusCommandPointToPointToMultiPoint) GetTypeName() string {
+func (m *_CBusCommandPointToPointToMultiPoint) GetPlx4xTypeName() string {
 	return "CBusCommandPointToPointToMultiPoint"
 }
 
@@ -254,7 +251,7 @@ func (m *_CBusCommandPointToPointToMultiPoint) parse(ctx context.Context, readBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	command, err := ReadSimpleField[CBusPointToPointToMultiPointCommand](ctx, "command", ReadComplex[CBusPointToPointToMultiPointCommand](CBusPointToPointToMultiPointCommandParseWithBufferProducer[CBusPointToPointToMultiPointCommand]((CBusOptions)(cBusOptions)), readBuffer))
+	command, err := ReadSimpleField[CBusPointToPointToMultiPointCommand](ctx, "command", ReadComplex[CBusPointToPointToMultiPointCommand](CBusPointToPointToMultiPointCommandParseWithBufferProducer[CBusPointToPointToMultiPointCommand]((CBusOptions)(cBusOptions)), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'command' field"))
 	}
@@ -268,7 +265,7 @@ func (m *_CBusCommandPointToPointToMultiPoint) parse(ctx context.Context, readBu
 }
 
 func (m *_CBusCommandPointToPointToMultiPoint) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -285,7 +282,7 @@ func (m *_CBusCommandPointToPointToMultiPoint) SerializeWithWriteBuffer(ctx cont
 			return errors.Wrap(pushErr, "Error pushing for CBusCommandPointToPointToMultiPoint")
 		}
 
-		if err := WriteSimpleField[CBusPointToPointToMultiPointCommand](ctx, "command", m.GetCommand(), WriteComplex[CBusPointToPointToMultiPointCommand](writeBuffer)); err != nil {
+		if err := WriteSimpleField[CBusPointToPointToMultiPointCommand](ctx, "command", m.GetCommand(), WriteComplex[CBusPointToPointToMultiPointCommand](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'command' field")
 		}
 

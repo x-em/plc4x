@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -188,7 +190,7 @@ type _ProgramDiagnostic2DataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ProgramDiagnostic2DataTypeBuilder) = (*_ProgramDiagnostic2DataTypeBuilder)(nil)
@@ -212,10 +214,7 @@ func (b *_ProgramDiagnostic2DataTypeBuilder) WithCreateSessionIdBuilder(builderS
 	var err error
 	b.CreateSessionId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -230,10 +229,7 @@ func (b *_ProgramDiagnostic2DataTypeBuilder) WithCreateClientNameBuilder(builder
 	var err error
 	b.CreateClientName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -258,10 +254,7 @@ func (b *_ProgramDiagnostic2DataTypeBuilder) WithLastMethodCallBuilder(builderSu
 	var err error
 	b.LastMethodCall, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -276,10 +269,7 @@ func (b *_ProgramDiagnostic2DataTypeBuilder) WithLastMethodSessionIdBuilder(buil
 	var err error
 	b.LastMethodSessionId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -319,47 +309,29 @@ func (b *_ProgramDiagnostic2DataTypeBuilder) WithLastMethodReturnStatusBuilder(b
 	var err error
 	b.LastMethodReturnStatus, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ProgramDiagnostic2DataTypeBuilder) Build() (ProgramDiagnostic2DataType, error) {
 	if b.CreateSessionId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'createSessionId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'createSessionId' not set"))
 	}
 	if b.CreateClientName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'createClientName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'createClientName' not set"))
 	}
 	if b.LastMethodCall == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'lastMethodCall' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'lastMethodCall' not set"))
 	}
 	if b.LastMethodSessionId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'lastMethodSessionId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'lastMethodSessionId' not set"))
 	}
 	if b.LastMethodReturnStatus == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'lastMethodReturnStatus' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'lastMethodReturnStatus' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ProgramDiagnostic2DataType.deepCopy(), nil
 }
@@ -385,8 +357,8 @@ func (b *_ProgramDiagnostic2DataTypeBuilder) buildForExtensionObjectDefinition()
 
 func (b *_ProgramDiagnostic2DataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateProgramDiagnostic2DataTypeBuilder().(*_ProgramDiagnostic2DataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -491,7 +463,7 @@ func CastProgramDiagnostic2DataType(structType any) ProgramDiagnostic2DataType {
 	return nil
 }
 
-func (m *_ProgramDiagnostic2DataType) GetTypeName() string {
+func (m *_ProgramDiagnostic2DataType) GetPlx4xTypeName() string {
 	return "ProgramDiagnostic2DataType"
 }
 
@@ -523,9 +495,7 @@ func (m *_ProgramDiagnostic2DataType) GetLengthInBits(ctx context.Context) uint1
 	if len(m.LastMethodInputArguments) > 0 {
 		for _curItem, element := range m.LastMethodInputArguments {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.LastMethodInputArguments), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -536,9 +506,7 @@ func (m *_ProgramDiagnostic2DataType) GetLengthInBits(ctx context.Context) uint1
 	if len(m.LastMethodOutputArguments) > 0 {
 		for _curItem, element := range m.LastMethodOutputArguments {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.LastMethodOutputArguments), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -549,9 +517,7 @@ func (m *_ProgramDiagnostic2DataType) GetLengthInBits(ctx context.Context) uint1
 	if len(m.LastMethodInputValues) > 0 {
 		for _curItem, element := range m.LastMethodInputValues {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.LastMethodInputValues), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -562,9 +528,7 @@ func (m *_ProgramDiagnostic2DataType) GetLengthInBits(ctx context.Context) uint1
 	if len(m.LastMethodOutputValues) > 0 {
 		for _curItem, element := range m.LastMethodOutputValues {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.LastMethodOutputValues), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -592,97 +556,97 @@ func (m *_ProgramDiagnostic2DataType) parse(ctx context.Context, readBuffer util
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	createSessionId, err := ReadSimpleField[NodeId](ctx, "createSessionId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	createSessionId, err := ReadSimpleField[NodeId](ctx, "createSessionId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'createSessionId' field"))
 	}
 	m.CreateSessionId = createSessionId
 
-	createClientName, err := ReadSimpleField[PascalString](ctx, "createClientName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	createClientName, err := ReadSimpleField[PascalString](ctx, "createClientName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'createClientName' field"))
 	}
 	m.CreateClientName = createClientName
 
-	invocationCreationTime, err := ReadSimpleField(ctx, "invocationCreationTime", ReadSignedLong(readBuffer, uint8(64)))
+	invocationCreationTime, err := ReadSimpleField(ctx, "invocationCreationTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'invocationCreationTime' field"))
 	}
 	m.InvocationCreationTime = invocationCreationTime
 
-	lastTransitionTime, err := ReadSimpleField(ctx, "lastTransitionTime", ReadSignedLong(readBuffer, uint8(64)))
+	lastTransitionTime, err := ReadSimpleField(ctx, "lastTransitionTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastTransitionTime' field"))
 	}
 	m.LastTransitionTime = lastTransitionTime
 
-	lastMethodCall, err := ReadSimpleField[PascalString](ctx, "lastMethodCall", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	lastMethodCall, err := ReadSimpleField[PascalString](ctx, "lastMethodCall", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodCall' field"))
 	}
 	m.LastMethodCall = lastMethodCall
 
-	lastMethodSessionId, err := ReadSimpleField[NodeId](ctx, "lastMethodSessionId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	lastMethodSessionId, err := ReadSimpleField[NodeId](ctx, "lastMethodSessionId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodSessionId' field"))
 	}
 	m.LastMethodSessionId = lastMethodSessionId
 
-	noOfLastMethodInputArguments, err := ReadImplicitField[int32](ctx, "noOfLastMethodInputArguments", ReadSignedInt(readBuffer, uint8(32)))
+	noOfLastMethodInputArguments, err := ReadImplicitField[int32](ctx, "noOfLastMethodInputArguments", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfLastMethodInputArguments' field"))
 	}
 	_ = noOfLastMethodInputArguments
 
-	lastMethodInputArguments, err := ReadCountArrayField[Argument](ctx, "lastMethodInputArguments", ReadComplex[Argument](ExtensionObjectDefinitionParseWithBufferProducer[Argument]((int32)(int32(298))), readBuffer), uint64(noOfLastMethodInputArguments))
+	lastMethodInputArguments, err := ReadCountArrayField[Argument](ctx, "lastMethodInputArguments", ReadComplex[Argument](ExtensionObjectDefinitionParseWithBufferProducer[Argument]((int32)(int32(298))), readBuffer), uint64(noOfLastMethodInputArguments), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodInputArguments' field"))
 	}
 	m.LastMethodInputArguments = lastMethodInputArguments
 
-	noOfLastMethodOutputArguments, err := ReadImplicitField[int32](ctx, "noOfLastMethodOutputArguments", ReadSignedInt(readBuffer, uint8(32)))
+	noOfLastMethodOutputArguments, err := ReadImplicitField[int32](ctx, "noOfLastMethodOutputArguments", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfLastMethodOutputArguments' field"))
 	}
 	_ = noOfLastMethodOutputArguments
 
-	lastMethodOutputArguments, err := ReadCountArrayField[Argument](ctx, "lastMethodOutputArguments", ReadComplex[Argument](ExtensionObjectDefinitionParseWithBufferProducer[Argument]((int32)(int32(298))), readBuffer), uint64(noOfLastMethodOutputArguments))
+	lastMethodOutputArguments, err := ReadCountArrayField[Argument](ctx, "lastMethodOutputArguments", ReadComplex[Argument](ExtensionObjectDefinitionParseWithBufferProducer[Argument]((int32)(int32(298))), readBuffer), uint64(noOfLastMethodOutputArguments), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodOutputArguments' field"))
 	}
 	m.LastMethodOutputArguments = lastMethodOutputArguments
 
-	noOfLastMethodInputValues, err := ReadImplicitField[int32](ctx, "noOfLastMethodInputValues", ReadSignedInt(readBuffer, uint8(32)))
+	noOfLastMethodInputValues, err := ReadImplicitField[int32](ctx, "noOfLastMethodInputValues", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfLastMethodInputValues' field"))
 	}
 	_ = noOfLastMethodInputValues
 
-	lastMethodInputValues, err := ReadCountArrayField[Variant](ctx, "lastMethodInputValues", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfLastMethodInputValues))
+	lastMethodInputValues, err := ReadCountArrayField[Variant](ctx, "lastMethodInputValues", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfLastMethodInputValues), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodInputValues' field"))
 	}
 	m.LastMethodInputValues = lastMethodInputValues
 
-	noOfLastMethodOutputValues, err := ReadImplicitField[int32](ctx, "noOfLastMethodOutputValues", ReadSignedInt(readBuffer, uint8(32)))
+	noOfLastMethodOutputValues, err := ReadImplicitField[int32](ctx, "noOfLastMethodOutputValues", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfLastMethodOutputValues' field"))
 	}
 	_ = noOfLastMethodOutputValues
 
-	lastMethodOutputValues, err := ReadCountArrayField[Variant](ctx, "lastMethodOutputValues", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfLastMethodOutputValues))
+	lastMethodOutputValues, err := ReadCountArrayField[Variant](ctx, "lastMethodOutputValues", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfLastMethodOutputValues), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodOutputValues' field"))
 	}
 	m.LastMethodOutputValues = lastMethodOutputValues
 
-	lastMethodCallTime, err := ReadSimpleField(ctx, "lastMethodCallTime", ReadSignedLong(readBuffer, uint8(64)))
+	lastMethodCallTime, err := ReadSimpleField(ctx, "lastMethodCallTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodCallTime' field"))
 	}
 	m.LastMethodCallTime = lastMethodCallTime
 
-	lastMethodReturnStatus, err := ReadSimpleField[StatusCode](ctx, "lastMethodReturnStatus", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	lastMethodReturnStatus, err := ReadSimpleField[StatusCode](ctx, "lastMethodReturnStatus", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastMethodReturnStatus' field"))
 	}
@@ -713,67 +677,67 @@ func (m *_ProgramDiagnostic2DataType) SerializeWithWriteBuffer(ctx context.Conte
 			return errors.Wrap(pushErr, "Error pushing for ProgramDiagnostic2DataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "createSessionId", m.GetCreateSessionId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "createSessionId", m.GetCreateSessionId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'createSessionId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "createClientName", m.GetCreateClientName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "createClientName", m.GetCreateClientName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'createClientName' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "invocationCreationTime", m.GetInvocationCreationTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "invocationCreationTime", m.GetInvocationCreationTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'invocationCreationTime' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "lastTransitionTime", m.GetLastTransitionTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "lastTransitionTime", m.GetLastTransitionTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastTransitionTime' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "lastMethodCall", m.GetLastMethodCall(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "lastMethodCall", m.GetLastMethodCall(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodCall' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "lastMethodSessionId", m.GetLastMethodSessionId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "lastMethodSessionId", m.GetLastMethodSessionId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodSessionId' field")
 		}
 		noOfLastMethodInputArguments := int32(utils.InlineIf(bool((m.GetLastMethodInputArguments()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetLastMethodInputArguments()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfLastMethodInputArguments", noOfLastMethodInputArguments, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfLastMethodInputArguments", noOfLastMethodInputArguments, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfLastMethodInputArguments' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "lastMethodInputArguments", m.GetLastMethodInputArguments(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "lastMethodInputArguments", m.GetLastMethodInputArguments(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodInputArguments' field")
 		}
 		noOfLastMethodOutputArguments := int32(utils.InlineIf(bool((m.GetLastMethodOutputArguments()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetLastMethodOutputArguments()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfLastMethodOutputArguments", noOfLastMethodOutputArguments, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfLastMethodOutputArguments", noOfLastMethodOutputArguments, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfLastMethodOutputArguments' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "lastMethodOutputArguments", m.GetLastMethodOutputArguments(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "lastMethodOutputArguments", m.GetLastMethodOutputArguments(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodOutputArguments' field")
 		}
 		noOfLastMethodInputValues := int32(utils.InlineIf(bool((m.GetLastMethodInputValues()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetLastMethodInputValues()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfLastMethodInputValues", noOfLastMethodInputValues, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfLastMethodInputValues", noOfLastMethodInputValues, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfLastMethodInputValues' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "lastMethodInputValues", m.GetLastMethodInputValues(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "lastMethodInputValues", m.GetLastMethodInputValues(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodInputValues' field")
 		}
 		noOfLastMethodOutputValues := int32(utils.InlineIf(bool((m.GetLastMethodOutputValues()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetLastMethodOutputValues()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfLastMethodOutputValues", noOfLastMethodOutputValues, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfLastMethodOutputValues", noOfLastMethodOutputValues, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfLastMethodOutputValues' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "lastMethodOutputValues", m.GetLastMethodOutputValues(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "lastMethodOutputValues", m.GetLastMethodOutputValues(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodOutputValues' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "lastMethodCallTime", m.GetLastMethodCallTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "lastMethodCallTime", m.GetLastMethodCallTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodCallTime' field")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "lastMethodReturnStatus", m.GetLastMethodReturnStatus(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "lastMethodReturnStatus", m.GetLastMethodReturnStatus(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastMethodReturnStatus' field")
 		}
 

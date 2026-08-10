@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ LRawInd = (*_LRawInd)(nil)
 var _ CEMIRequirements = (*_LRawInd)(nil)
 
 // NewLRawInd factory function for _LRawInd
-func NewLRawInd(size uint16) *_LRawInd {
+func NewLRawInd() *_LRawInd {
 	_result := &_LRawInd{
-		CEMIContract: NewCEMI(size),
+		CEMIContract: NewCEMI(),
 	}
 	_result.CEMIContract.(*_CEMI)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _LRawIndBuilder struct {
 
 	parentBuilder *_CEMIBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (LRawIndBuilder) = (*_LRawIndBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_LRawIndBuilder) WithMandatoryFields() LRawIndBuilder {
 }
 
 func (b *_LRawIndBuilder) Build() (LRawInd, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._LRawInd.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_LRawIndBuilder) buildForCEMI() (CEMI, error) {
 
 func (b *_LRawIndBuilder) DeepCopy() any {
 	_copy := b.CreateLRawIndBuilder().(*_LRawIndBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastLRawInd(structType any) LRawInd {
 	return nil
 }
 
-func (m *_LRawInd) GetTypeName() string {
+func (m *_LRawInd) GetPlx4xTypeName() string {
 	return "LRawInd"
 }
 

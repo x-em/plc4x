@@ -28,10 +28,10 @@ import (
 	"crypto/x509"
 	"encoding/binary"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	readWriteModel "github.com/apache/plc4x/plc4go/protocols/opcua/readwrite/model"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,14 +78,14 @@ func (h *EncryptionHandler) encodeMessage(ctx context.Context, pdu readWriteMode
 	numberOfBlocks := preEncryptedLength / PREENCRYPTED_BLOCK_LENGTH
 	encryptedLength := numberOfBlocks*256 + positionFirstBlock
 	buf := utils.NewWriteBufferByteBased(utils.WithByteOrderForByteBasedBuffer(binary.LittleEndian))
-	if err := readWriteModel.NewOpcuaAPU(pdu, false, true).SerializeWithWriteBuffer(ctx, buf); err != nil {
+	if err := readWriteModel.NewOpcuaAPU(pdu).SerializeWithWriteBuffer(ctx, buf); err != nil {
 		return nil, errors.Wrap(err, "error serializing")
 	}
 	paddingByte := byte(paddingSize)
 	if err := buf.WriteByte("", paddingByte); err != nil {
 		return nil, errors.Wrap(err, "error writing byte")
 	}
-	for i := 0; i < paddingSize; i++ {
+	for range paddingSize {
 		if err := buf.WriteByte("", paddingByte); err != nil {
 			return nil, errors.Wrap(err, "error writing byte")
 		}

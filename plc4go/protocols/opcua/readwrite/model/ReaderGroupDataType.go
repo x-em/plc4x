@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -173,7 +175,7 @@ type _ReaderGroupDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ReaderGroupDataTypeBuilder) = (*_ReaderGroupDataTypeBuilder)(nil)
@@ -197,10 +199,7 @@ func (b *_ReaderGroupDataTypeBuilder) WithNameBuilder(builderSupplier func(Pasca
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -225,10 +224,7 @@ func (b *_ReaderGroupDataTypeBuilder) WithSecurityGroupIdBuilder(builderSupplier
 	var err error
 	b.SecurityGroupId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -258,10 +254,7 @@ func (b *_ReaderGroupDataTypeBuilder) WithTransportSettingsBuilder(builderSuppli
 	var err error
 	b.TransportSettings, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -276,10 +269,7 @@ func (b *_ReaderGroupDataTypeBuilder) WithMessageSettingsBuilder(builderSupplier
 	var err error
 	b.MessageSettings, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -291,31 +281,19 @@ func (b *_ReaderGroupDataTypeBuilder) WithDataSetReaders(dataSetReaders ...DataS
 
 func (b *_ReaderGroupDataTypeBuilder) Build() (ReaderGroupDataType, error) {
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
 	if b.SecurityGroupId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'securityGroupId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'securityGroupId' not set"))
 	}
 	if b.TransportSettings == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'transportSettings' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'transportSettings' not set"))
 	}
 	if b.MessageSettings == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'messageSettings' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'messageSettings' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ReaderGroupDataType.deepCopy(), nil
 }
@@ -341,8 +319,8 @@ func (b *_ReaderGroupDataTypeBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_ReaderGroupDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateReaderGroupDataTypeBuilder().(*_ReaderGroupDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -439,7 +417,7 @@ func CastReaderGroupDataType(structType any) ReaderGroupDataType {
 	return nil
 }
 
-func (m *_ReaderGroupDataType) GetTypeName() string {
+func (m *_ReaderGroupDataType) GetPlx4xTypeName() string {
 	return "ReaderGroupDataType"
 }
 
@@ -468,9 +446,7 @@ func (m *_ReaderGroupDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.SecurityKeyServices) > 0 {
 		for _curItem, element := range m.SecurityKeyServices {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.SecurityKeyServices), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -484,9 +460,7 @@ func (m *_ReaderGroupDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.GroupProperties) > 0 {
 		for _curItem, element := range m.GroupProperties {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.GroupProperties), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -503,9 +477,7 @@ func (m *_ReaderGroupDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.DataSetReaders) > 0 {
 		for _curItem, element := range m.DataSetReaders {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DataSetReaders), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -527,85 +499,85 @@ func (m *_ReaderGroupDataType) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'name' field"))
 	}
 	m.Name = name
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	enabled, err := ReadSimpleField(ctx, "enabled", ReadBoolean(readBuffer))
+	enabled, err := ReadSimpleField(ctx, "enabled", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'enabled' field"))
 	}
 	m.Enabled = enabled
 
-	securityMode, err := ReadEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", ReadEnum(MessageSecurityModeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	securityMode, err := ReadEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", ReadEnum(MessageSecurityModeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityMode' field"))
 	}
 	m.SecurityMode = securityMode
 
-	securityGroupId, err := ReadSimpleField[PascalString](ctx, "securityGroupId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	securityGroupId, err := ReadSimpleField[PascalString](ctx, "securityGroupId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityGroupId' field"))
 	}
 	m.SecurityGroupId = securityGroupId
 
-	noOfSecurityKeyServices, err := ReadImplicitField[int32](ctx, "noOfSecurityKeyServices", ReadSignedInt(readBuffer, uint8(32)))
+	noOfSecurityKeyServices, err := ReadImplicitField[int32](ctx, "noOfSecurityKeyServices", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfSecurityKeyServices' field"))
 	}
 	_ = noOfSecurityKeyServices
 
-	securityKeyServices, err := ReadCountArrayField[EndpointDescription](ctx, "securityKeyServices", ReadComplex[EndpointDescription](ExtensionObjectDefinitionParseWithBufferProducer[EndpointDescription]((int32)(int32(314))), readBuffer), uint64(noOfSecurityKeyServices))
+	securityKeyServices, err := ReadCountArrayField[EndpointDescription](ctx, "securityKeyServices", ReadComplex[EndpointDescription](ExtensionObjectDefinitionParseWithBufferProducer[EndpointDescription]((int32)(int32(314))), readBuffer), uint64(noOfSecurityKeyServices), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityKeyServices' field"))
 	}
 	m.SecurityKeyServices = securityKeyServices
 
-	maxNetworkMessageSize, err := ReadSimpleField(ctx, "maxNetworkMessageSize", ReadUnsignedInt(readBuffer, uint8(32)))
+	maxNetworkMessageSize, err := ReadSimpleField(ctx, "maxNetworkMessageSize", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'maxNetworkMessageSize' field"))
 	}
 	m.MaxNetworkMessageSize = maxNetworkMessageSize
 
-	noOfGroupProperties, err := ReadImplicitField[int32](ctx, "noOfGroupProperties", ReadSignedInt(readBuffer, uint8(32)))
+	noOfGroupProperties, err := ReadImplicitField[int32](ctx, "noOfGroupProperties", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfGroupProperties' field"))
 	}
 	_ = noOfGroupProperties
 
-	groupProperties, err := ReadCountArrayField[KeyValuePair](ctx, "groupProperties", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfGroupProperties))
+	groupProperties, err := ReadCountArrayField[KeyValuePair](ctx, "groupProperties", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfGroupProperties), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'groupProperties' field"))
 	}
 	m.GroupProperties = groupProperties
 
-	transportSettings, err := ReadSimpleField[ExtensionObject](ctx, "transportSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	transportSettings, err := ReadSimpleField[ExtensionObject](ctx, "transportSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'transportSettings' field"))
 	}
 	m.TransportSettings = transportSettings
 
-	messageSettings, err := ReadSimpleField[ExtensionObject](ctx, "messageSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	messageSettings, err := ReadSimpleField[ExtensionObject](ctx, "messageSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageSettings' field"))
 	}
 	m.MessageSettings = messageSettings
 
-	noOfDataSetReaders, err := ReadImplicitField[int32](ctx, "noOfDataSetReaders", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDataSetReaders, err := ReadImplicitField[int32](ctx, "noOfDataSetReaders", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDataSetReaders' field"))
 	}
 	_ = noOfDataSetReaders
 
-	dataSetReaders, err := ReadCountArrayField[DataSetReaderDataType](ctx, "dataSetReaders", ReadComplex[DataSetReaderDataType](ExtensionObjectDefinitionParseWithBufferProducer[DataSetReaderDataType]((int32)(int32(15625))), readBuffer), uint64(noOfDataSetReaders))
+	dataSetReaders, err := ReadCountArrayField[DataSetReaderDataType](ctx, "dataSetReaders", ReadComplex[DataSetReaderDataType](ExtensionObjectDefinitionParseWithBufferProducer[DataSetReaderDataType]((int32)(int32(15625))), readBuffer), uint64(noOfDataSetReaders), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetReaders' field"))
 	}
@@ -636,59 +608,59 @@ func (m *_ReaderGroupDataType) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for ReaderGroupDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'name' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "enabled", m.GetEnabled(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "enabled", m.GetEnabled(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'enabled' field")
 		}
 
-		if err := WriteSimpleEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", m.GetSecurityMode(), WriteEnum[MessageSecurityMode, uint32](MessageSecurityMode.GetValue, MessageSecurityMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", m.GetSecurityMode(), WriteEnum[MessageSecurityMode, uint32](MessageSecurityMode.GetValue, MessageSecurityMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityMode' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "securityGroupId", m.GetSecurityGroupId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "securityGroupId", m.GetSecurityGroupId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityGroupId' field")
 		}
 		noOfSecurityKeyServices := int32(utils.InlineIf(bool((m.GetSecurityKeyServices()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetSecurityKeyServices()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfSecurityKeyServices", noOfSecurityKeyServices, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfSecurityKeyServices", noOfSecurityKeyServices, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfSecurityKeyServices' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "securityKeyServices", m.GetSecurityKeyServices(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "securityKeyServices", m.GetSecurityKeyServices(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityKeyServices' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "maxNetworkMessageSize", m.GetMaxNetworkMessageSize(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "maxNetworkMessageSize", m.GetMaxNetworkMessageSize(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'maxNetworkMessageSize' field")
 		}
 		noOfGroupProperties := int32(utils.InlineIf(bool((m.GetGroupProperties()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetGroupProperties()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfGroupProperties", noOfGroupProperties, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfGroupProperties", noOfGroupProperties, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfGroupProperties' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "groupProperties", m.GetGroupProperties(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "groupProperties", m.GetGroupProperties(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'groupProperties' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "transportSettings", m.GetTransportSettings(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "transportSettings", m.GetTransportSettings(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'transportSettings' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "messageSettings", m.GetMessageSettings(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "messageSettings", m.GetMessageSettings(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageSettings' field")
 		}
 		noOfDataSetReaders := int32(utils.InlineIf(bool((m.GetDataSetReaders()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDataSetReaders()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDataSetReaders", noOfDataSetReaders, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDataSetReaders", noOfDataSetReaders, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDataSetReaders' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "dataSetReaders", m.GetDataSetReaders(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "dataSetReaders", m.GetDataSetReaders(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetReaders' field")
 		}
 

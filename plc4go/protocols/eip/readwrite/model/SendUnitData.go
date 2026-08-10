@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -106,7 +108,7 @@ type _SendUnitDataBuilder struct {
 
 	parentBuilder *_EipPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SendUnitDataBuilder) = (*_SendUnitDataBuilder)(nil)
@@ -131,8 +133,8 @@ func (b *_SendUnitDataBuilder) WithTypeIds(typeIds ...TypeId) SendUnitDataBuilde
 }
 
 func (b *_SendUnitDataBuilder) Build() (SendUnitData, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SendUnitData.deepCopy(), nil
 }
@@ -158,8 +160,8 @@ func (b *_SendUnitDataBuilder) buildForEipPacket() (EipPacket, error) {
 
 func (b *_SendUnitDataBuilder) DeepCopy() any {
 	_copy := b.CreateSendUnitDataBuilder().(*_SendUnitDataBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +247,7 @@ func CastSendUnitData(structType any) SendUnitData {
 	return nil
 }
 
-func (m *_SendUnitData) GetTypeName() string {
+func (m *_SendUnitData) GetPlx4xTypeName() string {
 	return "SendUnitData"
 }
 
@@ -265,9 +267,7 @@ func (m *_SendUnitData) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.TypeIds) > 0 {
 		for _curItem, element := range m.TypeIds {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.TypeIds), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -289,25 +289,25 @@ func (m *_SendUnitData) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	interfaceHandle, err := ReadConstField[uint32](ctx, "interfaceHandle", ReadUnsignedInt(readBuffer, uint8(32)), SendUnitData_INTERFACEHANDLE)
+	interfaceHandle, err := ReadConstField[uint32](ctx, "interfaceHandle", ReadUnsignedInt(readBuffer, uint8(32)), SendUnitData_INTERFACEHANDLE, codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'interfaceHandle' field"))
 	}
 	_ = interfaceHandle
 
-	timeout, err := ReadSimpleField(ctx, "timeout", ReadUnsignedShort(readBuffer, uint8(16)))
+	timeout, err := ReadSimpleField(ctx, "timeout", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timeout' field"))
 	}
 	m.Timeout = timeout
 
-	typeIdCount, err := ReadImplicitField[uint16](ctx, "typeIdCount", ReadUnsignedShort(readBuffer, uint8(16)))
+	typeIdCount, err := ReadImplicitField[uint16](ctx, "typeIdCount", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'typeIdCount' field"))
 	}
 	_ = typeIdCount
 
-	typeIds, err := ReadCountArrayField[TypeId](ctx, "typeIds", ReadComplex[TypeId](TypeIdParseWithBuffer, readBuffer), uint64(typeIdCount))
+	typeIds, err := ReadCountArrayField[TypeId](ctx, "typeIds", ReadComplex[TypeId](TypeIdParseWithBuffer, readBuffer), uint64(typeIdCount), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'typeIds' field"))
 	}
@@ -338,19 +338,19 @@ func (m *_SendUnitData) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for SendUnitData")
 		}
 
-		if err := WriteConstField(ctx, "interfaceHandle", SendUnitData_INTERFACEHANDLE, WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteConstField(ctx, "interfaceHandle", SendUnitData_INTERFACEHANDLE, WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'interfaceHandle' field")
 		}
 
-		if err := WriteSimpleField[uint16](ctx, "timeout", m.GetTimeout(), WriteUnsignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteSimpleField[uint16](ctx, "timeout", m.GetTimeout(), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timeout' field")
 		}
 		typeIdCount := uint16(uint16(len(m.GetTypeIds())))
-		if err := WriteImplicitField(ctx, "typeIdCount", typeIdCount, WriteUnsignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteImplicitField(ctx, "typeIdCount", typeIdCount, WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'typeIdCount' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "typeIds", m.GetTypeIds(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "typeIds", m.GetTypeIds(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'typeIds' field")
 		}
 

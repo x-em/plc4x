@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -163,7 +165,7 @@ type _AddNodesItemBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AddNodesItemBuilder) = (*_AddNodesItemBuilder)(nil)
@@ -187,10 +189,7 @@ func (b *_AddNodesItemBuilder) WithParentNodeIdBuilder(builderSupplier func(Expa
 	var err error
 	b.ParentNodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
@@ -205,10 +204,7 @@ func (b *_AddNodesItemBuilder) WithReferenceTypeIdBuilder(builderSupplier func(N
 	var err error
 	b.ReferenceTypeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -223,10 +219,7 @@ func (b *_AddNodesItemBuilder) WithRequestedNewNodeIdBuilder(builderSupplier fun
 	var err error
 	b.RequestedNewNodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
@@ -241,10 +234,7 @@ func (b *_AddNodesItemBuilder) WithBrowseNameBuilder(builderSupplier func(Qualif
 	var err error
 	b.BrowseName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "QualifiedNameBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "QualifiedNameBuilder failed"))
 	}
 	return b
 }
@@ -264,10 +254,7 @@ func (b *_AddNodesItemBuilder) WithNodeAttributesBuilder(builderSupplier func(Ex
 	var err error
 	b.NodeAttributes, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -282,53 +269,32 @@ func (b *_AddNodesItemBuilder) WithTypeDefinitionBuilder(builderSupplier func(Ex
 	var err error
 	b.TypeDefinition, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
 
 func (b *_AddNodesItemBuilder) Build() (AddNodesItem, error) {
 	if b.ParentNodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'parentNodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'parentNodeId' not set"))
 	}
 	if b.ReferenceTypeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'referenceTypeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'referenceTypeId' not set"))
 	}
 	if b.RequestedNewNodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestedNewNodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestedNewNodeId' not set"))
 	}
 	if b.BrowseName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'browseName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'browseName' not set"))
 	}
 	if b.NodeAttributes == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'nodeAttributes' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'nodeAttributes' not set"))
 	}
 	if b.TypeDefinition == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'typeDefinition' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'typeDefinition' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AddNodesItem.deepCopy(), nil
 }
@@ -354,8 +320,8 @@ func (b *_AddNodesItemBuilder) buildForExtensionObjectDefinition() (ExtensionObj
 
 func (b *_AddNodesItemBuilder) DeepCopy() any {
 	_copy := b.CreateAddNodesItemBuilder().(*_AddNodesItemBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -440,7 +406,7 @@ func CastAddNodesItem(structType any) AddNodesItem {
 	return nil
 }
 
-func (m *_AddNodesItem) GetTypeName() string {
+func (m *_AddNodesItem) GetPlx4xTypeName() string {
 	return "AddNodesItem"
 }
 
@@ -486,43 +452,43 @@ func (m *_AddNodesItem) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	parentNodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "parentNodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	parentNodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "parentNodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'parentNodeId' field"))
 	}
 	m.ParentNodeId = parentNodeId
 
-	referenceTypeId, err := ReadSimpleField[NodeId](ctx, "referenceTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	referenceTypeId, err := ReadSimpleField[NodeId](ctx, "referenceTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'referenceTypeId' field"))
 	}
 	m.ReferenceTypeId = referenceTypeId
 
-	requestedNewNodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "requestedNewNodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	requestedNewNodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "requestedNewNodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestedNewNodeId' field"))
 	}
 	m.RequestedNewNodeId = requestedNewNodeId
 
-	browseName, err := ReadSimpleField[QualifiedName](ctx, "browseName", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer))
+	browseName, err := ReadSimpleField[QualifiedName](ctx, "browseName", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'browseName' field"))
 	}
 	m.BrowseName = browseName
 
-	nodeClass, err := ReadEnumField[NodeClass](ctx, "nodeClass", "NodeClass", ReadEnum(NodeClassByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	nodeClass, err := ReadEnumField[NodeClass](ctx, "nodeClass", "NodeClass", ReadEnum(NodeClassByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeClass' field"))
 	}
 	m.NodeClass = nodeClass
 
-	nodeAttributes, err := ReadSimpleField[ExtensionObject](ctx, "nodeAttributes", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	nodeAttributes, err := ReadSimpleField[ExtensionObject](ctx, "nodeAttributes", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeAttributes' field"))
 	}
 	m.NodeAttributes = nodeAttributes
 
-	typeDefinition, err := ReadSimpleField[ExpandedNodeId](ctx, "typeDefinition", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	typeDefinition, err := ReadSimpleField[ExpandedNodeId](ctx, "typeDefinition", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'typeDefinition' field"))
 	}
@@ -553,31 +519,31 @@ func (m *_AddNodesItem) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for AddNodesItem")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "parentNodeId", m.GetParentNodeId(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "parentNodeId", m.GetParentNodeId(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'parentNodeId' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "referenceTypeId", m.GetReferenceTypeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "referenceTypeId", m.GetReferenceTypeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'referenceTypeId' field")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "requestedNewNodeId", m.GetRequestedNewNodeId(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "requestedNewNodeId", m.GetRequestedNewNodeId(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestedNewNodeId' field")
 		}
 
-		if err := WriteSimpleField[QualifiedName](ctx, "browseName", m.GetBrowseName(), WriteComplex[QualifiedName](writeBuffer)); err != nil {
+		if err := WriteSimpleField[QualifiedName](ctx, "browseName", m.GetBrowseName(), WriteComplex[QualifiedName](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'browseName' field")
 		}
 
-		if err := WriteSimpleEnumField[NodeClass](ctx, "nodeClass", "NodeClass", m.GetNodeClass(), WriteEnum[NodeClass, uint32](NodeClass.GetValue, NodeClass.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[NodeClass](ctx, "nodeClass", "NodeClass", m.GetNodeClass(), WriteEnum[NodeClass, uint32](NodeClass.GetValue, NodeClass.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodeClass' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "nodeAttributes", m.GetNodeAttributes(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "nodeAttributes", m.GetNodeAttributes(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodeAttributes' field")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "typeDefinition", m.GetTypeDefinition(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "typeDefinition", m.GetTypeDefinition(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'typeDefinition' field")
 		}
 

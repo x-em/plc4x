@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _HistoryUpdateDetailsBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (HistoryUpdateDetailsBuilder) = (*_HistoryUpdateDetailsBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_HistoryUpdateDetailsBuilder) WithMandatoryFields() HistoryUpdateDetail
 }
 
 func (b *_HistoryUpdateDetailsBuilder) Build() (HistoryUpdateDetails, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._HistoryUpdateDetails.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_HistoryUpdateDetailsBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_HistoryUpdateDetailsBuilder) DeepCopy() any {
 	_copy := b.CreateHistoryUpdateDetailsBuilder().(*_HistoryUpdateDetailsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastHistoryUpdateDetails(structType any) HistoryUpdateDetails {
 	return nil
 }
 
-func (m *_HistoryUpdateDetails) GetTypeName() string {
+func (m *_HistoryUpdateDetails) GetPlx4xTypeName() string {
 	return "HistoryUpdateDetails"
 }
 

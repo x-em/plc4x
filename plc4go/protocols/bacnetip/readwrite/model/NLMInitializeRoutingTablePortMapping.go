@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -100,7 +101,7 @@ func NewNLMInitializeRoutingTablePortMappingBuilder() NLMInitializeRoutingTableP
 type _NLMInitializeRoutingTablePortMappingBuilder struct {
 	*_NLMInitializeRoutingTablePortMapping
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NLMInitializeRoutingTablePortMappingBuilder) = (*_NLMInitializeRoutingTablePortMappingBuilder)(nil)
@@ -130,8 +131,8 @@ func (b *_NLMInitializeRoutingTablePortMappingBuilder) WithPortInfo(portInfo ...
 }
 
 func (b *_NLMInitializeRoutingTablePortMappingBuilder) Build() (NLMInitializeRoutingTablePortMapping, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NLMInitializeRoutingTablePortMapping.deepCopy(), nil
 }
@@ -146,8 +147,8 @@ func (b *_NLMInitializeRoutingTablePortMappingBuilder) MustBuild() NLMInitialize
 
 func (b *_NLMInitializeRoutingTablePortMappingBuilder) DeepCopy() any {
 	_copy := b.CreateNLMInitializeRoutingTablePortMappingBuilder().(*_NLMInitializeRoutingTablePortMappingBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -202,7 +203,7 @@ func CastNLMInitializeRoutingTablePortMapping(structType any) NLMInitializeRouti
 	return nil
 }
 
-func (m *_NLMInitializeRoutingTablePortMapping) GetTypeName() string {
+func (m *_NLMInitializeRoutingTablePortMapping) GetPlx4xTypeName() string {
 	return "NLMInitializeRoutingTablePortMapping"
 }
 
@@ -241,7 +242,7 @@ func NLMInitializeRoutingTablePortMappingParseWithBufferProducer() func(ctx cont
 }
 
 func NLMInitializeRoutingTablePortMappingParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (NLMInitializeRoutingTablePortMapping, error) {
-	v, err := (&_NLMInitializeRoutingTablePortMapping{}).parse(ctx, readBuffer)
+	v, err := (new(_NLMInitializeRoutingTablePortMapping)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

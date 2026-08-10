@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -49,6 +52,7 @@ type MonitoredSALShortFormBasicMode interface {
 	// GetNoCounts returns NoCounts (property field)
 	GetNoCounts() *byte
 	// GetApplication returns Application (property field)
+	// TODO: add validation that this is 0x00 when no bridge and network number are set
 	GetApplication() ApplicationIdContainer
 	// GetSalData returns SalData (property field)
 	GetSalData() SALData
@@ -73,9 +77,9 @@ var _ MonitoredSALShortFormBasicMode = (*_MonitoredSALShortFormBasicMode)(nil)
 var _ MonitoredSALRequirements = (*_MonitoredSALShortFormBasicMode)(nil)
 
 // NewMonitoredSALShortFormBasicMode factory function for _MonitoredSALShortFormBasicMode
-func NewMonitoredSALShortFormBasicMode(salType byte, counts byte, bridgeCount *uint8, networkNumber *uint8, noCounts *byte, application ApplicationIdContainer, salData SALData, cBusOptions CBusOptions) *_MonitoredSALShortFormBasicMode {
+func NewMonitoredSALShortFormBasicMode(salType byte, counts byte, bridgeCount *uint8, networkNumber *uint8, noCounts *byte, application ApplicationIdContainer, salData SALData) *_MonitoredSALShortFormBasicMode {
 	_result := &_MonitoredSALShortFormBasicMode{
-		MonitoredSALContract: NewMonitoredSAL(salType, cBusOptions),
+		MonitoredSALContract: NewMonitoredSAL(salType),
 		Counts:               counts,
 		BridgeCount:          bridgeCount,
 		NetworkNumber:        networkNumber,
@@ -129,7 +133,7 @@ type _MonitoredSALShortFormBasicModeBuilder struct {
 
 	parentBuilder *_MonitoredSALBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MonitoredSALShortFormBasicModeBuilder) = (*_MonitoredSALShortFormBasicModeBuilder)(nil)
@@ -178,17 +182,14 @@ func (b *_MonitoredSALShortFormBasicModeBuilder) WithOptionalSalDataBuilder(buil
 	var err error
 	b.SalData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "SALDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "SALDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_MonitoredSALShortFormBasicModeBuilder) Build() (MonitoredSALShortFormBasicMode, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MonitoredSALShortFormBasicMode.deepCopy(), nil
 }
@@ -214,8 +215,8 @@ func (b *_MonitoredSALShortFormBasicModeBuilder) buildForMonitoredSAL() (Monitor
 
 func (b *_MonitoredSALShortFormBasicModeBuilder) DeepCopy() any {
 	_copy := b.CreateMonitoredSALShortFormBasicModeBuilder().(*_MonitoredSALShortFormBasicModeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -292,7 +293,7 @@ func CastMonitoredSALShortFormBasicMode(structType any) MonitoredSALShortFormBas
 	return nil
 }
 
-func (m *_MonitoredSALShortFormBasicMode) GetTypeName() string {
+func (m *_MonitoredSALShortFormBasicMode) GetPlx4xTypeName() string {
 	return "MonitoredSALShortFormBasicMode"
 }
 
@@ -340,41 +341,41 @@ func (m *_MonitoredSALShortFormBasicMode) parse(ctx context.Context, readBuffer 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	counts, err := ReadPeekField[byte](ctx, "counts", ReadByte(readBuffer, 8), 0)
+	counts, err := ReadPeekField[byte](ctx, "counts", ReadByte(readBuffer, 8), 0, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'counts' field"))
 	}
 	m.Counts = counts
 
 	var bridgeCount *uint8
-	bridgeCount, err = ReadOptionalField[uint8](ctx, "bridgeCount", ReadUnsignedByte(readBuffer, uint8(8)), bool((counts) != (0x00)))
+	bridgeCount, err = ReadOptionalField[uint8](ctx, "bridgeCount", ReadUnsignedByte(readBuffer, uint8(8)), bool((counts) != (0x00)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'bridgeCount' field"))
 	}
 	m.BridgeCount = bridgeCount
 
 	var networkNumber *uint8
-	networkNumber, err = ReadOptionalField[uint8](ctx, "networkNumber", ReadUnsignedByte(readBuffer, uint8(8)), bool((counts) != (0x00)))
+	networkNumber, err = ReadOptionalField[uint8](ctx, "networkNumber", ReadUnsignedByte(readBuffer, uint8(8)), bool((counts) != (0x00)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'networkNumber' field"))
 	}
 	m.NetworkNumber = networkNumber
 
 	var noCounts *byte
-	noCounts, err = ReadOptionalField[byte](ctx, "noCounts", ReadByte(readBuffer, 8), bool((counts) == (0x00)))
+	noCounts, err = ReadOptionalField[byte](ctx, "noCounts", ReadByte(readBuffer, 8), bool((counts) == (0x00)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noCounts' field"))
 	}
 	m.NoCounts = noCounts
 
-	application, err := ReadEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", ReadEnum(ApplicationIdContainerByValue, ReadUnsignedByte(readBuffer, uint8(8))))
+	application, err := ReadEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", ReadEnum(ApplicationIdContainerByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'application' field"))
 	}
 	m.Application = application
 
 	var salData SALData
-	_salData, err := ReadOptionalField[SALData](ctx, "salData", ReadComplex[SALData](SALDataParseWithBufferProducer[SALData]((ApplicationId)(application.ApplicationId())), readBuffer), true)
+	_salData, err := ReadOptionalField[SALData](ctx, "salData", ReadComplex[SALData](SALDataParseWithBufferProducer[SALData]((ApplicationId)(application.ApplicationId())), readBuffer), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'salData' field"))
 	}
@@ -391,7 +392,7 @@ func (m *_MonitoredSALShortFormBasicMode) parse(ctx context.Context, readBuffer 
 }
 
 func (m *_MonitoredSALShortFormBasicMode) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -408,23 +409,23 @@ func (m *_MonitoredSALShortFormBasicMode) SerializeWithWriteBuffer(ctx context.C
 			return errors.Wrap(pushErr, "Error pushing for MonitoredSALShortFormBasicMode")
 		}
 
-		if err := WriteOptionalField[uint8](ctx, "bridgeCount", m.GetBridgeCount(), WriteUnsignedByte(writeBuffer, 8), true); err != nil {
+		if err := WriteOptionalField[uint8](ctx, "bridgeCount", m.GetBridgeCount(), WriteUnsignedByte(writeBuffer, 8), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'bridgeCount' field")
 		}
 
-		if err := WriteOptionalField[uint8](ctx, "networkNumber", m.GetNetworkNumber(), WriteUnsignedByte(writeBuffer, 8), true); err != nil {
+		if err := WriteOptionalField[uint8](ctx, "networkNumber", m.GetNetworkNumber(), WriteUnsignedByte(writeBuffer, 8), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'networkNumber' field")
 		}
 
-		if err := WriteOptionalField[byte](ctx, "noCounts", m.GetNoCounts(), WriteByte(writeBuffer, 8), true); err != nil {
+		if err := WriteOptionalField[byte](ctx, "noCounts", m.GetNoCounts(), WriteByte(writeBuffer, 8), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'noCounts' field")
 		}
 
-		if err := WriteSimpleEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", m.GetApplication(), WriteEnum[ApplicationIdContainer, uint8](ApplicationIdContainer.GetValue, ApplicationIdContainer.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8))); err != nil {
+		if err := WriteSimpleEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", m.GetApplication(), WriteEnum[ApplicationIdContainer, uint8](ApplicationIdContainer.GetValue, ApplicationIdContainer.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'application' field")
 		}
 
-		if err := WriteOptionalField[SALData](ctx, "salData", GetRef(m.GetSalData()), WriteComplex[SALData](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[SALData](ctx, "salData", new(m.GetSalData()), WriteComplex[SALData](writeBuffer), true, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'salData' field")
 		}
 

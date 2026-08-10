@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -106,7 +107,7 @@ func NewLocalizedTextBuilder() LocalizedTextBuilder {
 type _LocalizedTextBuilder struct {
 	*_LocalizedText
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (LocalizedTextBuilder) = (*_LocalizedTextBuilder)(nil)
@@ -135,10 +136,7 @@ func (b *_LocalizedTextBuilder) WithOptionalLocaleBuilder(builderSupplier func(P
 	var err error
 	b.Locale, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -153,17 +151,14 @@ func (b *_LocalizedTextBuilder) WithOptionalTextBuilder(builderSupplier func(Pas
 	var err error
 	b.Text, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_LocalizedTextBuilder) Build() (LocalizedText, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._LocalizedText.deepCopy(), nil
 }
@@ -178,8 +173,8 @@ func (b *_LocalizedTextBuilder) MustBuild() LocalizedText {
 
 func (b *_LocalizedTextBuilder) DeepCopy() any {
 	_copy := b.CreateLocalizedTextBuilder().(*_LocalizedTextBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -234,7 +229,7 @@ func CastLocalizedText(structType any) LocalizedText {
 	return nil
 }
 
-func (m *_LocalizedText) GetTypeName() string {
+func (m *_LocalizedText) GetPlx4xTypeName() string {
 	return "LocalizedText"
 }
 
@@ -278,7 +273,7 @@ func LocalizedTextParseWithBufferProducer() func(ctx context.Context, readBuffer
 }
 
 func LocalizedTextParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (LocalizedText, error) {
-	v, err := (&_LocalizedText{}).parse(ctx, readBuffer)
+	v, err := (new(_LocalizedText)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -368,11 +363,11 @@ func (m *_LocalizedText) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 		return errors.Wrap(err, "Error serializing 'localeSpecified' field")
 	}
 
-	if err := WriteOptionalField[PascalString](ctx, "locale", GetRef(m.GetLocale()), WriteComplex[PascalString](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[PascalString](ctx, "locale", new(m.GetLocale()), WriteComplex[PascalString](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'locale' field")
 	}
 
-	if err := WriteOptionalField[PascalString](ctx, "text", GetRef(m.GetText()), WriteComplex[PascalString](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[PascalString](ctx, "text", new(m.GetText()), WriteComplex[PascalString](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'text' field")
 	}
 

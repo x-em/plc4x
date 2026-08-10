@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,6 +44,7 @@ type SALDataAudioAndVideo interface {
 	utils.Copyable
 	SALData
 	// GetAudioVideoData returns AudioVideoData (property field)
+	// Note: the documentation states that the data for audio video data uses LightingData
 	GetAudioVideoData() LightingData
 	// IsSALDataAudioAndVideo is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsSALDataAudioAndVideo()
@@ -102,7 +106,7 @@ type _SALDataAudioAndVideoBuilder struct {
 
 	parentBuilder *_SALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SALDataAudioAndVideoBuilder) = (*_SALDataAudioAndVideoBuilder)(nil)
@@ -126,23 +130,17 @@ func (b *_SALDataAudioAndVideoBuilder) WithAudioVideoDataBuilder(builderSupplier
 	var err error
 	b.AudioVideoData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LightingDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LightingDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SALDataAudioAndVideoBuilder) Build() (SALDataAudioAndVideo, error) {
 	if b.AudioVideoData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'audioVideoData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'audioVideoData' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SALDataAudioAndVideo.deepCopy(), nil
 }
@@ -168,8 +166,8 @@ func (b *_SALDataAudioAndVideoBuilder) buildForSALData() (SALData, error) {
 
 func (b *_SALDataAudioAndVideoBuilder) DeepCopy() any {
 	_copy := b.CreateSALDataAudioAndVideoBuilder().(*_SALDataAudioAndVideoBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +228,7 @@ func CastSALDataAudioAndVideo(structType any) SALDataAudioAndVideo {
 	return nil
 }
 
-func (m *_SALDataAudioAndVideo) GetTypeName() string {
+func (m *_SALDataAudioAndVideo) GetPlx4xTypeName() string {
 	return "SALDataAudioAndVideo"
 }
 
@@ -258,7 +256,7 @@ func (m *_SALDataAudioAndVideo) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	audioVideoData, err := ReadSimpleField[LightingData](ctx, "audioVideoData", ReadComplex[LightingData](LightingDataParseWithBuffer, readBuffer))
+	audioVideoData, err := ReadSimpleField[LightingData](ctx, "audioVideoData", ReadComplex[LightingData](LightingDataParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'audioVideoData' field"))
 	}
@@ -272,7 +270,7 @@ func (m *_SALDataAudioAndVideo) parse(ctx context.Context, readBuffer utils.Read
 }
 
 func (m *_SALDataAudioAndVideo) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -289,7 +287,7 @@ func (m *_SALDataAudioAndVideo) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for SALDataAudioAndVideo")
 		}
 
-		if err := WriteSimpleField[LightingData](ctx, "audioVideoData", m.GetAudioVideoData(), WriteComplex[LightingData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LightingData](ctx, "audioVideoData", m.GetAudioVideoData(), WriteComplex[LightingData](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'audioVideoData' field")
 		}
 

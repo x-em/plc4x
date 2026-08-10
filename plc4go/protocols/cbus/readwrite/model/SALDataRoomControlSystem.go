@@ -21,11 +21,13 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +91,7 @@ type _SALDataRoomControlSystemBuilder struct {
 
 	parentBuilder *_SALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SALDataRoomControlSystemBuilder) = (*_SALDataRoomControlSystemBuilder)(nil)
@@ -104,8 +106,8 @@ func (b *_SALDataRoomControlSystemBuilder) WithMandatoryFields() SALDataRoomCont
 }
 
 func (b *_SALDataRoomControlSystemBuilder) Build() (SALDataRoomControlSystem, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SALDataRoomControlSystem.deepCopy(), nil
 }
@@ -131,8 +133,8 @@ func (b *_SALDataRoomControlSystemBuilder) buildForSALData() (SALData, error) {
 
 func (b *_SALDataRoomControlSystemBuilder) DeepCopy() any {
 	_copy := b.CreateSALDataRoomControlSystemBuilder().(*_SALDataRoomControlSystemBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +181,7 @@ func CastSALDataRoomControlSystem(structType any) SALDataRoomControlSystem {
 	return nil
 }
 
-func (m *_SALDataRoomControlSystem) GetTypeName() string {
+func (m *_SALDataRoomControlSystem) GetPlx4xTypeName() string {
 	return "SALDataRoomControlSystem"
 }
 
@@ -217,7 +219,7 @@ func (m *_SALDataRoomControlSystem) parse(ctx context.Context, readBuffer utils.
 }
 
 func (m *_SALDataRoomControlSystem) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}

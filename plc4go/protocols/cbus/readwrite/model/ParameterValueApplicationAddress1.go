@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -43,6 +46,7 @@ type ParameterValueApplicationAddress1 interface {
 	// GetValue returns Value (property field)
 	GetValue() ApplicationAddress1
 	// GetData returns Data (property field)
+	// TODO: find out what additional bytes mean here... would that be application address 2 then?
 	GetData() []byte
 	// IsParameterValueApplicationAddress1 is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsParameterValueApplicationAddress1()
@@ -61,12 +65,12 @@ var _ ParameterValueApplicationAddress1 = (*_ParameterValueApplicationAddress1)(
 var _ ParameterValueRequirements = (*_ParameterValueApplicationAddress1)(nil)
 
 // NewParameterValueApplicationAddress1 factory function for _ParameterValueApplicationAddress1
-func NewParameterValueApplicationAddress1(value ApplicationAddress1, data []byte, numBytes uint8) *_ParameterValueApplicationAddress1 {
+func NewParameterValueApplicationAddress1(value ApplicationAddress1, data []byte) *_ParameterValueApplicationAddress1 {
 	if value == nil {
 		panic("value of type ApplicationAddress1 for ParameterValueApplicationAddress1 must not be nil")
 	}
 	_result := &_ParameterValueApplicationAddress1{
-		ParameterValueContract: NewParameterValue(numBytes),
+		ParameterValueContract: NewParameterValue(),
 		Value:                  value,
 		Data:                   data,
 	}
@@ -108,7 +112,7 @@ type _ParameterValueApplicationAddress1Builder struct {
 
 	parentBuilder *_ParameterValueBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ParameterValueApplicationAddress1Builder) = (*_ParameterValueApplicationAddress1Builder)(nil)
@@ -132,10 +136,7 @@ func (b *_ParameterValueApplicationAddress1Builder) WithValueBuilder(builderSupp
 	var err error
 	b.Value, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ApplicationAddress1Builder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ApplicationAddress1Builder failed"))
 	}
 	return b
 }
@@ -147,13 +148,10 @@ func (b *_ParameterValueApplicationAddress1Builder) WithData(data ...byte) Param
 
 func (b *_ParameterValueApplicationAddress1Builder) Build() (ParameterValueApplicationAddress1, error) {
 	if b.Value == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'value' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'value' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ParameterValueApplicationAddress1.deepCopy(), nil
 }
@@ -179,8 +177,8 @@ func (b *_ParameterValueApplicationAddress1Builder) buildForParameterValue() (Pa
 
 func (b *_ParameterValueApplicationAddress1Builder) DeepCopy() any {
 	_copy := b.CreateParameterValueApplicationAddress1Builder().(*_ParameterValueApplicationAddress1Builder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +243,7 @@ func CastParameterValueApplicationAddress1(structType any) ParameterValueApplica
 	return nil
 }
 
-func (m *_ParameterValueApplicationAddress1) GetTypeName() string {
+func (m *_ParameterValueApplicationAddress1) GetPlx4xTypeName() string {
 	return "ParameterValueApplicationAddress1"
 }
 
@@ -283,13 +281,13 @@ func (m *_ParameterValueApplicationAddress1) parse(ctx context.Context, readBuff
 		return nil, errors.WithStack(utils.ParseValidationError{Message: "ApplicationAddress1 has exactly one byte"})
 	}
 
-	value, err := ReadSimpleField[ApplicationAddress1](ctx, "value", ReadComplex[ApplicationAddress1](ApplicationAddress1ParseWithBuffer, readBuffer))
+	value, err := ReadSimpleField[ApplicationAddress1](ctx, "value", ReadComplex[ApplicationAddress1](ApplicationAddress1ParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'value' field"))
 	}
 	m.Value = value
 
-	data, err := readBuffer.ReadByteArray("data", int(int32(numBytes)-int32(int32(1))))
+	data, err := readBuffer.ReadByteArray("data", int(int32(numBytes)-int32(int32(1))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'data' field"))
 	}
@@ -303,7 +301,7 @@ func (m *_ParameterValueApplicationAddress1) parse(ctx context.Context, readBuff
 }
 
 func (m *_ParameterValueApplicationAddress1) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -320,11 +318,11 @@ func (m *_ParameterValueApplicationAddress1) SerializeWithWriteBuffer(ctx contex
 			return errors.Wrap(pushErr, "Error pushing for ParameterValueApplicationAddress1")
 		}
 
-		if err := WriteSimpleField[ApplicationAddress1](ctx, "value", m.GetValue(), WriteComplex[ApplicationAddress1](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ApplicationAddress1](ctx, "value", m.GetValue(), WriteComplex[ApplicationAddress1](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'value' field")
 		}
 
-		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'data' field")
 		}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -100,7 +101,7 @@ type _AdsDiscoveryBlockStatusBuilder struct {
 
 	parentBuilder *_AdsDiscoveryBlockBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDiscoveryBlockStatusBuilder) = (*_AdsDiscoveryBlockStatusBuilder)(nil)
@@ -120,8 +121,8 @@ func (b *_AdsDiscoveryBlockStatusBuilder) WithStatus(status Status) AdsDiscovery
 }
 
 func (b *_AdsDiscoveryBlockStatusBuilder) Build() (AdsDiscoveryBlockStatus, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDiscoveryBlockStatus.deepCopy(), nil
 }
@@ -147,8 +148,8 @@ func (b *_AdsDiscoveryBlockStatusBuilder) buildForAdsDiscoveryBlock() (AdsDiscov
 
 func (b *_AdsDiscoveryBlockStatusBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDiscoveryBlockStatusBuilder().(*_AdsDiscoveryBlockStatusBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -222,7 +223,7 @@ func CastAdsDiscoveryBlockStatus(structType any) AdsDiscoveryBlockStatus {
 	return nil
 }
 
-func (m *_AdsDiscoveryBlockStatus) GetTypeName() string {
+func (m *_AdsDiscoveryBlockStatus) GetPlx4xTypeName() string {
 	return "AdsDiscoveryBlockStatus"
 }
 

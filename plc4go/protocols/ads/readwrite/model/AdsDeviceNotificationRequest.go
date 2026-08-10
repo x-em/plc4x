@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,10 +42,13 @@ type AdsDeviceNotificationRequest interface {
 	utils.Copyable
 	AmsPacket
 	// GetLength returns Length (property field)
+	// 4 bytes	Size of data in byte.
 	GetLength() uint32
 	// GetStamps returns Stamps (property field)
+	// 4 bytes	Number of elements of type AdsStampHeader.
 	GetStamps() uint32
 	// GetAdsStampHeaders returns AdsStampHeaders (property field)
+	// n bytes	Array with elements of type AdsStampHeader.
 	GetAdsStampHeaders() []AdsStampHeader
 	// IsAdsDeviceNotificationRequest is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsAdsDeviceNotificationRequest()
@@ -64,7 +68,7 @@ var _ AdsDeviceNotificationRequest = (*_AdsDeviceNotificationRequest)(nil)
 var _ AmsPacketRequirements = (*_AdsDeviceNotificationRequest)(nil)
 
 // NewAdsDeviceNotificationRequest factory function for _AdsDeviceNotificationRequest
-func NewAdsDeviceNotificationRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32, length uint32, stamps uint32, adsStampHeaders []AdsStampHeader) *_AdsDeviceNotificationRequest {
+func NewAdsDeviceNotificationRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32, length uint32, stamps uint32, adsStampHeaders []AdsStampHeader) *_AdsDeviceNotificationRequest {
 	_result := &_AdsDeviceNotificationRequest{
 		AmsPacketContract: NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 		Length:            length,
@@ -109,7 +113,7 @@ type _AdsDeviceNotificationRequestBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDeviceNotificationRequestBuilder) = (*_AdsDeviceNotificationRequestBuilder)(nil)
@@ -139,8 +143,8 @@ func (b *_AdsDeviceNotificationRequestBuilder) WithAdsStampHeaders(adsStampHeade
 }
 
 func (b *_AdsDeviceNotificationRequestBuilder) Build() (AdsDeviceNotificationRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDeviceNotificationRequest.deepCopy(), nil
 }
@@ -166,8 +170,8 @@ func (b *_AdsDeviceNotificationRequestBuilder) buildForAmsPacket() (AmsPacket, e
 
 func (b *_AdsDeviceNotificationRequestBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDeviceNotificationRequestBuilder().(*_AdsDeviceNotificationRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -240,7 +244,7 @@ func CastAdsDeviceNotificationRequest(structType any) AdsDeviceNotificationReque
 	return nil
 }
 
-func (m *_AdsDeviceNotificationRequest) GetTypeName() string {
+func (m *_AdsDeviceNotificationRequest) GetPlx4xTypeName() string {
 	return "AdsDeviceNotificationRequest"
 }
 
@@ -257,9 +261,7 @@ func (m *_AdsDeviceNotificationRequest) GetLengthInBits(ctx context.Context) uin
 	if len(m.AdsStampHeaders) > 0 {
 		for _curItem, element := range m.AdsStampHeaders {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.AdsStampHeaders), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

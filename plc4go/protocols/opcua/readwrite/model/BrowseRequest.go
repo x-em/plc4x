@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -125,7 +127,7 @@ type _BrowseRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BrowseRequestBuilder) = (*_BrowseRequestBuilder)(nil)
@@ -149,10 +151,7 @@ func (b *_BrowseRequestBuilder) WithRequestHeaderBuilder(builderSupplier func(Re
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -167,10 +166,7 @@ func (b *_BrowseRequestBuilder) WithViewBuilder(builderSupplier func(ViewDescrip
 	var err error
 	b.View, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ViewDescriptionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ViewDescriptionBuilder failed"))
 	}
 	return b
 }
@@ -187,19 +183,13 @@ func (b *_BrowseRequestBuilder) WithNodesToBrowse(nodesToBrowse ...BrowseDescrip
 
 func (b *_BrowseRequestBuilder) Build() (BrowseRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
 	if b.View == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'view' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'view' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BrowseRequest.deepCopy(), nil
 }
@@ -225,8 +215,8 @@ func (b *_BrowseRequestBuilder) buildForExtensionObjectDefinition() (ExtensionOb
 
 func (b *_BrowseRequestBuilder) DeepCopy() any {
 	_copy := b.CreateBrowseRequestBuilder().(*_BrowseRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +289,7 @@ func CastBrowseRequest(structType any) BrowseRequest {
 	return nil
 }
 
-func (m *_BrowseRequest) GetTypeName() string {
+func (m *_BrowseRequest) GetPlx4xTypeName() string {
 	return "BrowseRequest"
 }
 
@@ -322,9 +312,7 @@ func (m *_BrowseRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.NodesToBrowse) > 0 {
 		for _curItem, element := range m.NodesToBrowse {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.NodesToBrowse), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -346,31 +334,31 @@ func (m *_BrowseRequest) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	view, err := ReadSimpleField[ViewDescription](ctx, "view", ReadComplex[ViewDescription](ExtensionObjectDefinitionParseWithBufferProducer[ViewDescription]((int32)(int32(513))), readBuffer))
+	view, err := ReadSimpleField[ViewDescription](ctx, "view", ReadComplex[ViewDescription](ExtensionObjectDefinitionParseWithBufferProducer[ViewDescription]((int32)(int32(513))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'view' field"))
 	}
 	m.View = view
 
-	requestedMaxReferencesPerNode, err := ReadSimpleField(ctx, "requestedMaxReferencesPerNode", ReadUnsignedInt(readBuffer, uint8(32)))
+	requestedMaxReferencesPerNode, err := ReadSimpleField(ctx, "requestedMaxReferencesPerNode", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestedMaxReferencesPerNode' field"))
 	}
 	m.RequestedMaxReferencesPerNode = requestedMaxReferencesPerNode
 
-	noOfNodesToBrowse, err := ReadImplicitField[int32](ctx, "noOfNodesToBrowse", ReadSignedInt(readBuffer, uint8(32)))
+	noOfNodesToBrowse, err := ReadImplicitField[int32](ctx, "noOfNodesToBrowse", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfNodesToBrowse' field"))
 	}
 	_ = noOfNodesToBrowse
 
-	nodesToBrowse, err := ReadCountArrayField[BrowseDescription](ctx, "nodesToBrowse", ReadComplex[BrowseDescription](ExtensionObjectDefinitionParseWithBufferProducer[BrowseDescription]((int32)(int32(516))), readBuffer), uint64(noOfNodesToBrowse))
+	nodesToBrowse, err := ReadCountArrayField[BrowseDescription](ctx, "nodesToBrowse", ReadComplex[BrowseDescription](ExtensionObjectDefinitionParseWithBufferProducer[BrowseDescription]((int32)(int32(516))), readBuffer), uint64(noOfNodesToBrowse), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodesToBrowse' field"))
 	}
@@ -401,23 +389,23 @@ func (m *_BrowseRequest) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 			return errors.Wrap(pushErr, "Error pushing for BrowseRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteSimpleField[ViewDescription](ctx, "view", m.GetView(), WriteComplex[ViewDescription](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ViewDescription](ctx, "view", m.GetView(), WriteComplex[ViewDescription](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'view' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "requestedMaxReferencesPerNode", m.GetRequestedMaxReferencesPerNode(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "requestedMaxReferencesPerNode", m.GetRequestedMaxReferencesPerNode(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestedMaxReferencesPerNode' field")
 		}
 		noOfNodesToBrowse := int32(utils.InlineIf(bool((m.GetNodesToBrowse()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetNodesToBrowse()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfNodesToBrowse", noOfNodesToBrowse, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfNodesToBrowse", noOfNodesToBrowse, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfNodesToBrowse' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "nodesToBrowse", m.GetNodesToBrowse(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "nodesToBrowse", m.GetNodesToBrowse(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodesToBrowse' field")
 		}
 

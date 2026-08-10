@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -154,7 +156,7 @@ type _PublishedVariableDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PublishedVariableDataTypeBuilder) = (*_PublishedVariableDataTypeBuilder)(nil)
@@ -178,10 +180,7 @@ func (b *_PublishedVariableDataTypeBuilder) WithPublishedVariableBuilder(builder
 	var err error
 	b.PublishedVariable, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -216,10 +215,7 @@ func (b *_PublishedVariableDataTypeBuilder) WithIndexRangeBuilder(builderSupplie
 	var err error
 	b.IndexRange, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -234,10 +230,7 @@ func (b *_PublishedVariableDataTypeBuilder) WithSubstituteValueBuilder(builderSu
 	var err error
 	b.SubstituteValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "VariantBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "VariantBuilder failed"))
 	}
 	return b
 }
@@ -249,25 +242,16 @@ func (b *_PublishedVariableDataTypeBuilder) WithMetaDataProperties(metaDataPrope
 
 func (b *_PublishedVariableDataTypeBuilder) Build() (PublishedVariableDataType, error) {
 	if b.PublishedVariable == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'publishedVariable' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'publishedVariable' not set"))
 	}
 	if b.IndexRange == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'indexRange' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'indexRange' not set"))
 	}
 	if b.SubstituteValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'substituteValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'substituteValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PublishedVariableDataType.deepCopy(), nil
 }
@@ -293,8 +277,8 @@ func (b *_PublishedVariableDataTypeBuilder) buildForExtensionObjectDefinition() 
 
 func (b *_PublishedVariableDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreatePublishedVariableDataTypeBuilder().(*_PublishedVariableDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -383,7 +367,7 @@ func CastPublishedVariableDataType(structType any) PublishedVariableDataType {
 	return nil
 }
 
-func (m *_PublishedVariableDataType) GetTypeName() string {
+func (m *_PublishedVariableDataType) GetPlx4xTypeName() string {
 	return "PublishedVariableDataType"
 }
 
@@ -418,9 +402,7 @@ func (m *_PublishedVariableDataType) GetLengthInBits(ctx context.Context) uint16
 	if len(m.MetaDataProperties) > 0 {
 		for _curItem, element := range m.MetaDataProperties {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.MetaDataProperties), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -442,55 +424,55 @@ func (m *_PublishedVariableDataType) parse(ctx context.Context, readBuffer utils
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	publishedVariable, err := ReadSimpleField[NodeId](ctx, "publishedVariable", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	publishedVariable, err := ReadSimpleField[NodeId](ctx, "publishedVariable", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'publishedVariable' field"))
 	}
 	m.PublishedVariable = publishedVariable
 
-	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)))
+	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'attributeId' field"))
 	}
 	m.AttributeId = attributeId
 
-	samplingIntervalHint, err := ReadSimpleField(ctx, "samplingIntervalHint", ReadDouble(readBuffer, uint8(64)))
+	samplingIntervalHint, err := ReadSimpleField(ctx, "samplingIntervalHint", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'samplingIntervalHint' field"))
 	}
 	m.SamplingIntervalHint = samplingIntervalHint
 
-	deadbandType, err := ReadSimpleField(ctx, "deadbandType", ReadUnsignedInt(readBuffer, uint8(32)))
+	deadbandType, err := ReadSimpleField(ctx, "deadbandType", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deadbandType' field"))
 	}
 	m.DeadbandType = deadbandType
 
-	deadbandValue, err := ReadSimpleField(ctx, "deadbandValue", ReadDouble(readBuffer, uint8(64)))
+	deadbandValue, err := ReadSimpleField(ctx, "deadbandValue", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deadbandValue' field"))
 	}
 	m.DeadbandValue = deadbandValue
 
-	indexRange, err := ReadSimpleField[PascalString](ctx, "indexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	indexRange, err := ReadSimpleField[PascalString](ctx, "indexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'indexRange' field"))
 	}
 	m.IndexRange = indexRange
 
-	substituteValue, err := ReadSimpleField[Variant](ctx, "substituteValue", ReadComplex[Variant](VariantParseWithBuffer, readBuffer))
+	substituteValue, err := ReadSimpleField[Variant](ctx, "substituteValue", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'substituteValue' field"))
 	}
 	m.SubstituteValue = substituteValue
 
-	noOfMetaDataProperties, err := ReadImplicitField[int32](ctx, "noOfMetaDataProperties", ReadSignedInt(readBuffer, uint8(32)))
+	noOfMetaDataProperties, err := ReadImplicitField[int32](ctx, "noOfMetaDataProperties", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfMetaDataProperties' field"))
 	}
 	_ = noOfMetaDataProperties
 
-	metaDataProperties, err := ReadCountArrayField[QualifiedName](ctx, "metaDataProperties", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), uint64(noOfMetaDataProperties))
+	metaDataProperties, err := ReadCountArrayField[QualifiedName](ctx, "metaDataProperties", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), uint64(noOfMetaDataProperties), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'metaDataProperties' field"))
 	}
@@ -521,39 +503,39 @@ func (m *_PublishedVariableDataType) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(pushErr, "Error pushing for PublishedVariableDataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "publishedVariable", m.GetPublishedVariable(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "publishedVariable", m.GetPublishedVariable(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'publishedVariable' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'attributeId' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "samplingIntervalHint", m.GetSamplingIntervalHint(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "samplingIntervalHint", m.GetSamplingIntervalHint(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'samplingIntervalHint' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "deadbandType", m.GetDeadbandType(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "deadbandType", m.GetDeadbandType(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'deadbandType' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "deadbandValue", m.GetDeadbandValue(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "deadbandValue", m.GetDeadbandValue(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'deadbandValue' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "indexRange", m.GetIndexRange(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "indexRange", m.GetIndexRange(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'indexRange' field")
 		}
 
-		if err := WriteSimpleField[Variant](ctx, "substituteValue", m.GetSubstituteValue(), WriteComplex[Variant](writeBuffer)); err != nil {
+		if err := WriteSimpleField[Variant](ctx, "substituteValue", m.GetSubstituteValue(), WriteComplex[Variant](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'substituteValue' field")
 		}
 		noOfMetaDataProperties := int32(utils.InlineIf(bool((m.GetMetaDataProperties()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetMetaDataProperties()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfMetaDataProperties", noOfMetaDataProperties, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfMetaDataProperties", noOfMetaDataProperties, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfMetaDataProperties' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "metaDataProperties", m.GetMetaDataProperties(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "metaDataProperties", m.GetMetaDataProperties(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'metaDataProperties' field")
 		}
 

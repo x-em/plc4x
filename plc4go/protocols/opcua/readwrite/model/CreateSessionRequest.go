@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -180,7 +182,7 @@ type _CreateSessionRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CreateSessionRequestBuilder) = (*_CreateSessionRequestBuilder)(nil)
@@ -204,10 +206,7 @@ func (b *_CreateSessionRequestBuilder) WithRequestHeaderBuilder(builderSupplier 
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -222,10 +221,7 @@ func (b *_CreateSessionRequestBuilder) WithClientDescriptionBuilder(builderSuppl
 	var err error
 	b.ClientDescription, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
 	}
 	return b
 }
@@ -240,10 +236,7 @@ func (b *_CreateSessionRequestBuilder) WithServerUriBuilder(builderSupplier func
 	var err error
 	b.ServerUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -258,10 +251,7 @@ func (b *_CreateSessionRequestBuilder) WithEndpointUrlBuilder(builderSupplier fu
 	var err error
 	b.EndpointUrl, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -276,10 +266,7 @@ func (b *_CreateSessionRequestBuilder) WithSessionNameBuilder(builderSupplier fu
 	var err error
 	b.SessionName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -294,10 +281,7 @@ func (b *_CreateSessionRequestBuilder) WithClientNonceBuilder(builderSupplier fu
 	var err error
 	b.ClientNonce, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -312,10 +296,7 @@ func (b *_CreateSessionRequestBuilder) WithClientCertificateBuilder(builderSuppl
 	var err error
 	b.ClientCertificate, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -332,49 +313,28 @@ func (b *_CreateSessionRequestBuilder) WithMaxResponseMessageSize(maxResponseMes
 
 func (b *_CreateSessionRequestBuilder) Build() (CreateSessionRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
 	if b.ClientDescription == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'clientDescription' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'clientDescription' not set"))
 	}
 	if b.ServerUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'serverUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'serverUri' not set"))
 	}
 	if b.EndpointUrl == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'endpointUrl' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'endpointUrl' not set"))
 	}
 	if b.SessionName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'sessionName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'sessionName' not set"))
 	}
 	if b.ClientNonce == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'clientNonce' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'clientNonce' not set"))
 	}
 	if b.ClientCertificate == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'clientCertificate' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'clientCertificate' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CreateSessionRequest.deepCopy(), nil
 }
@@ -400,8 +360,8 @@ func (b *_CreateSessionRequestBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_CreateSessionRequestBuilder) DeepCopy() any {
 	_copy := b.CreateCreateSessionRequestBuilder().(*_CreateSessionRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -494,7 +454,7 @@ func CastCreateSessionRequest(structType any) CreateSessionRequest {
 	return nil
 }
 
-func (m *_CreateSessionRequest) GetTypeName() string {
+func (m *_CreateSessionRequest) GetPlx4xTypeName() string {
 	return "CreateSessionRequest"
 }
 
@@ -546,55 +506,55 @@ func (m *_CreateSessionRequest) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	clientDescription, err := ReadSimpleField[ApplicationDescription](ctx, "clientDescription", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer))
+	clientDescription, err := ReadSimpleField[ApplicationDescription](ctx, "clientDescription", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientDescription' field"))
 	}
 	m.ClientDescription = clientDescription
 
-	serverUri, err := ReadSimpleField[PascalString](ctx, "serverUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	serverUri, err := ReadSimpleField[PascalString](ctx, "serverUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverUri' field"))
 	}
 	m.ServerUri = serverUri
 
-	endpointUrl, err := ReadSimpleField[PascalString](ctx, "endpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	endpointUrl, err := ReadSimpleField[PascalString](ctx, "endpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'endpointUrl' field"))
 	}
 	m.EndpointUrl = endpointUrl
 
-	sessionName, err := ReadSimpleField[PascalString](ctx, "sessionName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	sessionName, err := ReadSimpleField[PascalString](ctx, "sessionName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'sessionName' field"))
 	}
 	m.SessionName = sessionName
 
-	clientNonce, err := ReadSimpleField[PascalByteString](ctx, "clientNonce", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	clientNonce, err := ReadSimpleField[PascalByteString](ctx, "clientNonce", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientNonce' field"))
 	}
 	m.ClientNonce = clientNonce
 
-	clientCertificate, err := ReadSimpleField[PascalByteString](ctx, "clientCertificate", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	clientCertificate, err := ReadSimpleField[PascalByteString](ctx, "clientCertificate", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientCertificate' field"))
 	}
 	m.ClientCertificate = clientCertificate
 
-	requestedSessionTimeout, err := ReadSimpleField(ctx, "requestedSessionTimeout", ReadDouble(readBuffer, uint8(64)))
+	requestedSessionTimeout, err := ReadSimpleField(ctx, "requestedSessionTimeout", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestedSessionTimeout' field"))
 	}
 	m.RequestedSessionTimeout = requestedSessionTimeout
 
-	maxResponseMessageSize, err := ReadSimpleField(ctx, "maxResponseMessageSize", ReadUnsignedInt(readBuffer, uint8(32)))
+	maxResponseMessageSize, err := ReadSimpleField(ctx, "maxResponseMessageSize", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'maxResponseMessageSize' field"))
 	}
@@ -625,39 +585,39 @@ func (m *_CreateSessionRequest) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for CreateSessionRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteSimpleField[ApplicationDescription](ctx, "clientDescription", m.GetClientDescription(), WriteComplex[ApplicationDescription](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ApplicationDescription](ctx, "clientDescription", m.GetClientDescription(), WriteComplex[ApplicationDescription](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientDescription' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "serverUri", m.GetServerUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "serverUri", m.GetServerUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "endpointUrl", m.GetEndpointUrl(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "endpointUrl", m.GetEndpointUrl(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'endpointUrl' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "sessionName", m.GetSessionName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "sessionName", m.GetSessionName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'sessionName' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "clientNonce", m.GetClientNonce(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "clientNonce", m.GetClientNonce(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientNonce' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "clientCertificate", m.GetClientCertificate(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "clientCertificate", m.GetClientCertificate(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientCertificate' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "requestedSessionTimeout", m.GetRequestedSessionTimeout(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "requestedSessionTimeout", m.GetRequestedSessionTimeout(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestedSessionTimeout' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "maxResponseMessageSize", m.GetMaxResponseMessageSize(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "maxResponseMessageSize", m.GetMaxResponseMessageSize(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'maxResponseMessageSize' field")
 		}
 

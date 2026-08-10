@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ IdentifyReplyCommandMaximumLevels = (*_IdentifyReplyCommandMaximumLevels)(
 var _ IdentifyReplyCommandRequirements = (*_IdentifyReplyCommandMaximumLevels)(nil)
 
 // NewIdentifyReplyCommandMaximumLevels factory function for _IdentifyReplyCommandMaximumLevels
-func NewIdentifyReplyCommandMaximumLevels(maximumLevels []byte, numBytes uint8) *_IdentifyReplyCommandMaximumLevels {
+func NewIdentifyReplyCommandMaximumLevels(maximumLevels []byte) *_IdentifyReplyCommandMaximumLevels {
 	_result := &_IdentifyReplyCommandMaximumLevels{
-		IdentifyReplyCommandContract: NewIdentifyReplyCommand(numBytes),
+		IdentifyReplyCommandContract: NewIdentifyReplyCommand(),
 		MaximumLevels:                maximumLevels,
 	}
 	_result.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = _result
@@ -97,7 +100,7 @@ type _IdentifyReplyCommandMaximumLevelsBuilder struct {
 
 	parentBuilder *_IdentifyReplyCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IdentifyReplyCommandMaximumLevelsBuilder) = (*_IdentifyReplyCommandMaximumLevelsBuilder)(nil)
@@ -117,8 +120,8 @@ func (b *_IdentifyReplyCommandMaximumLevelsBuilder) WithMaximumLevels(maximumLev
 }
 
 func (b *_IdentifyReplyCommandMaximumLevelsBuilder) Build() (IdentifyReplyCommandMaximumLevels, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IdentifyReplyCommandMaximumLevels.deepCopy(), nil
 }
@@ -144,8 +147,8 @@ func (b *_IdentifyReplyCommandMaximumLevelsBuilder) buildForIdentifyReplyCommand
 
 func (b *_IdentifyReplyCommandMaximumLevelsBuilder) DeepCopy() any {
 	_copy := b.CreateIdentifyReplyCommandMaximumLevelsBuilder().(*_IdentifyReplyCommandMaximumLevelsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +209,7 @@ func CastIdentifyReplyCommandMaximumLevels(structType any) IdentifyReplyCommandM
 	return nil
 }
 
-func (m *_IdentifyReplyCommandMaximumLevels) GetTypeName() string {
+func (m *_IdentifyReplyCommandMaximumLevels) GetPlx4xTypeName() string {
 	return "IdentifyReplyCommandMaximumLevels"
 }
 
@@ -236,7 +239,7 @@ func (m *_IdentifyReplyCommandMaximumLevels) parse(ctx context.Context, readBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	maximumLevels, err := readBuffer.ReadByteArray("maximumLevels", int(numBytes))
+	maximumLevels, err := readBuffer.ReadByteArray("maximumLevels", int(numBytes), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'maximumLevels' field"))
 	}
@@ -250,7 +253,7 @@ func (m *_IdentifyReplyCommandMaximumLevels) parse(ctx context.Context, readBuff
 }
 
 func (m *_IdentifyReplyCommandMaximumLevels) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -267,7 +270,7 @@ func (m *_IdentifyReplyCommandMaximumLevels) SerializeWithWriteBuffer(ctx contex
 			return errors.Wrap(pushErr, "Error pushing for IdentifyReplyCommandMaximumLevels")
 		}
 
-		if err := WriteByteArrayField(ctx, "maximumLevels", m.GetMaximumLevels(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "maximumLevels", m.GetMaximumLevels(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'maximumLevels' field")
 		}
 

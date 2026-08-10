@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _GenericAttributeValueBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (GenericAttributeValueBuilder) = (*_GenericAttributeValueBuilder)(nil)
@@ -137,23 +139,17 @@ func (b *_GenericAttributeValueBuilder) WithValueBuilder(builderSupplier func(Va
 	var err error
 	b.Value, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "VariantBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "VariantBuilder failed"))
 	}
 	return b
 }
 
 func (b *_GenericAttributeValueBuilder) Build() (GenericAttributeValue, error) {
 	if b.Value == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'value' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'value' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._GenericAttributeValue.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_GenericAttributeValueBuilder) buildForExtensionObjectDefinition() (Ext
 
 func (b *_GenericAttributeValueBuilder) DeepCopy() any {
 	_copy := b.CreateGenericAttributeValueBuilder().(*_GenericAttributeValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastGenericAttributeValue(structType any) GenericAttributeValue {
 	return nil
 }
 
-func (m *_GenericAttributeValue) GetTypeName() string {
+func (m *_GenericAttributeValue) GetPlx4xTypeName() string {
 	return "GenericAttributeValue"
 }
 
@@ -276,13 +272,13 @@ func (m *_GenericAttributeValue) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)))
+	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'attributeId' field"))
 	}
 	m.AttributeId = attributeId
 
-	value, err := ReadSimpleField[Variant](ctx, "value", ReadComplex[Variant](VariantParseWithBuffer, readBuffer))
+	value, err := ReadSimpleField[Variant](ctx, "value", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'value' field"))
 	}
@@ -313,11 +309,11 @@ func (m *_GenericAttributeValue) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for GenericAttributeValue")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'attributeId' field")
 		}
 
-		if err := WriteSimpleField[Variant](ctx, "value", m.GetValue(), WriteComplex[Variant](writeBuffer)); err != nil {
+		if err := WriteSimpleField[Variant](ctx, "value", m.GetValue(), WriteComplex[Variant](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'value' field")
 		}
 

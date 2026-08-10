@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ func NewBACnetRecipientProcessBuilder() BACnetRecipientProcessBuilder {
 type _BACnetRecipientProcessBuilder struct {
 	*_BACnetRecipientProcess
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetRecipientProcessBuilder) = (*_BACnetRecipientProcessBuilder)(nil)
@@ -116,10 +117,7 @@ func (b *_BACnetRecipientProcessBuilder) WithRecipientBuilder(builderSupplier fu
 	var err error
 	b.Recipient, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetRecipientEnclosedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetRecipientEnclosedBuilder failed"))
 	}
 	return b
 }
@@ -134,23 +132,17 @@ func (b *_BACnetRecipientProcessBuilder) WithOptionalProcessIdentifierBuilder(bu
 	var err error
 	b.ProcessIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetRecipientProcessBuilder) Build() (BACnetRecipientProcess, error) {
 	if b.Recipient == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'recipient' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'recipient' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetRecipientProcess.deepCopy(), nil
 }
@@ -165,8 +157,8 @@ func (b *_BACnetRecipientProcessBuilder) MustBuild() BACnetRecipientProcess {
 
 func (b *_BACnetRecipientProcessBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetRecipientProcessBuilder().(*_BACnetRecipientProcessBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -213,7 +205,7 @@ func CastBACnetRecipientProcess(structType any) BACnetRecipientProcess {
 	return nil
 }
 
-func (m *_BACnetRecipientProcess) GetTypeName() string {
+func (m *_BACnetRecipientProcess) GetPlx4xTypeName() string {
 	return "BACnetRecipientProcess"
 }
 
@@ -246,7 +238,7 @@ func BACnetRecipientProcessParseWithBufferProducer() func(ctx context.Context, r
 }
 
 func BACnetRecipientProcessParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetRecipientProcess, error) {
-	v, err := (&_BACnetRecipientProcess{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetRecipientProcess)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +298,7 @@ func (m *_BACnetRecipientProcess) SerializeWithWriteBuffer(ctx context.Context, 
 		return errors.Wrap(err, "Error serializing 'recipient' field")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "processIdentifier", GetRef(m.GetProcessIdentifier()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "processIdentifier", new(m.GetProcessIdentifier()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'processIdentifier' field")
 	}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataTrendLogLogBuffer = (*_BACnetConstructedDataTrendLogL
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataTrendLogLogBuffer)(nil)
 
 // NewBACnetConstructedDataTrendLogLogBuffer factory function for _BACnetConstructedDataTrendLogLogBuffer
-func NewBACnetConstructedDataTrendLogLogBuffer(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, floorText []BACnetLogRecord, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataTrendLogLogBuffer {
+func NewBACnetConstructedDataTrendLogLogBuffer(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, floorText []BACnetLogRecord) *_BACnetConstructedDataTrendLogLogBuffer {
 	_result := &_BACnetConstructedDataTrendLogLogBuffer{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		FloorText:                     floorText,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataTrendLogLogBufferBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataTrendLogLogBufferBuilder) = (*_BACnetConstructedDataTrendLogLogBufferBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataTrendLogLogBufferBuilder) WithFloorText(floorText
 }
 
 func (b *_BACnetConstructedDataTrendLogLogBufferBuilder) Build() (BACnetConstructedDataTrendLogLogBuffer, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataTrendLogLogBuffer.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataTrendLogLogBufferBuilder) buildForBACnetConstruct
 
 func (b *_BACnetConstructedDataTrendLogLogBufferBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataTrendLogLogBufferBuilder().(*_BACnetConstructedDataTrendLogLogBufferBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataTrendLogLogBuffer(structType any) BACnetConstructe
 	return nil
 }
 
-func (m *_BACnetConstructedDataTrendLogLogBuffer) GetTypeName() string {
+func (m *_BACnetConstructedDataTrendLogLogBuffer) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataTrendLogLogBuffer"
 }
 

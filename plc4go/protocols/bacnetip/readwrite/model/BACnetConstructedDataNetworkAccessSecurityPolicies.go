@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -45,6 +46,7 @@ type BACnetConstructedDataNetworkAccessSecurityPolicies interface {
 	// GetNetworkAccessSecurityPolicies returns NetworkAccessSecurityPolicies (property field)
 	GetNetworkAccessSecurityPolicies() []BACnetNetworkSecurityPolicy
 	// GetZero returns Zero (virtual field)
+	// TODO: uint 64 ---> big int in java == boom
 	GetZero() uint64
 	// IsBACnetConstructedDataNetworkAccessSecurityPolicies is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsBACnetConstructedDataNetworkAccessSecurityPolicies()
@@ -63,9 +65,9 @@ var _ BACnetConstructedDataNetworkAccessSecurityPolicies = (*_BACnetConstructedD
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataNetworkAccessSecurityPolicies)(nil)
 
 // NewBACnetConstructedDataNetworkAccessSecurityPolicies factory function for _BACnetConstructedDataNetworkAccessSecurityPolicies
-func NewBACnetConstructedDataNetworkAccessSecurityPolicies(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, networkAccessSecurityPolicies []BACnetNetworkSecurityPolicy, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataNetworkAccessSecurityPolicies {
+func NewBACnetConstructedDataNetworkAccessSecurityPolicies(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, networkAccessSecurityPolicies []BACnetNetworkSecurityPolicy) *_BACnetConstructedDataNetworkAccessSecurityPolicies {
 	_result := &_BACnetConstructedDataNetworkAccessSecurityPolicies{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		NumberOfDataElements:          numberOfDataElements,
 		NetworkAccessSecurityPolicies: networkAccessSecurityPolicies,
 	}
@@ -107,7 +109,7 @@ type _BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder) = (*_BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder)(nil)
@@ -131,10 +133,7 @@ func (b *_BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder) WithOptiona
 	var err error
 	b.NumberOfDataElements, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -145,8 +144,8 @@ func (b *_BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder) WithNetwork
 }
 
 func (b *_BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder) Build() (BACnetConstructedDataNetworkAccessSecurityPolicies, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataNetworkAccessSecurityPolicies.deepCopy(), nil
 }
@@ -172,8 +171,8 @@ func (b *_BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder) buildForBAC
 
 func (b *_BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataNetworkAccessSecurityPoliciesBuilder().(*_BACnetConstructedDataNetworkAccessSecurityPoliciesBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -259,7 +258,7 @@ func CastBACnetConstructedDataNetworkAccessSecurityPolicies(structType any) BACn
 	return nil
 }
 
-func (m *_BACnetConstructedDataNetworkAccessSecurityPolicies) GetTypeName() string {
+func (m *_BACnetConstructedDataNetworkAccessSecurityPolicies) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataNetworkAccessSecurityPolicies"
 }
 
@@ -351,7 +350,7 @@ func (m *_BACnetConstructedDataNetworkAccessSecurityPolicies) SerializeWithWrite
 			return errors.Wrap(_zeroErr, "Error serializing 'zero' field")
 		}
 
-		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", GetRef(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", new(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'numberOfDataElements' field")
 		}
 

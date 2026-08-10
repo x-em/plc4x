@@ -26,17 +26,19 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"syscall"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/pkg/api/config"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/pool"
+	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
 var sharedExecutorInstance pool.Executor // shared instance
@@ -58,7 +60,7 @@ func init() {
 	}()
 }
 
-type RequestTransactionRunnable func(RequestTransaction)
+type RequestTransactionRunnable func(context.Context, RequestTransaction)
 
 // RequestTransactionManager handles transactions
 type RequestTransactionManager interface {
@@ -68,14 +70,14 @@ type RequestTransactionManager interface {
 	// SetNumberOfConcurrentRequests sets the number of concurrent requests that will be sent out to a device
 	SetNumberOfConcurrentRequests(numberOfConcurrentRequests int)
 	// StartTransaction starts a RequestTransaction
-	StartTransaction() RequestTransaction
+	StartTransaction(transactionInfo string) RequestTransaction
 }
 
 // NewRequestTransactionManager creates a new RequestTransactionManager
 func NewRequestTransactionManager(numberOfConcurrentRequests int, _options ...options.WithOption) RequestTransactionManager {
 	extractTraceTransactionManagerTransactions, _ := options.ExtractTraceTransactionManagerTransactions(_options...)
 	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
-	_requestTransactionManager := &requestTransactionManager{
+	rtm := &requestTransactionManager{
 		numberOfConcurrentRequests: numberOfConcurrentRequests,
 		currentTransactionId:       0,
 		workLog:                    *list.New(),
@@ -85,13 +87,14 @@ func NewRequestTransactionManager(numberOfConcurrentRequests int, _options ...op
 
 		log: customLogger,
 	}
+	rtm.ctx, rtm.cancelCtx = context.WithCancel(context.Background())
 	for _, option := range _options {
 		switch option := option.(type) {
 		case *withCustomExecutor:
-			_requestTransactionManager.executor = option.executor
+			rtm.executor = option.executor
 		}
 	}
-	return _requestTransactionManager
+	return rtm
 }
 
 // WithCustomExecutor sets a custom Executor for the RequestTransactionManager
@@ -126,6 +129,9 @@ type requestTransactionManager struct {
 	executor pool.Executor
 
 	shutdown atomic.Bool // Indicates it this rtm is in shutdown
+
+	ctx       context.Context    `ignore:"true"`
+	cancelCtx context.CancelFunc `ignore:"true"`
 
 	traceTransactionManagerTransactions bool // flag set to true if it should trace transactions
 
@@ -176,19 +182,23 @@ func (r *requestTransactionManager) processWorklog() {
 		Msg("Processing work log with size of workLogLen (numberOfConcurrentRequests concurrent requests allowed)")
 	for len(r.runningRequests) < r.numberOfConcurrentRequests && r.workLog.Len() > 0 {
 		front := r.workLog.Front()
+		if front == nil {
+			r.log.Error().Msg("workLog front is nil")
+			break
+		}
 		next := front.Value.(*requestTransaction)
 		r.log.Debug().
-			Stringer("next", next).
+			Interface("next", next).
 			Int("nRunningRequests", len(r.runningRequests)).
 			Msg("Handling next. (Adding to running requests (length: nRunningRequests))")
 		r.runningRequests = append(r.runningRequests, next)
-		completionFuture := r.executor.Submit(context.Background(), next.transactionId, next.operation)
+		completionFuture := r.executor.Submit(r.ctx, next.transactionId, next.operation)
 		next.setCompletionFuture(completionFuture)
 		r.workLog.Remove(front)
 	}
 }
 
-func (r *requestTransactionManager) StartTransaction() RequestTransaction {
+func (r *requestTransactionManager) StartTransaction(transactionInfo string) RequestTransaction {
 	r.transactionMutex.Lock()
 	defer r.transactionMutex.Unlock()
 	currentTransactionId := r.currentTransactionId
@@ -197,7 +207,7 @@ func (r *requestTransactionManager) StartTransaction() RequestTransaction {
 	if !r.traceTransactionManagerTransactions {
 		transactionLogger = zerolog.Nop()
 	}
-	transaction := newRequestTransaction(transactionLogger, r, currentTransactionId)
+	transaction := newRequestTransaction(transactionLogger, r, currentTransactionId, transactionInfo)
 	if r.shutdown.Load() {
 		transaction.completed = true
 		transaction.setCompletionFuture(&completedFuture{errors.New("request transaction manager in shutdown")})
@@ -222,20 +232,18 @@ func (r *requestTransactionManager) endRequest(transaction *requestTransaction) 
 	r.runningRequestMutex.Lock()
 	transaction.log.Debug().Msg("Trying to find a existing transaction")
 	found := false
-	index := -1
-	for i, runningRequest := range r.runningRequests {
+	r.runningRequests = slices.DeleteFunc(r.runningRequests, func(runningRequest *requestTransaction) bool {
 		if runningRequest.transactionId == transaction.transactionId {
 			transaction.log.Debug().Msg("Found a existing transaction")
 			found = true
-			index = i
-			break
+			return true
 		}
-	}
+		return false
+	})
 	if !found {
 		return errors.New("Unknown Transaction or Transaction already finished!")
 	}
 	transaction.log.Debug().Msg("Removing the existing transaction transaction")
-	r.runningRequests = append(r.runningRequests[:index], r.runningRequests[index+1:]...)
 	r.runningRequestMutex.Unlock()
 	// Process the workLog, a slot should be free now
 	transaction.log.Debug().Msg("Processing the workLog")
@@ -244,6 +252,7 @@ func (r *requestTransactionManager) endRequest(transaction *requestTransaction) 
 }
 
 func (r *requestTransactionManager) Close() error {
+	defer utils.StopWarn(r.log)()
 	return r.CloseGraceful(0)
 }
 
@@ -283,6 +292,7 @@ func (r *requestTransactionManager) CloseGraceful(timeout time.Duration) error {
 	} else {
 		r.log.Warn().Msg("not closing shared instance")
 	}
+	r.cancelCtx()
 	r.log.Debug().Msg("closed")
 	return nil
 }

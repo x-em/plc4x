@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -76,9 +77,9 @@ var _ CipConnectionManagerCloseResponse = (*_CipConnectionManagerCloseResponse)(
 var _ CipServiceRequirements = (*_CipConnectionManagerCloseResponse)(nil)
 
 // NewCipConnectionManagerCloseResponse factory function for _CipConnectionManagerCloseResponse
-func NewCipConnectionManagerCloseResponse(status uint8, additionalStatusWords uint8, connectionSerialNumber uint16, originatorVendorId uint16, originatorSerialNumber uint32, applicationReplySize uint8, serviceLen uint16) *_CipConnectionManagerCloseResponse {
+func NewCipConnectionManagerCloseResponse(status uint8, additionalStatusWords uint8, connectionSerialNumber uint16, originatorVendorId uint16, originatorSerialNumber uint32, applicationReplySize uint8) *_CipConnectionManagerCloseResponse {
 	_result := &_CipConnectionManagerCloseResponse{
-		CipServiceContract:     NewCipService(serviceLen),
+		CipServiceContract:     NewCipService(),
 		Status:                 status,
 		AdditionalStatusWords:  additionalStatusWords,
 		ConnectionSerialNumber: connectionSerialNumber,
@@ -130,7 +131,7 @@ type _CipConnectionManagerCloseResponseBuilder struct {
 
 	parentBuilder *_CipServiceBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CipConnectionManagerCloseResponseBuilder) = (*_CipConnectionManagerCloseResponseBuilder)(nil)
@@ -175,8 +176,8 @@ func (b *_CipConnectionManagerCloseResponseBuilder) WithApplicationReplySize(app
 }
 
 func (b *_CipConnectionManagerCloseResponseBuilder) Build() (CipConnectionManagerCloseResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CipConnectionManagerCloseResponse.deepCopy(), nil
 }
@@ -202,8 +203,8 @@ func (b *_CipConnectionManagerCloseResponseBuilder) buildForCipService() (CipSer
 
 func (b *_CipConnectionManagerCloseResponseBuilder) DeepCopy() any {
 	_copy := b.CreateCipConnectionManagerCloseResponseBuilder().(*_CipConnectionManagerCloseResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -292,7 +293,7 @@ func CastCipConnectionManagerCloseResponse(structType any) CipConnectionManagerC
 	return nil
 }
 
-func (m *_CipConnectionManagerCloseResponse) GetTypeName() string {
+func (m *_CipConnectionManagerCloseResponse) GetPlx4xTypeName() string {
 	return "CipConnectionManagerCloseResponse"
 }
 

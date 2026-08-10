@@ -22,9 +22,8 @@ package readwrite
 import (
 	"context"
 
-	"github.com/pkg/errors"
-
 	. "github.com/apache/plc4x/plc4go/protocols/modbus/readwrite/model"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -52,8 +51,6 @@ func (m ModbusParserHelper) Parse(typeName string, arguments []string, io utils.
 		return ModbusPDUReadFileRecordResponseItemParseWithBuffer(context.Background(), io)
 	case "ModbusDeviceInformationObject":
 		return ModbusDeviceInformationObjectParseWithBuffer(context.Background(), io)
-	case "ModbusConstants":
-		return ModbusConstantsParseWithBuffer(context.Background(), io)
 	case "ModbusPDUWriteFileRecordResponseItem":
 		return ModbusPDUWriteFileRecordResponseItemParseWithBuffer(context.Background(), io)
 	case "ModbusPDU":

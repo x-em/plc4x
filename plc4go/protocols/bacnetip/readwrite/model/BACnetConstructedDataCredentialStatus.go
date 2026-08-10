@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataCredentialStatus = (*_BACnetConstructedDataCredential
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataCredentialStatus)(nil)
 
 // NewBACnetConstructedDataCredentialStatus factory function for _BACnetConstructedDataCredentialStatus
-func NewBACnetConstructedDataCredentialStatus(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, binaryPv BACnetBinaryPVTagged, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataCredentialStatus {
+func NewBACnetConstructedDataCredentialStatus(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, binaryPv BACnetBinaryPVTagged) *_BACnetConstructedDataCredentialStatus {
 	if binaryPv == nil {
 		panic("binaryPv of type BACnetBinaryPVTagged for BACnetConstructedDataCredentialStatus must not be nil")
 	}
 	_result := &_BACnetConstructedDataCredentialStatus{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		BinaryPv:                      binaryPv,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataCredentialStatusBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataCredentialStatusBuilder) = (*_BACnetConstructedDataCredentialStatusBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataCredentialStatusBuilder) WithBinaryPvBuilder(buil
 	var err error
 	b.BinaryPv, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetBinaryPVTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetBinaryPVTaggedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataCredentialStatusBuilder) Build() (BACnetConstructedDataCredentialStatus, error) {
 	if b.BinaryPv == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'binaryPv' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'binaryPv' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataCredentialStatus.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataCredentialStatusBuilder) buildForBACnetConstructe
 
 func (b *_BACnetConstructedDataCredentialStatusBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataCredentialStatusBuilder().(*_BACnetConstructedDataCredentialStatusBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataCredentialStatus(structType any) BACnetConstructed
 	return nil
 }
 
-func (m *_BACnetConstructedDataCredentialStatus) GetTypeName() string {
+func (m *_BACnetConstructedDataCredentialStatus) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataCredentialStatus"
 }
 

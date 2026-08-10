@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -519,7 +521,7 @@ type _SessionDiagnosticsDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SessionDiagnosticsDataTypeBuilder) = (*_SessionDiagnosticsDataTypeBuilder)(nil)
@@ -543,10 +545,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithSessionIdBuilder(builderSupplie
 	var err error
 	b.SessionId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -561,10 +560,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithSessionNameBuilder(builderSuppl
 	var err error
 	b.SessionName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -579,10 +575,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithClientDescriptionBuilder(builde
 	var err error
 	b.ClientDescription, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
 	}
 	return b
 }
@@ -597,10 +590,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithServerUriBuilder(builderSupplie
 	var err error
 	b.ServerUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -615,10 +605,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithEndpointUrlBuilder(builderSuppl
 	var err error
 	b.EndpointUrl, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -673,10 +660,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithTotalRequestCountBuilder(builde
 	var err error
 	b.TotalRequestCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -696,10 +680,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithReadCountBuilder(builderSupplie
 	var err error
 	b.ReadCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -714,10 +695,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithHistoryReadCountBuilder(builder
 	var err error
 	b.HistoryReadCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -732,10 +710,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithWriteCountBuilder(builderSuppli
 	var err error
 	b.WriteCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -750,10 +725,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithHistoryUpdateCountBuilder(build
 	var err error
 	b.HistoryUpdateCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -768,10 +740,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithCallCountBuilder(builderSupplie
 	var err error
 	b.CallCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -786,10 +755,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithCreateMonitoredItemsCountBuilde
 	var err error
 	b.CreateMonitoredItemsCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -804,10 +770,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithModifyMonitoredItemsCountBuilde
 	var err error
 	b.ModifyMonitoredItemsCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -822,10 +785,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithSetMonitoringModeCountBuilder(b
 	var err error
 	b.SetMonitoringModeCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -840,10 +800,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithSetTriggeringCountBuilder(build
 	var err error
 	b.SetTriggeringCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -858,10 +815,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithDeleteMonitoredItemsCountBuilde
 	var err error
 	b.DeleteMonitoredItemsCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -876,10 +830,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithCreateSubscriptionCountBuilder(
 	var err error
 	b.CreateSubscriptionCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -894,10 +845,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithModifySubscriptionCountBuilder(
 	var err error
 	b.ModifySubscriptionCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -912,10 +860,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithSetPublishingModeCountBuilder(b
 	var err error
 	b.SetPublishingModeCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -930,10 +875,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithPublishCountBuilder(builderSupp
 	var err error
 	b.PublishCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -948,10 +890,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithRepublishCountBuilder(builderSu
 	var err error
 	b.RepublishCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -966,10 +905,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithTransferSubscriptionsCountBuild
 	var err error
 	b.TransferSubscriptionsCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -984,10 +920,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithDeleteSubscriptionsCountBuilder
 	var err error
 	b.DeleteSubscriptionsCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1002,10 +935,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithAddNodesCountBuilder(builderSup
 	var err error
 	b.AddNodesCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1020,10 +950,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithAddReferencesCountBuilder(build
 	var err error
 	b.AddReferencesCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1038,10 +965,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithDeleteNodesCountBuilder(builder
 	var err error
 	b.DeleteNodesCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1056,10 +980,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithDeleteReferencesCountBuilder(bu
 	var err error
 	b.DeleteReferencesCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1074,10 +995,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithBrowseCountBuilder(builderSuppl
 	var err error
 	b.BrowseCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1092,10 +1010,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithBrowseNextCountBuilder(builderS
 	var err error
 	b.BrowseNextCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1110,10 +1025,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithTranslateBrowsePathsToNodeIdsCo
 	var err error
 	b.TranslateBrowsePathsToNodeIdsCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1128,10 +1040,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithQueryFirstCountBuilder(builderS
 	var err error
 	b.QueryFirstCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1146,10 +1055,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithQueryNextCountBuilder(builderSu
 	var err error
 	b.QueryNextCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1164,10 +1070,7 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithRegisterNodesCountBuilder(build
 	var err error
 	b.RegisterNodesCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -1182,221 +1085,116 @@ func (b *_SessionDiagnosticsDataTypeBuilder) WithUnregisterNodesCountBuilder(bui
 	var err error
 	b.UnregisterNodesCount, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ServiceCounterDataTypeBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SessionDiagnosticsDataTypeBuilder) Build() (SessionDiagnosticsDataType, error) {
 	if b.SessionId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'sessionId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'sessionId' not set"))
 	}
 	if b.SessionName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'sessionName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'sessionName' not set"))
 	}
 	if b.ClientDescription == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'clientDescription' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'clientDescription' not set"))
 	}
 	if b.ServerUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'serverUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'serverUri' not set"))
 	}
 	if b.EndpointUrl == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'endpointUrl' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'endpointUrl' not set"))
 	}
 	if b.TotalRequestCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'totalRequestCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'totalRequestCount' not set"))
 	}
 	if b.ReadCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'readCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'readCount' not set"))
 	}
 	if b.HistoryReadCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'historyReadCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'historyReadCount' not set"))
 	}
 	if b.WriteCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'writeCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'writeCount' not set"))
 	}
 	if b.HistoryUpdateCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'historyUpdateCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'historyUpdateCount' not set"))
 	}
 	if b.CallCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'callCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'callCount' not set"))
 	}
 	if b.CreateMonitoredItemsCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'createMonitoredItemsCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'createMonitoredItemsCount' not set"))
 	}
 	if b.ModifyMonitoredItemsCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'modifyMonitoredItemsCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'modifyMonitoredItemsCount' not set"))
 	}
 	if b.SetMonitoringModeCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'setMonitoringModeCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'setMonitoringModeCount' not set"))
 	}
 	if b.SetTriggeringCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'setTriggeringCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'setTriggeringCount' not set"))
 	}
 	if b.DeleteMonitoredItemsCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'deleteMonitoredItemsCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'deleteMonitoredItemsCount' not set"))
 	}
 	if b.CreateSubscriptionCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'createSubscriptionCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'createSubscriptionCount' not set"))
 	}
 	if b.ModifySubscriptionCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'modifySubscriptionCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'modifySubscriptionCount' not set"))
 	}
 	if b.SetPublishingModeCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'setPublishingModeCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'setPublishingModeCount' not set"))
 	}
 	if b.PublishCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'publishCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'publishCount' not set"))
 	}
 	if b.RepublishCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'republishCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'republishCount' not set"))
 	}
 	if b.TransferSubscriptionsCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'transferSubscriptionsCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'transferSubscriptionsCount' not set"))
 	}
 	if b.DeleteSubscriptionsCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'deleteSubscriptionsCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'deleteSubscriptionsCount' not set"))
 	}
 	if b.AddNodesCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'addNodesCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'addNodesCount' not set"))
 	}
 	if b.AddReferencesCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'addReferencesCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'addReferencesCount' not set"))
 	}
 	if b.DeleteNodesCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'deleteNodesCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'deleteNodesCount' not set"))
 	}
 	if b.DeleteReferencesCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'deleteReferencesCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'deleteReferencesCount' not set"))
 	}
 	if b.BrowseCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'browseCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'browseCount' not set"))
 	}
 	if b.BrowseNextCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'browseNextCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'browseNextCount' not set"))
 	}
 	if b.TranslateBrowsePathsToNodeIdsCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'translateBrowsePathsToNodeIdsCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'translateBrowsePathsToNodeIdsCount' not set"))
 	}
 	if b.QueryFirstCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'queryFirstCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'queryFirstCount' not set"))
 	}
 	if b.QueryNextCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'queryNextCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'queryNextCount' not set"))
 	}
 	if b.RegisterNodesCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'registerNodesCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'registerNodesCount' not set"))
 	}
 	if b.UnregisterNodesCount == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'unregisterNodesCount' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'unregisterNodesCount' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SessionDiagnosticsDataType.deepCopy(), nil
 }
@@ -1422,8 +1220,8 @@ func (b *_SessionDiagnosticsDataTypeBuilder) buildForExtensionObjectDefinition()
 
 func (b *_SessionDiagnosticsDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateSessionDiagnosticsDataTypeBuilder().(*_SessionDiagnosticsDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -1652,7 +1450,7 @@ func CastSessionDiagnosticsDataType(structType any) SessionDiagnosticsDataType {
 	return nil
 }
 
-func (m *_SessionDiagnosticsDataType) GetTypeName() string {
+func (m *_SessionDiagnosticsDataType) GetPlx4xTypeName() string {
 	return "SessionDiagnosticsDataType"
 }
 
@@ -1681,9 +1479,7 @@ func (m *_SessionDiagnosticsDataType) GetLengthInBits(ctx context.Context) uint1
 	if len(m.LocaleIds) > 0 {
 		for _curItem, element := range m.LocaleIds {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.LocaleIds), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -1816,265 +1612,265 @@ func (m *_SessionDiagnosticsDataType) parse(ctx context.Context, readBuffer util
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	sessionId, err := ReadSimpleField[NodeId](ctx, "sessionId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	sessionId, err := ReadSimpleField[NodeId](ctx, "sessionId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'sessionId' field"))
 	}
 	m.SessionId = sessionId
 
-	sessionName, err := ReadSimpleField[PascalString](ctx, "sessionName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	sessionName, err := ReadSimpleField[PascalString](ctx, "sessionName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'sessionName' field"))
 	}
 	m.SessionName = sessionName
 
-	clientDescription, err := ReadSimpleField[ApplicationDescription](ctx, "clientDescription", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer))
+	clientDescription, err := ReadSimpleField[ApplicationDescription](ctx, "clientDescription", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientDescription' field"))
 	}
 	m.ClientDescription = clientDescription
 
-	serverUri, err := ReadSimpleField[PascalString](ctx, "serverUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	serverUri, err := ReadSimpleField[PascalString](ctx, "serverUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverUri' field"))
 	}
 	m.ServerUri = serverUri
 
-	endpointUrl, err := ReadSimpleField[PascalString](ctx, "endpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	endpointUrl, err := ReadSimpleField[PascalString](ctx, "endpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'endpointUrl' field"))
 	}
 	m.EndpointUrl = endpointUrl
 
-	noOfLocaleIds, err := ReadImplicitField[int32](ctx, "noOfLocaleIds", ReadSignedInt(readBuffer, uint8(32)))
+	noOfLocaleIds, err := ReadImplicitField[int32](ctx, "noOfLocaleIds", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfLocaleIds' field"))
 	}
 	_ = noOfLocaleIds
 
-	localeIds, err := ReadCountArrayField[PascalString](ctx, "localeIds", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfLocaleIds))
+	localeIds, err := ReadCountArrayField[PascalString](ctx, "localeIds", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfLocaleIds), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'localeIds' field"))
 	}
 	m.LocaleIds = localeIds
 
-	actualSessionTimeout, err := ReadSimpleField(ctx, "actualSessionTimeout", ReadDouble(readBuffer, uint8(64)))
+	actualSessionTimeout, err := ReadSimpleField(ctx, "actualSessionTimeout", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'actualSessionTimeout' field"))
 	}
 	m.ActualSessionTimeout = actualSessionTimeout
 
-	maxResponseMessageSize, err := ReadSimpleField(ctx, "maxResponseMessageSize", ReadUnsignedInt(readBuffer, uint8(32)))
+	maxResponseMessageSize, err := ReadSimpleField(ctx, "maxResponseMessageSize", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'maxResponseMessageSize' field"))
 	}
 	m.MaxResponseMessageSize = maxResponseMessageSize
 
-	clientConnectionTime, err := ReadSimpleField(ctx, "clientConnectionTime", ReadSignedLong(readBuffer, uint8(64)))
+	clientConnectionTime, err := ReadSimpleField(ctx, "clientConnectionTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientConnectionTime' field"))
 	}
 	m.ClientConnectionTime = clientConnectionTime
 
-	clientLastContactTime, err := ReadSimpleField(ctx, "clientLastContactTime", ReadSignedLong(readBuffer, uint8(64)))
+	clientLastContactTime, err := ReadSimpleField(ctx, "clientLastContactTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientLastContactTime' field"))
 	}
 	m.ClientLastContactTime = clientLastContactTime
 
-	currentSubscriptionsCount, err := ReadSimpleField(ctx, "currentSubscriptionsCount", ReadUnsignedInt(readBuffer, uint8(32)))
+	currentSubscriptionsCount, err := ReadSimpleField(ctx, "currentSubscriptionsCount", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'currentSubscriptionsCount' field"))
 	}
 	m.CurrentSubscriptionsCount = currentSubscriptionsCount
 
-	currentMonitoredItemsCount, err := ReadSimpleField(ctx, "currentMonitoredItemsCount", ReadUnsignedInt(readBuffer, uint8(32)))
+	currentMonitoredItemsCount, err := ReadSimpleField(ctx, "currentMonitoredItemsCount", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'currentMonitoredItemsCount' field"))
 	}
 	m.CurrentMonitoredItemsCount = currentMonitoredItemsCount
 
-	currentPublishRequestsInQueue, err := ReadSimpleField(ctx, "currentPublishRequestsInQueue", ReadUnsignedInt(readBuffer, uint8(32)))
+	currentPublishRequestsInQueue, err := ReadSimpleField(ctx, "currentPublishRequestsInQueue", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'currentPublishRequestsInQueue' field"))
 	}
 	m.CurrentPublishRequestsInQueue = currentPublishRequestsInQueue
 
-	totalRequestCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "totalRequestCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	totalRequestCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "totalRequestCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'totalRequestCount' field"))
 	}
 	m.TotalRequestCount = totalRequestCount
 
-	unauthorizedRequestCount, err := ReadSimpleField(ctx, "unauthorizedRequestCount", ReadUnsignedInt(readBuffer, uint8(32)))
+	unauthorizedRequestCount, err := ReadSimpleField(ctx, "unauthorizedRequestCount", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'unauthorizedRequestCount' field"))
 	}
 	m.UnauthorizedRequestCount = unauthorizedRequestCount
 
-	readCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "readCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	readCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "readCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'readCount' field"))
 	}
 	m.ReadCount = readCount
 
-	historyReadCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "historyReadCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	historyReadCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "historyReadCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'historyReadCount' field"))
 	}
 	m.HistoryReadCount = historyReadCount
 
-	writeCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "writeCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	writeCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "writeCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'writeCount' field"))
 	}
 	m.WriteCount = writeCount
 
-	historyUpdateCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "historyUpdateCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	historyUpdateCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "historyUpdateCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'historyUpdateCount' field"))
 	}
 	m.HistoryUpdateCount = historyUpdateCount
 
-	callCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "callCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	callCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "callCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'callCount' field"))
 	}
 	m.CallCount = callCount
 
-	createMonitoredItemsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "createMonitoredItemsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	createMonitoredItemsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "createMonitoredItemsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'createMonitoredItemsCount' field"))
 	}
 	m.CreateMonitoredItemsCount = createMonitoredItemsCount
 
-	modifyMonitoredItemsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "modifyMonitoredItemsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	modifyMonitoredItemsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "modifyMonitoredItemsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'modifyMonitoredItemsCount' field"))
 	}
 	m.ModifyMonitoredItemsCount = modifyMonitoredItemsCount
 
-	setMonitoringModeCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "setMonitoringModeCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	setMonitoringModeCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "setMonitoringModeCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'setMonitoringModeCount' field"))
 	}
 	m.SetMonitoringModeCount = setMonitoringModeCount
 
-	setTriggeringCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "setTriggeringCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	setTriggeringCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "setTriggeringCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'setTriggeringCount' field"))
 	}
 	m.SetTriggeringCount = setTriggeringCount
 
-	deleteMonitoredItemsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteMonitoredItemsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	deleteMonitoredItemsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteMonitoredItemsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deleteMonitoredItemsCount' field"))
 	}
 	m.DeleteMonitoredItemsCount = deleteMonitoredItemsCount
 
-	createSubscriptionCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "createSubscriptionCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	createSubscriptionCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "createSubscriptionCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'createSubscriptionCount' field"))
 	}
 	m.CreateSubscriptionCount = createSubscriptionCount
 
-	modifySubscriptionCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "modifySubscriptionCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	modifySubscriptionCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "modifySubscriptionCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'modifySubscriptionCount' field"))
 	}
 	m.ModifySubscriptionCount = modifySubscriptionCount
 
-	setPublishingModeCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "setPublishingModeCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	setPublishingModeCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "setPublishingModeCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'setPublishingModeCount' field"))
 	}
 	m.SetPublishingModeCount = setPublishingModeCount
 
-	publishCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "publishCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	publishCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "publishCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'publishCount' field"))
 	}
 	m.PublishCount = publishCount
 
-	republishCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "republishCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	republishCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "republishCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'republishCount' field"))
 	}
 	m.RepublishCount = republishCount
 
-	transferSubscriptionsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "transferSubscriptionsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	transferSubscriptionsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "transferSubscriptionsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'transferSubscriptionsCount' field"))
 	}
 	m.TransferSubscriptionsCount = transferSubscriptionsCount
 
-	deleteSubscriptionsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteSubscriptionsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	deleteSubscriptionsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteSubscriptionsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deleteSubscriptionsCount' field"))
 	}
 	m.DeleteSubscriptionsCount = deleteSubscriptionsCount
 
-	addNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "addNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	addNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "addNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'addNodesCount' field"))
 	}
 	m.AddNodesCount = addNodesCount
 
-	addReferencesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "addReferencesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	addReferencesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "addReferencesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'addReferencesCount' field"))
 	}
 	m.AddReferencesCount = addReferencesCount
 
-	deleteNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	deleteNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deleteNodesCount' field"))
 	}
 	m.DeleteNodesCount = deleteNodesCount
 
-	deleteReferencesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteReferencesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	deleteReferencesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "deleteReferencesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'deleteReferencesCount' field"))
 	}
 	m.DeleteReferencesCount = deleteReferencesCount
 
-	browseCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "browseCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	browseCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "browseCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'browseCount' field"))
 	}
 	m.BrowseCount = browseCount
 
-	browseNextCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "browseNextCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	browseNextCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "browseNextCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'browseNextCount' field"))
 	}
 	m.BrowseNextCount = browseNextCount
 
-	translateBrowsePathsToNodeIdsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "translateBrowsePathsToNodeIdsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	translateBrowsePathsToNodeIdsCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "translateBrowsePathsToNodeIdsCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'translateBrowsePathsToNodeIdsCount' field"))
 	}
 	m.TranslateBrowsePathsToNodeIdsCount = translateBrowsePathsToNodeIdsCount
 
-	queryFirstCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "queryFirstCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	queryFirstCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "queryFirstCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'queryFirstCount' field"))
 	}
 	m.QueryFirstCount = queryFirstCount
 
-	queryNextCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "queryNextCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	queryNextCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "queryNextCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'queryNextCount' field"))
 	}
 	m.QueryNextCount = queryNextCount
 
-	registerNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "registerNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	registerNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "registerNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'registerNodesCount' field"))
 	}
 	m.RegisterNodesCount = registerNodesCount
 
-	unregisterNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "unregisterNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer))
+	unregisterNodesCount, err := ReadSimpleField[ServiceCounterDataType](ctx, "unregisterNodesCount", ReadComplex[ServiceCounterDataType](ExtensionObjectDefinitionParseWithBufferProducer[ServiceCounterDataType]((int32)(int32(873))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'unregisterNodesCount' field"))
 	}
@@ -2105,179 +1901,179 @@ func (m *_SessionDiagnosticsDataType) SerializeWithWriteBuffer(ctx context.Conte
 			return errors.Wrap(pushErr, "Error pushing for SessionDiagnosticsDataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "sessionId", m.GetSessionId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "sessionId", m.GetSessionId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'sessionId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "sessionName", m.GetSessionName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "sessionName", m.GetSessionName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'sessionName' field")
 		}
 
-		if err := WriteSimpleField[ApplicationDescription](ctx, "clientDescription", m.GetClientDescription(), WriteComplex[ApplicationDescription](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ApplicationDescription](ctx, "clientDescription", m.GetClientDescription(), WriteComplex[ApplicationDescription](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientDescription' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "serverUri", m.GetServerUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "serverUri", m.GetServerUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "endpointUrl", m.GetEndpointUrl(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "endpointUrl", m.GetEndpointUrl(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'endpointUrl' field")
 		}
 		noOfLocaleIds := int32(utils.InlineIf(bool((m.GetLocaleIds()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetLocaleIds()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfLocaleIds", noOfLocaleIds, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfLocaleIds", noOfLocaleIds, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfLocaleIds' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "localeIds", m.GetLocaleIds(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "localeIds", m.GetLocaleIds(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'localeIds' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "actualSessionTimeout", m.GetActualSessionTimeout(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "actualSessionTimeout", m.GetActualSessionTimeout(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'actualSessionTimeout' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "maxResponseMessageSize", m.GetMaxResponseMessageSize(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "maxResponseMessageSize", m.GetMaxResponseMessageSize(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'maxResponseMessageSize' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "clientConnectionTime", m.GetClientConnectionTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "clientConnectionTime", m.GetClientConnectionTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientConnectionTime' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "clientLastContactTime", m.GetClientLastContactTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "clientLastContactTime", m.GetClientLastContactTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientLastContactTime' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "currentSubscriptionsCount", m.GetCurrentSubscriptionsCount(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "currentSubscriptionsCount", m.GetCurrentSubscriptionsCount(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'currentSubscriptionsCount' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "currentMonitoredItemsCount", m.GetCurrentMonitoredItemsCount(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "currentMonitoredItemsCount", m.GetCurrentMonitoredItemsCount(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'currentMonitoredItemsCount' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "currentPublishRequestsInQueue", m.GetCurrentPublishRequestsInQueue(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "currentPublishRequestsInQueue", m.GetCurrentPublishRequestsInQueue(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'currentPublishRequestsInQueue' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "totalRequestCount", m.GetTotalRequestCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "totalRequestCount", m.GetTotalRequestCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'totalRequestCount' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "unauthorizedRequestCount", m.GetUnauthorizedRequestCount(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "unauthorizedRequestCount", m.GetUnauthorizedRequestCount(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'unauthorizedRequestCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "readCount", m.GetReadCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "readCount", m.GetReadCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'readCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "historyReadCount", m.GetHistoryReadCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "historyReadCount", m.GetHistoryReadCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'historyReadCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "writeCount", m.GetWriteCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "writeCount", m.GetWriteCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'writeCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "historyUpdateCount", m.GetHistoryUpdateCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "historyUpdateCount", m.GetHistoryUpdateCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'historyUpdateCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "callCount", m.GetCallCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "callCount", m.GetCallCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'callCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "createMonitoredItemsCount", m.GetCreateMonitoredItemsCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "createMonitoredItemsCount", m.GetCreateMonitoredItemsCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'createMonitoredItemsCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "modifyMonitoredItemsCount", m.GetModifyMonitoredItemsCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "modifyMonitoredItemsCount", m.GetModifyMonitoredItemsCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'modifyMonitoredItemsCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "setMonitoringModeCount", m.GetSetMonitoringModeCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "setMonitoringModeCount", m.GetSetMonitoringModeCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'setMonitoringModeCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "setTriggeringCount", m.GetSetTriggeringCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "setTriggeringCount", m.GetSetTriggeringCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'setTriggeringCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteMonitoredItemsCount", m.GetDeleteMonitoredItemsCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteMonitoredItemsCount", m.GetDeleteMonitoredItemsCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'deleteMonitoredItemsCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "createSubscriptionCount", m.GetCreateSubscriptionCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "createSubscriptionCount", m.GetCreateSubscriptionCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'createSubscriptionCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "modifySubscriptionCount", m.GetModifySubscriptionCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "modifySubscriptionCount", m.GetModifySubscriptionCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'modifySubscriptionCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "setPublishingModeCount", m.GetSetPublishingModeCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "setPublishingModeCount", m.GetSetPublishingModeCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'setPublishingModeCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "publishCount", m.GetPublishCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "publishCount", m.GetPublishCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'publishCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "republishCount", m.GetRepublishCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "republishCount", m.GetRepublishCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'republishCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "transferSubscriptionsCount", m.GetTransferSubscriptionsCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "transferSubscriptionsCount", m.GetTransferSubscriptionsCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'transferSubscriptionsCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteSubscriptionsCount", m.GetDeleteSubscriptionsCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteSubscriptionsCount", m.GetDeleteSubscriptionsCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'deleteSubscriptionsCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "addNodesCount", m.GetAddNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "addNodesCount", m.GetAddNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'addNodesCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "addReferencesCount", m.GetAddReferencesCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "addReferencesCount", m.GetAddReferencesCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'addReferencesCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteNodesCount", m.GetDeleteNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteNodesCount", m.GetDeleteNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'deleteNodesCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteReferencesCount", m.GetDeleteReferencesCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "deleteReferencesCount", m.GetDeleteReferencesCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'deleteReferencesCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "browseCount", m.GetBrowseCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "browseCount", m.GetBrowseCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'browseCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "browseNextCount", m.GetBrowseNextCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "browseNextCount", m.GetBrowseNextCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'browseNextCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "translateBrowsePathsToNodeIdsCount", m.GetTranslateBrowsePathsToNodeIdsCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "translateBrowsePathsToNodeIdsCount", m.GetTranslateBrowsePathsToNodeIdsCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'translateBrowsePathsToNodeIdsCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "queryFirstCount", m.GetQueryFirstCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "queryFirstCount", m.GetQueryFirstCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'queryFirstCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "queryNextCount", m.GetQueryNextCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "queryNextCount", m.GetQueryNextCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'queryNextCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "registerNodesCount", m.GetRegisterNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "registerNodesCount", m.GetRegisterNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'registerNodesCount' field")
 		}
 
-		if err := WriteSimpleField[ServiceCounterDataType](ctx, "unregisterNodesCount", m.GetUnregisterNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ServiceCounterDataType](ctx, "unregisterNodesCount", m.GetUnregisterNodesCount(), WriteComplex[ServiceCounterDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'unregisterNodesCount' field")
 		}
 

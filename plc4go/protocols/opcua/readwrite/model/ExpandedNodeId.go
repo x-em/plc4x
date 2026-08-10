@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -112,7 +114,7 @@ func NewExpandedNodeIdBuilder() ExpandedNodeIdBuilder {
 type _ExpandedNodeIdBuilder struct {
 	*_ExpandedNodeId
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ExpandedNodeIdBuilder) = (*_ExpandedNodeIdBuilder)(nil)
@@ -141,10 +143,7 @@ func (b *_ExpandedNodeIdBuilder) WithNodeIdBuilder(builderSupplier func(NodeIdTy
 	var err error
 	b.NodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdTypeDefinitionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdTypeDefinitionBuilder failed"))
 	}
 	return b
 }
@@ -159,10 +158,7 @@ func (b *_ExpandedNodeIdBuilder) WithOptionalNamespaceURIBuilder(builderSupplier
 	var err error
 	b.NamespaceURI, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -174,13 +170,10 @@ func (b *_ExpandedNodeIdBuilder) WithOptionalServerIndex(serverIndex uint32) Exp
 
 func (b *_ExpandedNodeIdBuilder) Build() (ExpandedNodeId, error) {
 	if b.NodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'nodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'nodeId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ExpandedNodeId.deepCopy(), nil
 }
@@ -195,8 +188,8 @@ func (b *_ExpandedNodeIdBuilder) MustBuild() ExpandedNodeId {
 
 func (b *_ExpandedNodeIdBuilder) DeepCopy() any {
 	_copy := b.CreateExpandedNodeIdBuilder().(*_ExpandedNodeIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -255,7 +248,7 @@ func CastExpandedNodeId(structType any) ExpandedNodeId {
 	return nil
 }
 
-func (m *_ExpandedNodeId) GetTypeName() string {
+func (m *_ExpandedNodeId) GetPlx4xTypeName() string {
 	return "ExpandedNodeId"
 }
 
@@ -299,7 +292,7 @@ func ExpandedNodeIdParseWithBufferProducer() func(ctx context.Context, readBuffe
 }
 
 func ExpandedNodeIdParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (ExpandedNodeId, error) {
-	v, err := (&_ExpandedNodeId{}).parse(ctx, readBuffer)
+	v, err := (new(_ExpandedNodeId)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -315,26 +308,26 @@ func (m *_ExpandedNodeId) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	namespaceURISpecified, err := ReadSimpleField(ctx, "namespaceURISpecified", ReadBoolean(readBuffer))
+	namespaceURISpecified, err := ReadSimpleField(ctx, "namespaceURISpecified", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'namespaceURISpecified' field"))
 	}
 	m.NamespaceURISpecified = namespaceURISpecified
 
-	serverIndexSpecified, err := ReadSimpleField(ctx, "serverIndexSpecified", ReadBoolean(readBuffer))
+	serverIndexSpecified, err := ReadSimpleField(ctx, "serverIndexSpecified", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverIndexSpecified' field"))
 	}
 	m.ServerIndexSpecified = serverIndexSpecified
 
-	nodeId, err := ReadSimpleField[NodeIdTypeDefinition](ctx, "nodeId", ReadComplex[NodeIdTypeDefinition](NodeIdTypeDefinitionParseWithBuffer, readBuffer))
+	nodeId, err := ReadSimpleField[NodeIdTypeDefinition](ctx, "nodeId", ReadComplex[NodeIdTypeDefinition](NodeIdTypeDefinitionParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeId' field"))
 	}
 	m.NodeId = nodeId
 
 	var namespaceURI PascalString
-	_namespaceURI, err := ReadOptionalField[PascalString](ctx, "namespaceURI", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), namespaceURISpecified)
+	_namespaceURI, err := ReadOptionalField[PascalString](ctx, "namespaceURI", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), namespaceURISpecified, codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'namespaceURI' field"))
 	}
@@ -344,7 +337,7 @@ func (m *_ExpandedNodeId) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	}
 
 	var serverIndex *uint32
-	serverIndex, err = ReadOptionalField[uint32](ctx, "serverIndex", ReadUnsignedInt(readBuffer, uint8(32)), serverIndexSpecified)
+	serverIndex, err = ReadOptionalField[uint32](ctx, "serverIndex", ReadUnsignedInt(readBuffer, uint8(32)), serverIndexSpecified, codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverIndex' field"))
 	}
@@ -374,23 +367,23 @@ func (m *_ExpandedNodeId) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 		return errors.Wrap(pushErr, "Error pushing for ExpandedNodeId")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "namespaceURISpecified", m.GetNamespaceURISpecified(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "namespaceURISpecified", m.GetNamespaceURISpecified(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'namespaceURISpecified' field")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "serverIndexSpecified", m.GetServerIndexSpecified(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "serverIndexSpecified", m.GetServerIndexSpecified(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'serverIndexSpecified' field")
 	}
 
-	if err := WriteSimpleField[NodeIdTypeDefinition](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeIdTypeDefinition](writeBuffer)); err != nil {
+	if err := WriteSimpleField[NodeIdTypeDefinition](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeIdTypeDefinition](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'nodeId' field")
 	}
 
-	if err := WriteOptionalField[PascalString](ctx, "namespaceURI", GetRef(m.GetNamespaceURI()), WriteComplex[PascalString](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[PascalString](ctx, "namespaceURI", new(m.GetNamespaceURI()), WriteComplex[PascalString](writeBuffer), true, codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'namespaceURI' field")
 	}
 
-	if err := WriteOptionalField[uint32](ctx, "serverIndex", m.GetServerIndex(), WriteUnsignedInt(writeBuffer, 32), true); err != nil {
+	if err := WriteOptionalField[uint32](ctx, "serverIndex", m.GetServerIndex(), WriteUnsignedInt(writeBuffer, 32), true, codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'serverIndex' field")
 	}
 

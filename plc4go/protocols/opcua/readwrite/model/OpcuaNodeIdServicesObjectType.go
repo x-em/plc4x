@@ -23,9 +23,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -177,16 +177,18 @@ const (
 	OpcuaNodeIdServicesObjectType_TargetVariablesType                          OpcuaNodeIdServicesObjectType = 15111
 	OpcuaNodeIdServicesObjectType_SubscribedDataSetMirrorType                  OpcuaNodeIdServicesObjectType = 15127
 	OpcuaNodeIdServicesObjectType_BrokerConnectionTransportType                OpcuaNodeIdServicesObjectType = 15155
-	OpcuaNodeIdServicesObjectType_UserCredentialCertificateType                OpcuaNodeIdServicesObjectType = 15181
 	OpcuaNodeIdServicesObjectType_DataSetWriterType                            OpcuaNodeIdServicesObjectType = 15298
 	OpcuaNodeIdServicesObjectType_DataSetWriterTransportType                   OpcuaNodeIdServicesObjectType = 15305
 	OpcuaNodeIdServicesObjectType_DataSetReaderType                            OpcuaNodeIdServicesObjectType = 15306
 	OpcuaNodeIdServicesObjectType_DataSetReaderTransportType                   OpcuaNodeIdServicesObjectType = 15319
+	OpcuaNodeIdServicesObjectType_ConfigurationFileType                        OpcuaNodeIdServicesObjectType = 15437
 	OpcuaNodeIdServicesObjectType_SecurityGroupFolderType                      OpcuaNodeIdServicesObjectType = 15452
 	OpcuaNodeIdServicesObjectType_SecurityGroupType                            OpcuaNodeIdServicesObjectType = 15471
 	OpcuaNodeIdServicesObjectType_ExtensionFieldsType                          OpcuaNodeIdServicesObjectType = 15489
 	OpcuaNodeIdServicesObjectType_PubSubStatusEventType                        OpcuaNodeIdServicesObjectType = 15535
+	OpcuaNodeIdServicesObjectType_ConfigurationUpdatedAuditEventType           OpcuaNodeIdServicesObjectType = 15541
 	OpcuaNodeIdServicesObjectType_PubSubTransportLimitsExceedEventType         OpcuaNodeIdServicesObjectType = 15548
+	OpcuaNodeIdServicesObjectType_ApplicationConfigurationFileType             OpcuaNodeIdServicesObjectType = 15550
 	OpcuaNodeIdServicesObjectType_PubSubCommunicationFailureEventType          OpcuaNodeIdServicesObjectType = 15563
 	OpcuaNodeIdServicesObjectType_RoleSetType                                  OpcuaNodeIdServicesObjectType = 15607
 	OpcuaNodeIdServicesObjectType_RoleType                                     OpcuaNodeIdServicesObjectType = 15620
@@ -231,9 +233,20 @@ const (
 	OpcuaNodeIdServicesObjectType_LldpRemoteSystemType                         OpcuaNodeIdServicesObjectType = 19033
 	OpcuaNodeIdServicesObjectType_AuditHistoryAnnotationUpdateEventType        OpcuaNodeIdServicesObjectType = 19095
 	OpcuaNodeIdServicesObjectType_TrustListOutOfDateAlarmType                  OpcuaNodeIdServicesObjectType = 19297
+	OpcuaNodeIdServicesObjectType_UserCertificateType                          OpcuaNodeIdServicesObjectType = 19323
+	OpcuaNodeIdServicesObjectType_TlsCertificateType                           OpcuaNodeIdServicesObjectType = 19324
+	OpcuaNodeIdServicesObjectType_TlsServerCertificateType                     OpcuaNodeIdServicesObjectType = 19325
+	OpcuaNodeIdServicesObjectType_TlsClientCertificateType                     OpcuaNodeIdServicesObjectType = 19326
+	OpcuaNodeIdServicesObjectType_LogObjectType                                OpcuaNodeIdServicesObjectType = 19352
+	OpcuaNodeIdServicesObjectType_BaseLogEventType                             OpcuaNodeIdServicesObjectType = 19362
+	OpcuaNodeIdServicesObjectType_LogOverflowEventType                         OpcuaNodeIdServicesObjectType = 19369
+	OpcuaNodeIdServicesObjectType_LogEntryConditionClassType                   OpcuaNodeIdServicesObjectType = 19370
 	OpcuaNodeIdServicesObjectType_PubSubDiagnosticsType                        OpcuaNodeIdServicesObjectType = 19677
 	OpcuaNodeIdServicesObjectType_PubSubDiagnosticsRootType                    OpcuaNodeIdServicesObjectType = 19732
 	OpcuaNodeIdServicesObjectType_PubSubDiagnosticsConnectionType              OpcuaNodeIdServicesObjectType = 19786
+	OpcuaNodeIdServicesObjectType_DataTypeRefinementType                       OpcuaNodeIdServicesObjectType = 19820
+	OpcuaNodeIdServicesObjectType_SubtypeRestrictionType                       OpcuaNodeIdServicesObjectType = 19822
+	OpcuaNodeIdServicesObjectType_SerializationEntityType                      OpcuaNodeIdServicesObjectType = 19824
 	OpcuaNodeIdServicesObjectType_PubSubDiagnosticsWriterGroupType             OpcuaNodeIdServicesObjectType = 19834
 	OpcuaNodeIdServicesObjectType_PubSubDiagnosticsReaderGroupType             OpcuaNodeIdServicesObjectType = 19903
 	OpcuaNodeIdServicesObjectType_PubSubDiagnosticsDataSetWriterType           OpcuaNodeIdServicesObjectType = 19968
@@ -305,7 +318,6 @@ const (
 	OpcuaNodeIdServicesObjectType_ServerUnitType                               OpcuaNodeIdServicesObjectType = 32447
 	OpcuaNodeIdServicesObjectType_AlternativeUnitType                          OpcuaNodeIdServicesObjectType = 32467
 	OpcuaNodeIdServicesObjectType_QuantityType                                 OpcuaNodeIdServicesObjectType = 32475
-	OpcuaNodeIdServicesObjectType_QuantitiesFolderType                         OpcuaNodeIdServicesObjectType = 32502
 	OpcuaNodeIdServicesObjectType_HistoricalEventConfigurationType             OpcuaNodeIdServicesObjectType = 32621
 	OpcuaNodeIdServicesObjectType_HistoricalExternalEventSourceType            OpcuaNodeIdServicesObjectType = 32625
 	OpcuaNodeIdServicesObjectType_AuditHistoryConfigurationChangeEventType     OpcuaNodeIdServicesObjectType = 32758
@@ -453,16 +465,18 @@ func init() {
 		OpcuaNodeIdServicesObjectType_TargetVariablesType,
 		OpcuaNodeIdServicesObjectType_SubscribedDataSetMirrorType,
 		OpcuaNodeIdServicesObjectType_BrokerConnectionTransportType,
-		OpcuaNodeIdServicesObjectType_UserCredentialCertificateType,
 		OpcuaNodeIdServicesObjectType_DataSetWriterType,
 		OpcuaNodeIdServicesObjectType_DataSetWriterTransportType,
 		OpcuaNodeIdServicesObjectType_DataSetReaderType,
 		OpcuaNodeIdServicesObjectType_DataSetReaderTransportType,
+		OpcuaNodeIdServicesObjectType_ConfigurationFileType,
 		OpcuaNodeIdServicesObjectType_SecurityGroupFolderType,
 		OpcuaNodeIdServicesObjectType_SecurityGroupType,
 		OpcuaNodeIdServicesObjectType_ExtensionFieldsType,
 		OpcuaNodeIdServicesObjectType_PubSubStatusEventType,
+		OpcuaNodeIdServicesObjectType_ConfigurationUpdatedAuditEventType,
 		OpcuaNodeIdServicesObjectType_PubSubTransportLimitsExceedEventType,
+		OpcuaNodeIdServicesObjectType_ApplicationConfigurationFileType,
 		OpcuaNodeIdServicesObjectType_PubSubCommunicationFailureEventType,
 		OpcuaNodeIdServicesObjectType_RoleSetType,
 		OpcuaNodeIdServicesObjectType_RoleType,
@@ -507,9 +521,20 @@ func init() {
 		OpcuaNodeIdServicesObjectType_LldpRemoteSystemType,
 		OpcuaNodeIdServicesObjectType_AuditHistoryAnnotationUpdateEventType,
 		OpcuaNodeIdServicesObjectType_TrustListOutOfDateAlarmType,
+		OpcuaNodeIdServicesObjectType_UserCertificateType,
+		OpcuaNodeIdServicesObjectType_TlsCertificateType,
+		OpcuaNodeIdServicesObjectType_TlsServerCertificateType,
+		OpcuaNodeIdServicesObjectType_TlsClientCertificateType,
+		OpcuaNodeIdServicesObjectType_LogObjectType,
+		OpcuaNodeIdServicesObjectType_BaseLogEventType,
+		OpcuaNodeIdServicesObjectType_LogOverflowEventType,
+		OpcuaNodeIdServicesObjectType_LogEntryConditionClassType,
 		OpcuaNodeIdServicesObjectType_PubSubDiagnosticsType,
 		OpcuaNodeIdServicesObjectType_PubSubDiagnosticsRootType,
 		OpcuaNodeIdServicesObjectType_PubSubDiagnosticsConnectionType,
+		OpcuaNodeIdServicesObjectType_DataTypeRefinementType,
+		OpcuaNodeIdServicesObjectType_SubtypeRestrictionType,
+		OpcuaNodeIdServicesObjectType_SerializationEntityType,
 		OpcuaNodeIdServicesObjectType_PubSubDiagnosticsWriterGroupType,
 		OpcuaNodeIdServicesObjectType_PubSubDiagnosticsReaderGroupType,
 		OpcuaNodeIdServicesObjectType_PubSubDiagnosticsDataSetWriterType,
@@ -581,7 +606,6 @@ func init() {
 		OpcuaNodeIdServicesObjectType_ServerUnitType,
 		OpcuaNodeIdServicesObjectType_AlternativeUnitType,
 		OpcuaNodeIdServicesObjectType_QuantityType,
-		OpcuaNodeIdServicesObjectType_QuantitiesFolderType,
 		OpcuaNodeIdServicesObjectType_HistoricalEventConfigurationType,
 		OpcuaNodeIdServicesObjectType_HistoricalExternalEventSourceType,
 		OpcuaNodeIdServicesObjectType_AuditHistoryConfigurationChangeEventType,
@@ -691,8 +715,6 @@ func OpcuaNodeIdServicesObjectTypeByValue(value int32) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_SubscribedDataSetMirrorType, true
 	case 15155:
 		return OpcuaNodeIdServicesObjectType_BrokerConnectionTransportType, true
-	case 15181:
-		return OpcuaNodeIdServicesObjectType_UserCredentialCertificateType, true
 	case 15298:
 		return OpcuaNodeIdServicesObjectType_DataSetWriterType, true
 	case 15305:
@@ -701,6 +723,8 @@ func OpcuaNodeIdServicesObjectTypeByValue(value int32) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_DataSetReaderType, true
 	case 15319:
 		return OpcuaNodeIdServicesObjectType_DataSetReaderTransportType, true
+	case 15437:
+		return OpcuaNodeIdServicesObjectType_ConfigurationFileType, true
 	case 15452:
 		return OpcuaNodeIdServicesObjectType_SecurityGroupFolderType, true
 	case 15471:
@@ -709,8 +733,12 @@ func OpcuaNodeIdServicesObjectTypeByValue(value int32) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_ExtensionFieldsType, true
 	case 15535:
 		return OpcuaNodeIdServicesObjectType_PubSubStatusEventType, true
+	case 15541:
+		return OpcuaNodeIdServicesObjectType_ConfigurationUpdatedAuditEventType, true
 	case 15548:
 		return OpcuaNodeIdServicesObjectType_PubSubTransportLimitsExceedEventType, true
+	case 15550:
+		return OpcuaNodeIdServicesObjectType_ApplicationConfigurationFileType, true
 	case 15563:
 		return OpcuaNodeIdServicesObjectType_PubSubCommunicationFailureEventType, true
 	case 15607:
@@ -799,12 +827,34 @@ func OpcuaNodeIdServicesObjectTypeByValue(value int32) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_AuditHistoryAnnotationUpdateEventType, true
 	case 19297:
 		return OpcuaNodeIdServicesObjectType_TrustListOutOfDateAlarmType, true
+	case 19323:
+		return OpcuaNodeIdServicesObjectType_UserCertificateType, true
+	case 19324:
+		return OpcuaNodeIdServicesObjectType_TlsCertificateType, true
+	case 19325:
+		return OpcuaNodeIdServicesObjectType_TlsServerCertificateType, true
+	case 19326:
+		return OpcuaNodeIdServicesObjectType_TlsClientCertificateType, true
+	case 19352:
+		return OpcuaNodeIdServicesObjectType_LogObjectType, true
+	case 19362:
+		return OpcuaNodeIdServicesObjectType_BaseLogEventType, true
+	case 19369:
+		return OpcuaNodeIdServicesObjectType_LogOverflowEventType, true
+	case 19370:
+		return OpcuaNodeIdServicesObjectType_LogEntryConditionClassType, true
 	case 19677:
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsType, true
 	case 19732:
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsRootType, true
 	case 19786:
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsConnectionType, true
+	case 19820:
+		return OpcuaNodeIdServicesObjectType_DataTypeRefinementType, true
+	case 19822:
+		return OpcuaNodeIdServicesObjectType_SubtypeRestrictionType, true
+	case 19824:
+		return OpcuaNodeIdServicesObjectType_SerializationEntityType, true
 	case 19834:
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsWriterGroupType, true
 	case 19903:
@@ -1089,8 +1139,6 @@ func OpcuaNodeIdServicesObjectTypeByValue(value int32) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_AlternativeUnitType, true
 	case 32475:
 		return OpcuaNodeIdServicesObjectType_QuantityType, true
-	case 32502:
-		return OpcuaNodeIdServicesObjectType_QuantitiesFolderType, true
 	case 32621:
 		return OpcuaNodeIdServicesObjectType_HistoricalEventConfigurationType, true
 	case 32625:
@@ -1235,8 +1283,6 @@ func OpcuaNodeIdServicesObjectTypeByName(value string) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_SubscribedDataSetMirrorType, true
 	case "BrokerConnectionTransportType":
 		return OpcuaNodeIdServicesObjectType_BrokerConnectionTransportType, true
-	case "UserCredentialCertificateType":
-		return OpcuaNodeIdServicesObjectType_UserCredentialCertificateType, true
 	case "DataSetWriterType":
 		return OpcuaNodeIdServicesObjectType_DataSetWriterType, true
 	case "DataSetWriterTransportType":
@@ -1245,6 +1291,8 @@ func OpcuaNodeIdServicesObjectTypeByName(value string) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_DataSetReaderType, true
 	case "DataSetReaderTransportType":
 		return OpcuaNodeIdServicesObjectType_DataSetReaderTransportType, true
+	case "ConfigurationFileType":
+		return OpcuaNodeIdServicesObjectType_ConfigurationFileType, true
 	case "SecurityGroupFolderType":
 		return OpcuaNodeIdServicesObjectType_SecurityGroupFolderType, true
 	case "SecurityGroupType":
@@ -1253,8 +1301,12 @@ func OpcuaNodeIdServicesObjectTypeByName(value string) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_ExtensionFieldsType, true
 	case "PubSubStatusEventType":
 		return OpcuaNodeIdServicesObjectType_PubSubStatusEventType, true
+	case "ConfigurationUpdatedAuditEventType":
+		return OpcuaNodeIdServicesObjectType_ConfigurationUpdatedAuditEventType, true
 	case "PubSubTransportLimitsExceedEventType":
 		return OpcuaNodeIdServicesObjectType_PubSubTransportLimitsExceedEventType, true
+	case "ApplicationConfigurationFileType":
+		return OpcuaNodeIdServicesObjectType_ApplicationConfigurationFileType, true
 	case "PubSubCommunicationFailureEventType":
 		return OpcuaNodeIdServicesObjectType_PubSubCommunicationFailureEventType, true
 	case "RoleSetType":
@@ -1343,12 +1395,34 @@ func OpcuaNodeIdServicesObjectTypeByName(value string) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_AuditHistoryAnnotationUpdateEventType, true
 	case "TrustListOutOfDateAlarmType":
 		return OpcuaNodeIdServicesObjectType_TrustListOutOfDateAlarmType, true
+	case "UserCertificateType":
+		return OpcuaNodeIdServicesObjectType_UserCertificateType, true
+	case "TlsCertificateType":
+		return OpcuaNodeIdServicesObjectType_TlsCertificateType, true
+	case "TlsServerCertificateType":
+		return OpcuaNodeIdServicesObjectType_TlsServerCertificateType, true
+	case "TlsClientCertificateType":
+		return OpcuaNodeIdServicesObjectType_TlsClientCertificateType, true
+	case "LogObjectType":
+		return OpcuaNodeIdServicesObjectType_LogObjectType, true
+	case "BaseLogEventType":
+		return OpcuaNodeIdServicesObjectType_BaseLogEventType, true
+	case "LogOverflowEventType":
+		return OpcuaNodeIdServicesObjectType_LogOverflowEventType, true
+	case "LogEntryConditionClassType":
+		return OpcuaNodeIdServicesObjectType_LogEntryConditionClassType, true
 	case "PubSubDiagnosticsType":
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsType, true
 	case "PubSubDiagnosticsRootType":
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsRootType, true
 	case "PubSubDiagnosticsConnectionType":
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsConnectionType, true
+	case "DataTypeRefinementType":
+		return OpcuaNodeIdServicesObjectType_DataTypeRefinementType, true
+	case "SubtypeRestrictionType":
+		return OpcuaNodeIdServicesObjectType_SubtypeRestrictionType, true
+	case "SerializationEntityType":
+		return OpcuaNodeIdServicesObjectType_SerializationEntityType, true
 	case "PubSubDiagnosticsWriterGroupType":
 		return OpcuaNodeIdServicesObjectType_PubSubDiagnosticsWriterGroupType, true
 	case "PubSubDiagnosticsReaderGroupType":
@@ -1633,8 +1707,6 @@ func OpcuaNodeIdServicesObjectTypeByName(value string) (enum OpcuaNodeIdServices
 		return OpcuaNodeIdServicesObjectType_AlternativeUnitType, true
 	case "QuantityType":
 		return OpcuaNodeIdServicesObjectType_QuantityType, true
-	case "QuantitiesFolderType":
-		return OpcuaNodeIdServicesObjectType_QuantitiesFolderType, true
 	case "HistoricalEventConfigurationType":
 		return OpcuaNodeIdServicesObjectType_HistoricalEventConfigurationType, true
 	case "HistoricalExternalEventSourceType":
@@ -1844,8 +1916,6 @@ func (e OpcuaNodeIdServicesObjectType) PLC4XEnumName() string {
 		return "SubscribedDataSetMirrorType"
 	case OpcuaNodeIdServicesObjectType_BrokerConnectionTransportType:
 		return "BrokerConnectionTransportType"
-	case OpcuaNodeIdServicesObjectType_UserCredentialCertificateType:
-		return "UserCredentialCertificateType"
 	case OpcuaNodeIdServicesObjectType_DataSetWriterType:
 		return "DataSetWriterType"
 	case OpcuaNodeIdServicesObjectType_DataSetWriterTransportType:
@@ -1854,6 +1924,8 @@ func (e OpcuaNodeIdServicesObjectType) PLC4XEnumName() string {
 		return "DataSetReaderType"
 	case OpcuaNodeIdServicesObjectType_DataSetReaderTransportType:
 		return "DataSetReaderTransportType"
+	case OpcuaNodeIdServicesObjectType_ConfigurationFileType:
+		return "ConfigurationFileType"
 	case OpcuaNodeIdServicesObjectType_SecurityGroupFolderType:
 		return "SecurityGroupFolderType"
 	case OpcuaNodeIdServicesObjectType_SecurityGroupType:
@@ -1862,8 +1934,12 @@ func (e OpcuaNodeIdServicesObjectType) PLC4XEnumName() string {
 		return "ExtensionFieldsType"
 	case OpcuaNodeIdServicesObjectType_PubSubStatusEventType:
 		return "PubSubStatusEventType"
+	case OpcuaNodeIdServicesObjectType_ConfigurationUpdatedAuditEventType:
+		return "ConfigurationUpdatedAuditEventType"
 	case OpcuaNodeIdServicesObjectType_PubSubTransportLimitsExceedEventType:
 		return "PubSubTransportLimitsExceedEventType"
+	case OpcuaNodeIdServicesObjectType_ApplicationConfigurationFileType:
+		return "ApplicationConfigurationFileType"
 	case OpcuaNodeIdServicesObjectType_PubSubCommunicationFailureEventType:
 		return "PubSubCommunicationFailureEventType"
 	case OpcuaNodeIdServicesObjectType_RoleSetType:
@@ -1952,12 +2028,34 @@ func (e OpcuaNodeIdServicesObjectType) PLC4XEnumName() string {
 		return "AuditHistoryAnnotationUpdateEventType"
 	case OpcuaNodeIdServicesObjectType_TrustListOutOfDateAlarmType:
 		return "TrustListOutOfDateAlarmType"
+	case OpcuaNodeIdServicesObjectType_UserCertificateType:
+		return "UserCertificateType"
+	case OpcuaNodeIdServicesObjectType_TlsCertificateType:
+		return "TlsCertificateType"
+	case OpcuaNodeIdServicesObjectType_TlsServerCertificateType:
+		return "TlsServerCertificateType"
+	case OpcuaNodeIdServicesObjectType_TlsClientCertificateType:
+		return "TlsClientCertificateType"
+	case OpcuaNodeIdServicesObjectType_LogObjectType:
+		return "LogObjectType"
+	case OpcuaNodeIdServicesObjectType_BaseLogEventType:
+		return "BaseLogEventType"
+	case OpcuaNodeIdServicesObjectType_LogOverflowEventType:
+		return "LogOverflowEventType"
+	case OpcuaNodeIdServicesObjectType_LogEntryConditionClassType:
+		return "LogEntryConditionClassType"
 	case OpcuaNodeIdServicesObjectType_PubSubDiagnosticsType:
 		return "PubSubDiagnosticsType"
 	case OpcuaNodeIdServicesObjectType_PubSubDiagnosticsRootType:
 		return "PubSubDiagnosticsRootType"
 	case OpcuaNodeIdServicesObjectType_PubSubDiagnosticsConnectionType:
 		return "PubSubDiagnosticsConnectionType"
+	case OpcuaNodeIdServicesObjectType_DataTypeRefinementType:
+		return "DataTypeRefinementType"
+	case OpcuaNodeIdServicesObjectType_SubtypeRestrictionType:
+		return "SubtypeRestrictionType"
+	case OpcuaNodeIdServicesObjectType_SerializationEntityType:
+		return "SerializationEntityType"
 	case OpcuaNodeIdServicesObjectType_PubSubDiagnosticsWriterGroupType:
 		return "PubSubDiagnosticsWriterGroupType"
 	case OpcuaNodeIdServicesObjectType_PubSubDiagnosticsReaderGroupType:
@@ -2242,8 +2340,6 @@ func (e OpcuaNodeIdServicesObjectType) PLC4XEnumName() string {
 		return "AlternativeUnitType"
 	case OpcuaNodeIdServicesObjectType_QuantityType:
 		return "QuantityType"
-	case OpcuaNodeIdServicesObjectType_QuantitiesFolderType:
-		return "QuantitiesFolderType"
 	case OpcuaNodeIdServicesObjectType_HistoricalEventConfigurationType:
 		return "HistoricalEventConfigurationType"
 	case OpcuaNodeIdServicesObjectType_HistoricalExternalEventSourceType:

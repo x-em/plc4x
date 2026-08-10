@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _SubscribedDataSetMirrorDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SubscribedDataSetMirrorDataTypeBuilder) = (*_SubscribedDataSetMirrorDataTypeBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_SubscribedDataSetMirrorDataTypeBuilder) WithParentNodeNameBuilder(buil
 	var err error
 	b.ParentNodeName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_SubscribedDataSetMirrorDataTypeBuilder) WithRolePermissions(rolePermis
 
 func (b *_SubscribedDataSetMirrorDataTypeBuilder) Build() (SubscribedDataSetMirrorDataType, error) {
 	if b.ParentNodeName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'parentNodeName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'parentNodeName' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SubscribedDataSetMirrorDataType.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_SubscribedDataSetMirrorDataTypeBuilder) buildForExtensionObjectDefinit
 
 func (b *_SubscribedDataSetMirrorDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateSubscribedDataSetMirrorDataTypeBuilder().(*_SubscribedDataSetMirrorDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastSubscribedDataSetMirrorDataType(structType any) SubscribedDataSetMirror
 	return nil
 }
 
-func (m *_SubscribedDataSetMirrorDataType) GetTypeName() string {
+func (m *_SubscribedDataSetMirrorDataType) GetPlx4xTypeName() string {
 	return "SubscribedDataSetMirrorDataType"
 }
 
@@ -262,9 +258,7 @@ func (m *_SubscribedDataSetMirrorDataType) GetLengthInBits(ctx context.Context) 
 	if len(m.RolePermissions) > 0 {
 		for _curItem, element := range m.RolePermissions {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.RolePermissions), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_SubscribedDataSetMirrorDataType) parse(ctx context.Context, readBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	parentNodeName, err := ReadSimpleField[PascalString](ctx, "parentNodeName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	parentNodeName, err := ReadSimpleField[PascalString](ctx, "parentNodeName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'parentNodeName' field"))
 	}
 	m.ParentNodeName = parentNodeName
 
-	noOfRolePermissions, err := ReadImplicitField[int32](ctx, "noOfRolePermissions", ReadSignedInt(readBuffer, uint8(32)))
+	noOfRolePermissions, err := ReadImplicitField[int32](ctx, "noOfRolePermissions", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfRolePermissions' field"))
 	}
 	_ = noOfRolePermissions
 
-	rolePermissions, err := ReadCountArrayField[RolePermissionType](ctx, "rolePermissions", ReadComplex[RolePermissionType](ExtensionObjectDefinitionParseWithBufferProducer[RolePermissionType]((int32)(int32(98))), readBuffer), uint64(noOfRolePermissions))
+	rolePermissions, err := ReadCountArrayField[RolePermissionType](ctx, "rolePermissions", ReadComplex[RolePermissionType](ExtensionObjectDefinitionParseWithBufferProducer[RolePermissionType]((int32)(int32(98))), readBuffer), uint64(noOfRolePermissions), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'rolePermissions' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_SubscribedDataSetMirrorDataType) SerializeWithWriteBuffer(ctx context.
 			return errors.Wrap(pushErr, "Error pushing for SubscribedDataSetMirrorDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "parentNodeName", m.GetParentNodeName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "parentNodeName", m.GetParentNodeName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'parentNodeName' field")
 		}
 		noOfRolePermissions := int32(utils.InlineIf(bool((m.GetRolePermissions()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetRolePermissions()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfRolePermissions", noOfRolePermissions, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfRolePermissions", noOfRolePermissions, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfRolePermissions' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "rolePermissions", m.GetRolePermissions(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "rolePermissions", m.GetRolePermissions(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'rolePermissions' field")
 		}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ NLMDisconnectConnectionToNetwork = (*_NLMDisconnectConnectionToNetwork)(ni
 var _ NLMRequirements = (*_NLMDisconnectConnectionToNetwork)(nil)
 
 // NewNLMDisconnectConnectionToNetwork factory function for _NLMDisconnectConnectionToNetwork
-func NewNLMDisconnectConnectionToNetwork(destinationNetworkAddress uint16, apduLength uint16) *_NLMDisconnectConnectionToNetwork {
+func NewNLMDisconnectConnectionToNetwork(destinationNetworkAddress uint16) *_NLMDisconnectConnectionToNetwork {
 	_result := &_NLMDisconnectConnectionToNetwork{
-		NLMContract:               NewNLM(apduLength),
+		NLMContract:               NewNLM(),
 		DestinationNetworkAddress: destinationNetworkAddress,
 	}
 	_result.NLMContract.(*_NLM)._SubType = _result
@@ -97,7 +98,7 @@ type _NLMDisconnectConnectionToNetworkBuilder struct {
 
 	parentBuilder *_NLMBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NLMDisconnectConnectionToNetworkBuilder) = (*_NLMDisconnectConnectionToNetworkBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_NLMDisconnectConnectionToNetworkBuilder) WithDestinationNetworkAddress
 }
 
 func (b *_NLMDisconnectConnectionToNetworkBuilder) Build() (NLMDisconnectConnectionToNetwork, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NLMDisconnectConnectionToNetwork.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_NLMDisconnectConnectionToNetworkBuilder) buildForNLM() (NLM, error) {
 
 func (b *_NLMDisconnectConnectionToNetworkBuilder) DeepCopy() any {
 	_copy := b.CreateNLMDisconnectConnectionToNetworkBuilder().(*_NLMDisconnectConnectionToNetworkBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +207,7 @@ func CastNLMDisconnectConnectionToNetwork(structType any) NLMDisconnectConnectio
 	return nil
 }
 
-func (m *_NLMDisconnectConnectionToNetwork) GetTypeName() string {
+func (m *_NLMDisconnectConnectionToNetwork) GetPlx4xTypeName() string {
 	return "NLMDisconnectConnectionToNetwork"
 }
 

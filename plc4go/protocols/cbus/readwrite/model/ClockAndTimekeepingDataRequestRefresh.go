@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _ClockAndTimekeepingDataRequestRefreshBuilder struct {
 
 	parentBuilder *_ClockAndTimekeepingDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ClockAndTimekeepingDataRequestRefreshBuilder) = (*_ClockAndTimekeepingDataRequestRefreshBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) WithMandatoryFields() Cl
 }
 
 func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) Build() (ClockAndTimekeepingDataRequestRefresh, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ClockAndTimekeepingDataRequestRefresh.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) buildForClockAndTimekeep
 
 func (b *_ClockAndTimekeepingDataRequestRefreshBuilder) DeepCopy() any {
 	_copy := b.CreateClockAndTimekeepingDataRequestRefreshBuilder().(*_ClockAndTimekeepingDataRequestRefreshBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -175,7 +176,7 @@ func CastClockAndTimekeepingDataRequestRefresh(structType any) ClockAndTimekeepi
 	return nil
 }
 
-func (m *_ClockAndTimekeepingDataRequestRefresh) GetTypeName() string {
+func (m *_ClockAndTimekeepingDataRequestRefresh) GetPlx4xTypeName() string {
 	return "ClockAndTimekeepingDataRequestRefresh"
 }
 

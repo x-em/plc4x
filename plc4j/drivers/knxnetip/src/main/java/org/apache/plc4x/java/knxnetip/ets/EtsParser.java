@@ -60,11 +60,24 @@ import java.util.regex.Pattern;
 
 public class EtsParser {
 
+    private static boolean isEts6Schema(String schemaVersion) {
+        if (schemaVersion == null) {
+            return false;
+        }
+        try {
+            return Integer.parseInt(schemaVersion) >= 21;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public EtsModel parse(File knxprojFile, String password) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             XPathFactory xPathFactory = XPathFactory.newInstance();
             XPath xPath = xPathFactory.newXPath();
@@ -91,8 +104,12 @@ public class EtsParser {
                         }
                     }
                 }
-                // 21 = ETS6, 22 = ETS6.1
-                EtsFileHandler fileHandler = ("21".equals(etsSchemaVersion) || "22".equals(etsSchemaVersion)) ? new Ets6FileHandler() : new Ets5FileHandler();
+                // Schema 21 (ETS6) onwards — 22, 23, ... — all use the same
+                // PBKDF2-SHA256 derivation with a fixed salt. Anything older
+                // uses the raw password.
+                EtsFileHandler fileHandler = isEts6Schema(etsSchemaVersion)
+                    ? new Ets6FileHandler()
+                    : new Ets5FileHandler();
 
                 ////////////////////////////////////////////////////////////////////////////////
                 // File containing the information on the type of encoding used for group addresses.
@@ -100,6 +117,9 @@ public class EtsParser {
                 Document projectHeaderDoc;
                 Document projectDoc;
                 String projectNumber = this.getProjectNumber(zipFile);
+                // If the project is not password protected, it contains a file called `project.xml`
+                // If it is a password protected one, there is a zip file inside, {project-number}.zip,
+                // which is password protected, which then contains the project.xml.
                 FileHeader projectFileHeader = zipFile.getFileHeader(projectNumber + "/project.xml");
                 if (projectFileHeader == null) {
                     // This is the case of a knxproj file which is password-protected

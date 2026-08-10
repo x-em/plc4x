@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _LldpTlvTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (LldpTlvTypeBuilder) = (*_LldpTlvTypeBuilder)(nil)
@@ -137,23 +139,17 @@ func (b *_LldpTlvTypeBuilder) WithTlvInfoBuilder(builderSupplier func(PascalByte
 	var err error
 	b.TlvInfo, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_LldpTlvTypeBuilder) Build() (LldpTlvType, error) {
 	if b.TlvInfo == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'tlvInfo' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'tlvInfo' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._LldpTlvType.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_LldpTlvTypeBuilder) buildForExtensionObjectDefinition() (ExtensionObje
 
 func (b *_LldpTlvTypeBuilder) DeepCopy() any {
 	_copy := b.CreateLldpTlvTypeBuilder().(*_LldpTlvTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastLldpTlvType(structType any) LldpTlvType {
 	return nil
 }
 
-func (m *_LldpTlvType) GetTypeName() string {
+func (m *_LldpTlvType) GetPlx4xTypeName() string {
 	return "LldpTlvType"
 }
 
@@ -276,13 +272,13 @@ func (m *_LldpTlvType) parse(ctx context.Context, readBuffer utils.ReadBuffer, p
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	tlvType, err := ReadSimpleField(ctx, "tlvType", ReadUnsignedInt(readBuffer, uint8(32)))
+	tlvType, err := ReadSimpleField(ctx, "tlvType", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'tlvType' field"))
 	}
 	m.TlvType = tlvType
 
-	tlvInfo, err := ReadSimpleField[PascalByteString](ctx, "tlvInfo", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	tlvInfo, err := ReadSimpleField[PascalByteString](ctx, "tlvInfo", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'tlvInfo' field"))
 	}
@@ -313,11 +309,11 @@ func (m *_LldpTlvType) SerializeWithWriteBuffer(ctx context.Context, writeBuffer
 			return errors.Wrap(pushErr, "Error pushing for LldpTlvType")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "tlvType", m.GetTlvType(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "tlvType", m.GetTlvType(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'tlvType' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "tlvInfo", m.GetTlvInfo(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "tlvInfo", m.GetTlvInfo(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'tlvInfo' field")
 		}
 

@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,6 +44,7 @@ type SALDataHeating interface {
 	utils.Copyable
 	SALData
 	// GetHeatingData returns HeatingData (property field)
+	// Note: the documentation states that the data for heating uses LightingData
 	GetHeatingData() LightingData
 	// IsSALDataHeating is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsSALDataHeating()
@@ -102,7 +106,7 @@ type _SALDataHeatingBuilder struct {
 
 	parentBuilder *_SALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SALDataHeatingBuilder) = (*_SALDataHeatingBuilder)(nil)
@@ -126,23 +130,17 @@ func (b *_SALDataHeatingBuilder) WithHeatingDataBuilder(builderSupplier func(Lig
 	var err error
 	b.HeatingData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LightingDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LightingDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SALDataHeatingBuilder) Build() (SALDataHeating, error) {
 	if b.HeatingData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'heatingData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'heatingData' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SALDataHeating.deepCopy(), nil
 }
@@ -168,8 +166,8 @@ func (b *_SALDataHeatingBuilder) buildForSALData() (SALData, error) {
 
 func (b *_SALDataHeatingBuilder) DeepCopy() any {
 	_copy := b.CreateSALDataHeatingBuilder().(*_SALDataHeatingBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +228,7 @@ func CastSALDataHeating(structType any) SALDataHeating {
 	return nil
 }
 
-func (m *_SALDataHeating) GetTypeName() string {
+func (m *_SALDataHeating) GetPlx4xTypeName() string {
 	return "SALDataHeating"
 }
 
@@ -258,7 +256,7 @@ func (m *_SALDataHeating) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	heatingData, err := ReadSimpleField[LightingData](ctx, "heatingData", ReadComplex[LightingData](LightingDataParseWithBuffer, readBuffer))
+	heatingData, err := ReadSimpleField[LightingData](ctx, "heatingData", ReadComplex[LightingData](LightingDataParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'heatingData' field"))
 	}
@@ -272,7 +270,7 @@ func (m *_SALDataHeating) parse(ctx context.Context, readBuffer utils.ReadBuffer
 }
 
 func (m *_SALDataHeating) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -289,7 +287,7 @@ func (m *_SALDataHeating) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for SALDataHeating")
 		}
 
-		if err := WriteSimpleField[LightingData](ctx, "heatingData", m.GetHeatingData(), WriteComplex[LightingData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LightingData](ctx, "heatingData", m.GetHeatingData(), WriteComplex[LightingData](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'heatingData' field")
 		}
 

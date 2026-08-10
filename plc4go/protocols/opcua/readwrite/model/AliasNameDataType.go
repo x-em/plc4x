@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _AliasNameDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AliasNameDataTypeBuilder) = (*_AliasNameDataTypeBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_AliasNameDataTypeBuilder) WithAliasNameBuilder(builderSupplier func(Qu
 	var err error
 	b.AliasName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "QualifiedNameBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "QualifiedNameBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_AliasNameDataTypeBuilder) WithReferencedNodes(referencedNodes ...Expan
 
 func (b *_AliasNameDataTypeBuilder) Build() (AliasNameDataType, error) {
 	if b.AliasName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'aliasName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'aliasName' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AliasNameDataType.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_AliasNameDataTypeBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_AliasNameDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateAliasNameDataTypeBuilder().(*_AliasNameDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastAliasNameDataType(structType any) AliasNameDataType {
 	return nil
 }
 
-func (m *_AliasNameDataType) GetTypeName() string {
+func (m *_AliasNameDataType) GetPlx4xTypeName() string {
 	return "AliasNameDataType"
 }
 
@@ -262,9 +258,7 @@ func (m *_AliasNameDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.ReferencedNodes) > 0 {
 		for _curItem, element := range m.ReferencedNodes {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ReferencedNodes), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_AliasNameDataType) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	aliasName, err := ReadSimpleField[QualifiedName](ctx, "aliasName", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer))
+	aliasName, err := ReadSimpleField[QualifiedName](ctx, "aliasName", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'aliasName' field"))
 	}
 	m.AliasName = aliasName
 
-	noOfReferencedNodes, err := ReadImplicitField[int32](ctx, "noOfReferencedNodes", ReadSignedInt(readBuffer, uint8(32)))
+	noOfReferencedNodes, err := ReadImplicitField[int32](ctx, "noOfReferencedNodes", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfReferencedNodes' field"))
 	}
 	_ = noOfReferencedNodes
 
-	referencedNodes, err := ReadCountArrayField[ExpandedNodeId](ctx, "referencedNodes", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), uint64(noOfReferencedNodes))
+	referencedNodes, err := ReadCountArrayField[ExpandedNodeId](ctx, "referencedNodes", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), uint64(noOfReferencedNodes), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'referencedNodes' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_AliasNameDataType) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for AliasNameDataType")
 		}
 
-		if err := WriteSimpleField[QualifiedName](ctx, "aliasName", m.GetAliasName(), WriteComplex[QualifiedName](writeBuffer)); err != nil {
+		if err := WriteSimpleField[QualifiedName](ctx, "aliasName", m.GetAliasName(), WriteComplex[QualifiedName](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'aliasName' field")
 		}
 		noOfReferencedNodes := int32(utils.InlineIf(bool((m.GetReferencedNodes()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetReferencedNodes()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfReferencedNodes", noOfReferencedNodes, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfReferencedNodes", noOfReferencedNodes, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfReferencedNodes' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "referencedNodes", m.GetReferencedNodes(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "referencedNodes", m.GetReferencedNodes(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'referencedNodes' field")
 		}
 

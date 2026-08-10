@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ IdentifyReplyCommandCurrentSenseLevels = (*_IdentifyReplyCommandCurrentSen
 var _ IdentifyReplyCommandRequirements = (*_IdentifyReplyCommandCurrentSenseLevels)(nil)
 
 // NewIdentifyReplyCommandCurrentSenseLevels factory function for _IdentifyReplyCommandCurrentSenseLevels
-func NewIdentifyReplyCommandCurrentSenseLevels(currentSenseLevels []byte, numBytes uint8) *_IdentifyReplyCommandCurrentSenseLevels {
+func NewIdentifyReplyCommandCurrentSenseLevels(currentSenseLevels []byte) *_IdentifyReplyCommandCurrentSenseLevels {
 	_result := &_IdentifyReplyCommandCurrentSenseLevels{
-		IdentifyReplyCommandContract: NewIdentifyReplyCommand(numBytes),
+		IdentifyReplyCommandContract: NewIdentifyReplyCommand(),
 		CurrentSenseLevels:           currentSenseLevels,
 	}
 	_result.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = _result
@@ -97,7 +100,7 @@ type _IdentifyReplyCommandCurrentSenseLevelsBuilder struct {
 
 	parentBuilder *_IdentifyReplyCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IdentifyReplyCommandCurrentSenseLevelsBuilder) = (*_IdentifyReplyCommandCurrentSenseLevelsBuilder)(nil)
@@ -117,8 +120,8 @@ func (b *_IdentifyReplyCommandCurrentSenseLevelsBuilder) WithCurrentSenseLevels(
 }
 
 func (b *_IdentifyReplyCommandCurrentSenseLevelsBuilder) Build() (IdentifyReplyCommandCurrentSenseLevels, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IdentifyReplyCommandCurrentSenseLevels.deepCopy(), nil
 }
@@ -144,8 +147,8 @@ func (b *_IdentifyReplyCommandCurrentSenseLevelsBuilder) buildForIdentifyReplyCo
 
 func (b *_IdentifyReplyCommandCurrentSenseLevelsBuilder) DeepCopy() any {
 	_copy := b.CreateIdentifyReplyCommandCurrentSenseLevelsBuilder().(*_IdentifyReplyCommandCurrentSenseLevelsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +209,7 @@ func CastIdentifyReplyCommandCurrentSenseLevels(structType any) IdentifyReplyCom
 	return nil
 }
 
-func (m *_IdentifyReplyCommandCurrentSenseLevels) GetTypeName() string {
+func (m *_IdentifyReplyCommandCurrentSenseLevels) GetPlx4xTypeName() string {
 	return "IdentifyReplyCommandCurrentSenseLevels"
 }
 
@@ -236,7 +239,7 @@ func (m *_IdentifyReplyCommandCurrentSenseLevels) parse(ctx context.Context, rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	currentSenseLevels, err := readBuffer.ReadByteArray("currentSenseLevels", int(numBytes))
+	currentSenseLevels, err := readBuffer.ReadByteArray("currentSenseLevels", int(numBytes), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'currentSenseLevels' field"))
 	}
@@ -250,7 +253,7 @@ func (m *_IdentifyReplyCommandCurrentSenseLevels) parse(ctx context.Context, rea
 }
 
 func (m *_IdentifyReplyCommandCurrentSenseLevels) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -267,7 +270,7 @@ func (m *_IdentifyReplyCommandCurrentSenseLevels) SerializeWithWriteBuffer(ctx c
 			return errors.Wrap(pushErr, "Error pushing for IdentifyReplyCommandCurrentSenseLevels")
 		}
 
-		if err := WriteByteArrayField(ctx, "currentSenseLevels", m.GetCurrentSenseLevels(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "currentSenseLevels", m.GetCurrentSenseLevels(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'currentSenseLevels' field")
 		}
 

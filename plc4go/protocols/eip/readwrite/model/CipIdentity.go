@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -175,7 +176,7 @@ type _CipIdentityBuilder struct {
 
 	parentBuilder *_CommandSpecificDataItemBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CipIdentityBuilder) = (*_CipIdentityBuilder)(nil)
@@ -255,8 +256,8 @@ func (b *_CipIdentityBuilder) WithState(state uint8) CipIdentityBuilder {
 }
 
 func (b *_CipIdentityBuilder) Build() (CipIdentity, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CipIdentity.deepCopy(), nil
 }
@@ -282,8 +283,8 @@ func (b *_CipIdentityBuilder) buildForCommandSpecificDataItem() (CommandSpecific
 
 func (b *_CipIdentityBuilder) DeepCopy() any {
 	_copy := b.CreateCipIdentityBuilder().(*_CipIdentityBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -409,7 +410,7 @@ func CastCipIdentity(structType any) CipIdentity {
 	return nil
 }
 
-func (m *_CipIdentity) GetTypeName() string {
+func (m *_CipIdentity) GetPlx4xTypeName() string {
 	return "CipIdentity"
 }
 

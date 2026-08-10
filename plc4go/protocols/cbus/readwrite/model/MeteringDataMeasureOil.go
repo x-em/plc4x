@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _MeteringDataMeasureOilBuilder struct {
 
 	parentBuilder *_MeteringDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MeteringDataMeasureOilBuilder) = (*_MeteringDataMeasureOilBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_MeteringDataMeasureOilBuilder) WithMandatoryFields() MeteringDataMeasu
 }
 
 func (b *_MeteringDataMeasureOilBuilder) Build() (MeteringDataMeasureOil, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MeteringDataMeasureOil.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_MeteringDataMeasureOilBuilder) buildForMeteringData() (MeteringData, e
 
 func (b *_MeteringDataMeasureOilBuilder) DeepCopy() any {
 	_copy := b.CreateMeteringDataMeasureOilBuilder().(*_MeteringDataMeasureOilBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -175,7 +176,7 @@ func CastMeteringDataMeasureOil(structType any) MeteringDataMeasureOil {
 	return nil
 }
 
-func (m *_MeteringDataMeasureOil) GetTypeName() string {
+func (m *_MeteringDataMeasureOil) GetPlx4xTypeName() string {
 	return "MeteringDataMeasureOil"
 }
 

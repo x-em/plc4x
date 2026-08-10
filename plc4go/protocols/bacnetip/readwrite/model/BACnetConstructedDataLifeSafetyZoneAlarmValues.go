@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataLifeSafetyZoneAlarmValues = (*_BACnetConstructedDataL
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLifeSafetyZoneAlarmValues)(nil)
 
 // NewBACnetConstructedDataLifeSafetyZoneAlarmValues factory function for _BACnetConstructedDataLifeSafetyZoneAlarmValues
-func NewBACnetConstructedDataLifeSafetyZoneAlarmValues(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, alarmValues []BACnetLifeSafetyStateTagged, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLifeSafetyZoneAlarmValues {
+func NewBACnetConstructedDataLifeSafetyZoneAlarmValues(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, alarmValues []BACnetLifeSafetyStateTagged) *_BACnetConstructedDataLifeSafetyZoneAlarmValues {
 	_result := &_BACnetConstructedDataLifeSafetyZoneAlarmValues{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		AlarmValues:                   alarmValues,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder) = (*_BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder) WithAlarmValues
 }
 
 func (b *_BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder) Build() (BACnetConstructedDataLifeSafetyZoneAlarmValues, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLifeSafetyZoneAlarmValues.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder) buildForBACnetC
 
 func (b *_BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder().(*_BACnetConstructedDataLifeSafetyZoneAlarmValuesBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataLifeSafetyZoneAlarmValues(structType any) BACnetCo
 	return nil
 }
 
-func (m *_BACnetConstructedDataLifeSafetyZoneAlarmValues) GetTypeName() string {
+func (m *_BACnetConstructedDataLifeSafetyZoneAlarmValues) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLifeSafetyZoneAlarmValues"
 }
 

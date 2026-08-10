@@ -25,14 +25,13 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	apiValues "github.com/apache/plc4x/plc4go/pkg/api/values"
 	driverModel "github.com/apache/plc4x/plc4go/protocols/knxnetip/readwrite/model"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/utils"
@@ -58,12 +57,10 @@ func NewReader(connection *Connection, _options ...options.WithOption) *Reader {
 func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) <-chan apiModel.PlcReadRequestResult {
 	// TODO: handle ctx
 	resultChan := make(chan apiModel.PlcReadRequestResult, 1)
-	m.wg.Add(1)
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		defer func() {
 			if err := recover(); err != nil {
-				resultChan <- spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack()))
+				utils.DeliverResult(m.log, resultChan, spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack())))
 			}
 		}()
 		responseCodes := map[string]apiModel.PlcResponseCode{}
@@ -121,13 +118,9 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 				case DevicePropertyAddressPlcTag:
 					propertyTag := tag.(DevicePropertyAddressPlcTag)
 
-					timeout := time.NewTimer(m.connection.defaultTtl)
 					results := m.connection.DeviceReadProperty(ctx, deviceAddress, propertyTag.ObjectId, propertyTag.PropertyId, propertyTag.PropertyIndex, propertyTag.NumElements)
 					select {
 					case result := <-results:
-						if !timeout.Stop() {
-							<-timeout.C
-						}
 						if result.err == nil {
 							responseCodes[tagName] = apiModel.PlcResponseCode_OK
 							plcValues[tagName] = result.value
@@ -135,20 +128,15 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 							responseCodes[tagName] = apiModel.PlcResponseCode_INTERNAL_ERROR
 							plcValues[tagName] = nil
 						}
-					case <-timeout.C:
-						timeout.Stop()
+					case <-ctx.Done():
 						responseCodes[tagName] = apiModel.PlcResponseCode_REMOTE_BUSY
 						plcValues[tagName] = nil
 					}
 				case DeviceMemoryAddressPlcTag:
-					timeout := time.NewTimer(m.connection.defaultTtl)
 					memoryTag := tag.(DeviceMemoryAddressPlcTag)
 					results := m.connection.DeviceReadMemory(ctx, deviceAddress, memoryTag.Address, memoryTag.NumElements, memoryTag.TagType)
 					select {
 					case result := <-results:
-						if !timeout.Stop() {
-							<-timeout.C
-						}
 						if result.err == nil {
 							responseCodes[tagName] = apiModel.PlcResponseCode_OK
 							plcValues[tagName] = result.value
@@ -156,8 +144,7 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 							responseCodes[tagName] = apiModel.PlcResponseCode_INTERNAL_ERROR
 							plcValues[tagName] = nil
 						}
-					case <-timeout.C:
-						timeout.Stop()
+					case <-ctx.Done():
 						responseCodes[tagName] = apiModel.PlcResponseCode_REMOTE_BUSY
 						plcValues[tagName] = nil
 					}
@@ -174,12 +161,12 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 
 		// Assemble the results
 		result := spiModel.NewDefaultPlcReadResponse(readRequest, responseCodes, plcValues)
-		resultChan <- spiModel.NewDefaultPlcReadRequestResult(
+		utils.DeliverResult(m.log, resultChan, spiModel.NewDefaultPlcReadRequestResult(
 			readRequest,
 			result,
 			nil,
-		)
-	}()
+		))
+	})
 	return resultChan
 }
 
@@ -239,10 +226,10 @@ func (m *Reader) readGroupAddress(ctx context.Context, tag GroupAddressTag) (api
 					return apiModel.PlcResponseCode_INVALID_DATATYPE, nil
 				}
 				// If the size of the tag is greater than 6, we have to skip the first byte
-				if tag.GetTagType().GetLengthInBits(context.Background()) > 6 {
+				if tag.GetTagType().GetLengthInBits(ctx) > 6 {
 					_, _ = rb.ReadUint8("tagType", 8)
 				}
-				plcValue, err := driverModel.KnxDatapointParseWithBuffer(context.Background(), rb, *tag.GetTagType())
+				plcValue, err := driverModel.KnxDatapointParseWithBuffer(ctx, rb, *tag.GetTagType())
 				// If any of the values doesn't decode correctly, we can't return any
 				if err != nil {
 					return apiModel.PlcResponseCode_INVALID_DATA, nil
@@ -335,7 +322,7 @@ func (m *Reader) resoleSegment(pattern string, minValue uint16, maxValue uint16)
 	} else if strings.HasPrefix(pattern, "[") && strings.HasSuffix(pattern, "]") {
 		// If the pattern starts and ends with square brackets, it's a list of values or range queries
 		// Multiple options are separated by ","
-		for _, segment := range strings.Split(pattern[1:len(pattern)-1], ",") {
+		for segment := range strings.SplitSeq(pattern[1:len(pattern)-1], ",") {
 			// If the segment contains a "-", then it's a range query,
 			// otherwise it's just a normal value.
 			if strings.Contains(segment, "-") {

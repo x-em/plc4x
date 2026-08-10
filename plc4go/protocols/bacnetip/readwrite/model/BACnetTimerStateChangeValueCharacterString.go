@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,12 +59,12 @@ var _ BACnetTimerStateChangeValueCharacterString = (*_BACnetTimerStateChangeValu
 var _ BACnetTimerStateChangeValueRequirements = (*_BACnetTimerStateChangeValueCharacterString)(nil)
 
 // NewBACnetTimerStateChangeValueCharacterString factory function for _BACnetTimerStateChangeValueCharacterString
-func NewBACnetTimerStateChangeValueCharacterString(peekedTagHeader BACnetTagHeader, characterStringValue BACnetApplicationTagCharacterString, objectTypeArgument BACnetObjectType) *_BACnetTimerStateChangeValueCharacterString {
+func NewBACnetTimerStateChangeValueCharacterString(peekedTagHeader BACnetTagHeader, characterStringValue BACnetApplicationTagCharacterString) *_BACnetTimerStateChangeValueCharacterString {
 	if characterStringValue == nil {
 		panic("characterStringValue of type BACnetApplicationTagCharacterString for BACnetTimerStateChangeValueCharacterString must not be nil")
 	}
 	_result := &_BACnetTimerStateChangeValueCharacterString{
-		BACnetTimerStateChangeValueContract: NewBACnetTimerStateChangeValue(peekedTagHeader, objectTypeArgument),
+		BACnetTimerStateChangeValueContract: NewBACnetTimerStateChangeValue(peekedTagHeader),
 		CharacterStringValue:                characterStringValue,
 	}
 	_result.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue)._SubType = _result
@@ -102,7 +103,7 @@ type _BACnetTimerStateChangeValueCharacterStringBuilder struct {
 
 	parentBuilder *_BACnetTimerStateChangeValueBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetTimerStateChangeValueCharacterStringBuilder) = (*_BACnetTimerStateChangeValueCharacterStringBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_BACnetTimerStateChangeValueCharacterStringBuilder) WithCharacterString
 	var err error
 	b.CharacterStringValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagCharacterStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagCharacterStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetTimerStateChangeValueCharacterStringBuilder) Build() (BACnetTimerStateChangeValueCharacterString, error) {
 	if b.CharacterStringValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'characterStringValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'characterStringValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetTimerStateChangeValueCharacterString.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_BACnetTimerStateChangeValueCharacterStringBuilder) buildForBACnetTimer
 
 func (b *_BACnetTimerStateChangeValueCharacterStringBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetTimerStateChangeValueCharacterStringBuilder().(*_BACnetTimerStateChangeValueCharacterStringBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +221,7 @@ func CastBACnetTimerStateChangeValueCharacterString(structType any) BACnetTimerS
 	return nil
 }
 
-func (m *_BACnetTimerStateChangeValueCharacterString) GetTypeName() string {
+func (m *_BACnetTimerStateChangeValueCharacterString) GetPlx4xTypeName() string {
 	return "BACnetTimerStateChangeValueCharacterString"
 }
 

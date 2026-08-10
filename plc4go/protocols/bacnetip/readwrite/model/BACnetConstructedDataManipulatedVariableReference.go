@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataManipulatedVariableReference = (*_BACnetConstructedDa
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataManipulatedVariableReference)(nil)
 
 // NewBACnetConstructedDataManipulatedVariableReference factory function for _BACnetConstructedDataManipulatedVariableReference
-func NewBACnetConstructedDataManipulatedVariableReference(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, manipulatedVariableReference BACnetObjectPropertyReference, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataManipulatedVariableReference {
+func NewBACnetConstructedDataManipulatedVariableReference(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, manipulatedVariableReference BACnetObjectPropertyReference) *_BACnetConstructedDataManipulatedVariableReference {
 	if manipulatedVariableReference == nil {
 		panic("manipulatedVariableReference of type BACnetObjectPropertyReference for BACnetConstructedDataManipulatedVariableReference must not be nil")
 	}
 	_result := &_BACnetConstructedDataManipulatedVariableReference{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		ManipulatedVariableReference:  manipulatedVariableReference,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataManipulatedVariableReferenceBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataManipulatedVariableReferenceBuilder) = (*_BACnetConstructedDataManipulatedVariableReferenceBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataManipulatedVariableReferenceBuilder) WithManipula
 	var err error
 	b.ManipulatedVariableReference, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetObjectPropertyReferenceBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetObjectPropertyReferenceBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataManipulatedVariableReferenceBuilder) Build() (BACnetConstructedDataManipulatedVariableReference, error) {
 	if b.ManipulatedVariableReference == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'manipulatedVariableReference' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'manipulatedVariableReference' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataManipulatedVariableReference.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataManipulatedVariableReferenceBuilder) buildForBACn
 
 func (b *_BACnetConstructedDataManipulatedVariableReferenceBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataManipulatedVariableReferenceBuilder().(*_BACnetConstructedDataManipulatedVariableReferenceBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataManipulatedVariableReference(structType any) BACne
 	return nil
 }
 
-func (m *_BACnetConstructedDataManipulatedVariableReference) GetTypeName() string {
+func (m *_BACnetConstructedDataManipulatedVariableReference) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataManipulatedVariableReference"
 }
 

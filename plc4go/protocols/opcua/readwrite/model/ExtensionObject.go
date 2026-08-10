@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,6 +55,11 @@ type ExtensionObjectContract interface {
 	GetTypeId() ExpandedNodeId
 	// GetExtensionId returns ExtensionId (virtual field)
 	GetExtensionId() int32
+	// GetStandardEncoding returns StandardEncoding (virtual field)
+	// Whether the encoding node refers to a well-known standard type (namespace 0). Computed here
+	// where typeId is in scope and threaded down like extensionId, so the masked-body dispatch can
+	// tell a decodable standard type from a custom one.
+	GetStandardEncoding() bool
 	// GetBody returns Body (abstract field)
 	GetBody() ExtensionObjectDefinition
 	// IsExtensionObject is a marker method to prevent unintentional type checks (interfaces of same signature)
@@ -134,7 +141,7 @@ type _ExtensionObjectBuilder struct {
 
 	childBuilder _ExtensionObjectChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ExtensionObjectBuilder) = (*_ExtensionObjectBuilder)(nil)
@@ -153,23 +160,17 @@ func (b *_ExtensionObjectBuilder) WithTypeIdBuilder(builderSupplier func(Expande
 	var err error
 	b.TypeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ExtensionObjectBuilder) PartialBuild() (ExtensionObjectContract, error) {
 	if b.TypeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'typeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'typeId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ExtensionObject.deepCopy(), nil
 }
@@ -226,8 +227,8 @@ func (b *_ExtensionObjectBuilder) DeepCopy() any {
 	_copy := b.CreateExtensionObjectBuilder().(*_ExtensionObjectBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_ExtensionObjectChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -270,6 +271,13 @@ func (pm *_ExtensionObject) GetExtensionId() int32 {
 	return int32(utils.InlineIf(bool((m.GetTypeId()) == (nil)), func() any { return int32(int32(0)) }, func() any { return int32(ExtensionId(ctx, m.GetTypeId())) }).(int32))
 }
 
+func (pm *_ExtensionObject) GetStandardEncoding() bool {
+	m := pm._SubType
+	ctx := context.Background()
+	_ = ctx
+	return bool(IsStandardEncoding(ctx, m.GetTypeId()))
+}
+
 ///////////////////////
 ///////////////////////
 ///////////////////////////////////////////////////////////
@@ -299,7 +307,7 @@ func CastExtensionObject(structType any) ExtensionObject {
 	return nil
 }
 
-func (m *_ExtensionObject) GetTypeName() string {
+func (m *_ExtensionObject) GetPlx4xTypeName() string {
 	return "ExtensionObject"
 }
 
@@ -308,6 +316,8 @@ func (m *_ExtensionObject) getLengthInBits(ctx context.Context) uint16 {
 
 	// Simple field (typeId)
 	lengthInBits += m.TypeId.GetLengthInBits(ctx)
+
+	// A virtual field doesn't have any in- or output.
 
 	// A virtual field doesn't have any in- or output.
 
@@ -338,7 +348,7 @@ func ExtensionObjectParseWithBufferProducer[T ExtensionObject](includeEncodingMa
 }
 
 func ExtensionObjectParseWithBuffer[T ExtensionObject](ctx context.Context, readBuffer utils.ReadBuffer, includeEncodingMask bool) (T, error) {
-	v, err := (&_ExtensionObject{}).parse(ctx, readBuffer, includeEncodingMask)
+	v, err := (new(_ExtensionObject)).parse(ctx, readBuffer, includeEncodingMask)
 	if err != nil {
 		var zero T
 		return zero, err
@@ -360,17 +370,23 @@ func (m *_ExtensionObject) parse(ctx context.Context, readBuffer utils.ReadBuffe
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	typeId, err := ReadSimpleField[ExpandedNodeId](ctx, "typeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	typeId, err := ReadSimpleField[ExpandedNodeId](ctx, "typeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'typeId' field"))
 	}
 	m.TypeId = typeId
 
-	extensionId, err := ReadVirtualField[int32](ctx, "extensionId", (*int32)(nil), utils.InlineIf(bool((typeId) == (nil)), func() any { return int32(int32(0)) }, func() any { return int32(ExtensionId(ctx, typeId)) }).(int32))
+	extensionId, err := ReadVirtualField[int32](ctx, "extensionId", (*int32)(nil), utils.InlineIf(bool((typeId) == (nil)), func() any { return int32(int32(0)) }, func() any { return int32(ExtensionId(ctx, typeId)) }).(int32), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'extensionId' field"))
 	}
 	_ = extensionId
+
+	standardEncoding, err := ReadVirtualField[bool](ctx, "standardEncoding", (*bool)(nil), IsStandardEncoding(ctx, typeId), codegen.WithEncoding("UTF8"))
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'standardEncoding' field"))
+	}
+	_ = standardEncoding
 
 	// Switch Field (Depending on the discriminator values, passes the instantiation to a sub-type)
 	var _child ExtensionObject
@@ -380,7 +396,7 @@ func (m *_ExtensionObject) parse(ctx context.Context, readBuffer utils.ReadBuffe
 			return nil, errors.Wrap(err, "Error parsing sub-type RootExtensionObject for type-switch of ExtensionObject")
 		}
 	case includeEncodingMask == bool(true): // ExtensionObjectWithMask
-		if _child, err = new(_ExtensionObjectWithMask).parse(ctx, readBuffer, m, extensionId, includeEncodingMask); err != nil {
+		if _child, err = new(_ExtensionObjectWithMask).parse(ctx, readBuffer, m, extensionId, standardEncoding, includeEncodingMask); err != nil {
 			return nil, errors.Wrap(err, "Error parsing sub-type ExtensionObjectWithMask for type-switch of ExtensionObject")
 		}
 	default:
@@ -406,7 +422,7 @@ func (pm *_ExtensionObject) serializeParent(ctx context.Context, writeBuffer uti
 		return errors.Wrap(pushErr, "Error pushing for ExtensionObject")
 	}
 
-	if err := WriteSimpleField[ExpandedNodeId](ctx, "typeId", m.GetTypeId(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+	if err := WriteSimpleField[ExpandedNodeId](ctx, "typeId", m.GetTypeId(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'typeId' field")
 	}
 	// Virtual field
@@ -414,6 +430,12 @@ func (pm *_ExtensionObject) serializeParent(ctx context.Context, writeBuffer uti
 	_ = extensionId
 	if _extensionIdErr := writeBuffer.WriteVirtual(ctx, "extensionId", m.GetExtensionId()); _extensionIdErr != nil {
 		return errors.Wrap(_extensionIdErr, "Error serializing 'extensionId' field")
+	}
+	// Virtual field
+	standardEncoding := m.GetStandardEncoding()
+	_ = standardEncoding
+	if _standardEncodingErr := writeBuffer.WriteVirtual(ctx, "standardEncoding", m.GetStandardEncoding()); _standardEncodingErr != nil {
+		return errors.Wrap(_standardEncodingErr, "Error serializing 'standardEncoding' field")
 	}
 
 	// Switch field (Depending on the discriminator values, passes the serialization to a sub-type)

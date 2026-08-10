@@ -22,13 +22,14 @@ package ads
 import (
 	"context"
 	"encoding/binary"
+	"io"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/protocols/ads/readwrite/model"
 	"github.com/apache/plc4x/plc4go/spi"
-	"github.com/apache/plc4x/plc4go/spi/default"
+	_default "github.com/apache/plc4x/plc4go/spi/default"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/transports"
 	"github.com/apache/plc4x/plc4go/spi/utils"
@@ -41,6 +42,10 @@ type MessageCodec struct {
 
 	log zerolog.Logger
 }
+
+var (
+	_ spi.TransportInstanceExposer = (*MessageCodec)(nil)
+)
 
 func NewMessageCodec(transportInstance transports.TransportInstance, _options ...options.WithOption) *MessageCodec {
 	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
@@ -55,7 +60,7 @@ func NewMessageCodec(transportInstance transports.TransportInstance, _options ..
 				// This just prevents the loop from aborting in the start and by returning false,
 				// it makes the message go to the default channel, as this means:
 				// The handler hasn't handled the message
-				func(codec _default.DefaultCodecRequirements, message spi.Message) bool {
+				func(ctx context.Context, codec _default.DefaultCodecRequirements, message spi.Message) bool {
 					return false
 				}),
 		)...,
@@ -67,69 +72,104 @@ func (m *MessageCodec) GetCodec() spi.MessageCodec {
 	return m
 }
 
-func (m *MessageCodec) Send(message spi.Message) error {
-	m.log.Trace().Msg("Sending message")
+func (m *MessageCodec) classifyTransportError(err error) transports.TransportErrorKind {
+	if err == nil {
+		return transports.TransportErrorUnknown
+	}
+	if transport := m.GetTransportInstance(); transport != nil {
+		return transport.ClassifyError(err)
+	}
+	return transports.TransportErrorUnknown
+}
+
+func (m *MessageCodec) isFatalTransportError(err error) bool {
+	if err == nil || transports.ErrorIs(err, io.EOF) {
+		return false
+	}
+	return m.classifyTransportError(err) == transports.TransportErrorFatal
+}
+
+func (m *MessageCodec) wrapFatalTransportError(err error, msg string) error {
+	if err == nil {
+		return nil
+	}
+	// TODO: Any additional context?
+	return transports.NewTransportError(transports.TransportErrorFatal, errors.Wrap(err, msg))
+}
+
+func (m *MessageCodec) Send(ctx context.Context, interactionInfo string, message spi.Message) error {
+	m.log.Trace().Str("interactionInfo", interactionInfo).Msg("Sending message")
 	// Cast the message to the correct type of struct
 	tcpPaket := message.(model.AmsTCPPacket)
 	// Serialize the request
 	wb := utils.NewWriteBufferByteBased(utils.WithByteOrderForByteBasedBuffer(binary.LittleEndian))
-	err := tcpPaket.SerializeWithWriteBuffer(context.Background(), wb)
+	err := tcpPaket.SerializeWithWriteBuffer(ctx, wb)
 	if err != nil {
 		return errors.Wrap(err, "error serializing request")
 	}
 
 	// Send it to the PLC
-	err = m.GetTransportInstance().Write(wb.GetBytes())
+	err = m.GetTransportInstance().Write(ctx, wb.GetBytes())
 	if err != nil {
 		return errors.Wrap(err, "error sending request")
 	}
 	return nil
 }
 
-func (m *MessageCodec) Receive() (spi.Message, error) {
+func (m *MessageCodec) Receive(ctx context.Context) (spi.Message, error) {
 	transportInstance := m.GetTransportInstance()
 
-	if err := transportInstance.FillBuffer(
-		func(pos uint, currentByte byte, reader transports.ExtendedReader) bool {
-			numBytesAvailable, err := transportInstance.GetNumBytesAvailableInBuffer()
-			if err != nil {
-				return false
-			}
-			return numBytesAvailable < 6
-		}); err != nil {
+	if err := transportInstance.FillBuffer(ctx, func(pos uint, currentByte byte, reader transports.ExtendedReader) bool {
+		numBytesAvailable, err := transportInstance.GetNumBytesAvailableInBuffer()
+		if err != nil {
+			m.log.Warn().Err(err).Msg("error getting bytes while filling buffer")
+			return false
+		}
+		return numBytesAvailable < 6
+	}); err != nil {
 		m.log.Warn().Err(err).Msg("error filling buffer")
+		if m.isFatalTransportError(err) {
+			return nil, m.wrapFatalTransportError(err, "error filling buffer")
+		}
 	}
 
 	// We need at least 6 bytes in order to know how big the packet is in total
 	if num, err := transportInstance.GetNumBytesAvailableInBuffer(); (err == nil) && (num >= 6) {
 		m.log.Debug().Uint32("num", num).Msg("we got num readable bytes")
-		data, err := transportInstance.PeekReadableBytes(6)
+		data, err := transportInstance.PeekReadableBytes(ctx, 6)
 		if err != nil {
 			m.log.Warn().Err(err).Msg("error peeking")
-			// TODO: Possibly clean up ...
+			if m.isFatalTransportError(err) {
+				return nil, m.wrapFatalTransportError(err, "error peeking header")
+			}
 			return nil, nil
 		}
 		// Get the size of the entire packet little endian plus size of header
 		packetSize := (uint32(data[5]) << 24) + (uint32(data[4]) << 16) + (uint32(data[3]) << 8) + (uint32(data[2])) + 6
 		if num < packetSize {
-			if err := transportInstance.FillBuffer(
-				func(pos uint, currentByte byte, reader transports.ExtendedReader) bool {
-					numBytesAvailable, err := transportInstance.GetNumBytesAvailableInBuffer()
-					if err != nil {
-						return false
-					}
-					return numBytesAvailable < packetSize
-				}); err != nil {
+			if err := transportInstance.FillBuffer(ctx, func(pos uint, currentByte byte, reader transports.ExtendedReader) bool {
+				numBytesAvailable, err := transportInstance.GetNumBytesAvailableInBuffer()
+				if err != nil {
+					return false
+				}
+				return numBytesAvailable < packetSize
+			}); err != nil {
 				m.log.Warn().Err(err).Msg("error filling buffer")
+				if m.isFatalTransportError(err) {
+					return nil, errors.Wrap(err, "error filling buffer")
+				}
 			}
 		}
-		data, err = transportInstance.Read(packetSize)
+		data, err = transportInstance.Read(ctx, packetSize)
 		if err != nil {
-			// TODO: Possibly clean up ...
+			m.log.Warn().Err(err).Msg("error reading packet data")
+			if m.isFatalTransportError(err) {
+				return nil, m.wrapFatalTransportError(err, "error reading packet data")
+			}
 			return nil, nil
 		}
 		rb := utils.NewReadBufferByteBased(data, utils.WithByteOrderForReadBufferByteBased(binary.LittleEndian))
-		tcpPacket, err := model.AmsTCPPacketParseWithBuffer(context.Background(), rb)
+		tcpPacket, err := model.AmsTCPPacketParseWithBuffer(ctx, rb)
 		if err != nil {
 			m.log.Warn().Err(err).Msg("error parsing")
 			// TODO: Possibly clean up ...
@@ -138,6 +178,9 @@ func (m *MessageCodec) Receive() (spi.Message, error) {
 		return tcpPacket, nil
 	} else if err != nil {
 		m.log.Warn().Err(err).Msg("Got error reading")
+		if m.isFatalTransportError(err) {
+			return nil, m.wrapFatalTransportError(err, "error getting readable bytes")
+		}
 		return nil, nil
 	}
 	// TODO: maybe we return here a not enough error error

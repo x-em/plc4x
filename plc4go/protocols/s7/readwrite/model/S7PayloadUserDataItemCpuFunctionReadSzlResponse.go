@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ type _S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder struct {
 
 	parentBuilder *_S7PayloadUserDataItemBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) = (*_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) WithItems(item
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) Build() (S7PayloadUserDataItemCpuFunctionReadSzlResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7PayloadUserDataItemCpuFunctionReadSzlResponse.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) buildForS7Payl
 
 func (b *_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder) DeepCopy() any {
 	_copy := b.CreateS7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder().(*_S7PayloadUserDataItemCpuFunctionReadSzlResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -214,7 +215,7 @@ func CastS7PayloadUserDataItemCpuFunctionReadSzlResponse(structType any) S7Paylo
 	return nil
 }
 
-func (m *_S7PayloadUserDataItemCpuFunctionReadSzlResponse) GetTypeName() string {
+func (m *_S7PayloadUserDataItemCpuFunctionReadSzlResponse) GetPlx4xTypeName() string {
 	return "S7PayloadUserDataItemCpuFunctionReadSzlResponse"
 }
 

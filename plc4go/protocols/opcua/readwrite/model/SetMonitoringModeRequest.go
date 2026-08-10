@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -120,7 +122,7 @@ type _SetMonitoringModeRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SetMonitoringModeRequestBuilder) = (*_SetMonitoringModeRequestBuilder)(nil)
@@ -144,10 +146,7 @@ func (b *_SetMonitoringModeRequestBuilder) WithRequestHeaderBuilder(builderSuppl
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -169,13 +168,10 @@ func (b *_SetMonitoringModeRequestBuilder) WithMonitoredItemIds(monitoredItemIds
 
 func (b *_SetMonitoringModeRequestBuilder) Build() (SetMonitoringModeRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SetMonitoringModeRequest.deepCopy(), nil
 }
@@ -201,8 +197,8 @@ func (b *_SetMonitoringModeRequestBuilder) buildForExtensionObjectDefinition() (
 
 func (b *_SetMonitoringModeRequestBuilder) DeepCopy() any {
 	_copy := b.CreateSetMonitoringModeRequestBuilder().(*_SetMonitoringModeRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -275,7 +271,7 @@ func CastSetMonitoringModeRequest(structType any) SetMonitoringModeRequest {
 	return nil
 }
 
-func (m *_SetMonitoringModeRequest) GetTypeName() string {
+func (m *_SetMonitoringModeRequest) GetPlx4xTypeName() string {
 	return "SetMonitoringModeRequest"
 }
 
@@ -317,31 +313,31 @@ func (m *_SetMonitoringModeRequest) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	subscriptionId, err := ReadSimpleField(ctx, "subscriptionId", ReadUnsignedInt(readBuffer, uint8(32)))
+	subscriptionId, err := ReadSimpleField(ctx, "subscriptionId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'subscriptionId' field"))
 	}
 	m.SubscriptionId = subscriptionId
 
-	monitoringMode, err := ReadEnumField[MonitoringMode](ctx, "monitoringMode", "MonitoringMode", ReadEnum(MonitoringModeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	monitoringMode, err := ReadEnumField[MonitoringMode](ctx, "monitoringMode", "MonitoringMode", ReadEnum(MonitoringModeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'monitoringMode' field"))
 	}
 	m.MonitoringMode = monitoringMode
 
-	noOfMonitoredItemIds, err := ReadImplicitField[int32](ctx, "noOfMonitoredItemIds", ReadSignedInt(readBuffer, uint8(32)))
+	noOfMonitoredItemIds, err := ReadImplicitField[int32](ctx, "noOfMonitoredItemIds", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfMonitoredItemIds' field"))
 	}
 	_ = noOfMonitoredItemIds
 
-	monitoredItemIds, err := ReadCountArrayField[uint32](ctx, "monitoredItemIds", ReadUnsignedInt(readBuffer, uint8(32)), uint64(noOfMonitoredItemIds))
+	monitoredItemIds, err := ReadCountArrayField[uint32](ctx, "monitoredItemIds", ReadUnsignedInt(readBuffer, uint8(32)), uint64(noOfMonitoredItemIds), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'monitoredItemIds' field"))
 	}
@@ -372,23 +368,23 @@ func (m *_SetMonitoringModeRequest) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for SetMonitoringModeRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "subscriptionId", m.GetSubscriptionId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "subscriptionId", m.GetSubscriptionId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'subscriptionId' field")
 		}
 
-		if err := WriteSimpleEnumField[MonitoringMode](ctx, "monitoringMode", "MonitoringMode", m.GetMonitoringMode(), WriteEnum[MonitoringMode, uint32](MonitoringMode.GetValue, MonitoringMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[MonitoringMode](ctx, "monitoringMode", "MonitoringMode", m.GetMonitoringMode(), WriteEnum[MonitoringMode, uint32](MonitoringMode.GetValue, MonitoringMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'monitoringMode' field")
 		}
 		noOfMonitoredItemIds := int32(utils.InlineIf(bool((m.GetMonitoredItemIds()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetMonitoredItemIds()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfMonitoredItemIds", noOfMonitoredItemIds, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfMonitoredItemIds", noOfMonitoredItemIds, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfMonitoredItemIds' field")
 		}
 
-		if err := WriteSimpleTypeArrayField(ctx, "monitoredItemIds", m.GetMonitoredItemIds(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleTypeArrayField(ctx, "monitoredItemIds", m.GetMonitoredItemIds(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'monitoredItemIds' field")
 		}
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +121,7 @@ type _BrowseResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BrowseResultBuilder) = (*_BrowseResultBuilder)(nil)
@@ -143,10 +145,7 @@ func (b *_BrowseResultBuilder) WithStatusCodeBuilder(builderSupplier func(Status
 	var err error
 	b.StatusCode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -161,10 +160,7 @@ func (b *_BrowseResultBuilder) WithContinuationPointBuilder(builderSupplier func
 	var err error
 	b.ContinuationPoint, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -176,19 +172,13 @@ func (b *_BrowseResultBuilder) WithReferences(references ...ReferenceDescription
 
 func (b *_BrowseResultBuilder) Build() (BrowseResult, error) {
 	if b.StatusCode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'statusCode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'statusCode' not set"))
 	}
 	if b.ContinuationPoint == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'continuationPoint' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'continuationPoint' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BrowseResult.deepCopy(), nil
 }
@@ -214,8 +204,8 @@ func (b *_BrowseResultBuilder) buildForExtensionObjectDefinition() (ExtensionObj
 
 func (b *_BrowseResultBuilder) DeepCopy() any {
 	_copy := b.CreateBrowseResultBuilder().(*_BrowseResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -284,7 +274,7 @@ func CastBrowseResult(structType any) BrowseResult {
 	return nil
 }
 
-func (m *_BrowseResult) GetTypeName() string {
+func (m *_BrowseResult) GetPlx4xTypeName() string {
 	return "BrowseResult"
 }
 
@@ -304,9 +294,7 @@ func (m *_BrowseResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.References) > 0 {
 		for _curItem, element := range m.References {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.References), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -328,25 +316,25 @@ func (m *_BrowseResult) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'statusCode' field"))
 	}
 	m.StatusCode = statusCode
 
-	continuationPoint, err := ReadSimpleField[PascalByteString](ctx, "continuationPoint", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	continuationPoint, err := ReadSimpleField[PascalByteString](ctx, "continuationPoint", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'continuationPoint' field"))
 	}
 	m.ContinuationPoint = continuationPoint
 
-	noOfReferences, err := ReadImplicitField[int32](ctx, "noOfReferences", ReadSignedInt(readBuffer, uint8(32)))
+	noOfReferences, err := ReadImplicitField[int32](ctx, "noOfReferences", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfReferences' field"))
 	}
 	_ = noOfReferences
 
-	references, err := ReadCountArrayField[ReferenceDescription](ctx, "references", ReadComplex[ReferenceDescription](ExtensionObjectDefinitionParseWithBufferProducer[ReferenceDescription]((int32)(int32(520))), readBuffer), uint64(noOfReferences))
+	references, err := ReadCountArrayField[ReferenceDescription](ctx, "references", ReadComplex[ReferenceDescription](ExtensionObjectDefinitionParseWithBufferProducer[ReferenceDescription]((int32)(int32(520))), readBuffer), uint64(noOfReferences), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'references' field"))
 	}
@@ -377,19 +365,19 @@ func (m *_BrowseResult) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for BrowseResult")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'statusCode' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "continuationPoint", m.GetContinuationPoint(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "continuationPoint", m.GetContinuationPoint(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'continuationPoint' field")
 		}
 		noOfReferences := int32(utils.InlineIf(bool((m.GetReferences()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetReferences()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfReferences", noOfReferences, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfReferences", noOfReferences, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfReferences' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "references", m.GetReferences(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "references", m.GetReferences(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'references' field")
 		}
 

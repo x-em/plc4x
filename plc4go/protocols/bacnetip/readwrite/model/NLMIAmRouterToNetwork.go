@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ NLMIAmRouterToNetwork = (*_NLMIAmRouterToNetwork)(nil)
 var _ NLMRequirements = (*_NLMIAmRouterToNetwork)(nil)
 
 // NewNLMIAmRouterToNetwork factory function for _NLMIAmRouterToNetwork
-func NewNLMIAmRouterToNetwork(destinationNetworkAddresses []uint16, apduLength uint16) *_NLMIAmRouterToNetwork {
+func NewNLMIAmRouterToNetwork(destinationNetworkAddresses []uint16) *_NLMIAmRouterToNetwork {
 	_result := &_NLMIAmRouterToNetwork{
-		NLMContract:                 NewNLM(apduLength),
+		NLMContract:                 NewNLM(),
 		DestinationNetworkAddresses: destinationNetworkAddresses,
 	}
 	_result.NLMContract.(*_NLM)._SubType = _result
@@ -97,7 +98,7 @@ type _NLMIAmRouterToNetworkBuilder struct {
 
 	parentBuilder *_NLMBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NLMIAmRouterToNetworkBuilder) = (*_NLMIAmRouterToNetworkBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_NLMIAmRouterToNetworkBuilder) WithDestinationNetworkAddresses(destinat
 }
 
 func (b *_NLMIAmRouterToNetworkBuilder) Build() (NLMIAmRouterToNetwork, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NLMIAmRouterToNetwork.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_NLMIAmRouterToNetworkBuilder) buildForNLM() (NLM, error) {
 
 func (b *_NLMIAmRouterToNetworkBuilder) DeepCopy() any {
 	_copy := b.CreateNLMIAmRouterToNetworkBuilder().(*_NLMIAmRouterToNetworkBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +207,7 @@ func CastNLMIAmRouterToNetwork(structType any) NLMIAmRouterToNetwork {
 	return nil
 }
 
-func (m *_NLMIAmRouterToNetwork) GetTypeName() string {
+func (m *_NLMIAmRouterToNetwork) GetPlx4xTypeName() string {
 	return "NLMIAmRouterToNetwork"
 }
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -130,7 +132,7 @@ type _SimpleTypeDescriptionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SimpleTypeDescriptionBuilder) = (*_SimpleTypeDescriptionBuilder)(nil)
@@ -154,10 +156,7 @@ func (b *_SimpleTypeDescriptionBuilder) WithDataTypeIdBuilder(builderSupplier fu
 	var err error
 	b.DataTypeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -172,10 +171,7 @@ func (b *_SimpleTypeDescriptionBuilder) WithNameBuilder(builderSupplier func(Qua
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "QualifiedNameBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "QualifiedNameBuilder failed"))
 	}
 	return b
 }
@@ -190,10 +186,7 @@ func (b *_SimpleTypeDescriptionBuilder) WithBaseDataTypeBuilder(builderSupplier 
 	var err error
 	b.BaseDataType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -205,25 +198,16 @@ func (b *_SimpleTypeDescriptionBuilder) WithBuiltInType(builtInType uint8) Simpl
 
 func (b *_SimpleTypeDescriptionBuilder) Build() (SimpleTypeDescription, error) {
 	if b.DataTypeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataTypeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataTypeId' not set"))
 	}
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
 	if b.BaseDataType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'baseDataType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'baseDataType' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SimpleTypeDescription.deepCopy(), nil
 }
@@ -249,8 +233,8 @@ func (b *_SimpleTypeDescriptionBuilder) buildForExtensionObjectDefinition() (Ext
 
 func (b *_SimpleTypeDescriptionBuilder) DeepCopy() any {
 	_copy := b.CreateSimpleTypeDescriptionBuilder().(*_SimpleTypeDescriptionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -323,7 +307,7 @@ func CastSimpleTypeDescription(structType any) SimpleTypeDescription {
 	return nil
 }
 
-func (m *_SimpleTypeDescription) GetTypeName() string {
+func (m *_SimpleTypeDescription) GetPlx4xTypeName() string {
 	return "SimpleTypeDescription"
 }
 
@@ -360,25 +344,25 @@ func (m *_SimpleTypeDescription) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	dataTypeId, err := ReadSimpleField[NodeId](ctx, "dataTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	dataTypeId, err := ReadSimpleField[NodeId](ctx, "dataTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataTypeId' field"))
 	}
 	m.DataTypeId = dataTypeId
 
-	name, err := ReadSimpleField[QualifiedName](ctx, "name", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer))
+	name, err := ReadSimpleField[QualifiedName](ctx, "name", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'name' field"))
 	}
 	m.Name = name
 
-	baseDataType, err := ReadSimpleField[NodeId](ctx, "baseDataType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	baseDataType, err := ReadSimpleField[NodeId](ctx, "baseDataType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'baseDataType' field"))
 	}
 	m.BaseDataType = baseDataType
 
-	builtInType, err := ReadSimpleField(ctx, "builtInType", ReadUnsignedByte(readBuffer, uint8(8)))
+	builtInType, err := ReadSimpleField(ctx, "builtInType", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'builtInType' field"))
 	}
@@ -409,19 +393,19 @@ func (m *_SimpleTypeDescription) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for SimpleTypeDescription")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "dataTypeId", m.GetDataTypeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "dataTypeId", m.GetDataTypeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataTypeId' field")
 		}
 
-		if err := WriteSimpleField[QualifiedName](ctx, "name", m.GetName(), WriteComplex[QualifiedName](writeBuffer)); err != nil {
+		if err := WriteSimpleField[QualifiedName](ctx, "name", m.GetName(), WriteComplex[QualifiedName](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'name' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "baseDataType", m.GetBaseDataType(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "baseDataType", m.GetBaseDataType(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'baseDataType' field")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "builtInType", m.GetBuiltInType(), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "builtInType", m.GetBuiltInType(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'builtInType' field")
 		}
 

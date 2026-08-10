@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +103,7 @@ type _BACnetPropertyStatesZoneOccupanyStateBuilder struct {
 
 	parentBuilder *_BACnetPropertyStatesBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetPropertyStatesZoneOccupanyStateBuilder) = (*_BACnetPropertyStatesZoneOccupanyStateBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_BACnetPropertyStatesZoneOccupanyStateBuilder) WithZoneOccupanyStateBui
 	var err error
 	b.ZoneOccupanyState, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetAccessZoneOccupancyStateTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetAccessZoneOccupancyStateTaggedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetPropertyStatesZoneOccupanyStateBuilder) Build() (BACnetPropertyStatesZoneOccupanyState, error) {
 	if b.ZoneOccupanyState == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'zoneOccupanyState' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'zoneOccupanyState' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetPropertyStatesZoneOccupanyState.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_BACnetPropertyStatesZoneOccupanyStateBuilder) buildForBACnetPropertySt
 
 func (b *_BACnetPropertyStatesZoneOccupanyStateBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetPropertyStatesZoneOccupanyStateBuilder().(*_BACnetPropertyStatesZoneOccupanyStateBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +221,7 @@ func CastBACnetPropertyStatesZoneOccupanyState(structType any) BACnetPropertySta
 	return nil
 }
 
-func (m *_BACnetPropertyStatesZoneOccupanyState) GetTypeName() string {
+func (m *_BACnetPropertyStatesZoneOccupanyState) GetPlx4xTypeName() string {
 	return "BACnetPropertyStatesZoneOccupanyState"
 }
 

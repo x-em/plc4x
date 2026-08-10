@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -129,7 +130,7 @@ type _S7AddressAnyBuilder struct {
 
 	parentBuilder *_S7AddressBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7AddressAnyBuilder) = (*_S7AddressAnyBuilder)(nil)
@@ -174,8 +175,8 @@ func (b *_S7AddressAnyBuilder) WithBitAddress(bitAddress uint8) S7AddressAnyBuil
 }
 
 func (b *_S7AddressAnyBuilder) Build() (S7AddressAny, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7AddressAny.deepCopy(), nil
 }
@@ -201,8 +202,8 @@ func (b *_S7AddressAnyBuilder) buildForS7Address() (S7Address, error) {
 
 func (b *_S7AddressAnyBuilder) DeepCopy() any {
 	_copy := b.CreateS7AddressAnyBuilder().(*_S7AddressAnyBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -283,7 +284,7 @@ func CastS7AddressAny(structType any) S7AddressAny {
 	return nil
 }
 
-func (m *_S7AddressAny) GetTypeName() string {
+func (m *_S7AddressAny) GetPlx4xTypeName() string {
 	return "S7AddressAny"
 }
 

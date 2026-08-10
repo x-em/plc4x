@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _BACnetApplicationTagNullBuilder struct {
 
 	parentBuilder *_BACnetApplicationTagBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetApplicationTagNullBuilder) = (*_BACnetApplicationTagNullBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_BACnetApplicationTagNullBuilder) WithMandatoryFields() BACnetApplicati
 }
 
 func (b *_BACnetApplicationTagNullBuilder) Build() (BACnetApplicationTagNull, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetApplicationTagNull.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_BACnetApplicationTagNullBuilder) buildForBACnetApplicationTag() (BACne
 
 func (b *_BACnetApplicationTagNullBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetApplicationTagNullBuilder().(*_BACnetApplicationTagNullBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -175,7 +176,7 @@ func CastBACnetApplicationTagNull(structType any) BACnetApplicationTagNull {
 	return nil
 }
 
-func (m *_BACnetApplicationTagNull) GetTypeName() string {
+func (m *_BACnetApplicationTagNull) GetPlx4xTypeName() string {
 	return "BACnetApplicationTagNull"
 }
 

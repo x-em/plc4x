@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -125,7 +127,7 @@ type _CurrencyUnitTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CurrencyUnitTypeBuilder) = (*_CurrencyUnitTypeBuilder)(nil)
@@ -159,10 +161,7 @@ func (b *_CurrencyUnitTypeBuilder) WithAlphabeticCodeBuilder(builderSupplier fun
 	var err error
 	b.AlphabeticCode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -177,29 +176,20 @@ func (b *_CurrencyUnitTypeBuilder) WithCurrencyBuilder(builderSupplier func(Loca
 	var err error
 	b.Currency, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LocalizedTextBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LocalizedTextBuilder failed"))
 	}
 	return b
 }
 
 func (b *_CurrencyUnitTypeBuilder) Build() (CurrencyUnitType, error) {
 	if b.AlphabeticCode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'alphabeticCode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'alphabeticCode' not set"))
 	}
 	if b.Currency == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'currency' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'currency' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CurrencyUnitType.deepCopy(), nil
 }
@@ -225,8 +215,8 @@ func (b *_CurrencyUnitTypeBuilder) buildForExtensionObjectDefinition() (Extensio
 
 func (b *_CurrencyUnitTypeBuilder) DeepCopy() any {
 	_copy := b.CreateCurrencyUnitTypeBuilder().(*_CurrencyUnitTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -299,7 +289,7 @@ func CastCurrencyUnitType(structType any) CurrencyUnitType {
 	return nil
 }
 
-func (m *_CurrencyUnitType) GetTypeName() string {
+func (m *_CurrencyUnitType) GetPlx4xTypeName() string {
 	return "CurrencyUnitType"
 }
 
@@ -336,25 +326,25 @@ func (m *_CurrencyUnitType) parse(ctx context.Context, readBuffer utils.ReadBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	numericCode, err := ReadSimpleField(ctx, "numericCode", ReadSignedShort(readBuffer, uint8(16)))
+	numericCode, err := ReadSimpleField(ctx, "numericCode", ReadSignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'numericCode' field"))
 	}
 	m.NumericCode = numericCode
 
-	exponent, err := ReadSimpleField(ctx, "exponent", ReadSignedByte(readBuffer, uint8(8)))
+	exponent, err := ReadSimpleField(ctx, "exponent", ReadSignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'exponent' field"))
 	}
 	m.Exponent = exponent
 
-	alphabeticCode, err := ReadSimpleField[PascalString](ctx, "alphabeticCode", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	alphabeticCode, err := ReadSimpleField[PascalString](ctx, "alphabeticCode", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'alphabeticCode' field"))
 	}
 	m.AlphabeticCode = alphabeticCode
 
-	currency, err := ReadSimpleField[LocalizedText](ctx, "currency", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer))
+	currency, err := ReadSimpleField[LocalizedText](ctx, "currency", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'currency' field"))
 	}
@@ -385,19 +375,19 @@ func (m *_CurrencyUnitType) SerializeWithWriteBuffer(ctx context.Context, writeB
 			return errors.Wrap(pushErr, "Error pushing for CurrencyUnitType")
 		}
 
-		if err := WriteSimpleField[int16](ctx, "numericCode", m.GetNumericCode(), WriteSignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteSimpleField[int16](ctx, "numericCode", m.GetNumericCode(), WriteSignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'numericCode' field")
 		}
 
-		if err := WriteSimpleField[int8](ctx, "exponent", m.GetExponent(), WriteSignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[int8](ctx, "exponent", m.GetExponent(), WriteSignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'exponent' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "alphabeticCode", m.GetAlphabeticCode(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "alphabeticCode", m.GetAlphabeticCode(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'alphabeticCode' field")
 		}
 
-		if err := WriteSimpleField[LocalizedText](ctx, "currency", m.GetCurrency(), WriteComplex[LocalizedText](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LocalizedText](ctx, "currency", m.GetCurrency(), WriteComplex[LocalizedText](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'currency' field")
 		}
 

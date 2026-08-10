@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataOccupancyState = (*_BACnetConstructedDataOccupancySta
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataOccupancyState)(nil)
 
 // NewBACnetConstructedDataOccupancyState factory function for _BACnetConstructedDataOccupancyState
-func NewBACnetConstructedDataOccupancyState(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, occupancyState BACnetAccessZoneOccupancyStateTagged, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataOccupancyState {
+func NewBACnetConstructedDataOccupancyState(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, occupancyState BACnetAccessZoneOccupancyStateTagged) *_BACnetConstructedDataOccupancyState {
 	if occupancyState == nil {
 		panic("occupancyState of type BACnetAccessZoneOccupancyStateTagged for BACnetConstructedDataOccupancyState must not be nil")
 	}
 	_result := &_BACnetConstructedDataOccupancyState{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		OccupancyState:                occupancyState,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataOccupancyStateBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataOccupancyStateBuilder) = (*_BACnetConstructedDataOccupancyStateBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataOccupancyStateBuilder) WithOccupancyStateBuilder(
 	var err error
 	b.OccupancyState, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetAccessZoneOccupancyStateTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetAccessZoneOccupancyStateTaggedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataOccupancyStateBuilder) Build() (BACnetConstructedDataOccupancyState, error) {
 	if b.OccupancyState == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'occupancyState' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'occupancyState' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataOccupancyState.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataOccupancyStateBuilder) buildForBACnetConstructedD
 
 func (b *_BACnetConstructedDataOccupancyStateBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataOccupancyStateBuilder().(*_BACnetConstructedDataOccupancyStateBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataOccupancyState(structType any) BACnetConstructedDa
 	return nil
 }
 
-func (m *_BACnetConstructedDataOccupancyState) GetTypeName() string {
+func (m *_BACnetConstructedDataOccupancyState) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataOccupancyState"
 }
 

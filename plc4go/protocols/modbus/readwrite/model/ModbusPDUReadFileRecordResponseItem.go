@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -90,7 +91,7 @@ func NewModbusPDUReadFileRecordResponseItemBuilder() ModbusPDUReadFileRecordResp
 type _ModbusPDUReadFileRecordResponseItemBuilder struct {
 	*_ModbusPDUReadFileRecordResponseItem
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ModbusPDUReadFileRecordResponseItemBuilder) = (*_ModbusPDUReadFileRecordResponseItemBuilder)(nil)
@@ -110,8 +111,8 @@ func (b *_ModbusPDUReadFileRecordResponseItemBuilder) WithData(data ...byte) Mod
 }
 
 func (b *_ModbusPDUReadFileRecordResponseItemBuilder) Build() (ModbusPDUReadFileRecordResponseItem, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ModbusPDUReadFileRecordResponseItem.deepCopy(), nil
 }
@@ -126,8 +127,8 @@ func (b *_ModbusPDUReadFileRecordResponseItemBuilder) MustBuild() ModbusPDUReadF
 
 func (b *_ModbusPDUReadFileRecordResponseItemBuilder) DeepCopy() any {
 	_copy := b.CreateModbusPDUReadFileRecordResponseItemBuilder().(*_ModbusPDUReadFileRecordResponseItemBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -174,7 +175,7 @@ func CastModbusPDUReadFileRecordResponseItem(structType any) ModbusPDUReadFileRe
 	return nil
 }
 
-func (m *_ModbusPDUReadFileRecordResponseItem) GetTypeName() string {
+func (m *_ModbusPDUReadFileRecordResponseItem) GetPlx4xTypeName() string {
 	return "ModbusPDUReadFileRecordResponseItem"
 }
 
@@ -210,7 +211,7 @@ func ModbusPDUReadFileRecordResponseItemParseWithBufferProducer() func(ctx conte
 }
 
 func ModbusPDUReadFileRecordResponseItemParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (ModbusPDUReadFileRecordResponseItem, error) {
-	v, err := (&_ModbusPDUReadFileRecordResponseItem{}).parse(ctx, readBuffer)
+	v, err := (new(_ModbusPDUReadFileRecordResponseItem)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

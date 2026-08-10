@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -149,7 +151,7 @@ type _AddReferencesItemBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AddReferencesItemBuilder) = (*_AddReferencesItemBuilder)(nil)
@@ -173,10 +175,7 @@ func (b *_AddReferencesItemBuilder) WithSourceNodeIdBuilder(builderSupplier func
 	var err error
 	b.SourceNodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -191,10 +190,7 @@ func (b *_AddReferencesItemBuilder) WithReferenceTypeIdBuilder(builderSupplier f
 	var err error
 	b.ReferenceTypeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -214,10 +210,7 @@ func (b *_AddReferencesItemBuilder) WithTargetServerUriBuilder(builderSupplier f
 	var err error
 	b.TargetServerUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -232,10 +225,7 @@ func (b *_AddReferencesItemBuilder) WithTargetNodeIdBuilder(builderSupplier func
 	var err error
 	b.TargetNodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
@@ -247,31 +237,19 @@ func (b *_AddReferencesItemBuilder) WithTargetNodeClass(targetNodeClass NodeClas
 
 func (b *_AddReferencesItemBuilder) Build() (AddReferencesItem, error) {
 	if b.SourceNodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'sourceNodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'sourceNodeId' not set"))
 	}
 	if b.ReferenceTypeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'referenceTypeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'referenceTypeId' not set"))
 	}
 	if b.TargetServerUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'targetServerUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'targetServerUri' not set"))
 	}
 	if b.TargetNodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'targetNodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'targetNodeId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AddReferencesItem.deepCopy(), nil
 }
@@ -297,8 +275,8 @@ func (b *_AddReferencesItemBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_AddReferencesItemBuilder) DeepCopy() any {
 	_copy := b.CreateAddReferencesItemBuilder().(*_AddReferencesItemBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -379,7 +357,7 @@ func CastAddReferencesItem(structType any) AddReferencesItem {
 	return nil
 }
 
-func (m *_AddReferencesItem) GetTypeName() string {
+func (m *_AddReferencesItem) GetPlx4xTypeName() string {
 	return "AddReferencesItem"
 }
 
@@ -425,43 +403,43 @@ func (m *_AddReferencesItem) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	sourceNodeId, err := ReadSimpleField[NodeId](ctx, "sourceNodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	sourceNodeId, err := ReadSimpleField[NodeId](ctx, "sourceNodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'sourceNodeId' field"))
 	}
 	m.SourceNodeId = sourceNodeId
 
-	referenceTypeId, err := ReadSimpleField[NodeId](ctx, "referenceTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	referenceTypeId, err := ReadSimpleField[NodeId](ctx, "referenceTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'referenceTypeId' field"))
 	}
 	m.ReferenceTypeId = referenceTypeId
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	isForward, err := ReadSimpleField(ctx, "isForward", ReadBoolean(readBuffer))
+	isForward, err := ReadSimpleField(ctx, "isForward", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'isForward' field"))
 	}
 	m.IsForward = isForward
 
-	targetServerUri, err := ReadSimpleField[PascalString](ctx, "targetServerUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	targetServerUri, err := ReadSimpleField[PascalString](ctx, "targetServerUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetServerUri' field"))
 	}
 	m.TargetServerUri = targetServerUri
 
-	targetNodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "targetNodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	targetNodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "targetNodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetNodeId' field"))
 	}
 	m.TargetNodeId = targetNodeId
 
-	targetNodeClass, err := ReadEnumField[NodeClass](ctx, "targetNodeClass", "NodeClass", ReadEnum(NodeClassByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	targetNodeClass, err := ReadEnumField[NodeClass](ctx, "targetNodeClass", "NodeClass", ReadEnum(NodeClassByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetNodeClass' field"))
 	}
@@ -492,31 +470,31 @@ func (m *_AddReferencesItem) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for AddReferencesItem")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "sourceNodeId", m.GetSourceNodeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "sourceNodeId", m.GetSourceNodeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'sourceNodeId' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "referenceTypeId", m.GetReferenceTypeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "referenceTypeId", m.GetReferenceTypeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'referenceTypeId' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "isForward", m.GetIsForward(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "isForward", m.GetIsForward(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'isForward' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "targetServerUri", m.GetTargetServerUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "targetServerUri", m.GetTargetServerUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetServerUri' field")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "targetNodeId", m.GetTargetNodeId(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "targetNodeId", m.GetTargetNodeId(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetNodeId' field")
 		}
 
-		if err := WriteSimpleEnumField[NodeClass](ctx, "targetNodeClass", "NodeClass", m.GetTargetNodeClass(), WriteEnum[NodeClass, uint32](NodeClass.GetValue, NodeClass.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[NodeClass](ctx, "targetNodeClass", "NodeClass", m.GetTargetNodeClass(), WriteEnum[NodeClass, uint32](NodeClass.GetValue, NodeClass.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetNodeClass' field")
 		}
 

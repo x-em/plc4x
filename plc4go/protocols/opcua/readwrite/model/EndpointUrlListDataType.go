@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _EndpointUrlListDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EndpointUrlListDataTypeBuilder) = (*_EndpointUrlListDataTypeBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_EndpointUrlListDataTypeBuilder) WithEndpointUrlList(endpointUrlList ..
 }
 
 func (b *_EndpointUrlListDataTypeBuilder) Build() (EndpointUrlListDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EndpointUrlListDataType.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_EndpointUrlListDataTypeBuilder) buildForExtensionObjectDefinition() (E
 
 func (b *_EndpointUrlListDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateEndpointUrlListDataTypeBuilder().(*_EndpointUrlListDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastEndpointUrlListDataType(structType any) EndpointUrlListDataType {
 	return nil
 }
 
-func (m *_EndpointUrlListDataType) GetTypeName() string {
+func (m *_EndpointUrlListDataType) GetPlx4xTypeName() string {
 	return "EndpointUrlListDataType"
 }
 
@@ -220,9 +222,7 @@ func (m *_EndpointUrlListDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.EndpointUrlList) > 0 {
 		for _curItem, element := range m.EndpointUrlList {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.EndpointUrlList), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -244,13 +244,13 @@ func (m *_EndpointUrlListDataType) parse(ctx context.Context, readBuffer utils.R
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfEndpointUrlList, err := ReadImplicitField[int32](ctx, "noOfEndpointUrlList", ReadSignedInt(readBuffer, uint8(32)))
+	noOfEndpointUrlList, err := ReadImplicitField[int32](ctx, "noOfEndpointUrlList", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfEndpointUrlList' field"))
 	}
 	_ = noOfEndpointUrlList
 
-	endpointUrlList, err := ReadCountArrayField[PascalString](ctx, "endpointUrlList", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfEndpointUrlList))
+	endpointUrlList, err := ReadCountArrayField[PascalString](ctx, "endpointUrlList", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfEndpointUrlList), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'endpointUrlList' field"))
 	}
@@ -281,11 +281,11 @@ func (m *_EndpointUrlListDataType) SerializeWithWriteBuffer(ctx context.Context,
 			return errors.Wrap(pushErr, "Error pushing for EndpointUrlListDataType")
 		}
 		noOfEndpointUrlList := int32(utils.InlineIf(bool((m.GetEndpointUrlList()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetEndpointUrlList()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfEndpointUrlList", noOfEndpointUrlList, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfEndpointUrlList", noOfEndpointUrlList, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfEndpointUrlList' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "endpointUrlList", m.GetEndpointUrlList(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "endpointUrlList", m.GetEndpointUrlList(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'endpointUrlList' field")
 		}
 

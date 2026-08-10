@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ func NewTPKTPacketBuilder() TPKTPacketBuilder {
 type _TPKTPacketBuilder struct {
 	*_TPKTPacket
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TPKTPacketBuilder) = (*_TPKTPacketBuilder)(nil)
@@ -116,23 +117,17 @@ func (b *_TPKTPacketBuilder) WithPayloadBuilder(builderSupplier func(COTPPacketB
 	var err error
 	b.Payload, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "COTPPacketBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "COTPPacketBuilder failed"))
 	}
 	return b
 }
 
 func (b *_TPKTPacketBuilder) Build() (TPKTPacket, error) {
 	if b.Payload == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'payload' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'payload' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TPKTPacket.deepCopy(), nil
 }
@@ -147,8 +142,8 @@ func (b *_TPKTPacketBuilder) MustBuild() TPKTPacket {
 
 func (b *_TPKTPacketBuilder) DeepCopy() any {
 	_copy := b.CreateTPKTPacketBuilder().(*_TPKTPacketBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -204,7 +199,7 @@ func CastTPKTPacket(structType any) TPKTPacket {
 	return nil
 }
 
-func (m *_TPKTPacket) GetTypeName() string {
+func (m *_TPKTPacket) GetPlx4xTypeName() string {
 	return "TPKTPacket"
 }
 
@@ -241,7 +236,7 @@ func TPKTPacketParseWithBufferProducer() func(ctx context.Context, readBuffer ut
 }
 
 func TPKTPacketParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (TPKTPacket, error) {
-	v, err := (&_TPKTPacket{}).parse(ctx, readBuffer)
+	v, err := (new(_TPKTPacket)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -257,25 +252,25 @@ func (m *_TPKTPacket) parse(ctx context.Context, readBuffer utils.ReadBuffer) (_
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	protocolId, err := ReadConstField[uint8](ctx, "protocolId", ReadUnsignedByte(readBuffer, uint8(8)), TPKTPacket_PROTOCOLID, codegen.WithByteOrder(binary.BigEndian))
+	protocolId, err := ReadConstField[uint8](ctx, "protocolId", ReadUnsignedByte(readBuffer, uint8(8)), TPKTPacket_PROTOCOLID, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'protocolId' field"))
 	}
 	_ = protocolId
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(8)), uint8(0x00), codegen.WithByteOrder(binary.BigEndian))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(8)), uint8(0x00), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	len, err := ReadImplicitField[uint16](ctx, "len", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithByteOrder(binary.BigEndian))
+	len, err := ReadImplicitField[uint16](ctx, "len", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'len' field"))
 	}
 	_ = len
 
-	payload, err := ReadSimpleField[COTPPacket](ctx, "payload", ReadComplex[COTPPacket](COTPPacketParseWithBufferProducer[COTPPacket]((uint16)(uint16(len)-uint16(uint16(4)))), readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	payload, err := ReadSimpleField[COTPPacket](ctx, "payload", ReadComplex[COTPPacket](COTPPacketParseWithBufferProducer[COTPPacket]((uint16)(uint16(len)-uint16(uint16(4)))), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'payload' field"))
 	}
@@ -305,19 +300,19 @@ func (m *_TPKTPacket) SerializeWithWriteBuffer(ctx context.Context, writeBuffer 
 		return errors.Wrap(pushErr, "Error pushing for TPKTPacket")
 	}
 
-	if err := WriteConstField(ctx, "protocolId", TPKTPacket_PROTOCOLID, WriteUnsignedByte(writeBuffer, 8), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+	if err := WriteConstField(ctx, "protocolId", TPKTPacket_PROTOCOLID, WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'protocolId' field")
 	}
 
-	if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 8), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+	if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 	}
 	len := uint16(uint16(m.GetPayload().GetLengthInBytes(ctx)) + uint16(uint16(4)))
-	if err := WriteImplicitField(ctx, "len", len, WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+	if err := WriteImplicitField(ctx, "len", len, WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'len' field")
 	}
 
-	if err := WriteSimpleField[COTPPacket](ctx, "payload", m.GetPayload(), WriteComplex[COTPPacket](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+	if err := WriteSimpleField[COTPPacket](ctx, "payload", m.GetPayload(), WriteComplex[COTPPacket](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'payload' field")
 	}
 

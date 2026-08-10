@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +121,7 @@ type _UserManagementDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (UserManagementDataTypeBuilder) = (*_UserManagementDataTypeBuilder)(nil)
@@ -143,10 +145,7 @@ func (b *_UserManagementDataTypeBuilder) WithUserNameBuilder(builderSupplier fun
 	var err error
 	b.UserName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -166,29 +165,20 @@ func (b *_UserManagementDataTypeBuilder) WithDescriptionBuilder(builderSupplier 
 	var err error
 	b.Description, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_UserManagementDataTypeBuilder) Build() (UserManagementDataType, error) {
 	if b.UserName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'userName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'userName' not set"))
 	}
 	if b.Description == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'description' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'description' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._UserManagementDataType.deepCopy(), nil
 }
@@ -214,8 +204,8 @@ func (b *_UserManagementDataTypeBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_UserManagementDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateUserManagementDataTypeBuilder().(*_UserManagementDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -284,7 +274,7 @@ func CastUserManagementDataType(structType any) UserManagementDataType {
 	return nil
 }
 
-func (m *_UserManagementDataType) GetTypeName() string {
+func (m *_UserManagementDataType) GetPlx4xTypeName() string {
 	return "UserManagementDataType"
 }
 
@@ -318,19 +308,19 @@ func (m *_UserManagementDataType) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	userName, err := ReadSimpleField[PascalString](ctx, "userName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	userName, err := ReadSimpleField[PascalString](ctx, "userName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'userName' field"))
 	}
 	m.UserName = userName
 
-	userConfiguration, err := ReadEnumField[UserConfigurationMask](ctx, "userConfiguration", "UserConfigurationMask", ReadEnum(UserConfigurationMaskByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	userConfiguration, err := ReadEnumField[UserConfigurationMask](ctx, "userConfiguration", "UserConfigurationMask", ReadEnum(UserConfigurationMaskByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'userConfiguration' field"))
 	}
 	m.UserConfiguration = userConfiguration
 
-	description, err := ReadSimpleField[PascalString](ctx, "description", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	description, err := ReadSimpleField[PascalString](ctx, "description", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'description' field"))
 	}
@@ -361,15 +351,15 @@ func (m *_UserManagementDataType) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for UserManagementDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "userName", m.GetUserName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "userName", m.GetUserName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'userName' field")
 		}
 
-		if err := WriteSimpleEnumField[UserConfigurationMask](ctx, "userConfiguration", "UserConfigurationMask", m.GetUserConfiguration(), WriteEnum[UserConfigurationMask, uint32](UserConfigurationMask.GetValue, UserConfigurationMask.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[UserConfigurationMask](ctx, "userConfiguration", "UserConfigurationMask", m.GetUserConfiguration(), WriteEnum[UserConfigurationMask, uint32](UserConfigurationMask.GetValue, UserConfigurationMask.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'userConfiguration' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "description", m.GetDescription(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "description", m.GetDescription(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'description' field")
 		}
 

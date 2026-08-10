@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ IdentifyReplyCommandGAVValuesStored = (*_IdentifyReplyCommandGAVValuesStor
 var _ IdentifyReplyCommandRequirements = (*_IdentifyReplyCommandGAVValuesStored)(nil)
 
 // NewIdentifyReplyCommandGAVValuesStored factory function for _IdentifyReplyCommandGAVValuesStored
-func NewIdentifyReplyCommandGAVValuesStored(values []byte, numBytes uint8) *_IdentifyReplyCommandGAVValuesStored {
+func NewIdentifyReplyCommandGAVValuesStored(values []byte) *_IdentifyReplyCommandGAVValuesStored {
 	_result := &_IdentifyReplyCommandGAVValuesStored{
-		IdentifyReplyCommandContract: NewIdentifyReplyCommand(numBytes),
+		IdentifyReplyCommandContract: NewIdentifyReplyCommand(),
 		Values:                       values,
 	}
 	_result.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = _result
@@ -97,7 +100,7 @@ type _IdentifyReplyCommandGAVValuesStoredBuilder struct {
 
 	parentBuilder *_IdentifyReplyCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IdentifyReplyCommandGAVValuesStoredBuilder) = (*_IdentifyReplyCommandGAVValuesStoredBuilder)(nil)
@@ -117,8 +120,8 @@ func (b *_IdentifyReplyCommandGAVValuesStoredBuilder) WithValues(values ...byte)
 }
 
 func (b *_IdentifyReplyCommandGAVValuesStoredBuilder) Build() (IdentifyReplyCommandGAVValuesStored, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IdentifyReplyCommandGAVValuesStored.deepCopy(), nil
 }
@@ -144,8 +147,8 @@ func (b *_IdentifyReplyCommandGAVValuesStoredBuilder) buildForIdentifyReplyComma
 
 func (b *_IdentifyReplyCommandGAVValuesStoredBuilder) DeepCopy() any {
 	_copy := b.CreateIdentifyReplyCommandGAVValuesStoredBuilder().(*_IdentifyReplyCommandGAVValuesStoredBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +209,7 @@ func CastIdentifyReplyCommandGAVValuesStored(structType any) IdentifyReplyComman
 	return nil
 }
 
-func (m *_IdentifyReplyCommandGAVValuesStored) GetTypeName() string {
+func (m *_IdentifyReplyCommandGAVValuesStored) GetPlx4xTypeName() string {
 	return "IdentifyReplyCommandGAVValuesStored"
 }
 
@@ -236,7 +239,7 @@ func (m *_IdentifyReplyCommandGAVValuesStored) parse(ctx context.Context, readBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	values, err := readBuffer.ReadByteArray("values", int(numBytes))
+	values, err := readBuffer.ReadByteArray("values", int(numBytes), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'values' field"))
 	}
@@ -250,7 +253,7 @@ func (m *_IdentifyReplyCommandGAVValuesStored) parse(ctx context.Context, readBu
 }
 
 func (m *_IdentifyReplyCommandGAVValuesStored) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -267,7 +270,7 @@ func (m *_IdentifyReplyCommandGAVValuesStored) SerializeWithWriteBuffer(ctx cont
 			return errors.Wrap(pushErr, "Error pushing for IdentifyReplyCommandGAVValuesStored")
 		}
 
-		if err := WriteByteArrayField(ctx, "values", m.GetValues(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "values", m.GetValues(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'values' field")
 		}
 

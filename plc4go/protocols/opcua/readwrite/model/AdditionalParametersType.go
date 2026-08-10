@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _AdditionalParametersTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdditionalParametersTypeBuilder) = (*_AdditionalParametersTypeBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_AdditionalParametersTypeBuilder) WithParameters(parameters ...KeyValue
 }
 
 func (b *_AdditionalParametersTypeBuilder) Build() (AdditionalParametersType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdditionalParametersType.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_AdditionalParametersTypeBuilder) buildForExtensionObjectDefinition() (
 
 func (b *_AdditionalParametersTypeBuilder) DeepCopy() any {
 	_copy := b.CreateAdditionalParametersTypeBuilder().(*_AdditionalParametersTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastAdditionalParametersType(structType any) AdditionalParametersType {
 	return nil
 }
 
-func (m *_AdditionalParametersType) GetTypeName() string {
+func (m *_AdditionalParametersType) GetPlx4xTypeName() string {
 	return "AdditionalParametersType"
 }
 
@@ -220,9 +222,7 @@ func (m *_AdditionalParametersType) GetLengthInBits(ctx context.Context) uint16 
 	if len(m.Parameters) > 0 {
 		for _curItem, element := range m.Parameters {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Parameters), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -244,13 +244,13 @@ func (m *_AdditionalParametersType) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfParameters, err := ReadImplicitField[int32](ctx, "noOfParameters", ReadSignedInt(readBuffer, uint8(32)))
+	noOfParameters, err := ReadImplicitField[int32](ctx, "noOfParameters", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfParameters' field"))
 	}
 	_ = noOfParameters
 
-	parameters, err := ReadCountArrayField[KeyValuePair](ctx, "parameters", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfParameters))
+	parameters, err := ReadCountArrayField[KeyValuePair](ctx, "parameters", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfParameters), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'parameters' field"))
 	}
@@ -281,11 +281,11 @@ func (m *_AdditionalParametersType) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for AdditionalParametersType")
 		}
 		noOfParameters := int32(utils.InlineIf(bool((m.GetParameters()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetParameters()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfParameters", noOfParameters, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfParameters", noOfParameters, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfParameters' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "parameters", m.GetParameters(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "parameters", m.GetParameters(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'parameters' field")
 		}
 

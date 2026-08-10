@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _KeyValuePairBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (KeyValuePairBuilder) = (*_KeyValuePairBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_KeyValuePairBuilder) WithKeyBuilder(builderSupplier func(QualifiedName
 	var err error
 	b.Key, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "QualifiedNameBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "QualifiedNameBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_KeyValuePairBuilder) WithValueBuilder(builderSupplier func(VariantBuil
 	var err error
 	b.Value, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "VariantBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "VariantBuilder failed"))
 	}
 	return b
 }
 
 func (b *_KeyValuePairBuilder) Build() (KeyValuePair, error) {
 	if b.Key == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'key' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'key' not set"))
 	}
 	if b.Value == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'value' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'value' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._KeyValuePair.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_KeyValuePairBuilder) buildForExtensionObjectDefinition() (ExtensionObj
 
 func (b *_KeyValuePairBuilder) DeepCopy() any {
 	_copy := b.CreateKeyValuePairBuilder().(*_KeyValuePairBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastKeyValuePair(structType any) KeyValuePair {
 	return nil
 }
 
-func (m *_KeyValuePair) GetTypeName() string {
+func (m *_KeyValuePair) GetPlx4xTypeName() string {
 	return "KeyValuePair"
 }
 
@@ -300,13 +290,13 @@ func (m *_KeyValuePair) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	key, err := ReadSimpleField[QualifiedName](ctx, "key", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer))
+	key, err := ReadSimpleField[QualifiedName](ctx, "key", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'key' field"))
 	}
 	m.Key = key
 
-	value, err := ReadSimpleField[Variant](ctx, "value", ReadComplex[Variant](VariantParseWithBuffer, readBuffer))
+	value, err := ReadSimpleField[Variant](ctx, "value", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'value' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_KeyValuePair) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for KeyValuePair")
 		}
 
-		if err := WriteSimpleField[QualifiedName](ctx, "key", m.GetKey(), WriteComplex[QualifiedName](writeBuffer)); err != nil {
+		if err := WriteSimpleField[QualifiedName](ctx, "key", m.GetKey(), WriteComplex[QualifiedName](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'key' field")
 		}
 
-		if err := WriteSimpleField[Variant](ctx, "value", m.GetValue(), WriteComplex[Variant](writeBuffer)); err != nil {
+		if err := WriteSimpleField[Variant](ctx, "value", m.GetValue(), WriteComplex[Variant](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'value' field")
 		}
 

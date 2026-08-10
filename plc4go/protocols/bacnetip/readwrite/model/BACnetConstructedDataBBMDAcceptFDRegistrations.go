@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataBBMDAcceptFDRegistrations = (*_BACnetConstructedDataB
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataBBMDAcceptFDRegistrations)(nil)
 
 // NewBACnetConstructedDataBBMDAcceptFDRegistrations factory function for _BACnetConstructedDataBBMDAcceptFDRegistrations
-func NewBACnetConstructedDataBBMDAcceptFDRegistrations(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, bbmdAcceptFDRegistrations BACnetApplicationTagBoolean, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataBBMDAcceptFDRegistrations {
+func NewBACnetConstructedDataBBMDAcceptFDRegistrations(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, bbmdAcceptFDRegistrations BACnetApplicationTagBoolean) *_BACnetConstructedDataBBMDAcceptFDRegistrations {
 	if bbmdAcceptFDRegistrations == nil {
 		panic("bbmdAcceptFDRegistrations of type BACnetApplicationTagBoolean for BACnetConstructedDataBBMDAcceptFDRegistrations must not be nil")
 	}
 	_result := &_BACnetConstructedDataBBMDAcceptFDRegistrations{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		BbmdAcceptFDRegistrations:     bbmdAcceptFDRegistrations,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) = (*_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) WithBbmdAcceptF
 	var err error
 	b.BbmdAcceptFDRegistrations, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) Build() (BACnetConstructedDataBBMDAcceptFDRegistrations, error) {
 	if b.BbmdAcceptFDRegistrations == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'bbmdAcceptFDRegistrations' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'bbmdAcceptFDRegistrations' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataBBMDAcceptFDRegistrations.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) buildForBACnetC
 
 func (b *_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataBBMDAcceptFDRegistrationsBuilder().(*_BACnetConstructedDataBBMDAcceptFDRegistrationsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataBBMDAcceptFDRegistrations(structType any) BACnetCo
 	return nil
 }
 
-func (m *_BACnetConstructedDataBBMDAcceptFDRegistrations) GetTypeName() string {
+func (m *_BACnetConstructedDataBBMDAcceptFDRegistrations) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataBBMDAcceptFDRegistrations"
 }
 

@@ -28,9 +28,7 @@ import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -48,16 +46,14 @@ import org.apache.plc4x.java.opcua.readwrite.*;
 import org.apache.plc4x.java.opcua.security.MessageSecurity;
 import org.apache.plc4x.java.opcua.security.SecurityPolicy;
 import org.apache.plc4x.java.opcua.security.SecurityPolicy.SignatureAlgorithm;
-import org.apache.plc4x.java.spi.generation.*;
-import org.apache.plc4x.java.spi.transaction.RequestTransactionManager;
-import org.apache.plc4x.java.spi.transaction.RequestTransactionManager.RequestTransaction;
+import org.apache.plc4x.java.spi.buffers.api.exceptions.BufferException;
+import org.apache.plc4x.java.spi.buffers.bytebased.ReadBufferByteBased;
+import org.apache.plc4x.java.opcua.protocol.chunk.PayloadConverter;
+import org.apache.plc4x.java.spi.buffers.bytebased.WriteBufferByteBased;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -90,18 +86,15 @@ public class SecureChannel {
     private final PascalString endpoint;
     private final String username;
     private final String password;
-    private final RequestTransactionManager tm;
     private final OpcuaConfiguration configuration;
     private final OpcuaDriverContext driverContext;
     private final Conversation conversation;
     private ScheduledFuture<?> keepAlive;
-    private final Set<String> endpoints = new HashSet<>();
     private double sessionTimeout;
     private long revisedLifetime;
 
-    public SecureChannel(Conversation conversation, RequestTransactionManager tm, OpcuaDriverContext driverContext, OpcuaConfiguration configuration, PlcAuthentication authentication) {
+    public SecureChannel(Conversation conversation, OpcuaDriverContext driverContext, OpcuaConfiguration configuration, PlcAuthentication authentication) {
         this.conversation = conversation;
-        this.tm = tm;
         this.configuration = configuration;
         this.driverContext = driverContext;
         this.endpoint = new PascalString(driverContext.getEndpoint());
@@ -116,17 +109,6 @@ public class SecureChannel {
         } else {
             this.username = configuration.getUsername();
             this.password = configuration.getPassword();
-        }
-
-        // Generate a list of endpoints we can use.
-        try {
-            InetAddress address = InetAddress.getByName(driverContext.getHost());
-            this.endpoints.add("opc.tcp://" + address.getHostAddress() + ":" + driverContext.getPort() + driverContext.getTransportEndpoint());
-            this.endpoints.add("opc.tcp://" + address.getHostName() + ":" + driverContext.getPort() + driverContext.getTransportEndpoint());
-            this.endpoints.add("opc.tcp://" + address.getCanonicalHostName() + ":" + driverContext.getPort() + driverContext.getTransportEndpoint());
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Unable to resolve host name. Using original host from connection string which may cause issues connecting to server");
-            this.endpoints.add(driverContext.getHost());
         }
 
         if (conversation.getSecurityPolicy() == SecurityPolicy.NONE) {
@@ -149,8 +131,18 @@ public class SecureChannel {
         LOGGER.debug("Opcua Driver running in ACTIVE mode.");
         return conversation.requestHello()
             .thenCompose(r -> onConnectOpenSecureChannel(SecurityTokenRequestType.securityTokenRequestTypeIssue, 0, 0))
-            .thenCompose(r -> onConnectCreateSessionRequest())
-            .thenCompose(r -> onConnectActivateSessionRequest(r))
+            .thenCompose(r -> onConnectSession());
+    }
+
+    /**
+     * Establishes the session (CreateSession + ActivateSession) on an already-open secure
+     * channel. Used after {@link #onDiscover()}, which has already performed the
+     * Hello/OpenSecureChannel exchange: sending a second Hello on the same TCP connection
+     * would stall, since Hello is a once-per-connection message.
+     */
+    public CompletableFuture<ActivateSessionResponse> onConnectSession() {
+        return onConnectCreateSessionRequest()
+            .thenCompose(this::onConnectActivateSessionRequest)
             .thenApply(response -> {
                 renewToken();
                 return response;
@@ -167,7 +159,7 @@ public class SecureChannel {
         if (conversation.getSecurityPolicy() != SecurityPolicy.NONE) {
             openSecureChannelRequest = new OpenSecureChannelRequest(
                 requestHeader,
-                OpcuaConstants.PROTOCOLVERSION,
+                (long) OpcuaConstants.PROTOCOLVERSION,
                 securityTokenRequestType,
                 configuration.getMessageSecurity().getMode(),
                 new PascalByteString(localNonce.length, localNonce),
@@ -176,7 +168,7 @@ public class SecureChannel {
         } else {
             openSecureChannelRequest = new OpenSecureChannelRequest(
                 requestHeader,
-                OpcuaConstants.PROTOCOLVERSION,
+                (long) OpcuaConstants.PROTOCOLVERSION,
                 securityTokenRequestType,
                 MessageSecurityMode.messageSecurityModeNone,
                 NULL_BYTE_STRING,
@@ -314,23 +306,10 @@ public class SecureChannel {
         conversation.setRemoteCertificate(getX509Certificate(sessionResponse.getServerCertificate().getStringValue()));
         conversation.setRemoteNonce(sessionResponse.getServerNonce().getStringValue());
 
-        List<String> contactPoints = new ArrayList<>(3);
-        String port = driverContext.getPort() == null ? "" : ":" + driverContext.getPort();
-        try {
-            InetAddress address = InetAddress.getByName(driverContext.getHost());
-            contactPoints.add("opc.tcp://" + address.getHostAddress() + port + driverContext.getTransportEndpoint());
-            contactPoints.add("opc.tcp://" + address.getHostName() + port + driverContext.getTransportEndpoint());
-            contactPoints.add("opc.tcp://" + address.getCanonicalHostName() + port + driverContext.getTransportEndpoint());
-        } catch (UnknownHostException e) {
-            // fall back to declared host
-            contactPoints.add("opc.tcp://" + driverContext.getHost() + port + driverContext.getTransportEndpoint());
-            LOGGER.warn("Could not reach host {}, possible network failure", driverContext.getHost(), e);
-        }
-
-        Entry<EndpointDescription, UserTokenPolicy> selectedEndpoint = selectEndpoint(sessionResponse.getServerEndpoints(), contactPoints,
+        Entry<EndpointDescription, UserTokenPolicy> selectedEndpoint = selectEndpoint(sessionResponse.getServerEndpoints(),
             configuration.getSecurityPolicy(), configuration.getMessageSecurity());
         if (selectedEndpoint == null) {
-            throw new PlcRuntimeException("Unable to find endpoint matching  " + contactPoints.get(0));
+            throw new PlcRuntimeException("Unable to find endpoint matching  " + driverContext.getEndpoint());
         }
 
         PascalString policyId = selectedEndpoint.getValue().getPolicyId();
@@ -361,7 +340,19 @@ public class SecureChannel {
         });
     }
 
-    public void onDisconnect() {
+    /**
+     * Closes the session and the secure channel on the server. The returned future
+     * completes once the {@code CloseSession} has been acknowledged and the
+     * {@code CloseSecureChannel} has been handed to the wire, so callers must await it
+     * before tearing down the socket — otherwise the server never sees the close, leaks
+     * the session/channel, and eventually refuses new channels once its concurrent-channel
+     * limit is reached.
+     *
+     * <p>Note that {@code CloseSecureChannel} is not awaited for a reply: per the OPC UA
+     * spec the server simply closes the channel without responding, so we only ensure its
+     * bytes are flushed (which {@code requestChannelClose} does synchronously).</p>
+     */
+    public CompletableFuture<Void> onDisconnect() {
         LOGGER.info("Disconnecting");
 
         if (keepAlive != null) {
@@ -371,13 +362,17 @@ public class SecureChannel {
 
         RequestHeader requestHeader = conversation.createRequestHeader(50000L);
         CloseSessionRequest closeSessionRequest = new CloseSessionRequest(requestHeader, true);
-        conversation.submit(closeSessionRequest, CloseSessionResponse.class).thenAccept(responseMessage -> {
-            LOGGER.trace("Got Close Session Response Connection Response" + responseMessage);
-            onDisconnectCloseSecureChannel();
-        });
+        return conversation.submit(closeSessionRequest, CloseSessionResponse.class)
+            // Proceed to close the channel even if the session close failed/timed out;
+            // the important thing is that we still tell the server to drop the channel.
+            .handle((responseMessage, error) -> {
+                LOGGER.trace("Got Close Session Response {}", responseMessage);
+                return null;
+            })
+            .thenRun(this::sendCloseSecureChannel);
     }
 
-    private void onDisconnectCloseSecureChannel() {
+    private void sendCloseSecureChannel() {
         RequestHeader requestHeader = conversation.createRequestHeader();
         CloseSecureChannelRequest closeSecureChannelRequest = new CloseSecureChannelRequest(requestHeader);
 
@@ -394,6 +389,7 @@ public class SecureChannel {
             )
         );
 
+        // Fire-and-forget: the bytes are flushed synchronously; no response is expected.
         conversation.requestChannelClose(closeRequest);
     }
 
@@ -421,7 +417,8 @@ public class SecureChannel {
         );
 
         return conversation.submit(endpointsRequest, GetEndpointsResponse.class).thenApply(response -> {
-            Entry<EndpointDescription, UserTokenPolicy> entry = selectEndpoint(response.getEndpoints(), this.endpoints, this.configuration.getSecurityPolicy(), this.configuration.getMessageSecurity());
+            Entry<EndpointDescription, UserTokenPolicy> entry = selectEndpoint(response.getEndpoints(),
+                this.configuration.getSecurityPolicy(), this.configuration.getMessageSecurity());
 
             if (entry == null) {
                 Set<String> endpointUris = response.getEndpoints().stream()
@@ -437,7 +434,7 @@ public class SecureChannel {
 
     private OpenSecureChannelResponse onOpenResponse(OpcuaOpenResponse opcuaOpenResponse) {
         try {
-            ReadBuffer readBuffer = toBuffer(opcuaOpenResponse::getMessage);
+            ReadBufferByteBased readBuffer = toBuffer(opcuaOpenResponse::getMessage);
             ExtensionObject message = ExtensionObject.staticParse(readBuffer, false);
 
             if (message.getBody() instanceof ServiceFault) {
@@ -447,7 +444,7 @@ public class SecureChannel {
 
             LOGGER.debug("Received valid answer for open secure channel request, forwarding it to call initiator");
             return (OpenSecureChannelResponse) message.getBody();
-        } catch (ParseException e) {
+        } catch (BufferException e) {
             throw new IllegalArgumentException("Could not handle response", e);
         }
     }
@@ -460,25 +457,21 @@ public class SecureChannel {
         long keepAliveTime = (long) Math.ceil(revisedLifetime * 0.75f);
         LOGGER.debug("Scheduling session keep alive to happen within {}s", TimeUnit.MILLISECONDS.toSeconds(keepAliveTime));
         keepAlive = KEEP_ALIVE_EXECUTOR.scheduleAtFixedRate(() -> {
-            RequestTransaction transaction = tm.startRequest();
-            transaction.submit(() -> {
-                int securityChannelId = this.conversation.getSecurityChannelId();
-                int requestId = this.conversation.getRequestId();
-                onConnectOpenSecureChannel(SecurityTokenRequestType.securityTokenRequestTypeRenew, securityChannelId, requestId)
-                    .whenComplete((response, error) -> {
-                        if (error != null) {
-                            transaction.failRequest(error);
-                            return;
-                        }
-                        // make sure we still honor channel lifetime boundary
-                        long newKeepAliveTime = (long) Math.ceil(revisedLifetime * 0.75f);
-                        if (newKeepAliveTime != keepAliveTime) {
-                            renewToken();
-                        }
-                        transaction.endRequest();
-
-                    });
-            });
+            int securityChannelId = this.conversation.getSecurityChannelId();
+            int requestId = this.conversation.getRequestId();
+            onConnectOpenSecureChannel(SecurityTokenRequestType.securityTokenRequestTypeRenew, securityChannelId, requestId)
+                .whenComplete((response, error) -> {
+                    if (error != null) {
+                        LOGGER.warn("Token renewal failed", error);
+                        return;
+                    }
+                    // Honor any new lifetime the server gave us — if it differs
+                    // from what's currently scheduled, reschedule the next renew.
+                    long newKeepAliveTime = (long) Math.ceil(revisedLifetime * 0.75f);
+                    if (newKeepAliveTime != keepAliveTime) {
+                        renewToken();
+                    }
+                });
         }, keepAliveTime, keepAliveTime, TimeUnit.MILLISECONDS);
     }
 
@@ -487,26 +480,25 @@ public class SecureChannel {
         if (!(payload instanceof BinaryPayload)) {
             throw new IllegalArgumentException("Unexpected payload kind");
         }
-        return new ReadBufferByteBased(((BinaryPayload) payload).getPayload(), org.apache.plc4x.java.spi.generation.ByteOrder.LITTLE_ENDIAN);
+        return new ReadBufferByteBased(((BinaryPayload) payload).getPayload(), PayloadConverter.LITTLE_ENDIAN);
     }
 
     /**
      * Selects the endpoint and authentication policy based on client settings.
      *
      * @param extensionObjects Endpoint descriptions returned by the server.
-     * @param contactPoints Contact points expected by client.
      * @param securityPolicy Security policy searched in endpoints.
      * @param messageSecurity Message security needed by client.
      * @return Endpoint matching given.
      */
-    private Entry<EndpointDescription, UserTokenPolicy> selectEndpoint(List<EndpointDescription> extensionObjects, Collection<String> contactPoints,
+    private Entry<EndpointDescription, UserTokenPolicy> selectEndpoint(List<EndpointDescription> extensionObjects,
         SecurityPolicy securityPolicy, MessageSecurity messageSecurity) throws PlcRuntimeException {
         // Get a list of the endpoints which match ours.
         MessageSecurityMode effectiveMessageSecurity = SecurityPolicy.NONE == securityPolicy ? MessageSecurityMode.messageSecurityModeNone : messageSecurity.getMode();
         List<Entry<EndpointDescription, UserTokenPolicy>> serverEndpoints = new ArrayList<>();
 
         for (EndpointDescription endpointDescription : extensionObjects) {
-            if (isMatchingEndpoint(endpointDescription, contactPoints)) {
+            if (isMatchingEndpointDescription(endpointDescription)) {
                 boolean policyMatch = endpointDescription.getSecurityPolicyUri().getStringValue().equals(securityPolicy.getSecurityPolicyUri());
                 boolean msgSecurityMatch = endpointDescription.getSecurityMode().equals(effectiveMessageSecurity);
 
@@ -530,22 +522,32 @@ public class SecureChannel {
         return serverEndpoints.get(0);
     }
 
+    private boolean isMatchingEndpointDescription(EndpointDescription endpointDescription) {
+        if (isMatchingEndpoint(endpointDescription, driverContext.getHost(), driverContext.getPort(), driverContext.getTransportEndpoint())) {
+            return true;
+        }
+        if (configuration.getEndpointHost() != null) {
+            return isMatchingEndpoint(endpointDescription, configuration.getEndpointHost(), configuration.getEndpointPort() == null ? driverContext.getPort() : String.valueOf(configuration.getEndpointPort()), driverContext.getTransportEndpoint());
+        } else if (configuration.getEndpointPort() != null) {
+            return isMatchingEndpoint(endpointDescription, driverContext.getHost(), configuration.getEndpointPort().toString(), driverContext.getTransportEndpoint());
+        }
+        return false;
+    }
+
     /**
      * Checks each component of the return endpoint description against the connection string.
      * If all are correct then return true.
      *
      * @param endpoint - EndpointDescription returned from server
+     * @param host Permitted host
+     * @param port Permitted port
+     * @param transportEndpoint Transport endpoint
      * @return true if this endpoint matches our configuration
      * @throws PlcRuntimeException - If the returned endpoint string doesn't match the format expected
      */
-    private static boolean isMatchingEndpoint(EndpointDescription endpoint, Collection<String> contactPoints) throws PlcRuntimeException {
-        // Split up the connection string into it's individual segments.
-        for (String contactPoint : contactPoints) {
-            if (endpoint.getEndpointUrl().getStringValue().startsWith(contactPoint)) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isMatchingEndpoint(EndpointDescription endpoint, String host, String port, String transportEndpoint) throws PlcRuntimeException {
+        String portAddition = port == null ? "" : ":" + port;
+        return endpoint.getEndpointUrl().getStringValue().startsWith("opc.tcp://" + host + portAddition + transportEndpoint);
     }
 
     /**
@@ -589,7 +591,7 @@ public class SecureChannel {
                 byte[] remoteNonce = conversation.getRemoteNonce();
                 byte[] passwordBytes = this.password == null ? new byte[0] : this.password.getBytes();
                 ByteBuffer encodeableBuffer = ByteBuffer.allocate(4 + passwordBytes.length + remoteNonce.length);
-                encodeableBuffer.order(ByteOrder.LITTLE_ENDIAN);
+                encodeableBuffer.order(java.nio.ByteOrder.LITTLE_ENDIAN);
                 encodeableBuffer.putInt(passwordBytes.length + remoteNonce.length);
                 encodeableBuffer.put(passwordBytes);
                 encodeableBuffer.put(remoteNonce);

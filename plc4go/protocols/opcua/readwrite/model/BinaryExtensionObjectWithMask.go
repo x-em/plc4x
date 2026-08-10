@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,12 +60,12 @@ var _ BinaryExtensionObjectWithMask = (*_BinaryExtensionObjectWithMask)(nil)
 var _ ExtensionObjectWithMaskRequirements = (*_BinaryExtensionObjectWithMask)(nil)
 
 // NewBinaryExtensionObjectWithMask factory function for _BinaryExtensionObjectWithMask
-func NewBinaryExtensionObjectWithMask(typeId ExpandedNodeId, encodingMask ExtensionObjectEncodingMask, body ExtensionObjectDefinition, extensionId int32, includeEncodingMask bool) *_BinaryExtensionObjectWithMask {
+func NewBinaryExtensionObjectWithMask(typeId ExpandedNodeId, encodingMask ExtensionObjectEncodingMask, body ExtensionObjectDefinition) *_BinaryExtensionObjectWithMask {
 	if body == nil {
 		panic("body of type ExtensionObjectDefinition for BinaryExtensionObjectWithMask must not be nil")
 	}
 	_result := &_BinaryExtensionObjectWithMask{
-		ExtensionObjectWithMaskContract: NewExtensionObjectWithMask(typeId, encodingMask, extensionId),
+		ExtensionObjectWithMaskContract: NewExtensionObjectWithMask(typeId, encodingMask),
 		Body:                            body,
 	}
 	_result.ExtensionObjectWithMaskContract.(*_ExtensionObjectWithMask)._SubType = _result
@@ -102,7 +104,7 @@ type _BinaryExtensionObjectWithMaskBuilder struct {
 
 	parentBuilder *_ExtensionObjectWithMaskBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BinaryExtensionObjectWithMaskBuilder) = (*_BinaryExtensionObjectWithMaskBuilder)(nil)
@@ -126,23 +128,17 @@ func (b *_BinaryExtensionObjectWithMaskBuilder) WithBodyBuilder(builderSupplier 
 	var err error
 	b.Body, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectDefinitionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectDefinitionBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BinaryExtensionObjectWithMaskBuilder) Build() (BinaryExtensionObjectWithMask, error) {
 	if b.Body == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'body' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'body' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BinaryExtensionObjectWithMask.deepCopy(), nil
 }
@@ -168,8 +164,8 @@ func (b *_BinaryExtensionObjectWithMaskBuilder) buildForExtensionObjectWithMask(
 
 func (b *_BinaryExtensionObjectWithMaskBuilder) DeepCopy() any {
 	_copy := b.CreateBinaryExtensionObjectWithMaskBuilder().(*_BinaryExtensionObjectWithMaskBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -191,14 +187,6 @@ func (b *_BinaryExtensionObjectWithMask) CreateBinaryExtensionObjectWithMaskBuil
 ///////////////////////////////////////////////////////////
 /////////////////////// Accessors for discriminator values.
 ///////////////////////
-
-func (m *_BinaryExtensionObjectWithMask) GetEncodingMaskXmlBody() bool {
-	return bool(false)
-}
-
-func (m *_BinaryExtensionObjectWithMask) GetEncodingMaskBinaryBody() bool {
-	return bool(true)
-}
 
 ///////////////////////
 ///////////////////////
@@ -234,7 +222,7 @@ func CastBinaryExtensionObjectWithMask(structType any) BinaryExtensionObjectWith
 	return nil
 }
 
-func (m *_BinaryExtensionObjectWithMask) GetTypeName() string {
+func (m *_BinaryExtensionObjectWithMask) GetPlx4xTypeName() string {
 	return "BinaryExtensionObjectWithMask"
 }
 
@@ -254,7 +242,7 @@ func (m *_BinaryExtensionObjectWithMask) GetLengthInBytes(ctx context.Context) u
 	return m.GetLengthInBits(ctx) / 8
 }
 
-func (m *_BinaryExtensionObjectWithMask) parse(ctx context.Context, readBuffer utils.ReadBuffer, parent *_ExtensionObjectWithMask, extensionId int32, includeEncodingMask bool) (__binaryExtensionObjectWithMask BinaryExtensionObjectWithMask, err error) {
+func (m *_BinaryExtensionObjectWithMask) parse(ctx context.Context, readBuffer utils.ReadBuffer, parent *_ExtensionObjectWithMask, extensionId int32, standardEncoding bool, includeEncodingMask bool) (__binaryExtensionObjectWithMask BinaryExtensionObjectWithMask, err error) {
 	m.ExtensionObjectWithMaskContract = parent
 	parent._SubType = m
 	positionAware := readBuffer
@@ -265,13 +253,13 @@ func (m *_BinaryExtensionObjectWithMask) parse(ctx context.Context, readBuffer u
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	bodyLength, err := ReadImplicitField[int32](ctx, "bodyLength", ReadSignedInt(readBuffer, uint8(32)))
+	bodyLength, err := ReadImplicitField[int32](ctx, "bodyLength", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'bodyLength' field"))
 	}
 	_ = bodyLength
 
-	body, err := ReadSimpleField[ExtensionObjectDefinition](ctx, "body", ReadComplex[ExtensionObjectDefinition](ExtensionObjectDefinitionParseWithBufferProducer[ExtensionObjectDefinition]((int32)(extensionId)), readBuffer))
+	body, err := ReadSimpleField[ExtensionObjectDefinition](ctx, "body", ReadComplex[ExtensionObjectDefinition](ExtensionObjectDefinitionParseWithBufferProducer[ExtensionObjectDefinition]((int32)(extensionId)), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'body' field"))
 	}
@@ -302,11 +290,11 @@ func (m *_BinaryExtensionObjectWithMask) SerializeWithWriteBuffer(ctx context.Co
 			return errors.Wrap(pushErr, "Error pushing for BinaryExtensionObjectWithMask")
 		}
 		bodyLength := int32(utils.InlineIf(bool((m.GetBody()) == (nil)), func() any { return int32(int32(0)) }, func() any { return int32(m.GetBody().GetLengthInBytes(ctx)) }).(int32))
-		if err := WriteImplicitField(ctx, "bodyLength", bodyLength, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "bodyLength", bodyLength, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'bodyLength' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObjectDefinition](ctx, "body", m.GetBody(), WriteComplex[ExtensionObjectDefinition](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObjectDefinition](ctx, "body", m.GetBody(), WriteComplex[ExtensionObjectDefinition](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'body' field")
 		}
 

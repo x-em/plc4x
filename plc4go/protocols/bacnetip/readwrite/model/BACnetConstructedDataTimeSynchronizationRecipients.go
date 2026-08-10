@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ BACnetConstructedDataTimeSynchronizationRecipients = (*_BACnetConstructedD
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataTimeSynchronizationRecipients)(nil)
 
 // NewBACnetConstructedDataTimeSynchronizationRecipients factory function for _BACnetConstructedDataTimeSynchronizationRecipients
-func NewBACnetConstructedDataTimeSynchronizationRecipients(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, timeSynchronizationRecipients []BACnetRecipient, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataTimeSynchronizationRecipients {
+func NewBACnetConstructedDataTimeSynchronizationRecipients(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, timeSynchronizationRecipients []BACnetRecipient) *_BACnetConstructedDataTimeSynchronizationRecipients {
 	_result := &_BACnetConstructedDataTimeSynchronizationRecipients{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		TimeSynchronizationRecipients: timeSynchronizationRecipients,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -97,7 +98,7 @@ type _BACnetConstructedDataTimeSynchronizationRecipientsBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataTimeSynchronizationRecipientsBuilder) = (*_BACnetConstructedDataTimeSynchronizationRecipientsBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_BACnetConstructedDataTimeSynchronizationRecipientsBuilder) WithTimeSyn
 }
 
 func (b *_BACnetConstructedDataTimeSynchronizationRecipientsBuilder) Build() (BACnetConstructedDataTimeSynchronizationRecipients, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataTimeSynchronizationRecipients.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_BACnetConstructedDataTimeSynchronizationRecipientsBuilder) buildForBAC
 
 func (b *_BACnetConstructedDataTimeSynchronizationRecipientsBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataTimeSynchronizationRecipientsBuilder().(*_BACnetConstructedDataTimeSynchronizationRecipientsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -210,7 +211,7 @@ func CastBACnetConstructedDataTimeSynchronizationRecipients(structType any) BACn
 	return nil
 }
 
-func (m *_BACnetConstructedDataTimeSynchronizationRecipients) GetTypeName() string {
+func (m *_BACnetConstructedDataTimeSynchronizationRecipients) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataTimeSynchronizationRecipients"
 }
 

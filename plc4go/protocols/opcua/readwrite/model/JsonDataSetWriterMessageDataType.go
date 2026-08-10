@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _JsonDataSetWriterMessageDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (JsonDataSetWriterMessageDataTypeBuilder) = (*_JsonDataSetWriterMessageDataTypeBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_JsonDataSetWriterMessageDataTypeBuilder) WithDataSetMessageContentMask
 }
 
 func (b *_JsonDataSetWriterMessageDataTypeBuilder) Build() (JsonDataSetWriterMessageDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._JsonDataSetWriterMessageDataType.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_JsonDataSetWriterMessageDataTypeBuilder) buildForExtensionObjectDefini
 
 func (b *_JsonDataSetWriterMessageDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateJsonDataSetWriterMessageDataTypeBuilder().(*_JsonDataSetWriterMessageDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastJsonDataSetWriterMessageDataType(structType any) JsonDataSetWriterMessa
 	return nil
 }
 
-func (m *_JsonDataSetWriterMessageDataType) GetTypeName() string {
+func (m *_JsonDataSetWriterMessageDataType) GetPlx4xTypeName() string {
 	return "JsonDataSetWriterMessageDataType"
 }
 
@@ -234,7 +236,7 @@ func (m *_JsonDataSetWriterMessageDataType) parse(ctx context.Context, readBuffe
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	dataSetMessageContentMask, err := ReadEnumField[JsonDataSetMessageContentMask](ctx, "dataSetMessageContentMask", "JsonDataSetMessageContentMask", ReadEnum(JsonDataSetMessageContentMaskByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	dataSetMessageContentMask, err := ReadEnumField[JsonDataSetMessageContentMask](ctx, "dataSetMessageContentMask", "JsonDataSetMessageContentMask", ReadEnum(JsonDataSetMessageContentMaskByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetMessageContentMask' field"))
 	}
@@ -265,7 +267,7 @@ func (m *_JsonDataSetWriterMessageDataType) SerializeWithWriteBuffer(ctx context
 			return errors.Wrap(pushErr, "Error pushing for JsonDataSetWriterMessageDataType")
 		}
 
-		if err := WriteSimpleEnumField[JsonDataSetMessageContentMask](ctx, "dataSetMessageContentMask", "JsonDataSetMessageContentMask", m.GetDataSetMessageContentMask(), WriteEnum[JsonDataSetMessageContentMask, uint32](JsonDataSetMessageContentMask.GetValue, JsonDataSetMessageContentMask.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[JsonDataSetMessageContentMask](ctx, "dataSetMessageContentMask", "JsonDataSetMessageContentMask", m.GetDataSetMessageContentMask(), WriteEnum[JsonDataSetMessageContentMask, uint32](JsonDataSetMessageContentMask.GetValue, JsonDataSetMessageContentMask.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetMessageContentMask' field")
 		}
 

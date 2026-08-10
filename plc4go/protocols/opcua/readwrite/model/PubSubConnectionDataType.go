@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -172,7 +174,7 @@ type _PubSubConnectionDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PubSubConnectionDataTypeBuilder) = (*_PubSubConnectionDataTypeBuilder)(nil)
@@ -196,10 +198,7 @@ func (b *_PubSubConnectionDataTypeBuilder) WithNameBuilder(builderSupplier func(
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -219,10 +218,7 @@ func (b *_PubSubConnectionDataTypeBuilder) WithPublisherIdBuilder(builderSupplie
 	var err error
 	b.PublisherId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "VariantBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "VariantBuilder failed"))
 	}
 	return b
 }
@@ -237,10 +233,7 @@ func (b *_PubSubConnectionDataTypeBuilder) WithTransportProfileUriBuilder(builde
 	var err error
 	b.TransportProfileUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -255,10 +248,7 @@ func (b *_PubSubConnectionDataTypeBuilder) WithAddressBuilder(builderSupplier fu
 	var err error
 	b.Address, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -278,10 +268,7 @@ func (b *_PubSubConnectionDataTypeBuilder) WithTransportSettingsBuilder(builderS
 	var err error
 	b.TransportSettings, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -298,37 +285,22 @@ func (b *_PubSubConnectionDataTypeBuilder) WithReaderGroups(readerGroups ...Read
 
 func (b *_PubSubConnectionDataTypeBuilder) Build() (PubSubConnectionDataType, error) {
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
 	if b.PublisherId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'publisherId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'publisherId' not set"))
 	}
 	if b.TransportProfileUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'transportProfileUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'transportProfileUri' not set"))
 	}
 	if b.Address == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'address' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'address' not set"))
 	}
 	if b.TransportSettings == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'transportSettings' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'transportSettings' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PubSubConnectionDataType.deepCopy(), nil
 }
@@ -354,8 +326,8 @@ func (b *_PubSubConnectionDataTypeBuilder) buildForExtensionObjectDefinition() (
 
 func (b *_PubSubConnectionDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreatePubSubConnectionDataTypeBuilder().(*_PubSubConnectionDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -448,7 +420,7 @@ func CastPubSubConnectionDataType(structType any) PubSubConnectionDataType {
 	return nil
 }
 
-func (m *_PubSubConnectionDataType) GetTypeName() string {
+func (m *_PubSubConnectionDataType) GetPlx4xTypeName() string {
 	return "PubSubConnectionDataType"
 }
 
@@ -480,9 +452,7 @@ func (m *_PubSubConnectionDataType) GetLengthInBits(ctx context.Context) uint16 
 	if len(m.ConnectionProperties) > 0 {
 		for _curItem, element := range m.ConnectionProperties {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ConnectionProperties), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -496,9 +466,7 @@ func (m *_PubSubConnectionDataType) GetLengthInBits(ctx context.Context) uint16 
 	if len(m.WriterGroups) > 0 {
 		for _curItem, element := range m.WriterGroups {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.WriterGroups), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -509,9 +477,7 @@ func (m *_PubSubConnectionDataType) GetLengthInBits(ctx context.Context) uint16 
 	if len(m.ReaderGroups) > 0 {
 		for _curItem, element := range m.ReaderGroups {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ReaderGroups), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -533,79 +499,79 @@ func (m *_PubSubConnectionDataType) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'name' field"))
 	}
 	m.Name = name
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	enabled, err := ReadSimpleField(ctx, "enabled", ReadBoolean(readBuffer))
+	enabled, err := ReadSimpleField(ctx, "enabled", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'enabled' field"))
 	}
 	m.Enabled = enabled
 
-	publisherId, err := ReadSimpleField[Variant](ctx, "publisherId", ReadComplex[Variant](VariantParseWithBuffer, readBuffer))
+	publisherId, err := ReadSimpleField[Variant](ctx, "publisherId", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'publisherId' field"))
 	}
 	m.PublisherId = publisherId
 
-	transportProfileUri, err := ReadSimpleField[PascalString](ctx, "transportProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	transportProfileUri, err := ReadSimpleField[PascalString](ctx, "transportProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'transportProfileUri' field"))
 	}
 	m.TransportProfileUri = transportProfileUri
 
-	address, err := ReadSimpleField[ExtensionObject](ctx, "address", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	address, err := ReadSimpleField[ExtensionObject](ctx, "address", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'address' field"))
 	}
 	m.Address = address
 
-	noOfConnectionProperties, err := ReadImplicitField[int32](ctx, "noOfConnectionProperties", ReadSignedInt(readBuffer, uint8(32)))
+	noOfConnectionProperties, err := ReadImplicitField[int32](ctx, "noOfConnectionProperties", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfConnectionProperties' field"))
 	}
 	_ = noOfConnectionProperties
 
-	connectionProperties, err := ReadCountArrayField[KeyValuePair](ctx, "connectionProperties", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfConnectionProperties))
+	connectionProperties, err := ReadCountArrayField[KeyValuePair](ctx, "connectionProperties", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfConnectionProperties), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'connectionProperties' field"))
 	}
 	m.ConnectionProperties = connectionProperties
 
-	transportSettings, err := ReadSimpleField[ExtensionObject](ctx, "transportSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	transportSettings, err := ReadSimpleField[ExtensionObject](ctx, "transportSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'transportSettings' field"))
 	}
 	m.TransportSettings = transportSettings
 
-	noOfWriterGroups, err := ReadImplicitField[int32](ctx, "noOfWriterGroups", ReadSignedInt(readBuffer, uint8(32)))
+	noOfWriterGroups, err := ReadImplicitField[int32](ctx, "noOfWriterGroups", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfWriterGroups' field"))
 	}
 	_ = noOfWriterGroups
 
-	writerGroups, err := ReadCountArrayField[WriterGroupDataType](ctx, "writerGroups", ReadComplex[WriterGroupDataType](ExtensionObjectDefinitionParseWithBufferProducer[WriterGroupDataType]((int32)(int32(15482))), readBuffer), uint64(noOfWriterGroups))
+	writerGroups, err := ReadCountArrayField[WriterGroupDataType](ctx, "writerGroups", ReadComplex[WriterGroupDataType](ExtensionObjectDefinitionParseWithBufferProducer[WriterGroupDataType]((int32)(int32(15482))), readBuffer), uint64(noOfWriterGroups), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'writerGroups' field"))
 	}
 	m.WriterGroups = writerGroups
 
-	noOfReaderGroups, err := ReadImplicitField[int32](ctx, "noOfReaderGroups", ReadSignedInt(readBuffer, uint8(32)))
+	noOfReaderGroups, err := ReadImplicitField[int32](ctx, "noOfReaderGroups", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfReaderGroups' field"))
 	}
 	_ = noOfReaderGroups
 
-	readerGroups, err := ReadCountArrayField[ReaderGroupDataType](ctx, "readerGroups", ReadComplex[ReaderGroupDataType](ExtensionObjectDefinitionParseWithBufferProducer[ReaderGroupDataType]((int32)(int32(15522))), readBuffer), uint64(noOfReaderGroups))
+	readerGroups, err := ReadCountArrayField[ReaderGroupDataType](ctx, "readerGroups", ReadComplex[ReaderGroupDataType](ExtensionObjectDefinitionParseWithBufferProducer[ReaderGroupDataType]((int32)(int32(15522))), readBuffer), uint64(noOfReaderGroups), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'readerGroups' field"))
 	}
@@ -636,55 +602,55 @@ func (m *_PubSubConnectionDataType) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for PubSubConnectionDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'name' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "enabled", m.GetEnabled(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "enabled", m.GetEnabled(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'enabled' field")
 		}
 
-		if err := WriteSimpleField[Variant](ctx, "publisherId", m.GetPublisherId(), WriteComplex[Variant](writeBuffer)); err != nil {
+		if err := WriteSimpleField[Variant](ctx, "publisherId", m.GetPublisherId(), WriteComplex[Variant](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'publisherId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "transportProfileUri", m.GetTransportProfileUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "transportProfileUri", m.GetTransportProfileUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'transportProfileUri' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "address", m.GetAddress(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "address", m.GetAddress(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'address' field")
 		}
 		noOfConnectionProperties := int32(utils.InlineIf(bool((m.GetConnectionProperties()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetConnectionProperties()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfConnectionProperties", noOfConnectionProperties, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfConnectionProperties", noOfConnectionProperties, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfConnectionProperties' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "connectionProperties", m.GetConnectionProperties(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "connectionProperties", m.GetConnectionProperties(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'connectionProperties' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "transportSettings", m.GetTransportSettings(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "transportSettings", m.GetTransportSettings(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'transportSettings' field")
 		}
 		noOfWriterGroups := int32(utils.InlineIf(bool((m.GetWriterGroups()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetWriterGroups()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfWriterGroups", noOfWriterGroups, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfWriterGroups", noOfWriterGroups, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfWriterGroups' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "writerGroups", m.GetWriterGroups(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "writerGroups", m.GetWriterGroups(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'writerGroups' field")
 		}
 		noOfReaderGroups := int32(utils.InlineIf(bool((m.GetReaderGroups()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetReaderGroups()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfReaderGroups", noOfReaderGroups, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfReaderGroups", noOfReaderGroups, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfReaderGroups' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "readerGroups", m.GetReaderGroups(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "readerGroups", m.GetReaderGroups(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'readerGroups' field")
 		}
 

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ BACnetConstructedDataScheduleAll = (*_BACnetConstructedDataScheduleAll)(ni
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataScheduleAll)(nil)
 
 // NewBACnetConstructedDataScheduleAll factory function for _BACnetConstructedDataScheduleAll
-func NewBACnetConstructedDataScheduleAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataScheduleAll {
+func NewBACnetConstructedDataScheduleAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag) *_BACnetConstructedDataScheduleAll {
 	_result := &_BACnetConstructedDataScheduleAll{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _BACnetConstructedDataScheduleAllBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataScheduleAllBuilder) = (*_BACnetConstructedDataScheduleAllBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_BACnetConstructedDataScheduleAllBuilder) WithMandatoryFields() BACnetC
 }
 
 func (b *_BACnetConstructedDataScheduleAllBuilder) Build() (BACnetConstructedDataScheduleAll, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataScheduleAll.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_BACnetConstructedDataScheduleAllBuilder) buildForBACnetConstructedData
 
 func (b *_BACnetConstructedDataScheduleAllBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataScheduleAllBuilder().(*_BACnetConstructedDataScheduleAllBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastBACnetConstructedDataScheduleAll(structType any) BACnetConstructedDataS
 	return nil
 }
 
-func (m *_BACnetConstructedDataScheduleAll) GetTypeName() string {
+func (m *_BACnetConstructedDataScheduleAll) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataScheduleAll"
 }
 

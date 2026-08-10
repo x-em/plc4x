@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -43,6 +46,7 @@ type ParameterValueInterfaceOptions3 interface {
 	// GetValue returns Value (property field)
 	GetValue() InterfaceOptions3
 	// GetData returns Data (property field)
+	// TODO: find out what additional bytes mean here...
 	GetData() []byte
 	// IsParameterValueInterfaceOptions3 is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsParameterValueInterfaceOptions3()
@@ -61,12 +65,12 @@ var _ ParameterValueInterfaceOptions3 = (*_ParameterValueInterfaceOptions3)(nil)
 var _ ParameterValueRequirements = (*_ParameterValueInterfaceOptions3)(nil)
 
 // NewParameterValueInterfaceOptions3 factory function for _ParameterValueInterfaceOptions3
-func NewParameterValueInterfaceOptions3(value InterfaceOptions3, data []byte, numBytes uint8) *_ParameterValueInterfaceOptions3 {
+func NewParameterValueInterfaceOptions3(value InterfaceOptions3, data []byte) *_ParameterValueInterfaceOptions3 {
 	if value == nil {
 		panic("value of type InterfaceOptions3 for ParameterValueInterfaceOptions3 must not be nil")
 	}
 	_result := &_ParameterValueInterfaceOptions3{
-		ParameterValueContract: NewParameterValue(numBytes),
+		ParameterValueContract: NewParameterValue(),
 		Value:                  value,
 		Data:                   data,
 	}
@@ -108,7 +112,7 @@ type _ParameterValueInterfaceOptions3Builder struct {
 
 	parentBuilder *_ParameterValueBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ParameterValueInterfaceOptions3Builder) = (*_ParameterValueInterfaceOptions3Builder)(nil)
@@ -132,10 +136,7 @@ func (b *_ParameterValueInterfaceOptions3Builder) WithValueBuilder(builderSuppli
 	var err error
 	b.Value, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "InterfaceOptions3Builder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "InterfaceOptions3Builder failed"))
 	}
 	return b
 }
@@ -147,13 +148,10 @@ func (b *_ParameterValueInterfaceOptions3Builder) WithData(data ...byte) Paramet
 
 func (b *_ParameterValueInterfaceOptions3Builder) Build() (ParameterValueInterfaceOptions3, error) {
 	if b.Value == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'value' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'value' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ParameterValueInterfaceOptions3.deepCopy(), nil
 }
@@ -179,8 +177,8 @@ func (b *_ParameterValueInterfaceOptions3Builder) buildForParameterValue() (Para
 
 func (b *_ParameterValueInterfaceOptions3Builder) DeepCopy() any {
 	_copy := b.CreateParameterValueInterfaceOptions3Builder().(*_ParameterValueInterfaceOptions3Builder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +243,7 @@ func CastParameterValueInterfaceOptions3(structType any) ParameterValueInterface
 	return nil
 }
 
-func (m *_ParameterValueInterfaceOptions3) GetTypeName() string {
+func (m *_ParameterValueInterfaceOptions3) GetPlx4xTypeName() string {
 	return "ParameterValueInterfaceOptions3"
 }
 
@@ -283,13 +281,13 @@ func (m *_ParameterValueInterfaceOptions3) parse(ctx context.Context, readBuffer
 		return nil, errors.WithStack(utils.ParseValidationError{Message: "InterfaceOptions3 has exactly one byte"})
 	}
 
-	value, err := ReadSimpleField[InterfaceOptions3](ctx, "value", ReadComplex[InterfaceOptions3](InterfaceOptions3ParseWithBuffer, readBuffer))
+	value, err := ReadSimpleField[InterfaceOptions3](ctx, "value", ReadComplex[InterfaceOptions3](InterfaceOptions3ParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'value' field"))
 	}
 	m.Value = value
 
-	data, err := readBuffer.ReadByteArray("data", int(int32(numBytes)-int32(int32(1))))
+	data, err := readBuffer.ReadByteArray("data", int(int32(numBytes)-int32(int32(1))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'data' field"))
 	}
@@ -303,7 +301,7 @@ func (m *_ParameterValueInterfaceOptions3) parse(ctx context.Context, readBuffer
 }
 
 func (m *_ParameterValueInterfaceOptions3) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -320,11 +318,11 @@ func (m *_ParameterValueInterfaceOptions3) SerializeWithWriteBuffer(ctx context.
 			return errors.Wrap(pushErr, "Error pushing for ParameterValueInterfaceOptions3")
 		}
 
-		if err := WriteSimpleField[InterfaceOptions3](ctx, "value", m.GetValue(), WriteComplex[InterfaceOptions3](writeBuffer)); err != nil {
+		if err := WriteSimpleField[InterfaceOptions3](ctx, "value", m.GetValue(), WriteComplex[InterfaceOptions3](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'value' field")
 		}
 
-		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'data' field")
 		}
 

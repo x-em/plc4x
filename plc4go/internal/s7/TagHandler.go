@@ -27,11 +27,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	readWriteModel "github.com/apache/plc4x/plc4go/protocols/s7/readwrite/model"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
@@ -90,6 +90,7 @@ const (
 )
 
 func (m TagHandler) ParseTag(tagAddress string) (apiModel.PlcTag, error) {
+	ctx := context.TODO()
 	if match := utils.GetSubgroupMatches(m.dataBlockStringAddressPattern, tagAddress); match != nil {
 		dataType, ok := readWriteModel.TransportSizeByName(match[DATA_TYPE])
 		if !ok {
@@ -266,7 +267,7 @@ func (m TagHandler) ParseTag(tagAddress string) (apiModel.PlcTag, error) {
 		if err != nil {
 			return nil, errors.Wrapf(err, "Unable to parse address: %s", tagAddress)
 		}
-		ctxForModel := options.GetLoggerContextForModel(context.TODO(), m.log, options.WithPassLoggerToModel(m.passLogToModel))
+		ctxForModel := options.GetLoggerContextForModel(ctx, m.log, options.WithPassLoggerToModel(m.passLogToModel))
 		s7Address, err := readWriteModel.S7AddressParse[readWriteModel.S7AddressAny](ctxForModel, addressData)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Unable to parse address: %s", tagAddress)

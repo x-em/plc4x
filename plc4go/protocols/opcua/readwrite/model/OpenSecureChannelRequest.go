@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -137,7 +139,7 @@ type _OpenSecureChannelRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (OpenSecureChannelRequestBuilder) = (*_OpenSecureChannelRequestBuilder)(nil)
@@ -161,10 +163,7 @@ func (b *_OpenSecureChannelRequestBuilder) WithRequestHeaderBuilder(builderSuppl
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -194,10 +193,7 @@ func (b *_OpenSecureChannelRequestBuilder) WithClientNonceBuilder(builderSupplie
 	var err error
 	b.ClientNonce, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -209,19 +205,13 @@ func (b *_OpenSecureChannelRequestBuilder) WithRequestedLifetime(requestedLifeti
 
 func (b *_OpenSecureChannelRequestBuilder) Build() (OpenSecureChannelRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
 	if b.ClientNonce == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'clientNonce' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'clientNonce' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._OpenSecureChannelRequest.deepCopy(), nil
 }
@@ -247,8 +237,8 @@ func (b *_OpenSecureChannelRequestBuilder) buildForExtensionObjectDefinition() (
 
 func (b *_OpenSecureChannelRequestBuilder) DeepCopy() any {
 	_copy := b.CreateOpenSecureChannelRequestBuilder().(*_OpenSecureChannelRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -329,7 +319,7 @@ func CastOpenSecureChannelRequest(structType any) OpenSecureChannelRequest {
 	return nil
 }
 
-func (m *_OpenSecureChannelRequest) GetTypeName() string {
+func (m *_OpenSecureChannelRequest) GetPlx4xTypeName() string {
 	return "OpenSecureChannelRequest"
 }
 
@@ -372,37 +362,37 @@ func (m *_OpenSecureChannelRequest) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	clientProtocolVersion, err := ReadSimpleField(ctx, "clientProtocolVersion", ReadUnsignedInt(readBuffer, uint8(32)))
+	clientProtocolVersion, err := ReadSimpleField(ctx, "clientProtocolVersion", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientProtocolVersion' field"))
 	}
 	m.ClientProtocolVersion = clientProtocolVersion
 
-	requestType, err := ReadEnumField[SecurityTokenRequestType](ctx, "requestType", "SecurityTokenRequestType", ReadEnum(SecurityTokenRequestTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	requestType, err := ReadEnumField[SecurityTokenRequestType](ctx, "requestType", "SecurityTokenRequestType", ReadEnum(SecurityTokenRequestTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestType' field"))
 	}
 	m.RequestType = requestType
 
-	securityMode, err := ReadEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", ReadEnum(MessageSecurityModeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	securityMode, err := ReadEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", ReadEnum(MessageSecurityModeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityMode' field"))
 	}
 	m.SecurityMode = securityMode
 
-	clientNonce, err := ReadSimpleField[PascalByteString](ctx, "clientNonce", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	clientNonce, err := ReadSimpleField[PascalByteString](ctx, "clientNonce", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientNonce' field"))
 	}
 	m.ClientNonce = clientNonce
 
-	requestedLifetime, err := ReadSimpleField(ctx, "requestedLifetime", ReadUnsignedInt(readBuffer, uint8(32)))
+	requestedLifetime, err := ReadSimpleField(ctx, "requestedLifetime", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestedLifetime' field"))
 	}
@@ -433,27 +423,27 @@ func (m *_OpenSecureChannelRequest) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for OpenSecureChannelRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "clientProtocolVersion", m.GetClientProtocolVersion(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "clientProtocolVersion", m.GetClientProtocolVersion(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientProtocolVersion' field")
 		}
 
-		if err := WriteSimpleEnumField[SecurityTokenRequestType](ctx, "requestType", "SecurityTokenRequestType", m.GetRequestType(), WriteEnum[SecurityTokenRequestType, uint32](SecurityTokenRequestType.GetValue, SecurityTokenRequestType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[SecurityTokenRequestType](ctx, "requestType", "SecurityTokenRequestType", m.GetRequestType(), WriteEnum[SecurityTokenRequestType, uint32](SecurityTokenRequestType.GetValue, SecurityTokenRequestType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestType' field")
 		}
 
-		if err := WriteSimpleEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", m.GetSecurityMode(), WriteEnum[MessageSecurityMode, uint32](MessageSecurityMode.GetValue, MessageSecurityMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", m.GetSecurityMode(), WriteEnum[MessageSecurityMode, uint32](MessageSecurityMode.GetValue, MessageSecurityMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityMode' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "clientNonce", m.GetClientNonce(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "clientNonce", m.GetClientNonce(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientNonce' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "requestedLifetime", m.GetRequestedLifetime(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "requestedLifetime", m.GetRequestedLifetime(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestedLifetime' field")
 		}
 

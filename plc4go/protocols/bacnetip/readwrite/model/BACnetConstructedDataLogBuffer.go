@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -45,6 +46,7 @@ type BACnetConstructedDataLogBuffer interface {
 	// GetFloorText returns FloorText (property field)
 	GetFloorText() []BACnetLogRecord
 	// GetZero returns Zero (virtual field)
+	// TODO: uint 64 ---> big int in java == boom
 	GetZero() uint64
 	// IsBACnetConstructedDataLogBuffer is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsBACnetConstructedDataLogBuffer()
@@ -63,9 +65,9 @@ var _ BACnetConstructedDataLogBuffer = (*_BACnetConstructedDataLogBuffer)(nil)
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLogBuffer)(nil)
 
 // NewBACnetConstructedDataLogBuffer factory function for _BACnetConstructedDataLogBuffer
-func NewBACnetConstructedDataLogBuffer(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, floorText []BACnetLogRecord, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLogBuffer {
+func NewBACnetConstructedDataLogBuffer(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, numberOfDataElements BACnetApplicationTagUnsignedInteger, floorText []BACnetLogRecord) *_BACnetConstructedDataLogBuffer {
 	_result := &_BACnetConstructedDataLogBuffer{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		NumberOfDataElements:          numberOfDataElements,
 		FloorText:                     floorText,
 	}
@@ -107,7 +109,7 @@ type _BACnetConstructedDataLogBufferBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLogBufferBuilder) = (*_BACnetConstructedDataLogBufferBuilder)(nil)
@@ -131,10 +133,7 @@ func (b *_BACnetConstructedDataLogBufferBuilder) WithOptionalNumberOfDataElement
 	var err error
 	b.NumberOfDataElements, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -145,8 +144,8 @@ func (b *_BACnetConstructedDataLogBufferBuilder) WithFloorText(floorText ...BACn
 }
 
 func (b *_BACnetConstructedDataLogBufferBuilder) Build() (BACnetConstructedDataLogBuffer, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLogBuffer.deepCopy(), nil
 }
@@ -172,8 +171,8 @@ func (b *_BACnetConstructedDataLogBufferBuilder) buildForBACnetConstructedData()
 
 func (b *_BACnetConstructedDataLogBufferBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLogBufferBuilder().(*_BACnetConstructedDataLogBufferBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -259,7 +258,7 @@ func CastBACnetConstructedDataLogBuffer(structType any) BACnetConstructedDataLog
 	return nil
 }
 
-func (m *_BACnetConstructedDataLogBuffer) GetTypeName() string {
+func (m *_BACnetConstructedDataLogBuffer) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLogBuffer"
 }
 
@@ -351,7 +350,7 @@ func (m *_BACnetConstructedDataLogBuffer) SerializeWithWriteBuffer(ctx context.C
 			return errors.Wrap(_zeroErr, "Error serializing 'zero' field")
 		}
 
-		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", GetRef(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[BACnetApplicationTagUnsignedInteger](ctx, "numberOfDataElements", new(m.GetNumberOfDataElements()), WriteComplex[BACnetApplicationTagUnsignedInteger](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'numberOfDataElements' field")
 		}
 

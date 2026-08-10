@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +121,7 @@ type _QueryNextResponseBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (QueryNextResponseBuilder) = (*_QueryNextResponseBuilder)(nil)
@@ -143,10 +145,7 @@ func (b *_QueryNextResponseBuilder) WithResponseHeaderBuilder(builderSupplier fu
 	var err error
 	b.ResponseHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ResponseHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ResponseHeaderBuilder failed"))
 	}
 	return b
 }
@@ -166,29 +165,20 @@ func (b *_QueryNextResponseBuilder) WithRevisedContinuationPointBuilder(builderS
 	var err error
 	b.RevisedContinuationPoint, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_QueryNextResponseBuilder) Build() (QueryNextResponse, error) {
 	if b.ResponseHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'responseHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'responseHeader' not set"))
 	}
 	if b.RevisedContinuationPoint == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'revisedContinuationPoint' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'revisedContinuationPoint' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._QueryNextResponse.deepCopy(), nil
 }
@@ -214,8 +204,8 @@ func (b *_QueryNextResponseBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_QueryNextResponseBuilder) DeepCopy() any {
 	_copy := b.CreateQueryNextResponseBuilder().(*_QueryNextResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -284,7 +274,7 @@ func CastQueryNextResponse(structType any) QueryNextResponse {
 	return nil
 }
 
-func (m *_QueryNextResponse) GetTypeName() string {
+func (m *_QueryNextResponse) GetPlx4xTypeName() string {
 	return "QueryNextResponse"
 }
 
@@ -301,9 +291,7 @@ func (m *_QueryNextResponse) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.QueryDataSets) > 0 {
 		for _curItem, element := range m.QueryDataSets {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.QueryDataSets), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -328,25 +316,25 @@ func (m *_QueryNextResponse) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer))
+	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'responseHeader' field"))
 	}
 	m.ResponseHeader = responseHeader
 
-	noOfQueryDataSets, err := ReadImplicitField[int32](ctx, "noOfQueryDataSets", ReadSignedInt(readBuffer, uint8(32)))
+	noOfQueryDataSets, err := ReadImplicitField[int32](ctx, "noOfQueryDataSets", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfQueryDataSets' field"))
 	}
 	_ = noOfQueryDataSets
 
-	queryDataSets, err := ReadCountArrayField[QueryDataSet](ctx, "queryDataSets", ReadComplex[QueryDataSet](ExtensionObjectDefinitionParseWithBufferProducer[QueryDataSet]((int32)(int32(579))), readBuffer), uint64(noOfQueryDataSets))
+	queryDataSets, err := ReadCountArrayField[QueryDataSet](ctx, "queryDataSets", ReadComplex[QueryDataSet](ExtensionObjectDefinitionParseWithBufferProducer[QueryDataSet]((int32)(int32(579))), readBuffer), uint64(noOfQueryDataSets), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'queryDataSets' field"))
 	}
 	m.QueryDataSets = queryDataSets
 
-	revisedContinuationPoint, err := ReadSimpleField[PascalByteString](ctx, "revisedContinuationPoint", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	revisedContinuationPoint, err := ReadSimpleField[PascalByteString](ctx, "revisedContinuationPoint", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'revisedContinuationPoint' field"))
 	}
@@ -377,19 +365,19 @@ func (m *_QueryNextResponse) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for QueryNextResponse")
 		}
 
-		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'responseHeader' field")
 		}
 		noOfQueryDataSets := int32(utils.InlineIf(bool((m.GetQueryDataSets()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetQueryDataSets()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfQueryDataSets", noOfQueryDataSets, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfQueryDataSets", noOfQueryDataSets, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfQueryDataSets' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "queryDataSets", m.GetQueryDataSets(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "queryDataSets", m.GetQueryDataSets(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'queryDataSets' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "revisedContinuationPoint", m.GetRevisedContinuationPoint(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "revisedContinuationPoint", m.GetRevisedContinuationPoint(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'revisedContinuationPoint' field")
 		}
 

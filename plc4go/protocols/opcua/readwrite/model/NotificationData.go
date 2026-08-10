@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _NotificationDataBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NotificationDataBuilder) = (*_NotificationDataBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_NotificationDataBuilder) WithMandatoryFields() NotificationDataBuilder
 }
 
 func (b *_NotificationDataBuilder) Build() (NotificationData, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NotificationData.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_NotificationDataBuilder) buildForExtensionObjectDefinition() (Extensio
 
 func (b *_NotificationDataBuilder) DeepCopy() any {
 	_copy := b.CreateNotificationDataBuilder().(*_NotificationDataBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastNotificationData(structType any) NotificationData {
 	return nil
 }
 
-func (m *_NotificationData) GetTypeName() string {
+func (m *_NotificationData) GetPlx4xTypeName() string {
 	return "NotificationData"
 }
 

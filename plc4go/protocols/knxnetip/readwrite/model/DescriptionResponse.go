@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -115,7 +116,7 @@ type _DescriptionResponseBuilder struct {
 
 	parentBuilder *_KnxNetIpMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DescriptionResponseBuilder) = (*_DescriptionResponseBuilder)(nil)
@@ -139,10 +140,7 @@ func (b *_DescriptionResponseBuilder) WithDibDeviceInfoBuilder(builderSupplier f
 	var err error
 	b.DibDeviceInfo, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DIBDeviceInfoBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DIBDeviceInfoBuilder failed"))
 	}
 	return b
 }
@@ -157,29 +155,20 @@ func (b *_DescriptionResponseBuilder) WithDibSuppSvcFamiliesBuilder(builderSuppl
 	var err error
 	b.DibSuppSvcFamilies, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DIBSuppSvcFamiliesBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DIBSuppSvcFamiliesBuilder failed"))
 	}
 	return b
 }
 
 func (b *_DescriptionResponseBuilder) Build() (DescriptionResponse, error) {
 	if b.DibDeviceInfo == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dibDeviceInfo' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dibDeviceInfo' not set"))
 	}
 	if b.DibSuppSvcFamilies == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dibSuppSvcFamilies' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dibSuppSvcFamilies' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DescriptionResponse.deepCopy(), nil
 }
@@ -205,8 +194,8 @@ func (b *_DescriptionResponseBuilder) buildForKnxNetIpMessage() (KnxNetIpMessage
 
 func (b *_DescriptionResponseBuilder) DeepCopy() any {
 	_copy := b.CreateDescriptionResponseBuilder().(*_DescriptionResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -271,7 +260,7 @@ func CastDescriptionResponse(structType any) DescriptionResponse {
 	return nil
 }
 
-func (m *_DescriptionResponse) GetTypeName() string {
+func (m *_DescriptionResponse) GetPlx4xTypeName() string {
 	return "DescriptionResponse"
 }
 
@@ -302,13 +291,13 @@ func (m *_DescriptionResponse) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	dibDeviceInfo, err := ReadSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", ReadComplex[DIBDeviceInfo](DIBDeviceInfoParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	dibDeviceInfo, err := ReadSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", ReadComplex[DIBDeviceInfo](DIBDeviceInfoParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dibDeviceInfo' field"))
 	}
 	m.DibDeviceInfo = dibDeviceInfo
 
-	dibSuppSvcFamilies, err := ReadSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", ReadComplex[DIBSuppSvcFamilies](DIBSuppSvcFamiliesParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	dibSuppSvcFamilies, err := ReadSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", ReadComplex[DIBSuppSvcFamilies](DIBSuppSvcFamiliesParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dibSuppSvcFamilies' field"))
 	}
@@ -339,11 +328,11 @@ func (m *_DescriptionResponse) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for DescriptionResponse")
 		}
 
-		if err := WriteSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", m.GetDibDeviceInfo(), WriteComplex[DIBDeviceInfo](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", m.GetDibDeviceInfo(), WriteComplex[DIBDeviceInfo](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'dibDeviceInfo' field")
 		}
 
-		if err := WriteSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", m.GetDibSuppSvcFamilies(), WriteComplex[DIBSuppSvcFamilies](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", m.GetDibSuppSvcFamilies(), WriteComplex[DIBSuppSvcFamilies](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'dibSuppSvcFamilies' field")
 		}
 

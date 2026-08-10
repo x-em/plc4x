@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -152,7 +154,7 @@ type _BuildInfoBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BuildInfoBuilder) = (*_BuildInfoBuilder)(nil)
@@ -176,10 +178,7 @@ func (b *_BuildInfoBuilder) WithProductUriBuilder(builderSupplier func(PascalStr
 	var err error
 	b.ProductUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -194,10 +193,7 @@ func (b *_BuildInfoBuilder) WithManufacturerNameBuilder(builderSupplier func(Pas
 	var err error
 	b.ManufacturerName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -212,10 +208,7 @@ func (b *_BuildInfoBuilder) WithProductNameBuilder(builderSupplier func(PascalSt
 	var err error
 	b.ProductName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -230,10 +223,7 @@ func (b *_BuildInfoBuilder) WithSoftwareVersionBuilder(builderSupplier func(Pasc
 	var err error
 	b.SoftwareVersion, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -248,10 +238,7 @@ func (b *_BuildInfoBuilder) WithBuildNumberBuilder(builderSupplier func(PascalSt
 	var err error
 	b.BuildNumber, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -263,37 +250,22 @@ func (b *_BuildInfoBuilder) WithBuildDate(buildDate int64) BuildInfoBuilder {
 
 func (b *_BuildInfoBuilder) Build() (BuildInfo, error) {
 	if b.ProductUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'productUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'productUri' not set"))
 	}
 	if b.ManufacturerName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'manufacturerName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'manufacturerName' not set"))
 	}
 	if b.ProductName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'productName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'productName' not set"))
 	}
 	if b.SoftwareVersion == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'softwareVersion' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'softwareVersion' not set"))
 	}
 	if b.BuildNumber == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'buildNumber' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'buildNumber' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BuildInfo.deepCopy(), nil
 }
@@ -319,8 +291,8 @@ func (b *_BuildInfoBuilder) buildForExtensionObjectDefinition() (ExtensionObject
 
 func (b *_BuildInfoBuilder) DeepCopy() any {
 	_copy := b.CreateBuildInfoBuilder().(*_BuildInfoBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -401,7 +373,7 @@ func CastBuildInfo(structType any) BuildInfo {
 	return nil
 }
 
-func (m *_BuildInfo) GetTypeName() string {
+func (m *_BuildInfo) GetPlx4xTypeName() string {
 	return "BuildInfo"
 }
 
@@ -444,37 +416,37 @@ func (m *_BuildInfo) parse(ctx context.Context, readBuffer utils.ReadBuffer, par
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	productUri, err := ReadSimpleField[PascalString](ctx, "productUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	productUri, err := ReadSimpleField[PascalString](ctx, "productUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'productUri' field"))
 	}
 	m.ProductUri = productUri
 
-	manufacturerName, err := ReadSimpleField[PascalString](ctx, "manufacturerName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	manufacturerName, err := ReadSimpleField[PascalString](ctx, "manufacturerName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'manufacturerName' field"))
 	}
 	m.ManufacturerName = manufacturerName
 
-	productName, err := ReadSimpleField[PascalString](ctx, "productName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	productName, err := ReadSimpleField[PascalString](ctx, "productName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'productName' field"))
 	}
 	m.ProductName = productName
 
-	softwareVersion, err := ReadSimpleField[PascalString](ctx, "softwareVersion", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	softwareVersion, err := ReadSimpleField[PascalString](ctx, "softwareVersion", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'softwareVersion' field"))
 	}
 	m.SoftwareVersion = softwareVersion
 
-	buildNumber, err := ReadSimpleField[PascalString](ctx, "buildNumber", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	buildNumber, err := ReadSimpleField[PascalString](ctx, "buildNumber", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'buildNumber' field"))
 	}
 	m.BuildNumber = buildNumber
 
-	buildDate, err := ReadSimpleField(ctx, "buildDate", ReadSignedLong(readBuffer, uint8(64)))
+	buildDate, err := ReadSimpleField(ctx, "buildDate", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'buildDate' field"))
 	}
@@ -505,27 +477,27 @@ func (m *_BuildInfo) SerializeWithWriteBuffer(ctx context.Context, writeBuffer u
 			return errors.Wrap(pushErr, "Error pushing for BuildInfo")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "productUri", m.GetProductUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "productUri", m.GetProductUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'productUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "manufacturerName", m.GetManufacturerName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "manufacturerName", m.GetManufacturerName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'manufacturerName' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "productName", m.GetProductName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "productName", m.GetProductName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'productName' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "softwareVersion", m.GetSoftwareVersion(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "softwareVersion", m.GetSoftwareVersion(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'softwareVersion' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "buildNumber", m.GetBuildNumber(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "buildNumber", m.GetBuildNumber(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'buildNumber' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "buildDate", m.GetBuildDate(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "buildDate", m.GetBuildDate(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'buildDate' field")
 		}
 

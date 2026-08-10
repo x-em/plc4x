@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -147,7 +149,7 @@ type _ActivateSessionRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ActivateSessionRequestBuilder) = (*_ActivateSessionRequestBuilder)(nil)
@@ -171,10 +173,7 @@ func (b *_ActivateSessionRequestBuilder) WithRequestHeaderBuilder(builderSupplie
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -189,10 +188,7 @@ func (b *_ActivateSessionRequestBuilder) WithClientSignatureBuilder(builderSuppl
 	var err error
 	b.ClientSignature, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "SignatureDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "SignatureDataBuilder failed"))
 	}
 	return b
 }
@@ -217,10 +213,7 @@ func (b *_ActivateSessionRequestBuilder) WithUserIdentityTokenBuilder(builderSup
 	var err error
 	b.UserIdentityToken, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -235,41 +228,26 @@ func (b *_ActivateSessionRequestBuilder) WithUserTokenSignatureBuilder(builderSu
 	var err error
 	b.UserTokenSignature, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "SignatureDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "SignatureDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ActivateSessionRequestBuilder) Build() (ActivateSessionRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
 	if b.ClientSignature == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'clientSignature' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'clientSignature' not set"))
 	}
 	if b.UserIdentityToken == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'userIdentityToken' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'userIdentityToken' not set"))
 	}
 	if b.UserTokenSignature == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'userTokenSignature' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'userTokenSignature' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ActivateSessionRequest.deepCopy(), nil
 }
@@ -295,8 +273,8 @@ func (b *_ActivateSessionRequestBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_ActivateSessionRequestBuilder) DeepCopy() any {
 	_copy := b.CreateActivateSessionRequestBuilder().(*_ActivateSessionRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -377,7 +355,7 @@ func CastActivateSessionRequest(structType any) ActivateSessionRequest {
 	return nil
 }
 
-func (m *_ActivateSessionRequest) GetTypeName() string {
+func (m *_ActivateSessionRequest) GetPlx4xTypeName() string {
 	return "ActivateSessionRequest"
 }
 
@@ -397,9 +375,7 @@ func (m *_ActivateSessionRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.ClientSoftwareCertificates) > 0 {
 		for _curItem, element := range m.ClientSoftwareCertificates {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ClientSoftwareCertificates), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -410,9 +386,7 @@ func (m *_ActivateSessionRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.LocaleIds) > 0 {
 		for _curItem, element := range m.LocaleIds {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.LocaleIds), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -440,49 +414,49 @@ func (m *_ActivateSessionRequest) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	clientSignature, err := ReadSimpleField[SignatureData](ctx, "clientSignature", ReadComplex[SignatureData](ExtensionObjectDefinitionParseWithBufferProducer[SignatureData]((int32)(int32(458))), readBuffer))
+	clientSignature, err := ReadSimpleField[SignatureData](ctx, "clientSignature", ReadComplex[SignatureData](ExtensionObjectDefinitionParseWithBufferProducer[SignatureData]((int32)(int32(458))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientSignature' field"))
 	}
 	m.ClientSignature = clientSignature
 
-	noOfClientSoftwareCertificates, err := ReadImplicitField[int32](ctx, "noOfClientSoftwareCertificates", ReadSignedInt(readBuffer, uint8(32)))
+	noOfClientSoftwareCertificates, err := ReadImplicitField[int32](ctx, "noOfClientSoftwareCertificates", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfClientSoftwareCertificates' field"))
 	}
 	_ = noOfClientSoftwareCertificates
 
-	clientSoftwareCertificates, err := ReadCountArrayField[SignedSoftwareCertificate](ctx, "clientSoftwareCertificates", ReadComplex[SignedSoftwareCertificate](ExtensionObjectDefinitionParseWithBufferProducer[SignedSoftwareCertificate]((int32)(int32(346))), readBuffer), uint64(noOfClientSoftwareCertificates))
+	clientSoftwareCertificates, err := ReadCountArrayField[SignedSoftwareCertificate](ctx, "clientSoftwareCertificates", ReadComplex[SignedSoftwareCertificate](ExtensionObjectDefinitionParseWithBufferProducer[SignedSoftwareCertificate]((int32)(int32(346))), readBuffer), uint64(noOfClientSoftwareCertificates), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientSoftwareCertificates' field"))
 	}
 	m.ClientSoftwareCertificates = clientSoftwareCertificates
 
-	noOfLocaleIds, err := ReadImplicitField[int32](ctx, "noOfLocaleIds", ReadSignedInt(readBuffer, uint8(32)))
+	noOfLocaleIds, err := ReadImplicitField[int32](ctx, "noOfLocaleIds", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfLocaleIds' field"))
 	}
 	_ = noOfLocaleIds
 
-	localeIds, err := ReadCountArrayField[PascalString](ctx, "localeIds", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfLocaleIds))
+	localeIds, err := ReadCountArrayField[PascalString](ctx, "localeIds", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfLocaleIds), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'localeIds' field"))
 	}
 	m.LocaleIds = localeIds
 
-	userIdentityToken, err := ReadSimpleField[ExtensionObject](ctx, "userIdentityToken", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	userIdentityToken, err := ReadSimpleField[ExtensionObject](ctx, "userIdentityToken", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'userIdentityToken' field"))
 	}
 	m.UserIdentityToken = userIdentityToken
 
-	userTokenSignature, err := ReadSimpleField[SignatureData](ctx, "userTokenSignature", ReadComplex[SignatureData](ExtensionObjectDefinitionParseWithBufferProducer[SignatureData]((int32)(int32(458))), readBuffer))
+	userTokenSignature, err := ReadSimpleField[SignatureData](ctx, "userTokenSignature", ReadComplex[SignatureData](ExtensionObjectDefinitionParseWithBufferProducer[SignatureData]((int32)(int32(458))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'userTokenSignature' field"))
 	}
@@ -513,35 +487,35 @@ func (m *_ActivateSessionRequest) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for ActivateSessionRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteSimpleField[SignatureData](ctx, "clientSignature", m.GetClientSignature(), WriteComplex[SignatureData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[SignatureData](ctx, "clientSignature", m.GetClientSignature(), WriteComplex[SignatureData](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientSignature' field")
 		}
 		noOfClientSoftwareCertificates := int32(utils.InlineIf(bool((m.GetClientSoftwareCertificates()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetClientSoftwareCertificates()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfClientSoftwareCertificates", noOfClientSoftwareCertificates, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfClientSoftwareCertificates", noOfClientSoftwareCertificates, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfClientSoftwareCertificates' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "clientSoftwareCertificates", m.GetClientSoftwareCertificates(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "clientSoftwareCertificates", m.GetClientSoftwareCertificates(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientSoftwareCertificates' field")
 		}
 		noOfLocaleIds := int32(utils.InlineIf(bool((m.GetLocaleIds()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetLocaleIds()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfLocaleIds", noOfLocaleIds, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfLocaleIds", noOfLocaleIds, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfLocaleIds' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "localeIds", m.GetLocaleIds(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "localeIds", m.GetLocaleIds(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'localeIds' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "userIdentityToken", m.GetUserIdentityToken(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "userIdentityToken", m.GetUserIdentityToken(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'userIdentityToken' field")
 		}
 
-		if err := WriteSimpleField[SignatureData](ctx, "userTokenSignature", m.GetUserTokenSignature(), WriteComplex[SignatureData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[SignatureData](ctx, "userTokenSignature", m.GetUserTokenSignature(), WriteComplex[SignatureData](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'userTokenSignature' field")
 		}
 

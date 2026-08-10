@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -155,7 +156,7 @@ func NewBACnetActionCommandBuilder() BACnetActionCommandBuilder {
 type _BACnetActionCommandBuilder struct {
 	*_BACnetActionCommand
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetActionCommandBuilder) = (*_BACnetActionCommandBuilder)(nil)
@@ -174,10 +175,7 @@ func (b *_BACnetActionCommandBuilder) WithOptionalDeviceIdentifierBuilder(builde
 	var err error
 	b.DeviceIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
 	}
 	return b
 }
@@ -192,10 +190,7 @@ func (b *_BACnetActionCommandBuilder) WithObjectIdentifierBuilder(builderSupplie
 	var err error
 	b.ObjectIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagObjectIdentifierBuilder failed"))
 	}
 	return b
 }
@@ -210,10 +205,7 @@ func (b *_BACnetActionCommandBuilder) WithPropertyIdentifierBuilder(builderSuppl
 	var err error
 	b.PropertyIdentifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetPropertyIdentifierTaggedBuilder failed"))
 	}
 	return b
 }
@@ -228,10 +220,7 @@ func (b *_BACnetActionCommandBuilder) WithOptionalArrayIndexBuilder(builderSuppl
 	var err error
 	b.ArrayIndex, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -246,10 +235,7 @@ func (b *_BACnetActionCommandBuilder) WithOptionalPropertyValueBuilder(builderSu
 	var err error
 	b.PropertyValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetConstructedDataBuilder failed"))
 	}
 	return b
 }
@@ -264,10 +250,7 @@ func (b *_BACnetActionCommandBuilder) WithOptionalPriorityBuilder(builderSupplie
 	var err error
 	b.Priority, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
@@ -282,10 +265,7 @@ func (b *_BACnetActionCommandBuilder) WithOptionalPostDelayBuilder(builderSuppli
 	var err error
 	b.PostDelay, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
 	}
 	return b
 }
@@ -300,10 +280,7 @@ func (b *_BACnetActionCommandBuilder) WithQuitOnFailureBuilder(builderSupplier f
 	var err error
 	b.QuitOnFailure, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
 	}
 	return b
 }
@@ -318,41 +295,26 @@ func (b *_BACnetActionCommandBuilder) WithWriteSuccessfulBuilder(builderSupplier
 	var err error
 	b.WriteSuccessful, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetActionCommandBuilder) Build() (BACnetActionCommand, error) {
 	if b.ObjectIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'objectIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'objectIdentifier' not set"))
 	}
 	if b.PropertyIdentifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'propertyIdentifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'propertyIdentifier' not set"))
 	}
 	if b.QuitOnFailure == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'quitOnFailure' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'quitOnFailure' not set"))
 	}
 	if b.WriteSuccessful == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'writeSuccessful' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'writeSuccessful' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetActionCommand.deepCopy(), nil
 }
@@ -367,8 +329,8 @@ func (b *_BACnetActionCommandBuilder) MustBuild() BACnetActionCommand {
 
 func (b *_BACnetActionCommandBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetActionCommandBuilder().(*_BACnetActionCommandBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -443,7 +405,7 @@ func CastBACnetActionCommand(structType any) BACnetActionCommand {
 	return nil
 }
 
-func (m *_BACnetActionCommand) GetTypeName() string {
+func (m *_BACnetActionCommand) GetPlx4xTypeName() string {
 	return "BACnetActionCommand"
 }
 
@@ -505,7 +467,7 @@ func BACnetActionCommandParseWithBufferProducer() func(ctx context.Context, read
 }
 
 func BACnetActionCommandParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetActionCommand, error) {
-	v, err := (&_BACnetActionCommand{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetActionCommand)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -619,7 +581,7 @@ func (m *_BACnetActionCommand) SerializeWithWriteBuffer(ctx context.Context, wri
 		return errors.Wrap(pushErr, "Error pushing for BACnetActionCommand")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagObjectIdentifier](ctx, "deviceIdentifier", GetRef(m.GetDeviceIdentifier()), WriteComplex[BACnetContextTagObjectIdentifier](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagObjectIdentifier](ctx, "deviceIdentifier", new(m.GetDeviceIdentifier()), WriteComplex[BACnetContextTagObjectIdentifier](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'deviceIdentifier' field")
 	}
 
@@ -631,19 +593,19 @@ func (m *_BACnetActionCommand) SerializeWithWriteBuffer(ctx context.Context, wri
 		return errors.Wrap(err, "Error serializing 'propertyIdentifier' field")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "arrayIndex", GetRef(m.GetArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "arrayIndex", new(m.GetArrayIndex()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'arrayIndex' field")
 	}
 
-	if err := WriteOptionalField[BACnetConstructedData](ctx, "propertyValue", GetRef(m.GetPropertyValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetConstructedData](ctx, "propertyValue", new(m.GetPropertyValue()), WriteComplex[BACnetConstructedData](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'propertyValue' field")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "priority", GetRef(m.GetPriority()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagUnsignedInteger](ctx, "priority", new(m.GetPriority()), WriteComplex[BACnetContextTagUnsignedInteger](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'priority' field")
 	}
 
-	if err := WriteOptionalField[BACnetContextTagBoolean](ctx, "postDelay", GetRef(m.GetPostDelay()), WriteComplex[BACnetContextTagBoolean](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetContextTagBoolean](ctx, "postDelay", new(m.GetPostDelay()), WriteComplex[BACnetContextTagBoolean](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'postDelay' field")
 	}
 

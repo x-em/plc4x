@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -130,7 +132,7 @@ type _EUInformationBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EUInformationBuilder) = (*_EUInformationBuilder)(nil)
@@ -154,10 +156,7 @@ func (b *_EUInformationBuilder) WithNamespaceUriBuilder(builderSupplier func(Pas
 	var err error
 	b.NamespaceUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -177,10 +176,7 @@ func (b *_EUInformationBuilder) WithDisplayNameBuilder(builderSupplier func(Loca
 	var err error
 	b.DisplayName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LocalizedTextBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LocalizedTextBuilder failed"))
 	}
 	return b
 }
@@ -195,35 +191,23 @@ func (b *_EUInformationBuilder) WithDescriptionBuilder(builderSupplier func(Loca
 	var err error
 	b.Description, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LocalizedTextBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LocalizedTextBuilder failed"))
 	}
 	return b
 }
 
 func (b *_EUInformationBuilder) Build() (EUInformation, error) {
 	if b.NamespaceUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'namespaceUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'namespaceUri' not set"))
 	}
 	if b.DisplayName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'displayName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'displayName' not set"))
 	}
 	if b.Description == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'description' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'description' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EUInformation.deepCopy(), nil
 }
@@ -249,8 +233,8 @@ func (b *_EUInformationBuilder) buildForExtensionObjectDefinition() (ExtensionOb
 
 func (b *_EUInformationBuilder) DeepCopy() any {
 	_copy := b.CreateEUInformationBuilder().(*_EUInformationBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -323,7 +307,7 @@ func CastEUInformation(structType any) EUInformation {
 	return nil
 }
 
-func (m *_EUInformation) GetTypeName() string {
+func (m *_EUInformation) GetPlx4xTypeName() string {
 	return "EUInformation"
 }
 
@@ -360,25 +344,25 @@ func (m *_EUInformation) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	namespaceUri, err := ReadSimpleField[PascalString](ctx, "namespaceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	namespaceUri, err := ReadSimpleField[PascalString](ctx, "namespaceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'namespaceUri' field"))
 	}
 	m.NamespaceUri = namespaceUri
 
-	unitId, err := ReadSimpleField(ctx, "unitId", ReadSignedInt(readBuffer, uint8(32)))
+	unitId, err := ReadSimpleField(ctx, "unitId", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'unitId' field"))
 	}
 	m.UnitId = unitId
 
-	displayName, err := ReadSimpleField[LocalizedText](ctx, "displayName", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer))
+	displayName, err := ReadSimpleField[LocalizedText](ctx, "displayName", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'displayName' field"))
 	}
 	m.DisplayName = displayName
 
-	description, err := ReadSimpleField[LocalizedText](ctx, "description", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer))
+	description, err := ReadSimpleField[LocalizedText](ctx, "description", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'description' field"))
 	}
@@ -409,19 +393,19 @@ func (m *_EUInformation) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 			return errors.Wrap(pushErr, "Error pushing for EUInformation")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "namespaceUri", m.GetNamespaceUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "namespaceUri", m.GetNamespaceUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'namespaceUri' field")
 		}
 
-		if err := WriteSimpleField[int32](ctx, "unitId", m.GetUnitId(), WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[int32](ctx, "unitId", m.GetUnitId(), WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'unitId' field")
 		}
 
-		if err := WriteSimpleField[LocalizedText](ctx, "displayName", m.GetDisplayName(), WriteComplex[LocalizedText](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LocalizedText](ctx, "displayName", m.GetDisplayName(), WriteComplex[LocalizedText](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'displayName' field")
 		}
 
-		if err := WriteSimpleField[LocalizedText](ctx, "description", m.GetDescription(), WriteComplex[LocalizedText](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LocalizedText](ctx, "description", m.GetDescription(), WriteComplex[LocalizedText](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'description' field")
 		}
 

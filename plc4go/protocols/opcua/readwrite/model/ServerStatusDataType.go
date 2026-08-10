@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -137,7 +139,7 @@ type _ServerStatusDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ServerStatusDataTypeBuilder) = (*_ServerStatusDataTypeBuilder)(nil)
@@ -176,10 +178,7 @@ func (b *_ServerStatusDataTypeBuilder) WithBuildInfoBuilder(builderSupplier func
 	var err error
 	b.BuildInfo, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BuildInfoBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BuildInfoBuilder failed"))
 	}
 	return b
 }
@@ -199,29 +198,20 @@ func (b *_ServerStatusDataTypeBuilder) WithShutdownReasonBuilder(builderSupplier
 	var err error
 	b.ShutdownReason, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LocalizedTextBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LocalizedTextBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ServerStatusDataTypeBuilder) Build() (ServerStatusDataType, error) {
 	if b.BuildInfo == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'buildInfo' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'buildInfo' not set"))
 	}
 	if b.ShutdownReason == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'shutdownReason' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'shutdownReason' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ServerStatusDataType.deepCopy(), nil
 }
@@ -247,8 +237,8 @@ func (b *_ServerStatusDataTypeBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_ServerStatusDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateServerStatusDataTypeBuilder().(*_ServerStatusDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -329,7 +319,7 @@ func CastServerStatusDataType(structType any) ServerStatusDataType {
 	return nil
 }
 
-func (m *_ServerStatusDataType) GetTypeName() string {
+func (m *_ServerStatusDataType) GetPlx4xTypeName() string {
 	return "ServerStatusDataType"
 }
 
@@ -372,37 +362,37 @@ func (m *_ServerStatusDataType) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	startTime, err := ReadSimpleField(ctx, "startTime", ReadSignedLong(readBuffer, uint8(64)))
+	startTime, err := ReadSimpleField(ctx, "startTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'startTime' field"))
 	}
 	m.StartTime = startTime
 
-	currentTime, err := ReadSimpleField(ctx, "currentTime", ReadSignedLong(readBuffer, uint8(64)))
+	currentTime, err := ReadSimpleField(ctx, "currentTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'currentTime' field"))
 	}
 	m.CurrentTime = currentTime
 
-	state, err := ReadEnumField[ServerState](ctx, "state", "ServerState", ReadEnum(ServerStateByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	state, err := ReadEnumField[ServerState](ctx, "state", "ServerState", ReadEnum(ServerStateByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'state' field"))
 	}
 	m.State = state
 
-	buildInfo, err := ReadSimpleField[BuildInfo](ctx, "buildInfo", ReadComplex[BuildInfo](ExtensionObjectDefinitionParseWithBufferProducer[BuildInfo]((int32)(int32(340))), readBuffer))
+	buildInfo, err := ReadSimpleField[BuildInfo](ctx, "buildInfo", ReadComplex[BuildInfo](ExtensionObjectDefinitionParseWithBufferProducer[BuildInfo]((int32)(int32(340))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'buildInfo' field"))
 	}
 	m.BuildInfo = buildInfo
 
-	secondsTillShutdown, err := ReadSimpleField(ctx, "secondsTillShutdown", ReadUnsignedInt(readBuffer, uint8(32)))
+	secondsTillShutdown, err := ReadSimpleField(ctx, "secondsTillShutdown", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'secondsTillShutdown' field"))
 	}
 	m.SecondsTillShutdown = secondsTillShutdown
 
-	shutdownReason, err := ReadSimpleField[LocalizedText](ctx, "shutdownReason", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer))
+	shutdownReason, err := ReadSimpleField[LocalizedText](ctx, "shutdownReason", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'shutdownReason' field"))
 	}
@@ -433,27 +423,27 @@ func (m *_ServerStatusDataType) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for ServerStatusDataType")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "startTime", m.GetStartTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "startTime", m.GetStartTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'startTime' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "currentTime", m.GetCurrentTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "currentTime", m.GetCurrentTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'currentTime' field")
 		}
 
-		if err := WriteSimpleEnumField[ServerState](ctx, "state", "ServerState", m.GetState(), WriteEnum[ServerState, uint32](ServerState.GetValue, ServerState.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[ServerState](ctx, "state", "ServerState", m.GetState(), WriteEnum[ServerState, uint32](ServerState.GetValue, ServerState.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'state' field")
 		}
 
-		if err := WriteSimpleField[BuildInfo](ctx, "buildInfo", m.GetBuildInfo(), WriteComplex[BuildInfo](writeBuffer)); err != nil {
+		if err := WriteSimpleField[BuildInfo](ctx, "buildInfo", m.GetBuildInfo(), WriteComplex[BuildInfo](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'buildInfo' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "secondsTillShutdown", m.GetSecondsTillShutdown(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "secondsTillShutdown", m.GetSecondsTillShutdown(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'secondsTillShutdown' field")
 		}
 
-		if err := WriteSimpleField[LocalizedText](ctx, "shutdownReason", m.GetShutdownReason(), WriteComplex[LocalizedText](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LocalizedText](ctx, "shutdownReason", m.GetShutdownReason(), WriteComplex[LocalizedText](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'shutdownReason' field")
 		}
 

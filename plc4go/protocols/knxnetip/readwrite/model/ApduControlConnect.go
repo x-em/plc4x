@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _ApduControlConnectBuilder struct {
 
 	parentBuilder *_ApduControlBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ApduControlConnectBuilder) = (*_ApduControlConnectBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_ApduControlConnectBuilder) WithMandatoryFields() ApduControlConnectBui
 }
 
 func (b *_ApduControlConnectBuilder) Build() (ApduControlConnect, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ApduControlConnect.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_ApduControlConnectBuilder) buildForApduControl() (ApduControl, error) 
 
 func (b *_ApduControlConnectBuilder) DeepCopy() any {
 	_copy := b.CreateApduControlConnectBuilder().(*_ApduControlConnectBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastApduControlConnect(structType any) ApduControlConnect {
 	return nil
 }
 
-func (m *_ApduControlConnect) GetTypeName() string {
+func (m *_ApduControlConnect) GetPlx4xTypeName() string {
 	return "ApduControlConnect"
 }
 

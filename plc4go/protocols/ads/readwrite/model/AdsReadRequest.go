@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,10 +42,13 @@ type AdsReadRequest interface {
 	utils.Copyable
 	AmsPacket
 	// GetIndexGroup returns IndexGroup (property field)
+	// 4 bytes	Index Group of the data which should be read.
 	GetIndexGroup() uint32
 	// GetIndexOffset returns IndexOffset (property field)
+	// 4 bytes	Index Offset of the data which should be read.
 	GetIndexOffset() uint32
 	// GetLength returns Length (property field)
+	// 4 bytes	Length of the data (in bytes) which should be read.
 	GetLength() uint32
 	// IsAdsReadRequest is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsAdsReadRequest()
@@ -64,7 +68,7 @@ var _ AdsReadRequest = (*_AdsReadRequest)(nil)
 var _ AmsPacketRequirements = (*_AdsReadRequest)(nil)
 
 // NewAdsReadRequest factory function for _AdsReadRequest
-func NewAdsReadRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32, indexGroup uint32, indexOffset uint32, length uint32) *_AdsReadRequest {
+func NewAdsReadRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32, indexGroup uint32, indexOffset uint32, length uint32) *_AdsReadRequest {
 	_result := &_AdsReadRequest{
 		AmsPacketContract: NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 		IndexGroup:        indexGroup,
@@ -109,7 +113,7 @@ type _AdsReadRequestBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsReadRequestBuilder) = (*_AdsReadRequestBuilder)(nil)
@@ -139,8 +143,8 @@ func (b *_AdsReadRequestBuilder) WithLength(length uint32) AdsReadRequestBuilder
 }
 
 func (b *_AdsReadRequestBuilder) Build() (AdsReadRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsReadRequest.deepCopy(), nil
 }
@@ -166,8 +170,8 @@ func (b *_AdsReadRequestBuilder) buildForAmsPacket() (AmsPacket, error) {
 
 func (b *_AdsReadRequestBuilder) DeepCopy() any {
 	_copy := b.CreateAdsReadRequestBuilder().(*_AdsReadRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -240,7 +244,7 @@ func CastAdsReadRequest(structType any) AdsReadRequest {
 	return nil
 }
 
-func (m *_AdsReadRequest) GetTypeName() string {
+func (m *_AdsReadRequest) GetPlx4xTypeName() string {
 	return "AdsReadRequest"
 }
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -134,7 +136,7 @@ type _DtlsPubSubConnectionDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DtlsPubSubConnectionDataTypeBuilder) = (*_DtlsPubSubConnectionDataTypeBuilder)(nil)
@@ -158,10 +160,7 @@ func (b *_DtlsPubSubConnectionDataTypeBuilder) WithClientCipherSuiteBuilder(buil
 	var err error
 	b.ClientCipherSuite, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -186,10 +185,7 @@ func (b *_DtlsPubSubConnectionDataTypeBuilder) WithCertificateGroupIdBuilder(bui
 	var err error
 	b.CertificateGroupId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -201,19 +197,13 @@ func (b *_DtlsPubSubConnectionDataTypeBuilder) WithVerifyClientCertificate(verif
 
 func (b *_DtlsPubSubConnectionDataTypeBuilder) Build() (DtlsPubSubConnectionDataType, error) {
 	if b.ClientCipherSuite == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'clientCipherSuite' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'clientCipherSuite' not set"))
 	}
 	if b.CertificateGroupId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'certificateGroupId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'certificateGroupId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DtlsPubSubConnectionDataType.deepCopy(), nil
 }
@@ -239,8 +229,8 @@ func (b *_DtlsPubSubConnectionDataTypeBuilder) buildForExtensionObjectDefinition
 
 func (b *_DtlsPubSubConnectionDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateDtlsPubSubConnectionDataTypeBuilder().(*_DtlsPubSubConnectionDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -317,7 +307,7 @@ func CastDtlsPubSubConnectionDataType(structType any) DtlsPubSubConnectionDataTy
 	return nil
 }
 
-func (m *_DtlsPubSubConnectionDataType) GetTypeName() string {
+func (m *_DtlsPubSubConnectionDataType) GetPlx4xTypeName() string {
 	return "DtlsPubSubConnectionDataType"
 }
 
@@ -334,9 +324,7 @@ func (m *_DtlsPubSubConnectionDataType) GetLengthInBits(ctx context.Context) uin
 	if len(m.ServerCipherSuites) > 0 {
 		for _curItem, element := range m.ServerCipherSuites {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ServerCipherSuites), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -373,49 +361,49 @@ func (m *_DtlsPubSubConnectionDataType) parse(ctx context.Context, readBuffer ut
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	clientCipherSuite, err := ReadSimpleField[PascalString](ctx, "clientCipherSuite", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	clientCipherSuite, err := ReadSimpleField[PascalString](ctx, "clientCipherSuite", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientCipherSuite' field"))
 	}
 	m.ClientCipherSuite = clientCipherSuite
 
-	noOfServerCipherSuites, err := ReadImplicitField[int32](ctx, "noOfServerCipherSuites", ReadSignedInt(readBuffer, uint8(32)))
+	noOfServerCipherSuites, err := ReadImplicitField[int32](ctx, "noOfServerCipherSuites", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfServerCipherSuites' field"))
 	}
 	_ = noOfServerCipherSuites
 
-	serverCipherSuites, err := ReadCountArrayField[PascalString](ctx, "serverCipherSuites", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfServerCipherSuites))
+	serverCipherSuites, err := ReadCountArrayField[PascalString](ctx, "serverCipherSuites", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfServerCipherSuites), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverCipherSuites' field"))
 	}
 	m.ServerCipherSuites = serverCipherSuites
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	zeroRTT, err := ReadSimpleField(ctx, "zeroRTT", ReadBoolean(readBuffer))
+	zeroRTT, err := ReadSimpleField(ctx, "zeroRTT", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'zeroRTT' field"))
 	}
 	m.ZeroRTT = zeroRTT
 
-	certificateGroupId, err := ReadSimpleField[NodeId](ctx, "certificateGroupId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	certificateGroupId, err := ReadSimpleField[NodeId](ctx, "certificateGroupId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'certificateGroupId' field"))
 	}
 	m.CertificateGroupId = certificateGroupId
 
-	reservedField1, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField1, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField1 = reservedField1
 
-	verifyClientCertificate, err := ReadSimpleField(ctx, "verifyClientCertificate", ReadBoolean(readBuffer))
+	verifyClientCertificate, err := ReadSimpleField(ctx, "verifyClientCertificate", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'verifyClientCertificate' field"))
 	}
@@ -446,35 +434,35 @@ func (m *_DtlsPubSubConnectionDataType) SerializeWithWriteBuffer(ctx context.Con
 			return errors.Wrap(pushErr, "Error pushing for DtlsPubSubConnectionDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "clientCipherSuite", m.GetClientCipherSuite(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "clientCipherSuite", m.GetClientCipherSuite(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientCipherSuite' field")
 		}
 		noOfServerCipherSuites := int32(utils.InlineIf(bool((m.GetServerCipherSuites()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetServerCipherSuites()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfServerCipherSuites", noOfServerCipherSuites, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfServerCipherSuites", noOfServerCipherSuites, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfServerCipherSuites' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "serverCipherSuites", m.GetServerCipherSuites(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "serverCipherSuites", m.GetServerCipherSuites(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverCipherSuites' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "zeroRTT", m.GetZeroRTT(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "zeroRTT", m.GetZeroRTT(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'zeroRTT' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "certificateGroupId", m.GetCertificateGroupId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "certificateGroupId", m.GetCertificateGroupId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'certificateGroupId' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 2")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "verifyClientCertificate", m.GetVerifyClientCertificate(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "verifyClientCertificate", m.GetVerifyClientCertificate(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'verifyClientCertificate' field")
 		}
 

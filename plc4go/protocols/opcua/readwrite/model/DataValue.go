@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -146,7 +147,7 @@ func NewDataValueBuilder() DataValueBuilder {
 type _DataValueBuilder struct {
 	*_DataValue
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DataValueBuilder) = (*_DataValueBuilder)(nil)
@@ -195,10 +196,7 @@ func (b *_DataValueBuilder) WithOptionalValueBuilder(builderSupplier func(Varian
 	var err error
 	b.Value, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "VariantBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "VariantBuilder failed"))
 	}
 	return b
 }
@@ -213,10 +211,7 @@ func (b *_DataValueBuilder) WithOptionalStatusCodeBuilder(builderSupplier func(S
 	var err error
 	b.StatusCode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -242,8 +237,8 @@ func (b *_DataValueBuilder) WithOptionalServerPicoseconds(serverPicoseconds uint
 }
 
 func (b *_DataValueBuilder) Build() (DataValue, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DataValue.deepCopy(), nil
 }
@@ -258,8 +253,8 @@ func (b *_DataValueBuilder) MustBuild() DataValue {
 
 func (b *_DataValueBuilder) DeepCopy() any {
 	_copy := b.CreateDataValueBuilder().(*_DataValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -346,7 +341,7 @@ func CastDataValue(structType any) DataValue {
 	return nil
 }
 
-func (m *_DataValue) GetTypeName() string {
+func (m *_DataValue) GetPlx4xTypeName() string {
 	return "DataValue"
 }
 
@@ -422,7 +417,7 @@ func DataValueParseWithBufferProducer() func(ctx context.Context, readBuffer uti
 }
 
 func DataValueParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (DataValue, error) {
-	v, err := (&_DataValue{}).parse(ctx, readBuffer)
+	v, err := (new(_DataValue)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -580,11 +575,11 @@ func (m *_DataValue) SerializeWithWriteBuffer(ctx context.Context, writeBuffer u
 		return errors.Wrap(err, "Error serializing 'valueSpecified' field")
 	}
 
-	if err := WriteOptionalField[Variant](ctx, "value", GetRef(m.GetValue()), WriteComplex[Variant](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[Variant](ctx, "value", new(m.GetValue()), WriteComplex[Variant](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'value' field")
 	}
 
-	if err := WriteOptionalField[StatusCode](ctx, "statusCode", GetRef(m.GetStatusCode()), WriteComplex[StatusCode](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[StatusCode](ctx, "statusCode", new(m.GetStatusCode()), WriteComplex[StatusCode](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'statusCode' field")
 	}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -100,7 +101,7 @@ func NewBACnetLogMultipleRecordBuilder() BACnetLogMultipleRecordBuilder {
 type _BACnetLogMultipleRecordBuilder struct {
 	*_BACnetLogMultipleRecord
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetLogMultipleRecordBuilder) = (*_BACnetLogMultipleRecordBuilder)(nil)
@@ -119,10 +120,7 @@ func (b *_BACnetLogMultipleRecordBuilder) WithTimestampBuilder(builderSupplier f
 	var err error
 	b.Timestamp, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDateTimeEnclosedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDateTimeEnclosedBuilder failed"))
 	}
 	return b
 }
@@ -137,29 +135,20 @@ func (b *_BACnetLogMultipleRecordBuilder) WithLogDataBuilder(builderSupplier fun
 	var err error
 	b.LogData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetLogDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetLogDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetLogMultipleRecordBuilder) Build() (BACnetLogMultipleRecord, error) {
 	if b.Timestamp == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'timestamp' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'timestamp' not set"))
 	}
 	if b.LogData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'logData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'logData' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetLogMultipleRecord.deepCopy(), nil
 }
@@ -174,8 +163,8 @@ func (b *_BACnetLogMultipleRecordBuilder) MustBuild() BACnetLogMultipleRecord {
 
 func (b *_BACnetLogMultipleRecordBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetLogMultipleRecordBuilder().(*_BACnetLogMultipleRecordBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -222,7 +211,7 @@ func CastBACnetLogMultipleRecord(structType any) BACnetLogMultipleRecord {
 	return nil
 }
 
-func (m *_BACnetLogMultipleRecord) GetTypeName() string {
+func (m *_BACnetLogMultipleRecord) GetPlx4xTypeName() string {
 	return "BACnetLogMultipleRecord"
 }
 
@@ -253,7 +242,7 @@ func BACnetLogMultipleRecordParseWithBufferProducer() func(ctx context.Context, 
 }
 
 func BACnetLogMultipleRecordParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetLogMultipleRecord, error) {
-	v, err := (&_BACnetLogMultipleRecord{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetLogMultipleRecord)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -124,7 +125,7 @@ type _ErrorReportingSystemCategoryTypeBuilder struct {
 
 	childBuilder _ErrorReportingSystemCategoryTypeChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ErrorReportingSystemCategoryTypeBuilder) = (*_ErrorReportingSystemCategoryTypeBuilder)(nil)
@@ -134,8 +135,8 @@ func (b *_ErrorReportingSystemCategoryTypeBuilder) WithMandatoryFields() ErrorRe
 }
 
 func (b *_ErrorReportingSystemCategoryTypeBuilder) PartialBuild() (ErrorReportingSystemCategoryTypeContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ErrorReportingSystemCategoryType.deepCopy(), nil
 }
@@ -232,8 +233,8 @@ func (b *_ErrorReportingSystemCategoryTypeBuilder) DeepCopy() any {
 	_copy := b.CreateErrorReportingSystemCategoryTypeBuilder().(*_ErrorReportingSystemCategoryTypeBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_ErrorReportingSystemCategoryTypeChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -262,7 +263,7 @@ func CastErrorReportingSystemCategoryType(structType any) ErrorReportingSystemCa
 	return nil
 }
 
-func (m *_ErrorReportingSystemCategoryType) GetTypeName() string {
+func (m *_ErrorReportingSystemCategoryType) GetPlx4xTypeName() string {
 	return "ErrorReportingSystemCategoryType"
 }
 
@@ -296,7 +297,7 @@ func ErrorReportingSystemCategoryTypeParseWithBufferProducer[T ErrorReportingSys
 }
 
 func ErrorReportingSystemCategoryTypeParseWithBuffer[T ErrorReportingSystemCategoryType](ctx context.Context, readBuffer utils.ReadBuffer, errorReportingSystemCategoryClass ErrorReportingSystemCategoryClass) (T, error) {
-	v, err := (&_ErrorReportingSystemCategoryType{}).parse(ctx, readBuffer, errorReportingSystemCategoryClass)
+	v, err := (new(_ErrorReportingSystemCategoryType)).parse(ctx, readBuffer, errorReportingSystemCategoryClass)
 	if err != nil {
 		var zero T
 		return zero, err

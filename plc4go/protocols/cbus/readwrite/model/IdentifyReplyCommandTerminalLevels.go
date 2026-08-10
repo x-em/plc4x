@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ IdentifyReplyCommandTerminalLevels = (*_IdentifyReplyCommandTerminalLevels
 var _ IdentifyReplyCommandRequirements = (*_IdentifyReplyCommandTerminalLevels)(nil)
 
 // NewIdentifyReplyCommandTerminalLevels factory function for _IdentifyReplyCommandTerminalLevels
-func NewIdentifyReplyCommandTerminalLevels(terminalLevels []byte, numBytes uint8) *_IdentifyReplyCommandTerminalLevels {
+func NewIdentifyReplyCommandTerminalLevels(terminalLevels []byte) *_IdentifyReplyCommandTerminalLevels {
 	_result := &_IdentifyReplyCommandTerminalLevels{
-		IdentifyReplyCommandContract: NewIdentifyReplyCommand(numBytes),
+		IdentifyReplyCommandContract: NewIdentifyReplyCommand(),
 		TerminalLevels:               terminalLevels,
 	}
 	_result.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = _result
@@ -97,7 +100,7 @@ type _IdentifyReplyCommandTerminalLevelsBuilder struct {
 
 	parentBuilder *_IdentifyReplyCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IdentifyReplyCommandTerminalLevelsBuilder) = (*_IdentifyReplyCommandTerminalLevelsBuilder)(nil)
@@ -117,8 +120,8 @@ func (b *_IdentifyReplyCommandTerminalLevelsBuilder) WithTerminalLevels(terminal
 }
 
 func (b *_IdentifyReplyCommandTerminalLevelsBuilder) Build() (IdentifyReplyCommandTerminalLevels, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IdentifyReplyCommandTerminalLevels.deepCopy(), nil
 }
@@ -144,8 +147,8 @@ func (b *_IdentifyReplyCommandTerminalLevelsBuilder) buildForIdentifyReplyComman
 
 func (b *_IdentifyReplyCommandTerminalLevelsBuilder) DeepCopy() any {
 	_copy := b.CreateIdentifyReplyCommandTerminalLevelsBuilder().(*_IdentifyReplyCommandTerminalLevelsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +209,7 @@ func CastIdentifyReplyCommandTerminalLevels(structType any) IdentifyReplyCommand
 	return nil
 }
 
-func (m *_IdentifyReplyCommandTerminalLevels) GetTypeName() string {
+func (m *_IdentifyReplyCommandTerminalLevels) GetPlx4xTypeName() string {
 	return "IdentifyReplyCommandTerminalLevels"
 }
 
@@ -236,7 +239,7 @@ func (m *_IdentifyReplyCommandTerminalLevels) parse(ctx context.Context, readBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	terminalLevels, err := readBuffer.ReadByteArray("terminalLevels", int(numBytes))
+	terminalLevels, err := readBuffer.ReadByteArray("terminalLevels", int(numBytes), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'terminalLevels' field"))
 	}
@@ -250,7 +253,7 @@ func (m *_IdentifyReplyCommandTerminalLevels) parse(ctx context.Context, readBuf
 }
 
 func (m *_IdentifyReplyCommandTerminalLevels) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -267,7 +270,7 @@ func (m *_IdentifyReplyCommandTerminalLevels) SerializeWithWriteBuffer(ctx conte
 			return errors.Wrap(pushErr, "Error pushing for IdentifyReplyCommandTerminalLevels")
 		}
 
-		if err := WriteByteArrayField(ctx, "terminalLevels", m.GetTerminalLevels(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "terminalLevels", m.GetTerminalLevels(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'terminalLevels' field")
 		}
 

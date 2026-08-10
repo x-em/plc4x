@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataEnergyMeterRef = (*_BACnetConstructedDataEnergyMeterR
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataEnergyMeterRef)(nil)
 
 // NewBACnetConstructedDataEnergyMeterRef factory function for _BACnetConstructedDataEnergyMeterRef
-func NewBACnetConstructedDataEnergyMeterRef(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, energyMeterRef BACnetDeviceObjectReference, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataEnergyMeterRef {
+func NewBACnetConstructedDataEnergyMeterRef(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, energyMeterRef BACnetDeviceObjectReference) *_BACnetConstructedDataEnergyMeterRef {
 	if energyMeterRef == nil {
 		panic("energyMeterRef of type BACnetDeviceObjectReference for BACnetConstructedDataEnergyMeterRef must not be nil")
 	}
 	_result := &_BACnetConstructedDataEnergyMeterRef{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		EnergyMeterRef:                energyMeterRef,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataEnergyMeterRefBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataEnergyMeterRefBuilder) = (*_BACnetConstructedDataEnergyMeterRefBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataEnergyMeterRefBuilder) WithEnergyMeterRefBuilder(
 	var err error
 	b.EnergyMeterRef, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDeviceObjectReferenceBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDeviceObjectReferenceBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataEnergyMeterRefBuilder) Build() (BACnetConstructedDataEnergyMeterRef, error) {
 	if b.EnergyMeterRef == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'energyMeterRef' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'energyMeterRef' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataEnergyMeterRef.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataEnergyMeterRefBuilder) buildForBACnetConstructedD
 
 func (b *_BACnetConstructedDataEnergyMeterRefBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataEnergyMeterRefBuilder().(*_BACnetConstructedDataEnergyMeterRefBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataEnergyMeterRef(structType any) BACnetConstructedDa
 	return nil
 }
 
-func (m *_BACnetConstructedDataEnergyMeterRef) GetTypeName() string {
+func (m *_BACnetConstructedDataEnergyMeterRef) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataEnergyMeterRef"
 }
 

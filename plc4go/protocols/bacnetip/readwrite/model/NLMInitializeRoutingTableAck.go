@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,9 +62,9 @@ var _ NLMInitializeRoutingTableAck = (*_NLMInitializeRoutingTableAck)(nil)
 var _ NLMRequirements = (*_NLMInitializeRoutingTableAck)(nil)
 
 // NewNLMInitializeRoutingTableAck factory function for _NLMInitializeRoutingTableAck
-func NewNLMInitializeRoutingTableAck(numberOfPorts uint8, portMappings []NLMInitializeRoutingTablePortMapping, apduLength uint16) *_NLMInitializeRoutingTableAck {
+func NewNLMInitializeRoutingTableAck(numberOfPorts uint8, portMappings []NLMInitializeRoutingTablePortMapping) *_NLMInitializeRoutingTableAck {
 	_result := &_NLMInitializeRoutingTableAck{
-		NLMContract:   NewNLM(apduLength),
+		NLMContract:   NewNLM(),
 		NumberOfPorts: numberOfPorts,
 		PortMappings:  portMappings,
 	}
@@ -103,7 +104,7 @@ type _NLMInitializeRoutingTableAckBuilder struct {
 
 	parentBuilder *_NLMBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NLMInitializeRoutingTableAckBuilder) = (*_NLMInitializeRoutingTableAckBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_NLMInitializeRoutingTableAckBuilder) WithPortMappings(portMappings ...
 }
 
 func (b *_NLMInitializeRoutingTableAckBuilder) Build() (NLMInitializeRoutingTableAck, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NLMInitializeRoutingTableAck.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_NLMInitializeRoutingTableAckBuilder) buildForNLM() (NLM, error) {
 
 func (b *_NLMInitializeRoutingTableAckBuilder) DeepCopy() any {
 	_copy := b.CreateNLMInitializeRoutingTableAckBuilder().(*_NLMInitializeRoutingTableAckBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastNLMInitializeRoutingTableAck(structType any) NLMInitializeRoutingTableA
 	return nil
 }
 
-func (m *_NLMInitializeRoutingTableAck) GetTypeName() string {
+func (m *_NLMInitializeRoutingTableAck) GetPlx4xTypeName() string {
 	return "NLMInitializeRoutingTableAck"
 }
 
@@ -235,9 +236,7 @@ func (m *_NLMInitializeRoutingTableAck) GetLengthInBits(ctx context.Context) uin
 	if len(m.PortMappings) > 0 {
 		for _curItem, element := range m.PortMappings {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.PortMappings), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

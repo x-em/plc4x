@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,12 +59,12 @@ var _ BACnetTimerStateChangeValueNull = (*_BACnetTimerStateChangeValueNull)(nil)
 var _ BACnetTimerStateChangeValueRequirements = (*_BACnetTimerStateChangeValueNull)(nil)
 
 // NewBACnetTimerStateChangeValueNull factory function for _BACnetTimerStateChangeValueNull
-func NewBACnetTimerStateChangeValueNull(peekedTagHeader BACnetTagHeader, nullValue BACnetApplicationTagNull, objectTypeArgument BACnetObjectType) *_BACnetTimerStateChangeValueNull {
+func NewBACnetTimerStateChangeValueNull(peekedTagHeader BACnetTagHeader, nullValue BACnetApplicationTagNull) *_BACnetTimerStateChangeValueNull {
 	if nullValue == nil {
 		panic("nullValue of type BACnetApplicationTagNull for BACnetTimerStateChangeValueNull must not be nil")
 	}
 	_result := &_BACnetTimerStateChangeValueNull{
-		BACnetTimerStateChangeValueContract: NewBACnetTimerStateChangeValue(peekedTagHeader, objectTypeArgument),
+		BACnetTimerStateChangeValueContract: NewBACnetTimerStateChangeValue(peekedTagHeader),
 		NullValue:                           nullValue,
 	}
 	_result.BACnetTimerStateChangeValueContract.(*_BACnetTimerStateChangeValue)._SubType = _result
@@ -102,7 +103,7 @@ type _BACnetTimerStateChangeValueNullBuilder struct {
 
 	parentBuilder *_BACnetTimerStateChangeValueBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetTimerStateChangeValueNullBuilder) = (*_BACnetTimerStateChangeValueNullBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_BACnetTimerStateChangeValueNullBuilder) WithNullValueBuilder(builderSu
 	var err error
 	b.NullValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagNullBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagNullBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetTimerStateChangeValueNullBuilder) Build() (BACnetTimerStateChangeValueNull, error) {
 	if b.NullValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'nullValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'nullValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetTimerStateChangeValueNull.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_BACnetTimerStateChangeValueNullBuilder) buildForBACnetTimerStateChange
 
 func (b *_BACnetTimerStateChangeValueNullBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetTimerStateChangeValueNullBuilder().(*_BACnetTimerStateChangeValueNullBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +221,7 @@ func CastBACnetTimerStateChangeValueNull(structType any) BACnetTimerStateChangeV
 	return nil
 }
 
-func (m *_BACnetTimerStateChangeValueNull) GetTypeName() string {
+func (m *_BACnetTimerStateChangeValueNull) GetPlx4xTypeName() string {
 	return "BACnetTimerStateChangeValueNull"
 }
 

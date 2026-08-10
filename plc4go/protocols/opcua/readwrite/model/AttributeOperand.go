@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -141,7 +143,7 @@ type _AttributeOperandBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AttributeOperandBuilder) = (*_AttributeOperandBuilder)(nil)
@@ -165,10 +167,7 @@ func (b *_AttributeOperandBuilder) WithNodeIdBuilder(builderSupplier func(NodeId
 	var err error
 	b.NodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -183,10 +182,7 @@ func (b *_AttributeOperandBuilder) WithAliasBuilder(builderSupplier func(PascalS
 	var err error
 	b.Alias, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -201,10 +197,7 @@ func (b *_AttributeOperandBuilder) WithBrowsePathBuilder(builderSupplier func(Re
 	var err error
 	b.BrowsePath, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RelativePathBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RelativePathBuilder failed"))
 	}
 	return b
 }
@@ -224,41 +217,26 @@ func (b *_AttributeOperandBuilder) WithIndexRangeBuilder(builderSupplier func(Pa
 	var err error
 	b.IndexRange, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_AttributeOperandBuilder) Build() (AttributeOperand, error) {
 	if b.NodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'nodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'nodeId' not set"))
 	}
 	if b.Alias == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'alias' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'alias' not set"))
 	}
 	if b.BrowsePath == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'browsePath' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'browsePath' not set"))
 	}
 	if b.IndexRange == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'indexRange' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'indexRange' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AttributeOperand.deepCopy(), nil
 }
@@ -284,8 +262,8 @@ func (b *_AttributeOperandBuilder) buildForExtensionObjectDefinition() (Extensio
 
 func (b *_AttributeOperandBuilder) DeepCopy() any {
 	_copy := b.CreateAttributeOperandBuilder().(*_AttributeOperandBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -362,7 +340,7 @@ func CastAttributeOperand(structType any) AttributeOperand {
 	return nil
 }
 
-func (m *_AttributeOperand) GetTypeName() string {
+func (m *_AttributeOperand) GetPlx4xTypeName() string {
 	return "AttributeOperand"
 }
 
@@ -402,31 +380,31 @@ func (m *_AttributeOperand) parse(ctx context.Context, readBuffer utils.ReadBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	nodeId, err := ReadSimpleField[NodeId](ctx, "nodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	nodeId, err := ReadSimpleField[NodeId](ctx, "nodeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeId' field"))
 	}
 	m.NodeId = nodeId
 
-	alias, err := ReadSimpleField[PascalString](ctx, "alias", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	alias, err := ReadSimpleField[PascalString](ctx, "alias", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'alias' field"))
 	}
 	m.Alias = alias
 
-	browsePath, err := ReadSimpleField[RelativePath](ctx, "browsePath", ReadComplex[RelativePath](ExtensionObjectDefinitionParseWithBufferProducer[RelativePath]((int32)(int32(542))), readBuffer))
+	browsePath, err := ReadSimpleField[RelativePath](ctx, "browsePath", ReadComplex[RelativePath](ExtensionObjectDefinitionParseWithBufferProducer[RelativePath]((int32)(int32(542))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'browsePath' field"))
 	}
 	m.BrowsePath = browsePath
 
-	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)))
+	attributeId, err := ReadSimpleField(ctx, "attributeId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'attributeId' field"))
 	}
 	m.AttributeId = attributeId
 
-	indexRange, err := ReadSimpleField[PascalString](ctx, "indexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	indexRange, err := ReadSimpleField[PascalString](ctx, "indexRange", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'indexRange' field"))
 	}
@@ -457,23 +435,23 @@ func (m *_AttributeOperand) SerializeWithWriteBuffer(ctx context.Context, writeB
 			return errors.Wrap(pushErr, "Error pushing for AttributeOperand")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodeId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "alias", m.GetAlias(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "alias", m.GetAlias(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'alias' field")
 		}
 
-		if err := WriteSimpleField[RelativePath](ctx, "browsePath", m.GetBrowsePath(), WriteComplex[RelativePath](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RelativePath](ctx, "browsePath", m.GetBrowsePath(), WriteComplex[RelativePath](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'browsePath' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "attributeId", m.GetAttributeId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'attributeId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "indexRange", m.GetIndexRange(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "indexRange", m.GetIndexRange(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'indexRange' field")
 		}
 

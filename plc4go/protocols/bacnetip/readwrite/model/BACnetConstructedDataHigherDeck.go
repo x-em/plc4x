@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataHigherDeck = (*_BACnetConstructedDataHigherDeck)(nil)
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataHigherDeck)(nil)
 
 // NewBACnetConstructedDataHigherDeck factory function for _BACnetConstructedDataHigherDeck
-func NewBACnetConstructedDataHigherDeck(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, higherDeck BACnetApplicationTagObjectIdentifier, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataHigherDeck {
+func NewBACnetConstructedDataHigherDeck(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, higherDeck BACnetApplicationTagObjectIdentifier) *_BACnetConstructedDataHigherDeck {
 	if higherDeck == nil {
 		panic("higherDeck of type BACnetApplicationTagObjectIdentifier for BACnetConstructedDataHigherDeck must not be nil")
 	}
 	_result := &_BACnetConstructedDataHigherDeck{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		HigherDeck:                    higherDeck,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataHigherDeckBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataHigherDeckBuilder) = (*_BACnetConstructedDataHigherDeckBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataHigherDeckBuilder) WithHigherDeckBuilder(builderS
 	var err error
 	b.HigherDeck, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagObjectIdentifierBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagObjectIdentifierBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataHigherDeckBuilder) Build() (BACnetConstructedDataHigherDeck, error) {
 	if b.HigherDeck == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'higherDeck' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'higherDeck' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataHigherDeck.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataHigherDeckBuilder) buildForBACnetConstructedData(
 
 func (b *_BACnetConstructedDataHigherDeckBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataHigherDeckBuilder().(*_BACnetConstructedDataHigherDeckBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataHigherDeck(structType any) BACnetConstructedDataHi
 	return nil
 }
 
-func (m *_BACnetConstructedDataHigherDeck) GetTypeName() string {
+func (m *_BACnetConstructedDataHigherDeck) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataHigherDeck"
 }
 

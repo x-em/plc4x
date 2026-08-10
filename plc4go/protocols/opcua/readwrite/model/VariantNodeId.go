@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,7 +62,7 @@ var _ VariantNodeId = (*_VariantNodeId)(nil)
 var _ VariantRequirements = (*_VariantNodeId)(nil)
 
 // NewVariantNodeId factory function for _VariantNodeId
-func NewVariantNodeId(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool, arrayLength *int32, value []NodeId) *_VariantNodeId {
+func NewVariantNodeId(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32, arrayLength *int32, value []NodeId) *_VariantNodeId {
 	_result := &_VariantNodeId{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 		ArrayLength:     arrayLength,
@@ -103,7 +104,7 @@ type _VariantNodeIdBuilder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantNodeIdBuilder) = (*_VariantNodeIdBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_VariantNodeIdBuilder) WithValue(value ...NodeId) VariantNodeIdBuilder 
 }
 
 func (b *_VariantNodeIdBuilder) Build() (VariantNodeId, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantNodeId.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_VariantNodeIdBuilder) buildForVariant() (Variant, error) {
 
 func (b *_VariantNodeIdBuilder) DeepCopy() any {
 	_copy := b.CreateVariantNodeIdBuilder().(*_VariantNodeIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastVariantNodeId(structType any) VariantNodeId {
 	return nil
 }
 
-func (m *_VariantNodeId) GetTypeName() string {
+func (m *_VariantNodeId) GetPlx4xTypeName() string {
 	return "VariantNodeId"
 }
 
@@ -237,9 +238,7 @@ func (m *_VariantNodeId) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Value) > 0 {
 		for _curItem, element := range m.Value {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Value), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

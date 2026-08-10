@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -125,7 +126,7 @@ type _AirConditioningDataZoneTemperatureBuilder struct {
 
 	parentBuilder *_AirConditioningDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AirConditioningDataZoneTemperatureBuilder) = (*_AirConditioningDataZoneTemperatureBuilder)(nil)
@@ -154,10 +155,7 @@ func (b *_AirConditioningDataZoneTemperatureBuilder) WithZoneListBuilder(builder
 	var err error
 	b.ZoneList, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HVACZoneListBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HVACZoneListBuilder failed"))
 	}
 	return b
 }
@@ -172,10 +170,7 @@ func (b *_AirConditioningDataZoneTemperatureBuilder) WithTemperatureBuilder(buil
 	var err error
 	b.Temperature, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HVACTemperatureBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HVACTemperatureBuilder failed"))
 	}
 	return b
 }
@@ -187,19 +182,13 @@ func (b *_AirConditioningDataZoneTemperatureBuilder) WithSensorStatus(sensorStat
 
 func (b *_AirConditioningDataZoneTemperatureBuilder) Build() (AirConditioningDataZoneTemperature, error) {
 	if b.ZoneList == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'zoneList' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'zoneList' not set"))
 	}
 	if b.Temperature == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'temperature' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'temperature' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AirConditioningDataZoneTemperature.deepCopy(), nil
 }
@@ -225,8 +214,8 @@ func (b *_AirConditioningDataZoneTemperatureBuilder) buildForAirConditioningData
 
 func (b *_AirConditioningDataZoneTemperatureBuilder) DeepCopy() any {
 	_copy := b.CreateAirConditioningDataZoneTemperatureBuilder().(*_AirConditioningDataZoneTemperatureBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -295,7 +284,7 @@ func CastAirConditioningDataZoneTemperature(structType any) AirConditioningDataZ
 	return nil
 }
 
-func (m *_AirConditioningDataZoneTemperature) GetTypeName() string {
+func (m *_AirConditioningDataZoneTemperature) GetPlx4xTypeName() string {
 	return "AirConditioningDataZoneTemperature"
 }
 

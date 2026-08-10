@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ BACnetConstructedDataNotificationForwarderAll = (*_BACnetConstructedDataNo
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataNotificationForwarderAll)(nil)
 
 // NewBACnetConstructedDataNotificationForwarderAll factory function for _BACnetConstructedDataNotificationForwarderAll
-func NewBACnetConstructedDataNotificationForwarderAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataNotificationForwarderAll {
+func NewBACnetConstructedDataNotificationForwarderAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag) *_BACnetConstructedDataNotificationForwarderAll {
 	_result := &_BACnetConstructedDataNotificationForwarderAll{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _BACnetConstructedDataNotificationForwarderAllBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataNotificationForwarderAllBuilder) = (*_BACnetConstructedDataNotificationForwarderAllBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_BACnetConstructedDataNotificationForwarderAllBuilder) WithMandatoryFie
 }
 
 func (b *_BACnetConstructedDataNotificationForwarderAllBuilder) Build() (BACnetConstructedDataNotificationForwarderAll, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataNotificationForwarderAll.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_BACnetConstructedDataNotificationForwarderAllBuilder) buildForBACnetCo
 
 func (b *_BACnetConstructedDataNotificationForwarderAllBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataNotificationForwarderAllBuilder().(*_BACnetConstructedDataNotificationForwarderAllBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastBACnetConstructedDataNotificationForwarderAll(structType any) BACnetCon
 	return nil
 }
 
-func (m *_BACnetConstructedDataNotificationForwarderAll) GetTypeName() string {
+func (m *_BACnetConstructedDataNotificationForwarderAll) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataNotificationForwarderAll"
 }
 

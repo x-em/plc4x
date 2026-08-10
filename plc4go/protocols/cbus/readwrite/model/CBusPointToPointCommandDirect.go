@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +63,12 @@ var _ CBusPointToPointCommandDirect = (*_CBusPointToPointCommandDirect)(nil)
 var _ CBusPointToPointCommandRequirements = (*_CBusPointToPointCommandDirect)(nil)
 
 // NewCBusPointToPointCommandDirect factory function for _CBusPointToPointCommandDirect
-func NewCBusPointToPointCommandDirect(bridgeAddressCountPeek uint16, calData CALData, unitAddress UnitAddress, cBusOptions CBusOptions) *_CBusPointToPointCommandDirect {
+func NewCBusPointToPointCommandDirect(bridgeAddressCountPeek uint16, calData CALData, unitAddress UnitAddress) *_CBusPointToPointCommandDirect {
 	if unitAddress == nil {
 		panic("unitAddress of type UnitAddress for CBusPointToPointCommandDirect must not be nil")
 	}
 	_result := &_CBusPointToPointCommandDirect{
-		CBusPointToPointCommandContract: NewCBusPointToPointCommand(bridgeAddressCountPeek, calData, cBusOptions),
+		CBusPointToPointCommandContract: NewCBusPointToPointCommand(bridgeAddressCountPeek, calData),
 		UnitAddress:                     unitAddress,
 	}
 	_result.CBusPointToPointCommandContract.(*_CBusPointToPointCommand)._SubType = _result
@@ -104,7 +107,7 @@ type _CBusPointToPointCommandDirectBuilder struct {
 
 	parentBuilder *_CBusPointToPointCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CBusPointToPointCommandDirectBuilder) = (*_CBusPointToPointCommandDirectBuilder)(nil)
@@ -128,23 +131,17 @@ func (b *_CBusPointToPointCommandDirectBuilder) WithUnitAddressBuilder(builderSu
 	var err error
 	b.UnitAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "UnitAddressBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "UnitAddressBuilder failed"))
 	}
 	return b
 }
 
 func (b *_CBusPointToPointCommandDirectBuilder) Build() (CBusPointToPointCommandDirect, error) {
 	if b.UnitAddress == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'unitAddress' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'unitAddress' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CBusPointToPointCommandDirect.deepCopy(), nil
 }
@@ -170,8 +167,8 @@ func (b *_CBusPointToPointCommandDirectBuilder) buildForCBusPointToPointCommand(
 
 func (b *_CBusPointToPointCommandDirectBuilder) DeepCopy() any {
 	_copy := b.CreateCBusPointToPointCommandDirectBuilder().(*_CBusPointToPointCommandDirectBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -228,7 +225,7 @@ func CastCBusPointToPointCommandDirect(structType any) CBusPointToPointCommandDi
 	return nil
 }
 
-func (m *_CBusPointToPointCommandDirect) GetTypeName() string {
+func (m *_CBusPointToPointCommandDirect) GetPlx4xTypeName() string {
 	return "CBusPointToPointCommandDirect"
 }
 
@@ -259,13 +256,13 @@ func (m *_CBusPointToPointCommandDirect) parse(ctx context.Context, readBuffer u
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	unitAddress, err := ReadSimpleField[UnitAddress](ctx, "unitAddress", ReadComplex[UnitAddress](UnitAddressParseWithBuffer, readBuffer))
+	unitAddress, err := ReadSimpleField[UnitAddress](ctx, "unitAddress", ReadComplex[UnitAddress](UnitAddressParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'unitAddress' field"))
 	}
 	m.UnitAddress = unitAddress
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(8)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(8)), uint8(0x00), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
@@ -279,7 +276,7 @@ func (m *_CBusPointToPointCommandDirect) parse(ctx context.Context, readBuffer u
 }
 
 func (m *_CBusPointToPointCommandDirect) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -296,11 +293,11 @@ func (m *_CBusPointToPointCommandDirect) SerializeWithWriteBuffer(ctx context.Co
 			return errors.Wrap(pushErr, "Error pushing for CBusPointToPointCommandDirect")
 		}
 
-		if err := WriteSimpleField[UnitAddress](ctx, "unitAddress", m.GetUnitAddress(), WriteComplex[UnitAddress](writeBuffer)); err != nil {
+		if err := WriteSimpleField[UnitAddress](ctx, "unitAddress", m.GetUnitAddress(), WriteComplex[UnitAddress](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'unitAddress' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 

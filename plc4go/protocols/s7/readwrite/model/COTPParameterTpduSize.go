@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ COTPParameterTpduSize = (*_COTPParameterTpduSize)(nil)
 var _ COTPParameterRequirements = (*_COTPParameterTpduSize)(nil)
 
 // NewCOTPParameterTpduSize factory function for _COTPParameterTpduSize
-func NewCOTPParameterTpduSize(tpduSize COTPTpduSize, rest uint8) *_COTPParameterTpduSize {
+func NewCOTPParameterTpduSize(tpduSize COTPTpduSize) *_COTPParameterTpduSize {
 	_result := &_COTPParameterTpduSize{
-		COTPParameterContract: NewCOTPParameter(rest),
+		COTPParameterContract: NewCOTPParameter(),
 		TpduSize:              tpduSize,
 	}
 	_result.COTPParameterContract.(*_COTPParameter)._SubType = _result
@@ -97,7 +98,7 @@ type _COTPParameterTpduSizeBuilder struct {
 
 	parentBuilder *_COTPParameterBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (COTPParameterTpduSizeBuilder) = (*_COTPParameterTpduSizeBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_COTPParameterTpduSizeBuilder) WithTpduSize(tpduSize COTPTpduSize) COTP
 }
 
 func (b *_COTPParameterTpduSizeBuilder) Build() (COTPParameterTpduSize, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._COTPParameterTpduSize.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_COTPParameterTpduSizeBuilder) buildForCOTPParameter() (COTPParameter, 
 
 func (b *_COTPParameterTpduSizeBuilder) DeepCopy() any {
 	_copy := b.CreateCOTPParameterTpduSizeBuilder().(*_COTPParameterTpduSizeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +207,7 @@ func CastCOTPParameterTpduSize(structType any) COTPParameterTpduSize {
 	return nil
 }
 
-func (m *_COTPParameterTpduSize) GetTypeName() string {
+func (m *_COTPParameterTpduSize) GetPlx4xTypeName() string {
 	return "COTPParameterTpduSize"
 }
 

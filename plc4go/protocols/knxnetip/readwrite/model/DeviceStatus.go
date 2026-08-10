@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -87,7 +88,7 @@ func NewDeviceStatusBuilder() DeviceStatusBuilder {
 type _DeviceStatusBuilder struct {
 	*_DeviceStatus
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DeviceStatusBuilder) = (*_DeviceStatusBuilder)(nil)
@@ -102,8 +103,8 @@ func (b *_DeviceStatusBuilder) WithProgramMode(programMode bool) DeviceStatusBui
 }
 
 func (b *_DeviceStatusBuilder) Build() (DeviceStatus, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DeviceStatus.deepCopy(), nil
 }
@@ -118,8 +119,8 @@ func (b *_DeviceStatusBuilder) MustBuild() DeviceStatus {
 
 func (b *_DeviceStatusBuilder) DeepCopy() any {
 	_copy := b.CreateDeviceStatusBuilder().(*_DeviceStatusBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -162,7 +163,7 @@ func CastDeviceStatus(structType any) DeviceStatus {
 	return nil
 }
 
-func (m *_DeviceStatus) GetTypeName() string {
+func (m *_DeviceStatus) GetPlx4xTypeName() string {
 	return "DeviceStatus"
 }
 
@@ -193,7 +194,7 @@ func DeviceStatusParseWithBufferProducer() func(ctx context.Context, readBuffer 
 }
 
 func DeviceStatusParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (DeviceStatus, error) {
-	v, err := (&_DeviceStatus{}).parse(ctx, readBuffer)
+	v, err := (new(_DeviceStatus)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

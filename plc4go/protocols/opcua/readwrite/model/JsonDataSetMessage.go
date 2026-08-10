@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -192,7 +194,7 @@ type _JsonDataSetMessageBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (JsonDataSetMessageBuilder) = (*_JsonDataSetMessageBuilder)(nil)
@@ -221,10 +223,7 @@ func (b *_JsonDataSetMessageBuilder) WithDataSetWriterNameBuilder(builderSupplie
 	var err error
 	b.DataSetWriterName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -239,10 +238,7 @@ func (b *_JsonDataSetMessageBuilder) WithPublisherIdBuilder(builderSupplier func
 	var err error
 	b.PublisherId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -257,10 +253,7 @@ func (b *_JsonDataSetMessageBuilder) WithWriterGroupNameBuilder(builderSupplier 
 	var err error
 	b.WriterGroupName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -280,10 +273,7 @@ func (b *_JsonDataSetMessageBuilder) WithMetaDataVersionBuilder(builderSupplier 
 	var err error
 	b.MetaDataVersion, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ConfigurationVersionDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ConfigurationVersionDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -308,10 +298,7 @@ func (b *_JsonDataSetMessageBuilder) WithStatusBuilder(builderSupplier func(Stat
 	var err error
 	b.Status, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -326,10 +313,7 @@ func (b *_JsonDataSetMessageBuilder) WithMessageTypeBuilder(builderSupplier func
 	var err error
 	b.MessageType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -344,59 +328,35 @@ func (b *_JsonDataSetMessageBuilder) WithPayloadBuilder(builderSupplier func(Ext
 	var err error
 	b.Payload, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
 
 func (b *_JsonDataSetMessageBuilder) Build() (JsonDataSetMessage, error) {
 	if b.DataSetWriterName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataSetWriterName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataSetWriterName' not set"))
 	}
 	if b.PublisherId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'publisherId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'publisherId' not set"))
 	}
 	if b.WriterGroupName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'writerGroupName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'writerGroupName' not set"))
 	}
 	if b.MetaDataVersion == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'metaDataVersion' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'metaDataVersion' not set"))
 	}
 	if b.Status == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'status' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'status' not set"))
 	}
 	if b.MessageType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'messageType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'messageType' not set"))
 	}
 	if b.Payload == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'payload' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'payload' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._JsonDataSetMessage.deepCopy(), nil
 }
@@ -422,8 +382,8 @@ func (b *_JsonDataSetMessageBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_JsonDataSetMessageBuilder) DeepCopy() any {
 	_copy := b.CreateJsonDataSetMessageBuilder().(*_JsonDataSetMessageBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -524,7 +484,7 @@ func CastJsonDataSetMessage(structType any) JsonDataSetMessage {
 	return nil
 }
 
-func (m *_JsonDataSetMessage) GetTypeName() string {
+func (m *_JsonDataSetMessage) GetPlx4xTypeName() string {
 	return "JsonDataSetMessage"
 }
 
@@ -582,67 +542,67 @@ func (m *_JsonDataSetMessage) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	dataSetWriterId, err := ReadSimpleField(ctx, "dataSetWriterId", ReadUnsignedShort(readBuffer, uint8(16)))
+	dataSetWriterId, err := ReadSimpleField(ctx, "dataSetWriterId", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetWriterId' field"))
 	}
 	m.DataSetWriterId = dataSetWriterId
 
-	dataSetWriterName, err := ReadSimpleField[PascalString](ctx, "dataSetWriterName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	dataSetWriterName, err := ReadSimpleField[PascalString](ctx, "dataSetWriterName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetWriterName' field"))
 	}
 	m.DataSetWriterName = dataSetWriterName
 
-	publisherId, err := ReadSimpleField[PascalString](ctx, "publisherId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	publisherId, err := ReadSimpleField[PascalString](ctx, "publisherId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'publisherId' field"))
 	}
 	m.PublisherId = publisherId
 
-	writerGroupName, err := ReadSimpleField[PascalString](ctx, "writerGroupName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	writerGroupName, err := ReadSimpleField[PascalString](ctx, "writerGroupName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'writerGroupName' field"))
 	}
 	m.WriterGroupName = writerGroupName
 
-	sequenceNumber, err := ReadSimpleField(ctx, "sequenceNumber", ReadUnsignedInt(readBuffer, uint8(32)))
+	sequenceNumber, err := ReadSimpleField(ctx, "sequenceNumber", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'sequenceNumber' field"))
 	}
 	m.SequenceNumber = sequenceNumber
 
-	metaDataVersion, err := ReadSimpleField[ConfigurationVersionDataType](ctx, "metaDataVersion", ReadComplex[ConfigurationVersionDataType](ExtensionObjectDefinitionParseWithBufferProducer[ConfigurationVersionDataType]((int32)(int32(14595))), readBuffer))
+	metaDataVersion, err := ReadSimpleField[ConfigurationVersionDataType](ctx, "metaDataVersion", ReadComplex[ConfigurationVersionDataType](ExtensionObjectDefinitionParseWithBufferProducer[ConfigurationVersionDataType]((int32)(int32(14595))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'metaDataVersion' field"))
 	}
 	m.MetaDataVersion = metaDataVersion
 
-	minorVersion, err := ReadSimpleField(ctx, "minorVersion", ReadUnsignedInt(readBuffer, uint8(32)))
+	minorVersion, err := ReadSimpleField(ctx, "minorVersion", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'minorVersion' field"))
 	}
 	m.MinorVersion = minorVersion
 
-	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)))
+	timestamp, err := ReadSimpleField(ctx, "timestamp", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'timestamp' field"))
 	}
 	m.Timestamp = timestamp
 
-	status, err := ReadSimpleField[StatusCode](ctx, "status", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	status, err := ReadSimpleField[StatusCode](ctx, "status", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'status' field"))
 	}
 	m.Status = status
 
-	messageType, err := ReadSimpleField[PascalString](ctx, "messageType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	messageType, err := ReadSimpleField[PascalString](ctx, "messageType", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageType' field"))
 	}
 	m.MessageType = messageType
 
-	payload, err := ReadSimpleField[ExtensionObject](ctx, "payload", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	payload, err := ReadSimpleField[ExtensionObject](ctx, "payload", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'payload' field"))
 	}
@@ -673,47 +633,47 @@ func (m *_JsonDataSetMessage) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for JsonDataSetMessage")
 		}
 
-		if err := WriteSimpleField[uint16](ctx, "dataSetWriterId", m.GetDataSetWriterId(), WriteUnsignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteSimpleField[uint16](ctx, "dataSetWriterId", m.GetDataSetWriterId(), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetWriterId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "dataSetWriterName", m.GetDataSetWriterName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "dataSetWriterName", m.GetDataSetWriterName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetWriterName' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "publisherId", m.GetPublisherId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "publisherId", m.GetPublisherId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'publisherId' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "writerGroupName", m.GetWriterGroupName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "writerGroupName", m.GetWriterGroupName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'writerGroupName' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "sequenceNumber", m.GetSequenceNumber(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "sequenceNumber", m.GetSequenceNumber(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'sequenceNumber' field")
 		}
 
-		if err := WriteSimpleField[ConfigurationVersionDataType](ctx, "metaDataVersion", m.GetMetaDataVersion(), WriteComplex[ConfigurationVersionDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ConfigurationVersionDataType](ctx, "metaDataVersion", m.GetMetaDataVersion(), WriteComplex[ConfigurationVersionDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'metaDataVersion' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "minorVersion", m.GetMinorVersion(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "minorVersion", m.GetMinorVersion(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'minorVersion' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "timestamp", m.GetTimestamp(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'timestamp' field")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "status", m.GetStatus(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "status", m.GetStatus(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'status' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "messageType", m.GetMessageType(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "messageType", m.GetMessageType(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageType' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "payload", m.GetPayload(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "payload", m.GetPayload(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'payload' field")
 		}
 

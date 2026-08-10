@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +121,7 @@ type _CallMethodRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CallMethodRequestBuilder) = (*_CallMethodRequestBuilder)(nil)
@@ -143,10 +145,7 @@ func (b *_CallMethodRequestBuilder) WithObjectIdBuilder(builderSupplier func(Nod
 	var err error
 	b.ObjectId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -161,10 +160,7 @@ func (b *_CallMethodRequestBuilder) WithMethodIdBuilder(builderSupplier func(Nod
 	var err error
 	b.MethodId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -176,19 +172,13 @@ func (b *_CallMethodRequestBuilder) WithInputArguments(inputArguments ...Variant
 
 func (b *_CallMethodRequestBuilder) Build() (CallMethodRequest, error) {
 	if b.ObjectId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'objectId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'objectId' not set"))
 	}
 	if b.MethodId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'methodId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'methodId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CallMethodRequest.deepCopy(), nil
 }
@@ -214,8 +204,8 @@ func (b *_CallMethodRequestBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_CallMethodRequestBuilder) DeepCopy() any {
 	_copy := b.CreateCallMethodRequestBuilder().(*_CallMethodRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -284,7 +274,7 @@ func CastCallMethodRequest(structType any) CallMethodRequest {
 	return nil
 }
 
-func (m *_CallMethodRequest) GetTypeName() string {
+func (m *_CallMethodRequest) GetPlx4xTypeName() string {
 	return "CallMethodRequest"
 }
 
@@ -304,9 +294,7 @@ func (m *_CallMethodRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.InputArguments) > 0 {
 		for _curItem, element := range m.InputArguments {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.InputArguments), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -328,25 +316,25 @@ func (m *_CallMethodRequest) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	objectId, err := ReadSimpleField[NodeId](ctx, "objectId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	objectId, err := ReadSimpleField[NodeId](ctx, "objectId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'objectId' field"))
 	}
 	m.ObjectId = objectId
 
-	methodId, err := ReadSimpleField[NodeId](ctx, "methodId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	methodId, err := ReadSimpleField[NodeId](ctx, "methodId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'methodId' field"))
 	}
 	m.MethodId = methodId
 
-	noOfInputArguments, err := ReadImplicitField[int32](ctx, "noOfInputArguments", ReadSignedInt(readBuffer, uint8(32)))
+	noOfInputArguments, err := ReadImplicitField[int32](ctx, "noOfInputArguments", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfInputArguments' field"))
 	}
 	_ = noOfInputArguments
 
-	inputArguments, err := ReadCountArrayField[Variant](ctx, "inputArguments", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfInputArguments))
+	inputArguments, err := ReadCountArrayField[Variant](ctx, "inputArguments", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfInputArguments), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'inputArguments' field"))
 	}
@@ -377,19 +365,19 @@ func (m *_CallMethodRequest) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for CallMethodRequest")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "objectId", m.GetObjectId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "objectId", m.GetObjectId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'objectId' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "methodId", m.GetMethodId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "methodId", m.GetMethodId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'methodId' field")
 		}
 		noOfInputArguments := int32(utils.InlineIf(bool((m.GetInputArguments()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetInputArguments()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfInputArguments", noOfInputArguments, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfInputArguments", noOfInputArguments, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfInputArguments' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "inputArguments", m.GetInputArguments(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "inputArguments", m.GetInputArguments(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'inputArguments' field")
 		}
 

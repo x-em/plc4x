@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _MonitoringFilterResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MonitoringFilterResultBuilder) = (*_MonitoringFilterResultBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_MonitoringFilterResultBuilder) WithMandatoryFields() MonitoringFilterR
 }
 
 func (b *_MonitoringFilterResultBuilder) Build() (MonitoringFilterResult, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MonitoringFilterResult.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_MonitoringFilterResultBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_MonitoringFilterResultBuilder) DeepCopy() any {
 	_copy := b.CreateMonitoringFilterResultBuilder().(*_MonitoringFilterResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastMonitoringFilterResult(structType any) MonitoringFilterResult {
 	return nil
 }
 
-func (m *_MonitoringFilterResult) GetTypeName() string {
+func (m *_MonitoringFilterResult) GetPlx4xTypeName() string {
 	return "MonitoringFilterResult"
 }
 

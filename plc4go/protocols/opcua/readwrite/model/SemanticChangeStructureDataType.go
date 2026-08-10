@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _SemanticChangeStructureDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SemanticChangeStructureDataTypeBuilder) = (*_SemanticChangeStructureDataTypeBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_SemanticChangeStructureDataTypeBuilder) WithAffectedBuilder(builderSup
 	var err error
 	b.Affected, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_SemanticChangeStructureDataTypeBuilder) WithAffectedTypeBuilder(builde
 	var err error
 	b.AffectedType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SemanticChangeStructureDataTypeBuilder) Build() (SemanticChangeStructureDataType, error) {
 	if b.Affected == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'affected' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'affected' not set"))
 	}
 	if b.AffectedType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'affectedType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'affectedType' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SemanticChangeStructureDataType.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_SemanticChangeStructureDataTypeBuilder) buildForExtensionObjectDefinit
 
 func (b *_SemanticChangeStructureDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateSemanticChangeStructureDataTypeBuilder().(*_SemanticChangeStructureDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastSemanticChangeStructureDataType(structType any) SemanticChangeStructure
 	return nil
 }
 
-func (m *_SemanticChangeStructureDataType) GetTypeName() string {
+func (m *_SemanticChangeStructureDataType) GetPlx4xTypeName() string {
 	return "SemanticChangeStructureDataType"
 }
 
@@ -300,13 +290,13 @@ func (m *_SemanticChangeStructureDataType) parse(ctx context.Context, readBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	affected, err := ReadSimpleField[NodeId](ctx, "affected", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	affected, err := ReadSimpleField[NodeId](ctx, "affected", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'affected' field"))
 	}
 	m.Affected = affected
 
-	affectedType, err := ReadSimpleField[NodeId](ctx, "affectedType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	affectedType, err := ReadSimpleField[NodeId](ctx, "affectedType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'affectedType' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_SemanticChangeStructureDataType) SerializeWithWriteBuffer(ctx context.
 			return errors.Wrap(pushErr, "Error pushing for SemanticChangeStructureDataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "affected", m.GetAffected(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "affected", m.GetAffected(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'affected' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "affectedType", m.GetAffectedType(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "affectedType", m.GetAffectedType(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'affectedType' field")
 		}
 

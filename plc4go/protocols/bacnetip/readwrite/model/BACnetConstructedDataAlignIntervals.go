@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataAlignIntervals = (*_BACnetConstructedDataAlignInterva
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataAlignIntervals)(nil)
 
 // NewBACnetConstructedDataAlignIntervals factory function for _BACnetConstructedDataAlignIntervals
-func NewBACnetConstructedDataAlignIntervals(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, alignIntervals BACnetApplicationTagBoolean, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataAlignIntervals {
+func NewBACnetConstructedDataAlignIntervals(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, alignIntervals BACnetApplicationTagBoolean) *_BACnetConstructedDataAlignIntervals {
 	if alignIntervals == nil {
 		panic("alignIntervals of type BACnetApplicationTagBoolean for BACnetConstructedDataAlignIntervals must not be nil")
 	}
 	_result := &_BACnetConstructedDataAlignIntervals{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		AlignIntervals:                alignIntervals,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataAlignIntervalsBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataAlignIntervalsBuilder) = (*_BACnetConstructedDataAlignIntervalsBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataAlignIntervalsBuilder) WithAlignIntervalsBuilder(
 	var err error
 	b.AlignIntervals, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataAlignIntervalsBuilder) Build() (BACnetConstructedDataAlignIntervals, error) {
 	if b.AlignIntervals == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'alignIntervals' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'alignIntervals' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataAlignIntervals.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataAlignIntervalsBuilder) buildForBACnetConstructedD
 
 func (b *_BACnetConstructedDataAlignIntervalsBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataAlignIntervalsBuilder().(*_BACnetConstructedDataAlignIntervalsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataAlignIntervals(structType any) BACnetConstructedDa
 	return nil
 }
 
-func (m *_BACnetConstructedDataAlignIntervals) GetTypeName() string {
+func (m *_BACnetConstructedDataAlignIntervals) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataAlignIntervals"
 }
 

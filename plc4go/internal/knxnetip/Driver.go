@@ -23,18 +23,21 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/pkg/api"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	_default "github.com/apache/plc4x/plc4go/spi/default"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/transports"
+	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
 type Driver struct {
 	_default.DefaultDriver
+
+	discoverer *Discoverer
 
 	log      zerolog.Logger
 	_options []options.WithOption // Used to pass them downstream
@@ -43,8 +46,9 @@ type Driver struct {
 func NewDriver(_options ...options.WithOption) *Driver {
 	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
 	driver := &Driver{
-		log:      customLogger,
-		_options: _options,
+		discoverer: NewDiscoverer(_options...),
+		log:        customLogger,
+		_options:   _options,
 	}
 	driver.DefaultDriver = _default.NewDefaultDriver(driver, "knxnet-ip", "KNXNet/IP", "udp", NewTagHandler())
 	return driver
@@ -55,13 +59,12 @@ func (d *Driver) CheckQuery(query string) error {
 	return err
 }
 
-func (d *Driver) GetConnectionWithContext(ctx context.Context, transportUrl url.URL, transports map[string]transports.Transport, driverOptions map[string][]string) <-chan plc4go.PlcConnectionConnectResult {
+func (d *Driver) GetConnection(ctx context.Context, transportUrl url.URL, transports map[string]transports.Transport, driverOptions map[string][]string) (plc4go.PlcConnection, error) {
+	connectionLog := d.log.With().Ctx(ctx).Str("transportUrl", transportUrl.String()).Logger()
 	// Get an the transport specified in the url
 	transport, ok := transports[transportUrl.Scheme]
 	if !ok {
-		ch := make(chan plc4go.PlcConnectionConnectResult, 1)
-		ch <- _default.NewDefaultPlcConnectionConnectResult(nil, errors.Errorf("couldn't find transport for given transport url %#v", transportUrl))
-		return ch
+		return nil, errors.Errorf("couldn't find transport for given transport url %#v", transportUrl)
 	}
 	// Provide a default-port to the transport, which is used, if the user doesn't provide on in the connection string.
 	driverOptions["defaultUdpPort"] = []string{"3671"}
@@ -69,12 +72,10 @@ func (d *Driver) GetConnectionWithContext(ctx context.Context, transportUrl url.
 	transportInstance, err := transport.CreateTransportInstance(
 		transportUrl,
 		driverOptions,
-		append(d._options, options.WithCustomLogger(d.log))...,
+		append(d._options, options.WithCustomLogger(connectionLog))...,
 	)
 	if err != nil {
-		ch := make(chan plc4go.PlcConnectionConnectResult, 1)
-		ch <- _default.NewDefaultPlcConnectionConnectResult(nil, errors.Errorf("couldn't initialize transport configuration for given transport url %#v", transportUrl))
-		return ch
+		return nil, errors.Errorf("couldn't initialize transport configuration for given transport url %#v", transportUrl)
 	}
 
 	// Create the new connection
@@ -82,16 +83,29 @@ func (d *Driver) GetConnectionWithContext(ctx context.Context, transportUrl url.
 		transportInstance,
 		driverOptions,
 		d.GetPlcTagHandler(),
-		append(d._options, options.WithCustomLogger(d.log))...,
+		append(d._options, options.WithCustomLogger(connectionLog))...,
 	)
-	d.log.Trace().Str("transport", transportUrl.String()).Stringer("connection", connection).Msg("created new connection instance, trying to connect now")
-	return connection.ConnectWithContext(ctx)
+	connectionLog.Trace().
+		Str("transport", transportUrl.String()).
+		Interface("connection", connection).
+		Msg("created new connection instance, trying to connect now")
+	if err := connection.Connect(ctx); err != nil {
+		return nil, errors.Wrap(err, "Error connecting connection")
+	}
+	return connection, nil
 }
 
 func (d *Driver) SupportsDiscovery() bool {
 	return true
 }
 
-func (d *Driver) DiscoverWithContext(ctx context.Context, callback func(event apiModel.PlcDiscoveryItem), discoveryOptions ...options.WithDiscoveryOption) error {
-	return NewDiscoverer().Discover(ctx, callback, discoveryOptions...)
+func (d *Driver) Discover(ctx context.Context, callback func(event apiModel.PlcDiscoveryItem), discoveryOptions ...options.WithDiscoveryOption) error {
+	return d.discoverer.Discover(ctx, callback, discoveryOptions...)
+}
+
+func (d *Driver) Close() error {
+	defer utils.StopWarn(d.log)()
+	d.log.Trace().Msg("Closing driver")
+	d.log.Trace().Msg("Closing discoverer")
+	return d.discoverer.Close()
 }

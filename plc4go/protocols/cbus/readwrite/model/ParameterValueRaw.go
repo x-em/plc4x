@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ ParameterValueRaw = (*_ParameterValueRaw)(nil)
 var _ ParameterValueRequirements = (*_ParameterValueRaw)(nil)
 
 // NewParameterValueRaw factory function for _ParameterValueRaw
-func NewParameterValueRaw(data []byte, numBytes uint8) *_ParameterValueRaw {
+func NewParameterValueRaw(data []byte) *_ParameterValueRaw {
 	_result := &_ParameterValueRaw{
-		ParameterValueContract: NewParameterValue(numBytes),
+		ParameterValueContract: NewParameterValue(),
 		Data:                   data,
 	}
 	_result.ParameterValueContract.(*_ParameterValue)._SubType = _result
@@ -97,7 +100,7 @@ type _ParameterValueRawBuilder struct {
 
 	parentBuilder *_ParameterValueBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ParameterValueRawBuilder) = (*_ParameterValueRawBuilder)(nil)
@@ -117,8 +120,8 @@ func (b *_ParameterValueRawBuilder) WithData(data ...byte) ParameterValueRawBuil
 }
 
 func (b *_ParameterValueRawBuilder) Build() (ParameterValueRaw, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ParameterValueRaw.deepCopy(), nil
 }
@@ -144,8 +147,8 @@ func (b *_ParameterValueRawBuilder) buildForParameterValue() (ParameterValue, er
 
 func (b *_ParameterValueRawBuilder) DeepCopy() any {
 	_copy := b.CreateParameterValueRawBuilder().(*_ParameterValueRawBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +209,7 @@ func CastParameterValueRaw(structType any) ParameterValueRaw {
 	return nil
 }
 
-func (m *_ParameterValueRaw) GetTypeName() string {
+func (m *_ParameterValueRaw) GetPlx4xTypeName() string {
 	return "ParameterValueRaw"
 }
 
@@ -236,7 +239,7 @@ func (m *_ParameterValueRaw) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	data, err := readBuffer.ReadByteArray("data", int(numBytes))
+	data, err := readBuffer.ReadByteArray("data", int(numBytes), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'data' field"))
 	}
@@ -250,7 +253,7 @@ func (m *_ParameterValueRaw) parse(ctx context.Context, readBuffer utils.ReadBuf
 }
 
 func (m *_ParameterValueRaw) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -267,7 +270,7 @@ func (m *_ParameterValueRaw) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for ParameterValueRaw")
 		}
 
-		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "data", m.GetData(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'data' field")
 		}
 

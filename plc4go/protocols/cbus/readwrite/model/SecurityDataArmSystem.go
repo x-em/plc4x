@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -109,7 +110,7 @@ type _SecurityDataArmSystemBuilder struct {
 
 	parentBuilder *_SecurityDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SecurityDataArmSystemBuilder) = (*_SecurityDataArmSystemBuilder)(nil)
@@ -129,8 +130,8 @@ func (b *_SecurityDataArmSystemBuilder) WithArmMode(armMode byte) SecurityDataAr
 }
 
 func (b *_SecurityDataArmSystemBuilder) Build() (SecurityDataArmSystem, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SecurityDataArmSystem.deepCopy(), nil
 }
@@ -156,8 +157,8 @@ func (b *_SecurityDataArmSystemBuilder) buildForSecurityData() (SecurityData, er
 
 func (b *_SecurityDataArmSystemBuilder) DeepCopy() any {
 	_copy := b.CreateSecurityDataArmSystemBuilder().(*_SecurityDataArmSystemBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -259,7 +260,7 @@ func CastSecurityDataArmSystem(structType any) SecurityDataArmSystem {
 	return nil
 }
 
-func (m *_SecurityDataArmSystem) GetTypeName() string {
+func (m *_SecurityDataArmSystem) GetPlx4xTypeName() string {
 	return "SecurityDataArmSystem"
 }
 

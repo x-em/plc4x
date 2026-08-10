@@ -20,12 +20,15 @@
 package pool
 
 import (
+	"fmt"
 	"runtime/debug"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog"
+
+	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
 var upScaleInterval = 100 * time.Millisecond
@@ -42,13 +45,11 @@ type dynamicExecutor struct {
 	interrupter            chan struct{}
 
 	wg sync.WaitGroup // use to track spawned go routines
-
-	dynamicWorkers sync.WaitGroup
 }
 
-func newDynamicExecutor(queueDepth, maxNumberOfWorkers int, log zerolog.Logger) *dynamicExecutor {
+func newDynamicExecutor(queueDepth, maxNumberOfWorkers int, log zerolog.Logger, opts ...func(*executor)) *dynamicExecutor {
 	return &dynamicExecutor{
-		executor:           newExecutor(queueDepth, 0, log),
+		executor:           newExecutor(queueDepth, 0, log, opts...),
 		maxNumberOfWorkers: maxNumberOfWorkers,
 	}
 }
@@ -63,18 +64,14 @@ func (e *dynamicExecutor) Start() {
 	if e.interrupter != nil {
 		e.log.Debug().Msg("Ensuring that the old spawner/killers are not running")
 		close(e.interrupter)
-		e.dynamicWorkers.Wait()
+		e.wg.Wait()
 	}
 
 	e.executor.Start()
 	mutex := sync.Mutex{}
 	e.interrupter = make(chan struct{})
 	// Worker spawner
-	e.wg.Add(1)
-	go func() {
-		defer e.wg.Done()
-		e.dynamicWorkers.Add(1)
-		defer e.dynamicWorkers.Done()
+	e.wg.Go(func() {
 		defer func() {
 			if err := recover(); err != nil {
 				e.log.Error().
@@ -99,11 +96,11 @@ func (e *dynamicExecutor) Start() {
 				Msg("Checking if numberOfItemsInQueue > numberOfWorkers && numberOfWorkers < maxNumberOfWorkers")
 			if numberOfItemsInQueue > numberOfWorkers && numberOfWorkers < e.maxNumberOfWorkers {
 				workerLog.Trace().Msg("spawning new worker")
-				workerId := numberOfWorkers - 1
+				workerId := fmt.Sprintf("%s-worker-%d", e.name, numberOfWorkers-1)
 				_worker := newWorker(e.log, workerId, e)
 				_worker.lastReceived.Store(time.Now()) // We store the current timestamp so the worker isn't cut of instantly by the worker killer
 				e.worker = append(e.worker, _worker)
-				workerLog.Info().Int("Worker id", _worker.id).Msg("spawning")
+				workerLog.Info().Str("Worker id", _worker.id).Msg("spawning")
 				_worker.start()
 				e.currentNumberOfWorkers.Add(1)
 			} else {
@@ -121,13 +118,9 @@ func (e *dynamicExecutor) Start() {
 			}()
 		}
 		workerLog.Info().Msg("Terminated")
-	}()
+	})
 	// Worker killer
-	e.dynamicWorkers.Add(1)
-	e.wg.Add(1)
-	go func() {
-		defer e.wg.Done()
-		defer e.dynamicWorkers.Done()
+	e.wg.Go(func() {
 		defer func() {
 			if err := recover(); err != nil {
 				e.log.Error().
@@ -148,16 +141,16 @@ func (e *dynamicExecutor) Start() {
 			for _, _worker := range e.worker {
 				deadline := time.Now().Add(-timeToBecomeUnused)
 				workerLog.Debug().
-					Int("workerId", _worker.id).
+					Str("workerId", _worker.id).
 					Time("lastReceived", _worker.lastReceived.Load().(time.Time)).
 					Time("deadline", deadline).
 					Msg("Checking if lastReceived is before deadline")
 				if _worker.lastReceived.Load().(time.Time).Before(deadline) {
-					workerLog.Info().Int("Worker id", _worker.id).Msg("killing")
+					workerLog.Info().Str("Worker id", _worker.id).Msg("killing")
 					_worker.stop(true)
 					e.currentNumberOfWorkers.Add(-1)
 				} else {
-					workerLog.Debug().Int("Worker id", _worker.id).Msg("still ok")
+					workerLog.Debug().Str("Worker id", _worker.id).Msg("still ok")
 					newWorkers = append(newWorkers, _worker)
 					workersChanged = true
 				}
@@ -179,10 +172,11 @@ func (e *dynamicExecutor) Start() {
 			}()
 		}
 		workerLog.Info().Msg("Terminated")
-	}()
+	})
 }
 
 func (e *dynamicExecutor) Stop() {
+	defer utils.StopWarn(e.log, utils.WithStopWarnProcessId(e.name))()
 	e.log.Trace().Msg("stopping now")
 	e.dynamicStateChange.Lock()
 	defer e.dynamicStateChange.Unlock()
@@ -196,6 +190,11 @@ func (e *dynamicExecutor) Stop() {
 	e.log.Debug().
 		Interface("currentNumberOfWorkers", e.currentNumberOfWorkers.Load()).
 		Msg("waiting for currentNumberOfWorkers dynamic workers to stop")
-	e.dynamicWorkers.Wait()
+	e.wg.Wait()
 	e.log.Trace().Msg("stopped")
+}
+
+func (e *dynamicExecutor) Close() error {
+	e.Stop()
+	return nil
 }

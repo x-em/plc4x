@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewNormalizedStringBuilder() NormalizedStringBuilder {
 type _NormalizedStringBuilder struct {
 	*_NormalizedString
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NormalizedStringBuilder) = (*_NormalizedStringBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_NormalizedStringBuilder) WithMandatoryFields() NormalizedStringBuilder
 }
 
 func (b *_NormalizedStringBuilder) Build() (NormalizedString, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NormalizedString.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_NormalizedStringBuilder) MustBuild() NormalizedString {
 
 func (b *_NormalizedStringBuilder) DeepCopy() any {
 	_copy := b.CreateNormalizedStringBuilder().(*_NormalizedStringBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastNormalizedString(structType any) NormalizedString {
 	return nil
 }
 
-func (m *_NormalizedString) GetTypeName() string {
+func (m *_NormalizedString) GetPlx4xTypeName() string {
 	return "NormalizedString"
 }
 
@@ -159,7 +160,7 @@ func NormalizedStringParseWithBufferProducer() func(ctx context.Context, readBuf
 }
 
 func NormalizedStringParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (NormalizedString, error) {
-	v, err := (&_NormalizedString{}).parse(ctx, readBuffer)
+	v, err := (new(_NormalizedString)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

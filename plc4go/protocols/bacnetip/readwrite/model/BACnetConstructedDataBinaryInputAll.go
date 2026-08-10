@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ BACnetConstructedDataBinaryInputAll = (*_BACnetConstructedDataBinaryInputA
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataBinaryInputAll)(nil)
 
 // NewBACnetConstructedDataBinaryInputAll factory function for _BACnetConstructedDataBinaryInputAll
-func NewBACnetConstructedDataBinaryInputAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataBinaryInputAll {
+func NewBACnetConstructedDataBinaryInputAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag) *_BACnetConstructedDataBinaryInputAll {
 	_result := &_BACnetConstructedDataBinaryInputAll{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _BACnetConstructedDataBinaryInputAllBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataBinaryInputAllBuilder) = (*_BACnetConstructedDataBinaryInputAllBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_BACnetConstructedDataBinaryInputAllBuilder) WithMandatoryFields() BACn
 }
 
 func (b *_BACnetConstructedDataBinaryInputAllBuilder) Build() (BACnetConstructedDataBinaryInputAll, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataBinaryInputAll.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_BACnetConstructedDataBinaryInputAllBuilder) buildForBACnetConstructedD
 
 func (b *_BACnetConstructedDataBinaryInputAllBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataBinaryInputAllBuilder().(*_BACnetConstructedDataBinaryInputAllBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastBACnetConstructedDataBinaryInputAll(structType any) BACnetConstructedDa
 	return nil
 }
 
-func (m *_BACnetConstructedDataBinaryInputAll) GetTypeName() string {
+func (m *_BACnetConstructedDataBinaryInputAll) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataBinaryInputAll"
 }
 

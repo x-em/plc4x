@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataMaxActualValue = (*_BACnetConstructedDataMaxActualVal
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataMaxActualValue)(nil)
 
 // NewBACnetConstructedDataMaxActualValue factory function for _BACnetConstructedDataMaxActualValue
-func NewBACnetConstructedDataMaxActualValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, maxActualValue BACnetApplicationTagReal, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataMaxActualValue {
+func NewBACnetConstructedDataMaxActualValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, maxActualValue BACnetApplicationTagReal) *_BACnetConstructedDataMaxActualValue {
 	if maxActualValue == nil {
 		panic("maxActualValue of type BACnetApplicationTagReal for BACnetConstructedDataMaxActualValue must not be nil")
 	}
 	_result := &_BACnetConstructedDataMaxActualValue{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		MaxActualValue:                maxActualValue,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataMaxActualValueBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataMaxActualValueBuilder) = (*_BACnetConstructedDataMaxActualValueBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataMaxActualValueBuilder) WithMaxActualValueBuilder(
 	var err error
 	b.MaxActualValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagRealBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagRealBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataMaxActualValueBuilder) Build() (BACnetConstructedDataMaxActualValue, error) {
 	if b.MaxActualValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'maxActualValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'maxActualValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataMaxActualValue.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataMaxActualValueBuilder) buildForBACnetConstructedD
 
 func (b *_BACnetConstructedDataMaxActualValueBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataMaxActualValueBuilder().(*_BACnetConstructedDataMaxActualValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataMaxActualValue(structType any) BACnetConstructedDa
 	return nil
 }
 
-func (m *_BACnetConstructedDataMaxActualValue) GetTypeName() string {
+func (m *_BACnetConstructedDataMaxActualValue) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataMaxActualValue"
 }
 

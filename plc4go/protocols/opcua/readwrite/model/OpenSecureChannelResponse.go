@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -130,7 +132,7 @@ type _OpenSecureChannelResponseBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (OpenSecureChannelResponseBuilder) = (*_OpenSecureChannelResponseBuilder)(nil)
@@ -154,10 +156,7 @@ func (b *_OpenSecureChannelResponseBuilder) WithResponseHeaderBuilder(builderSup
 	var err error
 	b.ResponseHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ResponseHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ResponseHeaderBuilder failed"))
 	}
 	return b
 }
@@ -177,10 +176,7 @@ func (b *_OpenSecureChannelResponseBuilder) WithSecurityTokenBuilder(builderSupp
 	var err error
 	b.SecurityToken, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ChannelSecurityTokenBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ChannelSecurityTokenBuilder failed"))
 	}
 	return b
 }
@@ -195,35 +191,23 @@ func (b *_OpenSecureChannelResponseBuilder) WithServerNonceBuilder(builderSuppli
 	var err error
 	b.ServerNonce, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_OpenSecureChannelResponseBuilder) Build() (OpenSecureChannelResponse, error) {
 	if b.ResponseHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'responseHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'responseHeader' not set"))
 	}
 	if b.SecurityToken == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'securityToken' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'securityToken' not set"))
 	}
 	if b.ServerNonce == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'serverNonce' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'serverNonce' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._OpenSecureChannelResponse.deepCopy(), nil
 }
@@ -249,8 +233,8 @@ func (b *_OpenSecureChannelResponseBuilder) buildForExtensionObjectDefinition() 
 
 func (b *_OpenSecureChannelResponseBuilder) DeepCopy() any {
 	_copy := b.CreateOpenSecureChannelResponseBuilder().(*_OpenSecureChannelResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -323,7 +307,7 @@ func CastOpenSecureChannelResponse(structType any) OpenSecureChannelResponse {
 	return nil
 }
 
-func (m *_OpenSecureChannelResponse) GetTypeName() string {
+func (m *_OpenSecureChannelResponse) GetPlx4xTypeName() string {
 	return "OpenSecureChannelResponse"
 }
 
@@ -360,25 +344,25 @@ func (m *_OpenSecureChannelResponse) parse(ctx context.Context, readBuffer utils
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer))
+	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'responseHeader' field"))
 	}
 	m.ResponseHeader = responseHeader
 
-	serverProtocolVersion, err := ReadSimpleField(ctx, "serverProtocolVersion", ReadUnsignedInt(readBuffer, uint8(32)))
+	serverProtocolVersion, err := ReadSimpleField(ctx, "serverProtocolVersion", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverProtocolVersion' field"))
 	}
 	m.ServerProtocolVersion = serverProtocolVersion
 
-	securityToken, err := ReadSimpleField[ChannelSecurityToken](ctx, "securityToken", ReadComplex[ChannelSecurityToken](ExtensionObjectDefinitionParseWithBufferProducer[ChannelSecurityToken]((int32)(int32(443))), readBuffer))
+	securityToken, err := ReadSimpleField[ChannelSecurityToken](ctx, "securityToken", ReadComplex[ChannelSecurityToken](ExtensionObjectDefinitionParseWithBufferProducer[ChannelSecurityToken]((int32)(int32(443))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityToken' field"))
 	}
 	m.SecurityToken = securityToken
 
-	serverNonce, err := ReadSimpleField[PascalByteString](ctx, "serverNonce", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	serverNonce, err := ReadSimpleField[PascalByteString](ctx, "serverNonce", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverNonce' field"))
 	}
@@ -409,19 +393,19 @@ func (m *_OpenSecureChannelResponse) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(pushErr, "Error pushing for OpenSecureChannelResponse")
 		}
 
-		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'responseHeader' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "serverProtocolVersion", m.GetServerProtocolVersion(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "serverProtocolVersion", m.GetServerProtocolVersion(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverProtocolVersion' field")
 		}
 
-		if err := WriteSimpleField[ChannelSecurityToken](ctx, "securityToken", m.GetSecurityToken(), WriteComplex[ChannelSecurityToken](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ChannelSecurityToken](ctx, "securityToken", m.GetSecurityToken(), WriteComplex[ChannelSecurityToken](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityToken' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "serverNonce", m.GetServerNonce(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "serverNonce", m.GetServerNonce(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverNonce' field")
 		}
 

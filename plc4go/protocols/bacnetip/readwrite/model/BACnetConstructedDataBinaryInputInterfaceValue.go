@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataBinaryInputInterfaceValue = (*_BACnetConstructedDataB
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataBinaryInputInterfaceValue)(nil)
 
 // NewBACnetConstructedDataBinaryInputInterfaceValue factory function for _BACnetConstructedDataBinaryInputInterfaceValue
-func NewBACnetConstructedDataBinaryInputInterfaceValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, interfaceValue BACnetOptionalBinaryPV, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataBinaryInputInterfaceValue {
+func NewBACnetConstructedDataBinaryInputInterfaceValue(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, interfaceValue BACnetOptionalBinaryPV) *_BACnetConstructedDataBinaryInputInterfaceValue {
 	if interfaceValue == nil {
 		panic("interfaceValue of type BACnetOptionalBinaryPV for BACnetConstructedDataBinaryInputInterfaceValue must not be nil")
 	}
 	_result := &_BACnetConstructedDataBinaryInputInterfaceValue{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		InterfaceValue:                interfaceValue,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataBinaryInputInterfaceValueBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataBinaryInputInterfaceValueBuilder) = (*_BACnetConstructedDataBinaryInputInterfaceValueBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataBinaryInputInterfaceValueBuilder) WithInterfaceVa
 	var err error
 	b.InterfaceValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetOptionalBinaryPVBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetOptionalBinaryPVBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataBinaryInputInterfaceValueBuilder) Build() (BACnetConstructedDataBinaryInputInterfaceValue, error) {
 	if b.InterfaceValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'interfaceValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'interfaceValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataBinaryInputInterfaceValue.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataBinaryInputInterfaceValueBuilder) buildForBACnetC
 
 func (b *_BACnetConstructedDataBinaryInputInterfaceValueBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataBinaryInputInterfaceValueBuilder().(*_BACnetConstructedDataBinaryInputInterfaceValueBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataBinaryInputInterfaceValue(structType any) BACnetCo
 	return nil
 }
 
-func (m *_BACnetConstructedDataBinaryInputInterfaceValue) GetTypeName() string {
+func (m *_BACnetConstructedDataBinaryInputInterfaceValue) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataBinaryInputInterfaceValue"
 }
 

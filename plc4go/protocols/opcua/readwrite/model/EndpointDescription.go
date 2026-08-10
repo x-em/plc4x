@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -164,7 +166,7 @@ type _EndpointDescriptionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EndpointDescriptionBuilder) = (*_EndpointDescriptionBuilder)(nil)
@@ -188,10 +190,7 @@ func (b *_EndpointDescriptionBuilder) WithEndpointUrlBuilder(builderSupplier fun
 	var err error
 	b.EndpointUrl, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -206,10 +205,7 @@ func (b *_EndpointDescriptionBuilder) WithServerBuilder(builderSupplier func(App
 	var err error
 	b.Server, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ApplicationDescriptionBuilder failed"))
 	}
 	return b
 }
@@ -224,10 +220,7 @@ func (b *_EndpointDescriptionBuilder) WithServerCertificateBuilder(builderSuppli
 	var err error
 	b.ServerCertificate, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -247,10 +240,7 @@ func (b *_EndpointDescriptionBuilder) WithSecurityPolicyUriBuilder(builderSuppli
 	var err error
 	b.SecurityPolicyUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -270,10 +260,7 @@ func (b *_EndpointDescriptionBuilder) WithTransportProfileUriBuilder(builderSupp
 	var err error
 	b.TransportProfileUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -285,37 +272,22 @@ func (b *_EndpointDescriptionBuilder) WithSecurityLevel(securityLevel uint8) End
 
 func (b *_EndpointDescriptionBuilder) Build() (EndpointDescription, error) {
 	if b.EndpointUrl == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'endpointUrl' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'endpointUrl' not set"))
 	}
 	if b.Server == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'server' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'server' not set"))
 	}
 	if b.ServerCertificate == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'serverCertificate' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'serverCertificate' not set"))
 	}
 	if b.SecurityPolicyUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'securityPolicyUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'securityPolicyUri' not set"))
 	}
 	if b.TransportProfileUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'transportProfileUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'transportProfileUri' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EndpointDescription.deepCopy(), nil
 }
@@ -341,8 +313,8 @@ func (b *_EndpointDescriptionBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_EndpointDescriptionBuilder) DeepCopy() any {
 	_copy := b.CreateEndpointDescriptionBuilder().(*_EndpointDescriptionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -431,7 +403,7 @@ func CastEndpointDescription(structType any) EndpointDescription {
 	return nil
 }
 
-func (m *_EndpointDescription) GetTypeName() string {
+func (m *_EndpointDescription) GetPlx4xTypeName() string {
 	return "EndpointDescription"
 }
 
@@ -460,9 +432,7 @@ func (m *_EndpointDescription) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.UserIdentityTokens) > 0 {
 		for _curItem, element := range m.UserIdentityTokens {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.UserIdentityTokens), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -490,55 +460,55 @@ func (m *_EndpointDescription) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	endpointUrl, err := ReadSimpleField[PascalString](ctx, "endpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	endpointUrl, err := ReadSimpleField[PascalString](ctx, "endpointUrl", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'endpointUrl' field"))
 	}
 	m.EndpointUrl = endpointUrl
 
-	server, err := ReadSimpleField[ApplicationDescription](ctx, "server", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer))
+	server, err := ReadSimpleField[ApplicationDescription](ctx, "server", ReadComplex[ApplicationDescription](ExtensionObjectDefinitionParseWithBufferProducer[ApplicationDescription]((int32)(int32(310))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'server' field"))
 	}
 	m.Server = server
 
-	serverCertificate, err := ReadSimpleField[PascalByteString](ctx, "serverCertificate", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	serverCertificate, err := ReadSimpleField[PascalByteString](ctx, "serverCertificate", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverCertificate' field"))
 	}
 	m.ServerCertificate = serverCertificate
 
-	securityMode, err := ReadEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", ReadEnum(MessageSecurityModeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	securityMode, err := ReadEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", ReadEnum(MessageSecurityModeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityMode' field"))
 	}
 	m.SecurityMode = securityMode
 
-	securityPolicyUri, err := ReadSimpleField[PascalString](ctx, "securityPolicyUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	securityPolicyUri, err := ReadSimpleField[PascalString](ctx, "securityPolicyUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityPolicyUri' field"))
 	}
 	m.SecurityPolicyUri = securityPolicyUri
 
-	noOfUserIdentityTokens, err := ReadImplicitField[int32](ctx, "noOfUserIdentityTokens", ReadSignedInt(readBuffer, uint8(32)))
+	noOfUserIdentityTokens, err := ReadImplicitField[int32](ctx, "noOfUserIdentityTokens", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfUserIdentityTokens' field"))
 	}
 	_ = noOfUserIdentityTokens
 
-	userIdentityTokens, err := ReadCountArrayField[UserTokenPolicy](ctx, "userIdentityTokens", ReadComplex[UserTokenPolicy](ExtensionObjectDefinitionParseWithBufferProducer[UserTokenPolicy]((int32)(int32(306))), readBuffer), uint64(noOfUserIdentityTokens))
+	userIdentityTokens, err := ReadCountArrayField[UserTokenPolicy](ctx, "userIdentityTokens", ReadComplex[UserTokenPolicy](ExtensionObjectDefinitionParseWithBufferProducer[UserTokenPolicy]((int32)(int32(306))), readBuffer), uint64(noOfUserIdentityTokens), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'userIdentityTokens' field"))
 	}
 	m.UserIdentityTokens = userIdentityTokens
 
-	transportProfileUri, err := ReadSimpleField[PascalString](ctx, "transportProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	transportProfileUri, err := ReadSimpleField[PascalString](ctx, "transportProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'transportProfileUri' field"))
 	}
 	m.TransportProfileUri = transportProfileUri
 
-	securityLevel, err := ReadSimpleField(ctx, "securityLevel", ReadUnsignedByte(readBuffer, uint8(8)))
+	securityLevel, err := ReadSimpleField(ctx, "securityLevel", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'securityLevel' field"))
 	}
@@ -569,39 +539,39 @@ func (m *_EndpointDescription) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for EndpointDescription")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "endpointUrl", m.GetEndpointUrl(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "endpointUrl", m.GetEndpointUrl(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'endpointUrl' field")
 		}
 
-		if err := WriteSimpleField[ApplicationDescription](ctx, "server", m.GetServer(), WriteComplex[ApplicationDescription](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ApplicationDescription](ctx, "server", m.GetServer(), WriteComplex[ApplicationDescription](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'server' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "serverCertificate", m.GetServerCertificate(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "serverCertificate", m.GetServerCertificate(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverCertificate' field")
 		}
 
-		if err := WriteSimpleEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", m.GetSecurityMode(), WriteEnum[MessageSecurityMode, uint32](MessageSecurityMode.GetValue, MessageSecurityMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[MessageSecurityMode](ctx, "securityMode", "MessageSecurityMode", m.GetSecurityMode(), WriteEnum[MessageSecurityMode, uint32](MessageSecurityMode.GetValue, MessageSecurityMode.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityMode' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "securityPolicyUri", m.GetSecurityPolicyUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "securityPolicyUri", m.GetSecurityPolicyUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityPolicyUri' field")
 		}
 		noOfUserIdentityTokens := int32(utils.InlineIf(bool((m.GetUserIdentityTokens()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetUserIdentityTokens()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfUserIdentityTokens", noOfUserIdentityTokens, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfUserIdentityTokens", noOfUserIdentityTokens, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfUserIdentityTokens' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "userIdentityTokens", m.GetUserIdentityTokens(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "userIdentityTokens", m.GetUserIdentityTokens(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'userIdentityTokens' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "transportProfileUri", m.GetTransportProfileUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "transportProfileUri", m.GetTransportProfileUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'transportProfileUri' field")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "securityLevel", m.GetSecurityLevel(), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "securityLevel", m.GetSecurityLevel(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'securityLevel' field")
 		}
 

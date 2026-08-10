@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _BrowsePathTargetBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BrowsePathTargetBuilder) = (*_BrowsePathTargetBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_BrowsePathTargetBuilder) WithTargetIdBuilder(builderSupplier func(Expa
 	var err error
 	b.TargetId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_BrowsePathTargetBuilder) WithRemainingPathIndex(remainingPathIndex uin
 
 func (b *_BrowsePathTargetBuilder) Build() (BrowsePathTarget, error) {
 	if b.TargetId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'targetId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'targetId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BrowsePathTarget.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_BrowsePathTargetBuilder) buildForExtensionObjectDefinition() (Extensio
 
 func (b *_BrowsePathTargetBuilder) DeepCopy() any {
 	_copy := b.CreateBrowsePathTargetBuilder().(*_BrowsePathTargetBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastBrowsePathTarget(structType any) BrowsePathTarget {
 	return nil
 }
 
-func (m *_BrowsePathTarget) GetTypeName() string {
+func (m *_BrowsePathTarget) GetPlx4xTypeName() string {
 	return "BrowsePathTarget"
 }
 
@@ -276,13 +272,13 @@ func (m *_BrowsePathTarget) parse(ctx context.Context, readBuffer utils.ReadBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	targetId, err := ReadSimpleField[ExpandedNodeId](ctx, "targetId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	targetId, err := ReadSimpleField[ExpandedNodeId](ctx, "targetId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetId' field"))
 	}
 	m.TargetId = targetId
 
-	remainingPathIndex, err := ReadSimpleField(ctx, "remainingPathIndex", ReadUnsignedInt(readBuffer, uint8(32)))
+	remainingPathIndex, err := ReadSimpleField(ctx, "remainingPathIndex", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'remainingPathIndex' field"))
 	}
@@ -313,11 +309,11 @@ func (m *_BrowsePathTarget) SerializeWithWriteBuffer(ctx context.Context, writeB
 			return errors.Wrap(pushErr, "Error pushing for BrowsePathTarget")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "targetId", m.GetTargetId(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "targetId", m.GetTargetId(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetId' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "remainingPathIndex", m.GetRemainingPathIndex(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "remainingPathIndex", m.GetRemainingPathIndex(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'remainingPathIndex' field")
 		}
 

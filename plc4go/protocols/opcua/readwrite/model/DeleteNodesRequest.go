@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _DeleteNodesRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DeleteNodesRequestBuilder) = (*_DeleteNodesRequestBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_DeleteNodesRequestBuilder) WithRequestHeaderBuilder(builderSupplier fu
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_DeleteNodesRequestBuilder) WithNodesToDelete(nodesToDelete ...DeleteNo
 
 func (b *_DeleteNodesRequestBuilder) Build() (DeleteNodesRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DeleteNodesRequest.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_DeleteNodesRequestBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_DeleteNodesRequestBuilder) DeepCopy() any {
 	_copy := b.CreateDeleteNodesRequestBuilder().(*_DeleteNodesRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastDeleteNodesRequest(structType any) DeleteNodesRequest {
 	return nil
 }
 
-func (m *_DeleteNodesRequest) GetTypeName() string {
+func (m *_DeleteNodesRequest) GetPlx4xTypeName() string {
 	return "DeleteNodesRequest"
 }
 
@@ -262,9 +258,7 @@ func (m *_DeleteNodesRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.NodesToDelete) > 0 {
 		for _curItem, element := range m.NodesToDelete {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.NodesToDelete), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_DeleteNodesRequest) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	noOfNodesToDelete, err := ReadImplicitField[int32](ctx, "noOfNodesToDelete", ReadSignedInt(readBuffer, uint8(32)))
+	noOfNodesToDelete, err := ReadImplicitField[int32](ctx, "noOfNodesToDelete", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfNodesToDelete' field"))
 	}
 	_ = noOfNodesToDelete
 
-	nodesToDelete, err := ReadCountArrayField[DeleteNodesItem](ctx, "nodesToDelete", ReadComplex[DeleteNodesItem](ExtensionObjectDefinitionParseWithBufferProducer[DeleteNodesItem]((int32)(int32(384))), readBuffer), uint64(noOfNodesToDelete))
+	nodesToDelete, err := ReadCountArrayField[DeleteNodesItem](ctx, "nodesToDelete", ReadComplex[DeleteNodesItem](ExtensionObjectDefinitionParseWithBufferProducer[DeleteNodesItem]((int32)(int32(384))), readBuffer), uint64(noOfNodesToDelete), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodesToDelete' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_DeleteNodesRequest) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for DeleteNodesRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 		noOfNodesToDelete := int32(utils.InlineIf(bool((m.GetNodesToDelete()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetNodesToDelete()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfNodesToDelete", noOfNodesToDelete, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfNodesToDelete", noOfNodesToDelete, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfNodesToDelete' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "nodesToDelete", m.GetNodesToDelete(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "nodesToDelete", m.GetNodesToDelete(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodesToDelete' field")
 		}
 

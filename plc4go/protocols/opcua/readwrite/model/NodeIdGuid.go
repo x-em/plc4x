@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -107,7 +108,7 @@ type _NodeIdGuidBuilder struct {
 
 	parentBuilder *_NodeIdTypeDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NodeIdGuidBuilder) = (*_NodeIdGuidBuilder)(nil)
@@ -132,8 +133,8 @@ func (b *_NodeIdGuidBuilder) WithId(id ...byte) NodeIdGuidBuilder {
 }
 
 func (b *_NodeIdGuidBuilder) Build() (NodeIdGuid, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NodeIdGuid.deepCopy(), nil
 }
@@ -159,8 +160,8 @@ func (b *_NodeIdGuidBuilder) buildForNodeIdTypeDefinition() (NodeIdTypeDefinitio
 
 func (b *_NodeIdGuidBuilder) DeepCopy() any {
 	_copy := b.CreateNodeIdGuidBuilder().(*_NodeIdGuidBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -246,7 +247,7 @@ func CastNodeIdGuid(structType any) NodeIdGuid {
 	return nil
 }
 
-func (m *_NodeIdGuid) GetTypeName() string {
+func (m *_NodeIdGuid) GetPlx4xTypeName() string {
 	return "NodeIdGuid"
 }
 

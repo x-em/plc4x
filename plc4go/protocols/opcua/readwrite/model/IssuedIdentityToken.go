@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -124,7 +126,7 @@ type _IssuedIdentityTokenBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IssuedIdentityTokenBuilder) = (*_IssuedIdentityTokenBuilder)(nil)
@@ -148,10 +150,7 @@ func (b *_IssuedIdentityTokenBuilder) WithPolicyIdBuilder(builderSupplier func(P
 	var err error
 	b.PolicyId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -166,10 +165,7 @@ func (b *_IssuedIdentityTokenBuilder) WithTokenDataBuilder(builderSupplier func(
 	var err error
 	b.TokenData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
@@ -184,35 +180,23 @@ func (b *_IssuedIdentityTokenBuilder) WithEncryptionAlgorithmBuilder(builderSupp
 	var err error
 	b.EncryptionAlgorithm, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_IssuedIdentityTokenBuilder) Build() (IssuedIdentityToken, error) {
 	if b.PolicyId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'policyId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'policyId' not set"))
 	}
 	if b.TokenData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'tokenData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'tokenData' not set"))
 	}
 	if b.EncryptionAlgorithm == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'encryptionAlgorithm' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'encryptionAlgorithm' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IssuedIdentityToken.deepCopy(), nil
 }
@@ -238,8 +222,8 @@ func (b *_IssuedIdentityTokenBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_IssuedIdentityTokenBuilder) DeepCopy() any {
 	_copy := b.CreateIssuedIdentityTokenBuilder().(*_IssuedIdentityTokenBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -308,7 +292,7 @@ func CastIssuedIdentityToken(structType any) IssuedIdentityToken {
 	return nil
 }
 
-func (m *_IssuedIdentityToken) GetTypeName() string {
+func (m *_IssuedIdentityToken) GetPlx4xTypeName() string {
 	return "IssuedIdentityToken"
 }
 
@@ -342,19 +326,19 @@ func (m *_IssuedIdentityToken) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	policyId, err := ReadSimpleField[PascalString](ctx, "policyId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	policyId, err := ReadSimpleField[PascalString](ctx, "policyId", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'policyId' field"))
 	}
 	m.PolicyId = policyId
 
-	tokenData, err := ReadSimpleField[PascalByteString](ctx, "tokenData", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	tokenData, err := ReadSimpleField[PascalByteString](ctx, "tokenData", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'tokenData' field"))
 	}
 	m.TokenData = tokenData
 
-	encryptionAlgorithm, err := ReadSimpleField[PascalString](ctx, "encryptionAlgorithm", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	encryptionAlgorithm, err := ReadSimpleField[PascalString](ctx, "encryptionAlgorithm", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'encryptionAlgorithm' field"))
 	}
@@ -385,15 +369,15 @@ func (m *_IssuedIdentityToken) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for IssuedIdentityToken")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "policyId", m.GetPolicyId(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "policyId", m.GetPolicyId(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'policyId' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "tokenData", m.GetTokenData(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "tokenData", m.GetTokenData(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'tokenData' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "encryptionAlgorithm", m.GetEncryptionAlgorithm(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "encryptionAlgorithm", m.GetEncryptionAlgorithm(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'encryptionAlgorithm' field")
 		}
 

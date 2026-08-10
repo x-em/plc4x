@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -114,7 +116,7 @@ type _FindServersOnNetworkResponseBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (FindServersOnNetworkResponseBuilder) = (*_FindServersOnNetworkResponseBuilder)(nil)
@@ -138,10 +140,7 @@ func (b *_FindServersOnNetworkResponseBuilder) WithResponseHeaderBuilder(builder
 	var err error
 	b.ResponseHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ResponseHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ResponseHeaderBuilder failed"))
 	}
 	return b
 }
@@ -158,13 +157,10 @@ func (b *_FindServersOnNetworkResponseBuilder) WithServers(servers ...ServerOnNe
 
 func (b *_FindServersOnNetworkResponseBuilder) Build() (FindServersOnNetworkResponse, error) {
 	if b.ResponseHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'responseHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'responseHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._FindServersOnNetworkResponse.deepCopy(), nil
 }
@@ -190,8 +186,8 @@ func (b *_FindServersOnNetworkResponseBuilder) buildForExtensionObjectDefinition
 
 func (b *_FindServersOnNetworkResponseBuilder) DeepCopy() any {
 	_copy := b.CreateFindServersOnNetworkResponseBuilder().(*_FindServersOnNetworkResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -260,7 +256,7 @@ func CastFindServersOnNetworkResponse(structType any) FindServersOnNetworkRespon
 	return nil
 }
 
-func (m *_FindServersOnNetworkResponse) GetTypeName() string {
+func (m *_FindServersOnNetworkResponse) GetPlx4xTypeName() string {
 	return "FindServersOnNetworkResponse"
 }
 
@@ -280,9 +276,7 @@ func (m *_FindServersOnNetworkResponse) GetLengthInBits(ctx context.Context) uin
 	if len(m.Servers) > 0 {
 		for _curItem, element := range m.Servers {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Servers), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -304,25 +298,25 @@ func (m *_FindServersOnNetworkResponse) parse(ctx context.Context, readBuffer ut
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer))
+	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'responseHeader' field"))
 	}
 	m.ResponseHeader = responseHeader
 
-	lastCounterResetTime, err := ReadSimpleField(ctx, "lastCounterResetTime", ReadSignedLong(readBuffer, uint8(64)))
+	lastCounterResetTime, err := ReadSimpleField(ctx, "lastCounterResetTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lastCounterResetTime' field"))
 	}
 	m.LastCounterResetTime = lastCounterResetTime
 
-	noOfServers, err := ReadImplicitField[int32](ctx, "noOfServers", ReadSignedInt(readBuffer, uint8(32)))
+	noOfServers, err := ReadImplicitField[int32](ctx, "noOfServers", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfServers' field"))
 	}
 	_ = noOfServers
 
-	servers, err := ReadCountArrayField[ServerOnNetwork](ctx, "servers", ReadComplex[ServerOnNetwork](ExtensionObjectDefinitionParseWithBufferProducer[ServerOnNetwork]((int32)(int32(12191))), readBuffer), uint64(noOfServers))
+	servers, err := ReadCountArrayField[ServerOnNetwork](ctx, "servers", ReadComplex[ServerOnNetwork](ExtensionObjectDefinitionParseWithBufferProducer[ServerOnNetwork]((int32)(int32(12191))), readBuffer), uint64(noOfServers), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'servers' field"))
 	}
@@ -353,19 +347,19 @@ func (m *_FindServersOnNetworkResponse) SerializeWithWriteBuffer(ctx context.Con
 			return errors.Wrap(pushErr, "Error pushing for FindServersOnNetworkResponse")
 		}
 
-		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'responseHeader' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "lastCounterResetTime", m.GetLastCounterResetTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "lastCounterResetTime", m.GetLastCounterResetTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'lastCounterResetTime' field")
 		}
 		noOfServers := int32(utils.InlineIf(bool((m.GetServers()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetServers()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfServers", noOfServers, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfServers", noOfServers, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfServers' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "servers", m.GetServers(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "servers", m.GetServers(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'servers' field")
 		}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataLastCredentialAdded = (*_BACnetConstructedDataLastCre
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLastCredentialAdded)(nil)
 
 // NewBACnetConstructedDataLastCredentialAdded factory function for _BACnetConstructedDataLastCredentialAdded
-func NewBACnetConstructedDataLastCredentialAdded(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lastCredentialAdded BACnetDeviceObjectReference, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLastCredentialAdded {
+func NewBACnetConstructedDataLastCredentialAdded(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lastCredentialAdded BACnetDeviceObjectReference) *_BACnetConstructedDataLastCredentialAdded {
 	if lastCredentialAdded == nil {
 		panic("lastCredentialAdded of type BACnetDeviceObjectReference for BACnetConstructedDataLastCredentialAdded must not be nil")
 	}
 	_result := &_BACnetConstructedDataLastCredentialAdded{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		LastCredentialAdded:           lastCredentialAdded,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataLastCredentialAddedBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLastCredentialAddedBuilder) = (*_BACnetConstructedDataLastCredentialAddedBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataLastCredentialAddedBuilder) WithLastCredentialAdd
 	var err error
 	b.LastCredentialAdded, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDeviceObjectReferenceBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDeviceObjectReferenceBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataLastCredentialAddedBuilder) Build() (BACnetConstructedDataLastCredentialAdded, error) {
 	if b.LastCredentialAdded == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'lastCredentialAdded' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'lastCredentialAdded' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLastCredentialAdded.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataLastCredentialAddedBuilder) buildForBACnetConstru
 
 func (b *_BACnetConstructedDataLastCredentialAddedBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLastCredentialAddedBuilder().(*_BACnetConstructedDataLastCredentialAddedBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataLastCredentialAdded(structType any) BACnetConstruc
 	return nil
 }
 
-func (m *_BACnetConstructedDataLastCredentialAdded) GetTypeName() string {
+func (m *_BACnetConstructedDataLastCredentialAdded) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLastCredentialAdded"
 }
 

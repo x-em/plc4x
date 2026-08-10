@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -40,6 +43,7 @@ type ApplicationAddress2 interface {
 	utils.Serializable
 	utils.Copyable
 	// GetAddress returns Address (property field)
+	// Note 1
 	GetAddress() byte
 	// GetIsWildcard returns IsWildcard (virtual field)
 	GetIsWildcard() bool
@@ -87,7 +91,7 @@ func NewApplicationAddress2Builder() ApplicationAddress2Builder {
 type _ApplicationAddress2Builder struct {
 	*_ApplicationAddress2
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ApplicationAddress2Builder) = (*_ApplicationAddress2Builder)(nil)
@@ -102,8 +106,8 @@ func (b *_ApplicationAddress2Builder) WithAddress(address byte) ApplicationAddre
 }
 
 func (b *_ApplicationAddress2Builder) Build() (ApplicationAddress2, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ApplicationAddress2.deepCopy(), nil
 }
@@ -118,8 +122,8 @@ func (b *_ApplicationAddress2Builder) MustBuild() ApplicationAddress2 {
 
 func (b *_ApplicationAddress2Builder) DeepCopy() any {
 	_copy := b.CreateApplicationAddress2Builder().(*_ApplicationAddress2Builder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -177,7 +181,7 @@ func CastApplicationAddress2(structType any) ApplicationAddress2 {
 	return nil
 }
 
-func (m *_ApplicationAddress2) GetTypeName() string {
+func (m *_ApplicationAddress2) GetPlx4xTypeName() string {
 	return "ApplicationAddress2"
 }
 
@@ -197,7 +201,7 @@ func (m *_ApplicationAddress2) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func ApplicationAddress2Parse(ctx context.Context, theBytes []byte) (ApplicationAddress2, error) {
-	return ApplicationAddress2ParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return ApplicationAddress2ParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func ApplicationAddress2ParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (ApplicationAddress2, error) {
@@ -207,7 +211,7 @@ func ApplicationAddress2ParseWithBufferProducer() func(ctx context.Context, read
 }
 
 func ApplicationAddress2ParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (ApplicationAddress2, error) {
-	v, err := (&_ApplicationAddress2{}).parse(ctx, readBuffer)
+	v, err := (new(_ApplicationAddress2)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -223,13 +227,13 @@ func (m *_ApplicationAddress2) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	address, err := ReadSimpleField(ctx, "address", ReadByte(readBuffer, 8))
+	address, err := ReadSimpleField(ctx, "address", ReadByte(readBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'address' field"))
 	}
 	m.Address = address
 
-	isWildcard, err := ReadVirtualField[bool](ctx, "isWildcard", (*bool)(nil), bool((address) == (0xFF)))
+	isWildcard, err := ReadVirtualField[bool](ctx, "isWildcard", (*bool)(nil), bool((address) == (0xFF)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'isWildcard' field"))
 	}
@@ -243,7 +247,7 @@ func (m *_ApplicationAddress2) parse(ctx context.Context, readBuffer utils.ReadB
 }
 
 func (m *_ApplicationAddress2) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -259,7 +263,7 @@ func (m *_ApplicationAddress2) SerializeWithWriteBuffer(ctx context.Context, wri
 		return errors.Wrap(pushErr, "Error pushing for ApplicationAddress2")
 	}
 
-	if err := WriteSimpleField[byte](ctx, "address", m.GetAddress(), WriteByte(writeBuffer, 8)); err != nil {
+	if err := WriteSimpleField[byte](ctx, "address", m.GetAddress(), WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'address' field")
 	}
 	// Virtual field

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataFaultLowLimit = (*_BACnetConstructedDataFaultLowLimit
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataFaultLowLimit)(nil)
 
 // NewBACnetConstructedDataFaultLowLimit factory function for _BACnetConstructedDataFaultLowLimit
-func NewBACnetConstructedDataFaultLowLimit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, faultLowLimit BACnetApplicationTagReal, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataFaultLowLimit {
+func NewBACnetConstructedDataFaultLowLimit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, faultLowLimit BACnetApplicationTagReal) *_BACnetConstructedDataFaultLowLimit {
 	if faultLowLimit == nil {
 		panic("faultLowLimit of type BACnetApplicationTagReal for BACnetConstructedDataFaultLowLimit must not be nil")
 	}
 	_result := &_BACnetConstructedDataFaultLowLimit{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		FaultLowLimit:                 faultLowLimit,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataFaultLowLimitBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataFaultLowLimitBuilder) = (*_BACnetConstructedDataFaultLowLimitBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataFaultLowLimitBuilder) WithFaultLowLimitBuilder(bu
 	var err error
 	b.FaultLowLimit, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagRealBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagRealBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataFaultLowLimitBuilder) Build() (BACnetConstructedDataFaultLowLimit, error) {
 	if b.FaultLowLimit == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'faultLowLimit' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'faultLowLimit' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataFaultLowLimit.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataFaultLowLimitBuilder) buildForBACnetConstructedDa
 
 func (b *_BACnetConstructedDataFaultLowLimitBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataFaultLowLimitBuilder().(*_BACnetConstructedDataFaultLowLimitBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataFaultLowLimit(structType any) BACnetConstructedDat
 	return nil
 }
 
-func (m *_BACnetConstructedDataFaultLowLimit) GetTypeName() string {
+func (m *_BACnetConstructedDataFaultLowLimit) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataFaultLowLimit"
 }
 

@@ -22,18 +22,16 @@ package modbus
 import (
 	"context"
 	"fmt"
-	"runtime/debug"
 	"sync"
-	"time"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
-	"github.com/apache/plc4x/plc4go/pkg/api"
+	plc4go "github.com/apache/plc4x/plc4go/pkg/api"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	readWriteModel "github.com/apache/plc4x/plc4go/protocols/modbus/readwrite/model"
 	"github.com/apache/plc4x/plc4go/spi"
-	"github.com/apache/plc4x/plc4go/spi/default"
+	_default "github.com/apache/plc4x/plc4go/spi/default"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/interceptors"
 	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
@@ -42,6 +40,7 @@ import (
 
 type Connection struct {
 	_default.DefaultConnection
+
 	unitIdentifier     uint8
 	messageCodec       spi.MessageCodec
 	options            map[string][]string
@@ -55,6 +54,10 @@ type Connection struct {
 	log      zerolog.Logger
 	_options []options.WithOption // Used to pass them downstream
 }
+
+var (
+	_ spi.TransportInstanceExposer = (*Connection)(nil)
+)
 
 func NewConnection(unitIdentifier uint8, messageCodec spi.MessageCodec, connectionOptions map[string][]string, tagHandler spi.PlcTagHandler, _options ...options.WithOption) *Connection {
 	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)
@@ -78,9 +81,10 @@ func NewConnection(unitIdentifier uint8, messageCodec spi.MessageCodec, connecti
 		}
 	}
 	connection.DefaultConnection = _default.NewDefaultConnection(connection,
-		_default.WithDefaultTtl(5*time.Second),
-		_default.WithPlcTagHandler(tagHandler),
-		_default.WithPlcValueHandler(NewValueHandler(_options...)),
+		append(_options,
+			_default.WithPlcTagHandler(tagHandler),
+			_default.WithPlcValueHandler(NewValueHandler(_options...)),
+		)...,
 	)
 	return connection
 }
@@ -105,52 +109,59 @@ func (c *Connection) GetMessageCodec() spi.MessageCodec {
 	return c.messageCodec
 }
 
-func (c *Connection) Ping() <-chan plc4go.PlcConnectionPingResult {
-	// TODO: use proper context
-	ctx := context.TODO()
+func (c *Connection) Ping(ctx context.Context) error {
+	if c.DefaultConnection.IsInvalidated() {
+		return errors.New("connection has been invalidated")
+	}
 	c.log.Trace().Msg("Pinging")
-	result := make(chan plc4go.PlcConnectionPingResult, 1)
-	c.wg.Add(1)
-	go func() {
-		defer c.wg.Done()
-		defer func() {
-			if err := recover(); err != nil {
-				result <- _default.NewDefaultPlcConnectionPingResult(errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack()))
-			}
-		}()
-		diagnosticRequestPdu := readWriteModel.NewModbusPDUDiagnosticRequest(0, 0x42)
-		pingRequest := readWriteModel.NewModbusTcpADU(1, c.unitIdentifier, diagnosticRequestPdu, false)
-		if err := c.messageCodec.SendRequest(ctx, pingRequest,
-			func(message spi.Message) bool {
-				responseAdu, ok := message.(readWriteModel.ModbusTcpADU)
-				if !ok {
-					return false
-				}
-				return responseAdu.GetTransactionIdentifier() == 1 && responseAdu.GetUnitIdentifier() == c.unitIdentifier
-			},
-			func(message spi.Message) error {
-				c.log.Trace().Msg("Received Message")
-				if message != nil {
-					// If we got a valid response (even if it will probably contain an error, we know the remote is available)
-					c.log.Trace().Msg("got valid response")
-					result <- _default.NewDefaultPlcConnectionPingResult(nil)
-				} else {
-					c.log.Trace().Msg("got no response")
-					result <- _default.NewDefaultPlcConnectionPingResult(errors.New("no response"))
-				}
-				return nil
-			},
-			func(err error) error {
-				c.log.Trace().Msg("Received Error")
-				result <- _default.NewDefaultPlcConnectionPingResult(errors.Wrap(err, "got error processing request"))
-				return nil
-			},
-			time.Second*1,
-		); err != nil {
-			result <- _default.NewDefaultPlcConnectionPingResult(err)
+	errChan := make(chan error, 1)
+	successChan := make(chan struct{}, 1)
+	diagnosticRequestPdu := readWriteModel.NewModbusPDUDiagnosticRequest(0, 0x42)
+	pingRequest := readWriteModel.NewModbusTcpADU(1, c.unitIdentifier, diagnosticRequestPdu)
+	if err := c.messageCodec.SendRequest(ctx, "ping", pingRequest, func(message spi.Message) bool {
+		responseAdu, ok := message.(readWriteModel.ModbusTcpADU)
+		if !ok {
+			return false
 		}
-	}()
-	return result
+		return responseAdu.GetTransactionIdentifier() == 1 && responseAdu.GetUnitIdentifier() == c.unitIdentifier
+	}, func(message spi.Message) error {
+		c.log.Trace().Msg("Received Message")
+		if message != nil {
+			// If we got a valid response (even if it will probably contain an error, we know the remote is available)
+			c.log.Trace().Msg("got valid response")
+			select {
+			case successChan <- struct{}{}:
+			default:
+				c.log.Warn().Msg("failed to send success signal")
+			}
+		} else {
+			c.log.Trace().Msg("got no response")
+			select {
+			case errChan <- errors.New("no response"):
+			default:
+				c.log.Warn().Msg("failed to send error signal")
+			}
+		}
+		return nil
+	}, func(err error) error {
+		c.log.Trace().Msg("Received Error")
+		select {
+		case errChan <- errors.Wrap(err, "got error processing request"):
+		default:
+			c.log.Warn().Msg("failed to send error signal")
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "error sending ping request")
+	}
+	select {
+	case err := <-errChan:
+		return errors.Wrap(err, "got error while waiting for response")
+	case <-successChan:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 func (c *Connection) GetMetadata() apiModel.PlcConnectionMetadata {

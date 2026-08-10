@@ -24,11 +24,11 @@ import (
 	"io"
 	"net/url"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/pkg/api/config"
 	"github.com/apache/plc4x/plc4go/pkg/api/model"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/options/converter"
 	"github.com/apache/plc4x/plc4go/spi/transports"
@@ -46,12 +46,10 @@ type PlcDriverManager interface {
 	GetDriver(driverName string) (PlcDriver, error)
 
 	// GetConnection Get a connection to a remote PLC for a given plc4x connection-string
-	GetConnection(connectionString string) <-chan PlcConnectionConnectResult
+	GetConnection(ctx context.Context, connectionString string) (PlcConnection, error)
 
 	// Discover Execute all available discovery methods on all available drivers using all transports
-	Discover(callback func(event model.PlcDiscoveryItem), discoveryOptions ...WithDiscoveryOption) error
-	// DiscoverWithContext Execute all available discovery methods on all available drivers using all transports
-	DiscoverWithContext(ctx context.Context, callback func(event model.PlcDiscoveryItem), discoveryOptions ...WithDiscoveryOption) error
+	Discover(ctx context.Context, callback func(event model.PlcDiscoveryItem), discoveryOptions ...WithDiscoveryOption) error
 }
 
 func NewPlcDriverManager(_options ...config.WithOption) PlcDriverManager {
@@ -191,15 +189,13 @@ func (m *plcDriverManger) GetTransport(transportName string, _ string, _ map[str
 	return nil, errors.Errorf("couldn't find transport %s", transportName)
 }
 
-func (m *plcDriverManger) GetConnection(connectionString string) <-chan PlcConnectionConnectResult {
+func (m *plcDriverManger) GetConnection(ctx context.Context, connectionString string) (PlcConnection, error) {
 	m.log.Debug().Str("connectionString", connectionString).Msg("Getting connection for connectionString")
 	// Parse the connection string.
 	connectionUrl, err := url.Parse(connectionString)
 	if err != nil {
 		m.log.Error().Err(err).Msg("Error parsing connection")
-		ch := make(chan PlcConnectionConnectResult, 1)
-		ch <- &plcConnectionConnectResult{err: errors.Wrap(err, "error parsing connection string")}
-		return ch
+		return nil, errors.Wrap(err, "error parsing connection string")
 	}
 	m.log.Debug().Stringer("connectionUrl", connectionUrl).Msg("parsed connection URL")
 
@@ -211,9 +207,7 @@ func (m *plcDriverManger) GetConnection(connectionString string) <-chan PlcConne
 	driver, err := m.GetDriver(driverName)
 	if err != nil {
 		m.log.Err(err).Str("driverName", driverName).Msg("Couldn't get driver for driverName")
-		ch := make(chan PlcConnectionConnectResult, 1)
-		ch <- &plcConnectionConnectResult{err: errors.Wrap(err, "error getting driver for connection string")}
-		return ch
+		return nil, errors.Wrap(err, "error getting driver for connection string")
 	}
 	m.log.Debug().Stringer("connectionUrl", connectionUrl).Str("protocolName", driver.GetProtocolName()).Msg("got driver protocolName")
 
@@ -227,9 +221,7 @@ func (m *plcDriverManger) GetConnection(connectionString string) <-chan PlcConne
 		connectionUrl, err := url.Parse(connectionUrl.Opaque)
 		if err != nil {
 			m.log.Err(err).Str("connectionUrl.Opaque", connectionUrl.Opaque).Msg("Couldn't get transport due to parsing error")
-			ch := make(chan PlcConnectionConnectResult, 1)
-			ch <- &plcConnectionConnectResult{err: errors.Wrap(err, "error parsing connection string")}
-			return ch
+			return nil, errors.Wrap(err, "error parsing connection string")
 		}
 		transportName = connectionUrl.Scheme
 		transportConnectionString = connectionUrl.Host
@@ -248,9 +240,7 @@ func (m *plcDriverManger) GetConnection(connectionString string) <-chan PlcConne
 	// If no transport has been specified explicitly or per default, we have to abort.
 	if transportName == "" {
 		m.log.Error().Msg("got a empty transport")
-		ch := make(chan PlcConnectionConnectResult, 1)
-		ch <- &plcConnectionConnectResult{err: errors.New("no transport specified and no default defined by driver")}
-		return ch
+		return nil, errors.New("no transport specified and no default defined by driver")
 	}
 
 	// Assemble a correct transport url
@@ -262,14 +252,10 @@ func (m *plcDriverManger) GetConnection(connectionString string) <-chan PlcConne
 	m.log.Debug().Stringer("transportUrl", &transportUrl).Msg("Assembled transport url")
 
 	// Create a new connection
-	return driver.GetConnection(transportUrl, m.transports, configOptions)
+	return driver.GetConnection(ctx, transportUrl, m.transports, configOptions)
 }
 
-func (m *plcDriverManger) Discover(callback func(event model.PlcDiscoveryItem), discoveryOptions ...WithDiscoveryOption) error {
-	return m.DiscoverWithContext(context.TODO(), callback, discoveryOptions...)
-}
-
-func (m *plcDriverManger) DiscoverWithContext(ctx context.Context, callback func(event model.PlcDiscoveryItem), discoveryOptions ...WithDiscoveryOption) error {
+func (m *plcDriverManger) Discover(ctx context.Context, callback func(event model.PlcDiscoveryItem), discoveryOptions ...WithDiscoveryOption) error {
 	// Check if we've got at least one option to restrict to certain protocols only.
 	// If there is at least one, we only check that protocol, if there are none, all
 	// available protocols are checked.
@@ -289,7 +275,7 @@ func (m *plcDriverManger) DiscoverWithContext(ctx context.Context, callback func
 	// Execute discovery on all selected drivers
 	for _, driver := range discoveryDrivers {
 		if driver.SupportsDiscovery() {
-			err := driver.DiscoverWithContext(ctx, callback, internalOptions...)
+			err := driver.Discover(ctx, callback, internalOptions...)
 			if err != nil {
 				return errors.Wrapf(err, "Error running Discover on driver %s", driver.GetProtocolName())
 			}
@@ -299,6 +285,7 @@ func (m *plcDriverManger) DiscoverWithContext(ctx context.Context, callback func
 }
 
 func (m *plcDriverManger) Close() error {
+	defer utils.StopWarn(m.log)()
 	m.log.Info().Msg("Shutting down driver manager")
 	var aggregatedErrors []error
 	for s, driver := range m.drivers {
@@ -313,11 +300,8 @@ func (m *plcDriverManger) Close() error {
 			aggregatedErrors = append(aggregatedErrors, err)
 		}
 	}
-	if len(aggregatedErrors) > 0 {
-		return &utils.MultiError{
-			MainError: errors.New("error closing everything"),
-			Errors:    aggregatedErrors,
-		}
+	if err := errors.Join(aggregatedErrors...); err != nil {
+		return errors.Wrap(err, "error closing everything")
 	}
 	return nil
 }

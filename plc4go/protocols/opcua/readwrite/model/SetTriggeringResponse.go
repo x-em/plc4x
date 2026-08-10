@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -126,7 +128,7 @@ type _SetTriggeringResponseBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SetTriggeringResponseBuilder) = (*_SetTriggeringResponseBuilder)(nil)
@@ -150,10 +152,7 @@ func (b *_SetTriggeringResponseBuilder) WithResponseHeaderBuilder(builderSupplie
 	var err error
 	b.ResponseHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ResponseHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ResponseHeaderBuilder failed"))
 	}
 	return b
 }
@@ -180,13 +179,10 @@ func (b *_SetTriggeringResponseBuilder) WithRemoveDiagnosticInfos(removeDiagnost
 
 func (b *_SetTriggeringResponseBuilder) Build() (SetTriggeringResponse, error) {
 	if b.ResponseHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'responseHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'responseHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SetTriggeringResponse.deepCopy(), nil
 }
@@ -212,8 +208,8 @@ func (b *_SetTriggeringResponseBuilder) buildForExtensionObjectDefinition() (Ext
 
 func (b *_SetTriggeringResponseBuilder) DeepCopy() any {
 	_copy := b.CreateSetTriggeringResponseBuilder().(*_SetTriggeringResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -290,7 +286,7 @@ func CastSetTriggeringResponse(structType any) SetTriggeringResponse {
 	return nil
 }
 
-func (m *_SetTriggeringResponse) GetTypeName() string {
+func (m *_SetTriggeringResponse) GetPlx4xTypeName() string {
 	return "SetTriggeringResponse"
 }
 
@@ -307,9 +303,7 @@ func (m *_SetTriggeringResponse) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.AddResults) > 0 {
 		for _curItem, element := range m.AddResults {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.AddResults), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -320,9 +314,7 @@ func (m *_SetTriggeringResponse) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.AddDiagnosticInfos) > 0 {
 		for _curItem, element := range m.AddDiagnosticInfos {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.AddDiagnosticInfos), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -333,9 +325,7 @@ func (m *_SetTriggeringResponse) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.RemoveResults) > 0 {
 		for _curItem, element := range m.RemoveResults {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.RemoveResults), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -346,9 +336,7 @@ func (m *_SetTriggeringResponse) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.RemoveDiagnosticInfos) > 0 {
 		for _curItem, element := range m.RemoveDiagnosticInfos {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.RemoveDiagnosticInfos), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -370,55 +358,55 @@ func (m *_SetTriggeringResponse) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer))
+	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'responseHeader' field"))
 	}
 	m.ResponseHeader = responseHeader
 
-	noOfAddResults, err := ReadImplicitField[int32](ctx, "noOfAddResults", ReadSignedInt(readBuffer, uint8(32)))
+	noOfAddResults, err := ReadImplicitField[int32](ctx, "noOfAddResults", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfAddResults' field"))
 	}
 	_ = noOfAddResults
 
-	addResults, err := ReadCountArrayField[StatusCode](ctx, "addResults", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfAddResults))
+	addResults, err := ReadCountArrayField[StatusCode](ctx, "addResults", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfAddResults), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'addResults' field"))
 	}
 	m.AddResults = addResults
 
-	noOfAddDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfAddDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)))
+	noOfAddDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfAddDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfAddDiagnosticInfos' field"))
 	}
 	_ = noOfAddDiagnosticInfos
 
-	addDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "addDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfAddDiagnosticInfos))
+	addDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "addDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfAddDiagnosticInfos), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'addDiagnosticInfos' field"))
 	}
 	m.AddDiagnosticInfos = addDiagnosticInfos
 
-	noOfRemoveResults, err := ReadImplicitField[int32](ctx, "noOfRemoveResults", ReadSignedInt(readBuffer, uint8(32)))
+	noOfRemoveResults, err := ReadImplicitField[int32](ctx, "noOfRemoveResults", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfRemoveResults' field"))
 	}
 	_ = noOfRemoveResults
 
-	removeResults, err := ReadCountArrayField[StatusCode](ctx, "removeResults", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfRemoveResults))
+	removeResults, err := ReadCountArrayField[StatusCode](ctx, "removeResults", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfRemoveResults), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'removeResults' field"))
 	}
 	m.RemoveResults = removeResults
 
-	noOfRemoveDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfRemoveDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)))
+	noOfRemoveDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfRemoveDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfRemoveDiagnosticInfos' field"))
 	}
 	_ = noOfRemoveDiagnosticInfos
 
-	removeDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "removeDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfRemoveDiagnosticInfos))
+	removeDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "removeDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfRemoveDiagnosticInfos), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'removeDiagnosticInfos' field"))
 	}
@@ -449,39 +437,39 @@ func (m *_SetTriggeringResponse) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for SetTriggeringResponse")
 		}
 
-		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'responseHeader' field")
 		}
 		noOfAddResults := int32(utils.InlineIf(bool((m.GetAddResults()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetAddResults()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfAddResults", noOfAddResults, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfAddResults", noOfAddResults, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfAddResults' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "addResults", m.GetAddResults(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "addResults", m.GetAddResults(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'addResults' field")
 		}
 		noOfAddDiagnosticInfos := int32(utils.InlineIf(bool((m.GetAddDiagnosticInfos()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetAddDiagnosticInfos()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfAddDiagnosticInfos", noOfAddDiagnosticInfos, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfAddDiagnosticInfos", noOfAddDiagnosticInfos, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfAddDiagnosticInfos' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "addDiagnosticInfos", m.GetAddDiagnosticInfos(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "addDiagnosticInfos", m.GetAddDiagnosticInfos(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'addDiagnosticInfos' field")
 		}
 		noOfRemoveResults := int32(utils.InlineIf(bool((m.GetRemoveResults()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetRemoveResults()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfRemoveResults", noOfRemoveResults, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfRemoveResults", noOfRemoveResults, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfRemoveResults' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "removeResults", m.GetRemoveResults(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "removeResults", m.GetRemoveResults(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'removeResults' field")
 		}
 		noOfRemoveDiagnosticInfos := int32(utils.InlineIf(bool((m.GetRemoveDiagnosticInfos()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetRemoveDiagnosticInfos()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfRemoveDiagnosticInfos", noOfRemoveDiagnosticInfos, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfRemoveDiagnosticInfos", noOfRemoveDiagnosticInfos, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfRemoveDiagnosticInfos' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "removeDiagnosticInfos", m.GetRemoveDiagnosticInfos(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "removeDiagnosticInfos", m.GetRemoveDiagnosticInfos(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'removeDiagnosticInfos' field")
 		}
 

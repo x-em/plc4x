@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +104,7 @@ type _S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder struct {
 
 	parentBuilder *_S7PayloadUserDataItemBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder) = (*_S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder) WithMessageOb
 }
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder) Build() (S7PayloadUserDataItemCpuFunctionAlarmAckResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7PayloadUserDataItemCpuFunctionAlarmAckResponse.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder) buildForS7Pay
 
 func (b *_S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder) DeepCopy() any {
 	_copy := b.CreateS7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder().(*_S7PayloadUserDataItemCpuFunctionAlarmAckResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -229,7 +230,7 @@ func CastS7PayloadUserDataItemCpuFunctionAlarmAckResponse(structType any) S7Payl
 	return nil
 }
 
-func (m *_S7PayloadUserDataItemCpuFunctionAlarmAckResponse) GetTypeName() string {
+func (m *_S7PayloadUserDataItemCpuFunctionAlarmAckResponse) GetPlx4xTypeName() string {
 	return "S7PayloadUserDataItemCpuFunctionAlarmAckResponse"
 }
 

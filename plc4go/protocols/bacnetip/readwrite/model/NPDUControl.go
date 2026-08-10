@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +109,7 @@ func NewNPDUControlBuilder() NPDUControlBuilder {
 type _NPDUControlBuilder struct {
 	*_NPDUControl
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NPDUControlBuilder) = (*_NPDUControlBuilder)(nil)
@@ -143,8 +144,8 @@ func (b *_NPDUControlBuilder) WithNetworkPriority(networkPriority NPDUNetworkPri
 }
 
 func (b *_NPDUControlBuilder) Build() (NPDUControl, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NPDUControl.deepCopy(), nil
 }
@@ -159,8 +160,8 @@ func (b *_NPDUControlBuilder) MustBuild() NPDUControl {
 
 func (b *_NPDUControlBuilder) DeepCopy() any {
 	_copy := b.CreateNPDUControlBuilder().(*_NPDUControlBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -219,7 +220,7 @@ func CastNPDUControl(structType any) NPDUControl {
 	return nil
 }
 
-func (m *_NPDUControl) GetTypeName() string {
+func (m *_NPDUControl) GetPlx4xTypeName() string {
 	return "NPDUControl"
 }
 
@@ -265,7 +266,7 @@ func NPDUControlParseWithBufferProducer() func(ctx context.Context, readBuffer u
 }
 
 func NPDUControlParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (NPDUControl, error) {
-	v, err := (&_NPDUControl{}).parse(ctx, readBuffer)
+	v, err := (new(_NPDUControl)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

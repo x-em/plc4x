@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -126,7 +127,7 @@ type _SearchResponseBuilder struct {
 
 	parentBuilder *_KnxNetIpMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SearchResponseBuilder) = (*_SearchResponseBuilder)(nil)
@@ -150,10 +151,7 @@ func (b *_SearchResponseBuilder) WithHpaiControlEndpointBuilder(builderSupplier 
 	var err error
 	b.HpaiControlEndpoint, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HPAIControlEndpointBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HPAIControlEndpointBuilder failed"))
 	}
 	return b
 }
@@ -168,10 +166,7 @@ func (b *_SearchResponseBuilder) WithDibDeviceInfoBuilder(builderSupplier func(D
 	var err error
 	b.DibDeviceInfo, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DIBDeviceInfoBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DIBDeviceInfoBuilder failed"))
 	}
 	return b
 }
@@ -186,35 +181,23 @@ func (b *_SearchResponseBuilder) WithDibSuppSvcFamiliesBuilder(builderSupplier f
 	var err error
 	b.DibSuppSvcFamilies, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DIBSuppSvcFamiliesBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DIBSuppSvcFamiliesBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SearchResponseBuilder) Build() (SearchResponse, error) {
 	if b.HpaiControlEndpoint == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'hpaiControlEndpoint' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'hpaiControlEndpoint' not set"))
 	}
 	if b.DibDeviceInfo == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dibDeviceInfo' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dibDeviceInfo' not set"))
 	}
 	if b.DibSuppSvcFamilies == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dibSuppSvcFamilies' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dibSuppSvcFamilies' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SearchResponse.deepCopy(), nil
 }
@@ -240,8 +223,8 @@ func (b *_SearchResponseBuilder) buildForKnxNetIpMessage() (KnxNetIpMessage, err
 
 func (b *_SearchResponseBuilder) DeepCopy() any {
 	_copy := b.CreateSearchResponseBuilder().(*_SearchResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -310,7 +293,7 @@ func CastSearchResponse(structType any) SearchResponse {
 	return nil
 }
 
-func (m *_SearchResponse) GetTypeName() string {
+func (m *_SearchResponse) GetPlx4xTypeName() string {
 	return "SearchResponse"
 }
 
@@ -344,19 +327,19 @@ func (m *_SearchResponse) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	hpaiControlEndpoint, err := ReadSimpleField[HPAIControlEndpoint](ctx, "hpaiControlEndpoint", ReadComplex[HPAIControlEndpoint](HPAIControlEndpointParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	hpaiControlEndpoint, err := ReadSimpleField[HPAIControlEndpoint](ctx, "hpaiControlEndpoint", ReadComplex[HPAIControlEndpoint](HPAIControlEndpointParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'hpaiControlEndpoint' field"))
 	}
 	m.HpaiControlEndpoint = hpaiControlEndpoint
 
-	dibDeviceInfo, err := ReadSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", ReadComplex[DIBDeviceInfo](DIBDeviceInfoParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	dibDeviceInfo, err := ReadSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", ReadComplex[DIBDeviceInfo](DIBDeviceInfoParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dibDeviceInfo' field"))
 	}
 	m.DibDeviceInfo = dibDeviceInfo
 
-	dibSuppSvcFamilies, err := ReadSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", ReadComplex[DIBSuppSvcFamilies](DIBSuppSvcFamiliesParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	dibSuppSvcFamilies, err := ReadSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", ReadComplex[DIBSuppSvcFamilies](DIBSuppSvcFamiliesParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dibSuppSvcFamilies' field"))
 	}
@@ -387,15 +370,15 @@ func (m *_SearchResponse) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for SearchResponse")
 		}
 
-		if err := WriteSimpleField[HPAIControlEndpoint](ctx, "hpaiControlEndpoint", m.GetHpaiControlEndpoint(), WriteComplex[HPAIControlEndpoint](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[HPAIControlEndpoint](ctx, "hpaiControlEndpoint", m.GetHpaiControlEndpoint(), WriteComplex[HPAIControlEndpoint](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'hpaiControlEndpoint' field")
 		}
 
-		if err := WriteSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", m.GetDibDeviceInfo(), WriteComplex[DIBDeviceInfo](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[DIBDeviceInfo](ctx, "dibDeviceInfo", m.GetDibDeviceInfo(), WriteComplex[DIBDeviceInfo](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'dibDeviceInfo' field")
 		}
 
-		if err := WriteSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", m.GetDibSuppSvcFamilies(), WriteComplex[DIBSuppSvcFamilies](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[DIBSuppSvcFamilies](ctx, "dibSuppSvcFamilies", m.GetDibSuppSvcFamilies(), WriteComplex[DIBSuppSvcFamilies](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'dibSuppSvcFamilies' field")
 		}
 

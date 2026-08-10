@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _ActionMethodDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ActionMethodDataTypeBuilder) = (*_ActionMethodDataTypeBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_ActionMethodDataTypeBuilder) WithObjectIdBuilder(builderSupplier func(
 	var err error
 	b.ObjectId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_ActionMethodDataTypeBuilder) WithMethodIdBuilder(builderSupplier func(
 	var err error
 	b.MethodId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ActionMethodDataTypeBuilder) Build() (ActionMethodDataType, error) {
 	if b.ObjectId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'objectId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'objectId' not set"))
 	}
 	if b.MethodId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'methodId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'methodId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ActionMethodDataType.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_ActionMethodDataTypeBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_ActionMethodDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateActionMethodDataTypeBuilder().(*_ActionMethodDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastActionMethodDataType(structType any) ActionMethodDataType {
 	return nil
 }
 
-func (m *_ActionMethodDataType) GetTypeName() string {
+func (m *_ActionMethodDataType) GetPlx4xTypeName() string {
 	return "ActionMethodDataType"
 }
 
@@ -300,13 +290,13 @@ func (m *_ActionMethodDataType) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	objectId, err := ReadSimpleField[NodeId](ctx, "objectId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	objectId, err := ReadSimpleField[NodeId](ctx, "objectId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'objectId' field"))
 	}
 	m.ObjectId = objectId
 
-	methodId, err := ReadSimpleField[NodeId](ctx, "methodId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	methodId, err := ReadSimpleField[NodeId](ctx, "methodId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'methodId' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_ActionMethodDataType) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for ActionMethodDataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "objectId", m.GetObjectId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "objectId", m.GetObjectId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'objectId' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "methodId", m.GetMethodId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "methodId", m.GetMethodId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'methodId' field")
 		}
 

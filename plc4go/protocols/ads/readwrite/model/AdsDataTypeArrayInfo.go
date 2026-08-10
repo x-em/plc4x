@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -94,7 +95,7 @@ func NewAdsDataTypeArrayInfoBuilder() AdsDataTypeArrayInfoBuilder {
 type _AdsDataTypeArrayInfoBuilder struct {
 	*_AdsDataTypeArrayInfo
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDataTypeArrayInfoBuilder) = (*_AdsDataTypeArrayInfoBuilder)(nil)
@@ -114,8 +115,8 @@ func (b *_AdsDataTypeArrayInfoBuilder) WithNumElements(numElements uint32) AdsDa
 }
 
 func (b *_AdsDataTypeArrayInfoBuilder) Build() (AdsDataTypeArrayInfo, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDataTypeArrayInfo.deepCopy(), nil
 }
@@ -130,8 +131,8 @@ func (b *_AdsDataTypeArrayInfoBuilder) MustBuild() AdsDataTypeArrayInfo {
 
 func (b *_AdsDataTypeArrayInfoBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDataTypeArrayInfoBuilder().(*_AdsDataTypeArrayInfoBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -174,7 +175,7 @@ func (m *_AdsDataTypeArrayInfo) GetNumElements() uint32 {
 func (m *_AdsDataTypeArrayInfo) GetUpperBound() uint32 {
 	ctx := context.Background()
 	_ = ctx
-	return uint32(uint32(m.GetLowerBound()) + uint32(m.GetNumElements()))
+	return uint32(uint32(m.GetLowerBound()) + uint32((uint32(m.GetNumElements()) - uint32(uint32(1)))))
 }
 
 ///////////////////////
@@ -193,7 +194,7 @@ func CastAdsDataTypeArrayInfo(structType any) AdsDataTypeArrayInfo {
 	return nil
 }
 
-func (m *_AdsDataTypeArrayInfo) GetTypeName() string {
+func (m *_AdsDataTypeArrayInfo) GetPlx4xTypeName() string {
 	return "AdsDataTypeArrayInfo"
 }
 
@@ -226,7 +227,7 @@ func AdsDataTypeArrayInfoParseWithBufferProducer() func(ctx context.Context, rea
 }
 
 func AdsDataTypeArrayInfoParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (AdsDataTypeArrayInfo, error) {
-	v, err := (&_AdsDataTypeArrayInfo{}).parse(ctx, readBuffer)
+	v, err := (new(_AdsDataTypeArrayInfo)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +255,7 @@ func (m *_AdsDataTypeArrayInfo) parse(ctx context.Context, readBuffer utils.Read
 	}
 	m.NumElements = numElements
 
-	upperBound, err := ReadVirtualField[uint32](ctx, "upperBound", (*uint32)(nil), uint32(lowerBound)+uint32(numElements), codegen.WithByteOrder(binary.LittleEndian))
+	upperBound, err := ReadVirtualField[uint32](ctx, "upperBound", (*uint32)(nil), uint32(lowerBound)+uint32((uint32(numElements)-uint32(uint32(1)))), codegen.WithByteOrder(binary.LittleEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'upperBound' field"))
 	}

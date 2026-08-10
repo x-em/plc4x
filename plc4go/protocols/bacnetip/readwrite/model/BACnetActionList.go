@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -105,7 +106,7 @@ func NewBACnetActionListBuilder() BACnetActionListBuilder {
 type _BACnetActionListBuilder struct {
 	*_BACnetActionList
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetActionListBuilder) = (*_BACnetActionListBuilder)(nil)
@@ -124,10 +125,7 @@ func (b *_BACnetActionListBuilder) WithInnerOpeningTagBuilder(builderSupplier fu
 	var err error
 	b.InnerOpeningTag, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetOpeningTagBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetOpeningTagBuilder failed"))
 	}
 	return b
 }
@@ -147,29 +145,20 @@ func (b *_BACnetActionListBuilder) WithInnerClosingTagBuilder(builderSupplier fu
 	var err error
 	b.InnerClosingTag, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetClosingTagBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetClosingTagBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetActionListBuilder) Build() (BACnetActionList, error) {
 	if b.InnerOpeningTag == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'innerOpeningTag' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'innerOpeningTag' not set"))
 	}
 	if b.InnerClosingTag == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'innerClosingTag' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'innerClosingTag' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetActionList.deepCopy(), nil
 }
@@ -184,8 +173,8 @@ func (b *_BACnetActionListBuilder) MustBuild() BACnetActionList {
 
 func (b *_BACnetActionListBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetActionListBuilder().(*_BACnetActionListBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -236,7 +225,7 @@ func CastBACnetActionList(structType any) BACnetActionList {
 	return nil
 }
 
-func (m *_BACnetActionList) GetTypeName() string {
+func (m *_BACnetActionList) GetPlx4xTypeName() string {
 	return "BACnetActionList"
 }
 
@@ -274,7 +263,7 @@ func BACnetActionListParseWithBufferProducer() func(ctx context.Context, readBuf
 }
 
 func BACnetActionListParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetActionList, error) {
-	v, err := (&_BACnetActionList{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetActionList)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

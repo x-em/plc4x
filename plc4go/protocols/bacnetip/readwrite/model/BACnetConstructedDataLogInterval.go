@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataLogInterval = (*_BACnetConstructedDataLogInterval)(ni
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLogInterval)(nil)
 
 // NewBACnetConstructedDataLogInterval factory function for _BACnetConstructedDataLogInterval
-func NewBACnetConstructedDataLogInterval(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, logInterval BACnetApplicationTagUnsignedInteger, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLogInterval {
+func NewBACnetConstructedDataLogInterval(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, logInterval BACnetApplicationTagUnsignedInteger) *_BACnetConstructedDataLogInterval {
 	if logInterval == nil {
 		panic("logInterval of type BACnetApplicationTagUnsignedInteger for BACnetConstructedDataLogInterval must not be nil")
 	}
 	_result := &_BACnetConstructedDataLogInterval{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		LogInterval:                   logInterval,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataLogIntervalBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLogIntervalBuilder) = (*_BACnetConstructedDataLogIntervalBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataLogIntervalBuilder) WithLogIntervalBuilder(builde
 	var err error
 	b.LogInterval, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagUnsignedIntegerBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataLogIntervalBuilder) Build() (BACnetConstructedDataLogInterval, error) {
 	if b.LogInterval == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'logInterval' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'logInterval' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLogInterval.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataLogIntervalBuilder) buildForBACnetConstructedData
 
 func (b *_BACnetConstructedDataLogIntervalBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLogIntervalBuilder().(*_BACnetConstructedDataLogIntervalBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataLogInterval(structType any) BACnetConstructedDataL
 	return nil
 }
 
-func (m *_BACnetConstructedDataLogInterval) GetTypeName() string {
+func (m *_BACnetConstructedDataLogInterval) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLogInterval"
 }
 

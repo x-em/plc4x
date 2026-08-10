@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -54,16 +55,13 @@ type BVLCDistributeBroadcastToNetwork interface {
 type _BVLCDistributeBroadcastToNetwork struct {
 	BVLCContract
 	Npdu NPDU
-
-	// Arguments.
-	BvlcPayloadLength uint16
 }
 
 var _ BVLCDistributeBroadcastToNetwork = (*_BVLCDistributeBroadcastToNetwork)(nil)
 var _ BVLCRequirements = (*_BVLCDistributeBroadcastToNetwork)(nil)
 
 // NewBVLCDistributeBroadcastToNetwork factory function for _BVLCDistributeBroadcastToNetwork
-func NewBVLCDistributeBroadcastToNetwork(npdu NPDU, bvlcPayloadLength uint16) *_BVLCDistributeBroadcastToNetwork {
+func NewBVLCDistributeBroadcastToNetwork(npdu NPDU) *_BVLCDistributeBroadcastToNetwork {
 	if npdu == nil {
 		panic("npdu of type NPDU for BVLCDistributeBroadcastToNetwork must not be nil")
 	}
@@ -89,8 +87,6 @@ type BVLCDistributeBroadcastToNetworkBuilder interface {
 	WithNpdu(NPDU) BVLCDistributeBroadcastToNetworkBuilder
 	// WithNpduBuilder adds Npdu (property field) which is build by the builder
 	WithNpduBuilder(func(NPDUBuilder) NPDUBuilder) BVLCDistributeBroadcastToNetworkBuilder
-	// WithArgBvlcPayloadLength sets a parser argument
-	WithArgBvlcPayloadLength(uint16) BVLCDistributeBroadcastToNetworkBuilder
 	// Done is used to finish work on this child and return (or create one if none) to the parent builder
 	Done() BVLCBuilder
 	// Build builds the BVLCDistributeBroadcastToNetwork or returns an error if something is wrong
@@ -109,7 +105,7 @@ type _BVLCDistributeBroadcastToNetworkBuilder struct {
 
 	parentBuilder *_BVLCBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BVLCDistributeBroadcastToNetworkBuilder) = (*_BVLCDistributeBroadcastToNetworkBuilder)(nil)
@@ -133,28 +129,17 @@ func (b *_BVLCDistributeBroadcastToNetworkBuilder) WithNpduBuilder(builderSuppli
 	var err error
 	b.Npdu, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NPDUBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NPDUBuilder failed"))
 	}
-	return b
-}
-
-func (b *_BVLCDistributeBroadcastToNetworkBuilder) WithArgBvlcPayloadLength(bvlcPayloadLength uint16) BVLCDistributeBroadcastToNetworkBuilder {
-	b.BvlcPayloadLength = bvlcPayloadLength
 	return b
 }
 
 func (b *_BVLCDistributeBroadcastToNetworkBuilder) Build() (BVLCDistributeBroadcastToNetwork, error) {
 	if b.Npdu == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'npdu' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'npdu' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BVLCDistributeBroadcastToNetwork.deepCopy(), nil
 }
@@ -180,8 +165,8 @@ func (b *_BVLCDistributeBroadcastToNetworkBuilder) buildForBVLC() (BVLC, error) 
 
 func (b *_BVLCDistributeBroadcastToNetworkBuilder) DeepCopy() any {
 	_copy := b.CreateBVLCDistributeBroadcastToNetworkBuilder().(*_BVLCDistributeBroadcastToNetworkBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -242,7 +227,7 @@ func CastBVLCDistributeBroadcastToNetwork(structType any) BVLCDistributeBroadcas
 	return nil
 }
 
-func (m *_BVLCDistributeBroadcastToNetwork) GetTypeName() string {
+func (m *_BVLCDistributeBroadcastToNetwork) GetPlx4xTypeName() string {
 	return "BVLCDistributeBroadcastToNetwork"
 }
 
@@ -270,7 +255,7 @@ func (m *_BVLCDistributeBroadcastToNetwork) parse(ctx context.Context, readBuffe
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	npdu, err := ReadSimpleField[NPDU](ctx, "npdu", ReadComplex[NPDU](NPDUParseWithBufferProducer((uint16)(bvlcPayloadLength)), readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	npdu, err := ReadSimpleField[NPDU](ctx, "npdu", ReadComplex[NPDU](NPDUParseWithBufferProducer((uint16)(bvlcPayloadLength)), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'npdu' field"))
 	}
@@ -301,7 +286,7 @@ func (m *_BVLCDistributeBroadcastToNetwork) SerializeWithWriteBuffer(ctx context
 			return errors.Wrap(pushErr, "Error pushing for BVLCDistributeBroadcastToNetwork")
 		}
 
-		if err := WriteSimpleField[NPDU](ctx, "npdu", m.GetNpdu(), WriteComplex[NPDU](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[NPDU](ctx, "npdu", m.GetNpdu(), WriteComplex[NPDU](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'npdu' field")
 		}
 
@@ -312,16 +297,6 @@ func (m *_BVLCDistributeBroadcastToNetwork) SerializeWithWriteBuffer(ctx context
 	}
 	return m.BVLCContract.(*_BVLC).serializeParent(ctx, writeBuffer, m, ser)
 }
-
-////
-// Arguments Getter
-
-func (m *_BVLCDistributeBroadcastToNetwork) GetBvlcPayloadLength() uint16 {
-	return m.BvlcPayloadLength
-}
-
-//
-////
 
 func (m *_BVLCDistributeBroadcastToNetwork) IsBVLCDistributeBroadcastToNetwork() {}
 
@@ -336,7 +311,6 @@ func (m *_BVLCDistributeBroadcastToNetwork) deepCopy() *_BVLCDistributeBroadcast
 	_BVLCDistributeBroadcastToNetworkCopy := &_BVLCDistributeBroadcastToNetwork{
 		m.BVLCContract.(*_BVLC).deepCopy(),
 		utils.DeepCopy[NPDU](m.Npdu),
-		m.BvlcPayloadLength,
 	}
 	_BVLCDistributeBroadcastToNetworkCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCDistributeBroadcastToNetworkCopy

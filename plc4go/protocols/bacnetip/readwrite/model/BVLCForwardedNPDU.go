@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,16 +61,13 @@ type _BVLCForwardedNPDU struct {
 	Ip   []uint8
 	Port uint16
 	Npdu NPDU
-
-	// Arguments.
-	BvlcPayloadLength uint16
 }
 
 var _ BVLCForwardedNPDU = (*_BVLCForwardedNPDU)(nil)
 var _ BVLCRequirements = (*_BVLCForwardedNPDU)(nil)
 
 // NewBVLCForwardedNPDU factory function for _BVLCForwardedNPDU
-func NewBVLCForwardedNPDU(ip []uint8, port uint16, npdu NPDU, bvlcPayloadLength uint16) *_BVLCForwardedNPDU {
+func NewBVLCForwardedNPDU(ip []uint8, port uint16, npdu NPDU) *_BVLCForwardedNPDU {
 	if npdu == nil {
 		panic("npdu of type NPDU for BVLCForwardedNPDU must not be nil")
 	}
@@ -101,8 +99,6 @@ type BVLCForwardedNPDUBuilder interface {
 	WithNpdu(NPDU) BVLCForwardedNPDUBuilder
 	// WithNpduBuilder adds Npdu (property field) which is build by the builder
 	WithNpduBuilder(func(NPDUBuilder) NPDUBuilder) BVLCForwardedNPDUBuilder
-	// WithArgBvlcPayloadLength sets a parser argument
-	WithArgBvlcPayloadLength(uint16) BVLCForwardedNPDUBuilder
 	// Done is used to finish work on this child and return (or create one if none) to the parent builder
 	Done() BVLCBuilder
 	// Build builds the BVLCForwardedNPDU or returns an error if something is wrong
@@ -121,7 +117,7 @@ type _BVLCForwardedNPDUBuilder struct {
 
 	parentBuilder *_BVLCBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BVLCForwardedNPDUBuilder) = (*_BVLCForwardedNPDUBuilder)(nil)
@@ -155,28 +151,17 @@ func (b *_BVLCForwardedNPDUBuilder) WithNpduBuilder(builderSupplier func(NPDUBui
 	var err error
 	b.Npdu, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NPDUBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NPDUBuilder failed"))
 	}
-	return b
-}
-
-func (b *_BVLCForwardedNPDUBuilder) WithArgBvlcPayloadLength(bvlcPayloadLength uint16) BVLCForwardedNPDUBuilder {
-	b.BvlcPayloadLength = bvlcPayloadLength
 	return b
 }
 
 func (b *_BVLCForwardedNPDUBuilder) Build() (BVLCForwardedNPDU, error) {
 	if b.Npdu == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'npdu' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'npdu' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BVLCForwardedNPDU.deepCopy(), nil
 }
@@ -202,8 +187,8 @@ func (b *_BVLCForwardedNPDUBuilder) buildForBVLC() (BVLC, error) {
 
 func (b *_BVLCForwardedNPDUBuilder) DeepCopy() any {
 	_copy := b.CreateBVLCForwardedNPDUBuilder().(*_BVLCForwardedNPDUBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -272,7 +257,7 @@ func CastBVLCForwardedNPDU(structType any) BVLCForwardedNPDU {
 	return nil
 }
 
-func (m *_BVLCForwardedNPDU) GetTypeName() string {
+func (m *_BVLCForwardedNPDU) GetPlx4xTypeName() string {
 	return "BVLCForwardedNPDU"
 }
 
@@ -308,19 +293,19 @@ func (m *_BVLCForwardedNPDU) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	ip, err := ReadCountArrayField[uint8](ctx, "ip", ReadUnsignedByte(readBuffer, uint8(8)), uint64(int32(4)), codegen.WithByteOrder(binary.BigEndian))
+	ip, err := ReadCountArrayField[uint8](ctx, "ip", ReadUnsignedByte(readBuffer, uint8(8)), uint64(int32(4)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'ip' field"))
 	}
 	m.Ip = ip
 
-	port, err := ReadSimpleField(ctx, "port", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithByteOrder(binary.BigEndian))
+	port, err := ReadSimpleField(ctx, "port", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'port' field"))
 	}
 	m.Port = port
 
-	npdu, err := ReadSimpleField[NPDU](ctx, "npdu", ReadComplex[NPDU](NPDUParseWithBufferProducer((uint16)(uint16(bvlcPayloadLength)-uint16(uint16(6)))), readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	npdu, err := ReadSimpleField[NPDU](ctx, "npdu", ReadComplex[NPDU](NPDUParseWithBufferProducer((uint16)(uint16(bvlcPayloadLength)-uint16(uint16(6)))), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'npdu' field"))
 	}
@@ -351,15 +336,15 @@ func (m *_BVLCForwardedNPDU) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for BVLCForwardedNPDU")
 		}
 
-		if err := WriteSimpleTypeArrayField(ctx, "ip", m.GetIp(), WriteUnsignedByte(writeBuffer, 8), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleTypeArrayField(ctx, "ip", m.GetIp(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'ip' field")
 		}
 
-		if err := WriteSimpleField[uint16](ctx, "port", m.GetPort(), WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[uint16](ctx, "port", m.GetPort(), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'port' field")
 		}
 
-		if err := WriteSimpleField[NPDU](ctx, "npdu", m.GetNpdu(), WriteComplex[NPDU](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[NPDU](ctx, "npdu", m.GetNpdu(), WriteComplex[NPDU](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'npdu' field")
 		}
 
@@ -370,16 +355,6 @@ func (m *_BVLCForwardedNPDU) SerializeWithWriteBuffer(ctx context.Context, write
 	}
 	return m.BVLCContract.(*_BVLC).serializeParent(ctx, writeBuffer, m, ser)
 }
-
-////
-// Arguments Getter
-
-func (m *_BVLCForwardedNPDU) GetBvlcPayloadLength() uint16 {
-	return m.BvlcPayloadLength
-}
-
-//
-////
 
 func (m *_BVLCForwardedNPDU) IsBVLCForwardedNPDU() {}
 
@@ -396,7 +371,6 @@ func (m *_BVLCForwardedNPDU) deepCopy() *_BVLCForwardedNPDU {
 		utils.DeepCopySlice[uint8, uint8](m.Ip),
 		m.Port,
 		utils.DeepCopy[NPDU](m.Npdu),
-		m.BvlcPayloadLength,
 	}
 	_BVLCForwardedNPDUCopy.BVLCContract.(*_BVLC)._SubType = m
 	return _BVLCForwardedNPDUCopy

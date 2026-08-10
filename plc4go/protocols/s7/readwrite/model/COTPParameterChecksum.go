@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +59,9 @@ var _ COTPParameterChecksum = (*_COTPParameterChecksum)(nil)
 var _ COTPParameterRequirements = (*_COTPParameterChecksum)(nil)
 
 // NewCOTPParameterChecksum factory function for _COTPParameterChecksum
-func NewCOTPParameterChecksum(crc uint8, rest uint8) *_COTPParameterChecksum {
+func NewCOTPParameterChecksum(crc uint8) *_COTPParameterChecksum {
 	_result := &_COTPParameterChecksum{
-		COTPParameterContract: NewCOTPParameter(rest),
+		COTPParameterContract: NewCOTPParameter(),
 		Crc:                   crc,
 	}
 	_result.COTPParameterContract.(*_COTPParameter)._SubType = _result
@@ -97,7 +98,7 @@ type _COTPParameterChecksumBuilder struct {
 
 	parentBuilder *_COTPParameterBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (COTPParameterChecksumBuilder) = (*_COTPParameterChecksumBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_COTPParameterChecksumBuilder) WithCrc(crc uint8) COTPParameterChecksum
 }
 
 func (b *_COTPParameterChecksumBuilder) Build() (COTPParameterChecksum, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._COTPParameterChecksum.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_COTPParameterChecksumBuilder) buildForCOTPParameter() (COTPParameter, 
 
 func (b *_COTPParameterChecksumBuilder) DeepCopy() any {
 	_copy := b.CreateCOTPParameterChecksumBuilder().(*_COTPParameterChecksumBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +207,7 @@ func CastCOTPParameterChecksum(structType any) COTPParameterChecksum {
 	return nil
 }
 
-func (m *_COTPParameterChecksum) GetTypeName() string {
+func (m *_COTPParameterChecksum) GetPlx4xTypeName() string {
 	return "COTPParameterChecksum"
 }
 

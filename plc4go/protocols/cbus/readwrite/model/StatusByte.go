@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -100,7 +103,7 @@ func NewStatusByteBuilder() StatusByteBuilder {
 type _StatusByteBuilder struct {
 	*_StatusByte
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (StatusByteBuilder) = (*_StatusByteBuilder)(nil)
@@ -130,8 +133,8 @@ func (b *_StatusByteBuilder) WithGav0(gav0 GAVState) StatusByteBuilder {
 }
 
 func (b *_StatusByteBuilder) Build() (StatusByte, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._StatusByte.deepCopy(), nil
 }
@@ -146,8 +149,8 @@ func (b *_StatusByteBuilder) MustBuild() StatusByte {
 
 func (b *_StatusByteBuilder) DeepCopy() any {
 	_copy := b.CreateStatusByteBuilder().(*_StatusByteBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -202,7 +205,7 @@ func CastStatusByte(structType any) StatusByte {
 	return nil
 }
 
-func (m *_StatusByte) GetTypeName() string {
+func (m *_StatusByte) GetPlx4xTypeName() string {
 	return "StatusByte"
 }
 
@@ -229,7 +232,7 @@ func (m *_StatusByte) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func StatusByteParse(ctx context.Context, theBytes []byte) (StatusByte, error) {
-	return StatusByteParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return StatusByteParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func StatusByteParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (StatusByte, error) {
@@ -239,7 +242,7 @@ func StatusByteParseWithBufferProducer() func(ctx context.Context, readBuffer ut
 }
 
 func StatusByteParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (StatusByte, error) {
-	v, err := (&_StatusByte{}).parse(ctx, readBuffer)
+	v, err := (new(_StatusByte)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -255,25 +258,25 @@ func (m *_StatusByte) parse(ctx context.Context, readBuffer utils.ReadBuffer) (_
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	gav3, err := ReadEnumField[GAVState](ctx, "gav3", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))))
+	gav3, err := ReadEnumField[GAVState](ctx, "gav3", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'gav3' field"))
 	}
 	m.Gav3 = gav3
 
-	gav2, err := ReadEnumField[GAVState](ctx, "gav2", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))))
+	gav2, err := ReadEnumField[GAVState](ctx, "gav2", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'gav2' field"))
 	}
 	m.Gav2 = gav2
 
-	gav1, err := ReadEnumField[GAVState](ctx, "gav1", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))))
+	gav1, err := ReadEnumField[GAVState](ctx, "gav1", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'gav1' field"))
 	}
 	m.Gav1 = gav1
 
-	gav0, err := ReadEnumField[GAVState](ctx, "gav0", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))))
+	gav0, err := ReadEnumField[GAVState](ctx, "gav0", "GAVState", ReadEnum(GAVStateByValue, ReadUnsignedByte(readBuffer, uint8(2))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'gav0' field"))
 	}
@@ -287,7 +290,7 @@ func (m *_StatusByte) parse(ctx context.Context, readBuffer utils.ReadBuffer) (_
 }
 
 func (m *_StatusByte) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -303,19 +306,19 @@ func (m *_StatusByte) SerializeWithWriteBuffer(ctx context.Context, writeBuffer 
 		return errors.Wrap(pushErr, "Error pushing for StatusByte")
 	}
 
-	if err := WriteSimpleEnumField[GAVState](ctx, "gav3", "GAVState", m.GetGav3(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2))); err != nil {
+	if err := WriteSimpleEnumField[GAVState](ctx, "gav3", "GAVState", m.GetGav3(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'gav3' field")
 	}
 
-	if err := WriteSimpleEnumField[GAVState](ctx, "gav2", "GAVState", m.GetGav2(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2))); err != nil {
+	if err := WriteSimpleEnumField[GAVState](ctx, "gav2", "GAVState", m.GetGav2(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'gav2' field")
 	}
 
-	if err := WriteSimpleEnumField[GAVState](ctx, "gav1", "GAVState", m.GetGav1(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2))); err != nil {
+	if err := WriteSimpleEnumField[GAVState](ctx, "gav1", "GAVState", m.GetGav1(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'gav1' field")
 	}
 
-	if err := WriteSimpleEnumField[GAVState](ctx, "gav0", "GAVState", m.GetGav0(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2))); err != nil {
+	if err := WriteSimpleEnumField[GAVState](ctx, "gav0", "GAVState", m.GetGav0(), WriteEnum[GAVState, uint8](GAVState.GetValue, GAVState.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 2)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'gav0' field")
 	}
 

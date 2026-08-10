@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -114,7 +116,7 @@ type _AggregateFilterResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AggregateFilterResultBuilder) = (*_AggregateFilterResultBuilder)(nil)
@@ -148,23 +150,17 @@ func (b *_AggregateFilterResultBuilder) WithRevisedAggregateConfigurationBuilder
 	var err error
 	b.RevisedAggregateConfiguration, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "AggregateConfigurationBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "AggregateConfigurationBuilder failed"))
 	}
 	return b
 }
 
 func (b *_AggregateFilterResultBuilder) Build() (AggregateFilterResult, error) {
 	if b.RevisedAggregateConfiguration == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'revisedAggregateConfiguration' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'revisedAggregateConfiguration' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AggregateFilterResult.deepCopy(), nil
 }
@@ -190,8 +186,8 @@ func (b *_AggregateFilterResultBuilder) buildForExtensionObjectDefinition() (Ext
 
 func (b *_AggregateFilterResultBuilder) DeepCopy() any {
 	_copy := b.CreateAggregateFilterResultBuilder().(*_AggregateFilterResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -260,7 +256,7 @@ func CastAggregateFilterResult(structType any) AggregateFilterResult {
 	return nil
 }
 
-func (m *_AggregateFilterResult) GetTypeName() string {
+func (m *_AggregateFilterResult) GetPlx4xTypeName() string {
 	return "AggregateFilterResult"
 }
 
@@ -294,19 +290,19 @@ func (m *_AggregateFilterResult) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	revisedStartTime, err := ReadSimpleField(ctx, "revisedStartTime", ReadSignedLong(readBuffer, uint8(64)))
+	revisedStartTime, err := ReadSimpleField(ctx, "revisedStartTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'revisedStartTime' field"))
 	}
 	m.RevisedStartTime = revisedStartTime
 
-	revisedProcessingInterval, err := ReadSimpleField(ctx, "revisedProcessingInterval", ReadDouble(readBuffer, uint8(64)))
+	revisedProcessingInterval, err := ReadSimpleField(ctx, "revisedProcessingInterval", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'revisedProcessingInterval' field"))
 	}
 	m.RevisedProcessingInterval = revisedProcessingInterval
 
-	revisedAggregateConfiguration, err := ReadSimpleField[AggregateConfiguration](ctx, "revisedAggregateConfiguration", ReadComplex[AggregateConfiguration](ExtensionObjectDefinitionParseWithBufferProducer[AggregateConfiguration]((int32)(int32(950))), readBuffer))
+	revisedAggregateConfiguration, err := ReadSimpleField[AggregateConfiguration](ctx, "revisedAggregateConfiguration", ReadComplex[AggregateConfiguration](ExtensionObjectDefinitionParseWithBufferProducer[AggregateConfiguration]((int32)(int32(950))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'revisedAggregateConfiguration' field"))
 	}
@@ -337,15 +333,15 @@ func (m *_AggregateFilterResult) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for AggregateFilterResult")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "revisedStartTime", m.GetRevisedStartTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "revisedStartTime", m.GetRevisedStartTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'revisedStartTime' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "revisedProcessingInterval", m.GetRevisedProcessingInterval(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "revisedProcessingInterval", m.GetRevisedProcessingInterval(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'revisedProcessingInterval' field")
 		}
 
-		if err := WriteSimpleField[AggregateConfiguration](ctx, "revisedAggregateConfiguration", m.GetRevisedAggregateConfiguration(), WriteComplex[AggregateConfiguration](writeBuffer)); err != nil {
+		if err := WriteSimpleField[AggregateConfiguration](ctx, "revisedAggregateConfiguration", m.GetRevisedAggregateConfiguration(), WriteComplex[AggregateConfiguration](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'revisedAggregateConfiguration' field")
 		}
 

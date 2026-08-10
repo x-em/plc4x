@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataMaximumValueTimestamp = (*_BACnetConstructedDataMaxim
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataMaximumValueTimestamp)(nil)
 
 // NewBACnetConstructedDataMaximumValueTimestamp factory function for _BACnetConstructedDataMaximumValueTimestamp
-func NewBACnetConstructedDataMaximumValueTimestamp(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, maximumValueTimestamp BACnetDateTime, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataMaximumValueTimestamp {
+func NewBACnetConstructedDataMaximumValueTimestamp(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, maximumValueTimestamp BACnetDateTime) *_BACnetConstructedDataMaximumValueTimestamp {
 	if maximumValueTimestamp == nil {
 		panic("maximumValueTimestamp of type BACnetDateTime for BACnetConstructedDataMaximumValueTimestamp must not be nil")
 	}
 	_result := &_BACnetConstructedDataMaximumValueTimestamp{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		MaximumValueTimestamp:         maximumValueTimestamp,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataMaximumValueTimestampBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataMaximumValueTimestampBuilder) = (*_BACnetConstructedDataMaximumValueTimestampBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataMaximumValueTimestampBuilder) WithMaximumValueTim
 	var err error
 	b.MaximumValueTimestamp, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDateTimeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDateTimeBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataMaximumValueTimestampBuilder) Build() (BACnetConstructedDataMaximumValueTimestamp, error) {
 	if b.MaximumValueTimestamp == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'maximumValueTimestamp' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'maximumValueTimestamp' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataMaximumValueTimestamp.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataMaximumValueTimestampBuilder) buildForBACnetConst
 
 func (b *_BACnetConstructedDataMaximumValueTimestampBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataMaximumValueTimestampBuilder().(*_BACnetConstructedDataMaximumValueTimestampBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataMaximumValueTimestamp(structType any) BACnetConstr
 	return nil
 }
 
-func (m *_BACnetConstructedDataMaximumValueTimestamp) GetTypeName() string {
+func (m *_BACnetConstructedDataMaximumValueTimestamp) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataMaximumValueTimestamp"
 }
 

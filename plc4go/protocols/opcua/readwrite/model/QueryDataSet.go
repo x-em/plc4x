@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +121,7 @@ type _QueryDataSetBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (QueryDataSetBuilder) = (*_QueryDataSetBuilder)(nil)
@@ -143,10 +145,7 @@ func (b *_QueryDataSetBuilder) WithNodeIdBuilder(builderSupplier func(ExpandedNo
 	var err error
 	b.NodeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
@@ -161,10 +160,7 @@ func (b *_QueryDataSetBuilder) WithTypeDefinitionNodeBuilder(builderSupplier fun
 	var err error
 	b.TypeDefinitionNode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
@@ -176,19 +172,13 @@ func (b *_QueryDataSetBuilder) WithValues(values ...Variant) QueryDataSetBuilder
 
 func (b *_QueryDataSetBuilder) Build() (QueryDataSet, error) {
 	if b.NodeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'nodeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'nodeId' not set"))
 	}
 	if b.TypeDefinitionNode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'typeDefinitionNode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'typeDefinitionNode' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._QueryDataSet.deepCopy(), nil
 }
@@ -214,8 +204,8 @@ func (b *_QueryDataSetBuilder) buildForExtensionObjectDefinition() (ExtensionObj
 
 func (b *_QueryDataSetBuilder) DeepCopy() any {
 	_copy := b.CreateQueryDataSetBuilder().(*_QueryDataSetBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -284,7 +274,7 @@ func CastQueryDataSet(structType any) QueryDataSet {
 	return nil
 }
 
-func (m *_QueryDataSet) GetTypeName() string {
+func (m *_QueryDataSet) GetPlx4xTypeName() string {
 	return "QueryDataSet"
 }
 
@@ -304,9 +294,7 @@ func (m *_QueryDataSet) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Values) > 0 {
 		for _curItem, element := range m.Values {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Values), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -328,25 +316,25 @@ func (m *_QueryDataSet) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	nodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "nodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	nodeId, err := ReadSimpleField[ExpandedNodeId](ctx, "nodeId", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeId' field"))
 	}
 	m.NodeId = nodeId
 
-	typeDefinitionNode, err := ReadSimpleField[ExpandedNodeId](ctx, "typeDefinitionNode", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	typeDefinitionNode, err := ReadSimpleField[ExpandedNodeId](ctx, "typeDefinitionNode", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'typeDefinitionNode' field"))
 	}
 	m.TypeDefinitionNode = typeDefinitionNode
 
-	noOfValues, err := ReadImplicitField[int32](ctx, "noOfValues", ReadSignedInt(readBuffer, uint8(32)))
+	noOfValues, err := ReadImplicitField[int32](ctx, "noOfValues", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfValues' field"))
 	}
 	_ = noOfValues
 
-	values, err := ReadCountArrayField[Variant](ctx, "values", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfValues))
+	values, err := ReadCountArrayField[Variant](ctx, "values", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfValues), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'values' field"))
 	}
@@ -377,19 +365,19 @@ func (m *_QueryDataSet) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for QueryDataSet")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "nodeId", m.GetNodeId(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodeId' field")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "typeDefinitionNode", m.GetTypeDefinitionNode(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "typeDefinitionNode", m.GetTypeDefinitionNode(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'typeDefinitionNode' field")
 		}
 		noOfValues := int32(utils.InlineIf(bool((m.GetValues()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetValues()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfValues", noOfValues, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfValues", noOfValues, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfValues' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "values", m.GetValues(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "values", m.GetValues(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'values' field")
 		}
 

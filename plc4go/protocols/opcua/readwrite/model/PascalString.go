@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -87,7 +88,7 @@ func NewPascalStringBuilder() PascalStringBuilder {
 type _PascalStringBuilder struct {
 	*_PascalString
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PascalStringBuilder) = (*_PascalStringBuilder)(nil)
@@ -102,8 +103,8 @@ func (b *_PascalStringBuilder) WithOptionalStringValue(stringValue string) Pasca
 }
 
 func (b *_PascalStringBuilder) Build() (PascalString, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PascalString.deepCopy(), nil
 }
@@ -118,8 +119,8 @@ func (b *_PascalStringBuilder) MustBuild() PascalString {
 
 func (b *_PascalStringBuilder) DeepCopy() any {
 	_copy := b.CreatePascalStringBuilder().(*_PascalStringBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastPascalString(structType any) PascalString {
 	return nil
 }
 
-func (m *_PascalString) GetTypeName() string {
+func (m *_PascalString) GetPlx4xTypeName() string {
 	return "PascalString"
 }
 
@@ -214,7 +215,7 @@ func PascalStringParseWithBufferProducer() func(ctx context.Context, readBuffer 
 }
 
 func PascalStringParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (PascalString, error) {
-	v, err := (&_PascalString{}).parse(ctx, readBuffer)
+	v, err := (new(_PascalString)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

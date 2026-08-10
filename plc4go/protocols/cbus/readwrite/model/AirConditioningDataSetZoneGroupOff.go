@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ type _AirConditioningDataSetZoneGroupOffBuilder struct {
 
 	parentBuilder *_AirConditioningDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AirConditioningDataSetZoneGroupOffBuilder) = (*_AirConditioningDataSetZoneGroupOffBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_AirConditioningDataSetZoneGroupOffBuilder) WithZoneGroup(zoneGroup byt
 }
 
 func (b *_AirConditioningDataSetZoneGroupOffBuilder) Build() (AirConditioningDataSetZoneGroupOff, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AirConditioningDataSetZoneGroupOff.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_AirConditioningDataSetZoneGroupOffBuilder) buildForAirConditioningData
 
 func (b *_AirConditioningDataSetZoneGroupOffBuilder) DeepCopy() any {
 	_copy := b.CreateAirConditioningDataSetZoneGroupOffBuilder().(*_AirConditioningDataSetZoneGroupOffBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -202,7 +203,7 @@ func CastAirConditioningDataSetZoneGroupOff(structType any) AirConditioningDataS
 	return nil
 }
 
-func (m *_AirConditioningDataSetZoneGroupOff) GetTypeName() string {
+func (m *_AirConditioningDataSetZoneGroupOff) GetPlx4xTypeName() string {
 	return "AirConditioningDataSetZoneGroupOff"
 }
 

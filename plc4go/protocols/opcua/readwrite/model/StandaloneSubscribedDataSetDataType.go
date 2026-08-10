@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -130,7 +132,7 @@ type _StandaloneSubscribedDataSetDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (StandaloneSubscribedDataSetDataTypeBuilder) = (*_StandaloneSubscribedDataSetDataTypeBuilder)(nil)
@@ -154,10 +156,7 @@ func (b *_StandaloneSubscribedDataSetDataTypeBuilder) WithNameBuilder(builderSup
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -177,10 +176,7 @@ func (b *_StandaloneSubscribedDataSetDataTypeBuilder) WithDataSetMetaDataBuilder
 	var err error
 	b.DataSetMetaData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DataSetMetaDataTypeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DataSetMetaDataTypeBuilder failed"))
 	}
 	return b
 }
@@ -195,35 +191,23 @@ func (b *_StandaloneSubscribedDataSetDataTypeBuilder) WithSubscribedDataSetBuild
 	var err error
 	b.SubscribedDataSet, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
 
 func (b *_StandaloneSubscribedDataSetDataTypeBuilder) Build() (StandaloneSubscribedDataSetDataType, error) {
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
 	if b.DataSetMetaData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataSetMetaData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataSetMetaData' not set"))
 	}
 	if b.SubscribedDataSet == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'subscribedDataSet' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'subscribedDataSet' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._StandaloneSubscribedDataSetDataType.deepCopy(), nil
 }
@@ -249,8 +233,8 @@ func (b *_StandaloneSubscribedDataSetDataTypeBuilder) buildForExtensionObjectDef
 
 func (b *_StandaloneSubscribedDataSetDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateStandaloneSubscribedDataSetDataTypeBuilder().(*_StandaloneSubscribedDataSetDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -323,7 +307,7 @@ func CastStandaloneSubscribedDataSetDataType(structType any) StandaloneSubscribe
 	return nil
 }
 
-func (m *_StandaloneSubscribedDataSetDataType) GetTypeName() string {
+func (m *_StandaloneSubscribedDataSetDataType) GetPlx4xTypeName() string {
 	return "StandaloneSubscribedDataSetDataType"
 }
 
@@ -340,9 +324,7 @@ func (m *_StandaloneSubscribedDataSetDataType) GetLengthInBits(ctx context.Conte
 	if len(m.DataSetFolder) > 0 {
 		for _curItem, element := range m.DataSetFolder {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DataSetFolder), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -370,31 +352,31 @@ func (m *_StandaloneSubscribedDataSetDataType) parse(ctx context.Context, readBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'name' field"))
 	}
 	m.Name = name
 
-	noOfDataSetFolder, err := ReadImplicitField[int32](ctx, "noOfDataSetFolder", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDataSetFolder, err := ReadImplicitField[int32](ctx, "noOfDataSetFolder", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDataSetFolder' field"))
 	}
 	_ = noOfDataSetFolder
 
-	dataSetFolder, err := ReadCountArrayField[PascalString](ctx, "dataSetFolder", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfDataSetFolder))
+	dataSetFolder, err := ReadCountArrayField[PascalString](ctx, "dataSetFolder", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfDataSetFolder), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetFolder' field"))
 	}
 	m.DataSetFolder = dataSetFolder
 
-	dataSetMetaData, err := ReadSimpleField[DataSetMetaDataType](ctx, "dataSetMetaData", ReadComplex[DataSetMetaDataType](ExtensionObjectDefinitionParseWithBufferProducer[DataSetMetaDataType]((int32)(int32(14525))), readBuffer))
+	dataSetMetaData, err := ReadSimpleField[DataSetMetaDataType](ctx, "dataSetMetaData", ReadComplex[DataSetMetaDataType](ExtensionObjectDefinitionParseWithBufferProducer[DataSetMetaDataType]((int32)(int32(14525))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetMetaData' field"))
 	}
 	m.DataSetMetaData = dataSetMetaData
 
-	subscribedDataSet, err := ReadSimpleField[ExtensionObject](ctx, "subscribedDataSet", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	subscribedDataSet, err := ReadSimpleField[ExtensionObject](ctx, "subscribedDataSet", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'subscribedDataSet' field"))
 	}
@@ -425,23 +407,23 @@ func (m *_StandaloneSubscribedDataSetDataType) SerializeWithWriteBuffer(ctx cont
 			return errors.Wrap(pushErr, "Error pushing for StandaloneSubscribedDataSetDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'name' field")
 		}
 		noOfDataSetFolder := int32(utils.InlineIf(bool((m.GetDataSetFolder()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDataSetFolder()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDataSetFolder", noOfDataSetFolder, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDataSetFolder", noOfDataSetFolder, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDataSetFolder' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "dataSetFolder", m.GetDataSetFolder(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "dataSetFolder", m.GetDataSetFolder(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetFolder' field")
 		}
 
-		if err := WriteSimpleField[DataSetMetaDataType](ctx, "dataSetMetaData", m.GetDataSetMetaData(), WriteComplex[DataSetMetaDataType](writeBuffer)); err != nil {
+		if err := WriteSimpleField[DataSetMetaDataType](ctx, "dataSetMetaData", m.GetDataSetMetaData(), WriteComplex[DataSetMetaDataType](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetMetaData' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "subscribedDataSet", m.GetSubscribedDataSet(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "subscribedDataSet", m.GetSubscribedDataSet(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'subscribedDataSet' field")
 		}
 

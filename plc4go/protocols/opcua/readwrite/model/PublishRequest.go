@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _PublishRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PublishRequestBuilder) = (*_PublishRequestBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_PublishRequestBuilder) WithRequestHeaderBuilder(builderSupplier func(R
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_PublishRequestBuilder) WithSubscriptionAcknowledgements(subscriptionAc
 
 func (b *_PublishRequestBuilder) Build() (PublishRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PublishRequest.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_PublishRequestBuilder) buildForExtensionObjectDefinition() (ExtensionO
 
 func (b *_PublishRequestBuilder) DeepCopy() any {
 	_copy := b.CreatePublishRequestBuilder().(*_PublishRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastPublishRequest(structType any) PublishRequest {
 	return nil
 }
 
-func (m *_PublishRequest) GetTypeName() string {
+func (m *_PublishRequest) GetPlx4xTypeName() string {
 	return "PublishRequest"
 }
 
@@ -262,9 +258,7 @@ func (m *_PublishRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.SubscriptionAcknowledgements) > 0 {
 		for _curItem, element := range m.SubscriptionAcknowledgements {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.SubscriptionAcknowledgements), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_PublishRequest) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	noOfSubscriptionAcknowledgements, err := ReadImplicitField[int32](ctx, "noOfSubscriptionAcknowledgements", ReadSignedInt(readBuffer, uint8(32)))
+	noOfSubscriptionAcknowledgements, err := ReadImplicitField[int32](ctx, "noOfSubscriptionAcknowledgements", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfSubscriptionAcknowledgements' field"))
 	}
 	_ = noOfSubscriptionAcknowledgements
 
-	subscriptionAcknowledgements, err := ReadCountArrayField[SubscriptionAcknowledgement](ctx, "subscriptionAcknowledgements", ReadComplex[SubscriptionAcknowledgement](ExtensionObjectDefinitionParseWithBufferProducer[SubscriptionAcknowledgement]((int32)(int32(823))), readBuffer), uint64(noOfSubscriptionAcknowledgements))
+	subscriptionAcknowledgements, err := ReadCountArrayField[SubscriptionAcknowledgement](ctx, "subscriptionAcknowledgements", ReadComplex[SubscriptionAcknowledgement](ExtensionObjectDefinitionParseWithBufferProducer[SubscriptionAcknowledgement]((int32)(int32(823))), readBuffer), uint64(noOfSubscriptionAcknowledgements), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'subscriptionAcknowledgements' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_PublishRequest) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for PublishRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 		noOfSubscriptionAcknowledgements := int32(utils.InlineIf(bool((m.GetSubscriptionAcknowledgements()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetSubscriptionAcknowledgements()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfSubscriptionAcknowledgements", noOfSubscriptionAcknowledgements, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfSubscriptionAcknowledgements", noOfSubscriptionAcknowledgements, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfSubscriptionAcknowledgements' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "subscriptionAcknowledgements", m.GetSubscriptionAcknowledgements(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "subscriptionAcknowledgements", m.GetSubscriptionAcknowledgements(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'subscriptionAcknowledgements' field")
 		}
 

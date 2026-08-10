@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -118,7 +119,7 @@ type _ConnectionResponseDataBlockBuilder struct {
 
 	childBuilder _ConnectionResponseDataBlockChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ConnectionResponseDataBlockBuilder) = (*_ConnectionResponseDataBlockBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_ConnectionResponseDataBlockBuilder) WithMandatoryFields() ConnectionRe
 }
 
 func (b *_ConnectionResponseDataBlockBuilder) PartialBuild() (ConnectionResponseDataBlockContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ConnectionResponseDataBlock.deepCopy(), nil
 }
@@ -186,8 +187,8 @@ func (b *_ConnectionResponseDataBlockBuilder) DeepCopy() any {
 	_copy := b.CreateConnectionResponseDataBlockBuilder().(*_ConnectionResponseDataBlockBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_ConnectionResponseDataBlockChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -216,7 +217,7 @@ func CastConnectionResponseDataBlock(structType any) ConnectionResponseDataBlock
 	return nil
 }
 
-func (m *_ConnectionResponseDataBlock) GetTypeName() string {
+func (m *_ConnectionResponseDataBlock) GetPlx4xTypeName() string {
 	return "ConnectionResponseDataBlock"
 }
 
@@ -255,7 +256,7 @@ func ConnectionResponseDataBlockParseWithBufferProducer[T ConnectionResponseData
 }
 
 func ConnectionResponseDataBlockParseWithBuffer[T ConnectionResponseDataBlock](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_ConnectionResponseDataBlock{}).parse(ctx, readBuffer)
+	v, err := (new(_ConnectionResponseDataBlock)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

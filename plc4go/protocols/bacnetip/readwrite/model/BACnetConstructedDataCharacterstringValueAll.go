@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ BACnetConstructedDataCharacterstringValueAll = (*_BACnetConstructedDataCha
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataCharacterstringValueAll)(nil)
 
 // NewBACnetConstructedDataCharacterstringValueAll factory function for _BACnetConstructedDataCharacterstringValueAll
-func NewBACnetConstructedDataCharacterstringValueAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataCharacterstringValueAll {
+func NewBACnetConstructedDataCharacterstringValueAll(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag) *_BACnetConstructedDataCharacterstringValueAll {
 	_result := &_BACnetConstructedDataCharacterstringValueAll{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _BACnetConstructedDataCharacterstringValueAllBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataCharacterstringValueAllBuilder) = (*_BACnetConstructedDataCharacterstringValueAllBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_BACnetConstructedDataCharacterstringValueAllBuilder) WithMandatoryFiel
 }
 
 func (b *_BACnetConstructedDataCharacterstringValueAllBuilder) Build() (BACnetConstructedDataCharacterstringValueAll, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataCharacterstringValueAll.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_BACnetConstructedDataCharacterstringValueAllBuilder) buildForBACnetCon
 
 func (b *_BACnetConstructedDataCharacterstringValueAllBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataCharacterstringValueAllBuilder().(*_BACnetConstructedDataCharacterstringValueAllBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastBACnetConstructedDataCharacterstringValueAll(structType any) BACnetCons
 	return nil
 }
 
-func (m *_BACnetConstructedDataCharacterstringValueAll) GetTypeName() string {
+func (m *_BACnetConstructedDataCharacterstringValueAll) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataCharacterstringValueAll"
 }
 

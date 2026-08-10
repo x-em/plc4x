@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _BrokerConnectionTransportDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BrokerConnectionTransportDataTypeBuilder) = (*_BrokerConnectionTransportDataTypeBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_BrokerConnectionTransportDataTypeBuilder) WithResourceUriBuilder(build
 	var err error
 	b.ResourceUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_BrokerConnectionTransportDataTypeBuilder) WithAuthenticationProfileUri
 	var err error
 	b.AuthenticationProfileUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BrokerConnectionTransportDataTypeBuilder) Build() (BrokerConnectionTransportDataType, error) {
 	if b.ResourceUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'resourceUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'resourceUri' not set"))
 	}
 	if b.AuthenticationProfileUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'authenticationProfileUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'authenticationProfileUri' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BrokerConnectionTransportDataType.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_BrokerConnectionTransportDataTypeBuilder) buildForExtensionObjectDefin
 
 func (b *_BrokerConnectionTransportDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateBrokerConnectionTransportDataTypeBuilder().(*_BrokerConnectionTransportDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastBrokerConnectionTransportDataType(structType any) BrokerConnectionTrans
 	return nil
 }
 
-func (m *_BrokerConnectionTransportDataType) GetTypeName() string {
+func (m *_BrokerConnectionTransportDataType) GetPlx4xTypeName() string {
 	return "BrokerConnectionTransportDataType"
 }
 
@@ -300,13 +290,13 @@ func (m *_BrokerConnectionTransportDataType) parse(ctx context.Context, readBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	resourceUri, err := ReadSimpleField[PascalString](ctx, "resourceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	resourceUri, err := ReadSimpleField[PascalString](ctx, "resourceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'resourceUri' field"))
 	}
 	m.ResourceUri = resourceUri
 
-	authenticationProfileUri, err := ReadSimpleField[PascalString](ctx, "authenticationProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	authenticationProfileUri, err := ReadSimpleField[PascalString](ctx, "authenticationProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'authenticationProfileUri' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_BrokerConnectionTransportDataType) SerializeWithWriteBuffer(ctx contex
 			return errors.Wrap(pushErr, "Error pushing for BrokerConnectionTransportDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "resourceUri", m.GetResourceUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "resourceUri", m.GetResourceUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'resourceUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "authenticationProfileUri", m.GetAuthenticationProfileUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "authenticationProfileUri", m.GetAuthenticationProfileUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'authenticationProfileUri' field")
 		}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataLoopAction = (*_BACnetConstructedDataLoopAction)(nil)
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLoopAction)(nil)
 
 // NewBACnetConstructedDataLoopAction factory function for _BACnetConstructedDataLoopAction
-func NewBACnetConstructedDataLoopAction(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, action BACnetActionTagged, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLoopAction {
+func NewBACnetConstructedDataLoopAction(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, action BACnetActionTagged) *_BACnetConstructedDataLoopAction {
 	if action == nil {
 		panic("action of type BACnetActionTagged for BACnetConstructedDataLoopAction must not be nil")
 	}
 	_result := &_BACnetConstructedDataLoopAction{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		Action:                        action,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataLoopActionBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLoopActionBuilder) = (*_BACnetConstructedDataLoopActionBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataLoopActionBuilder) WithActionBuilder(builderSuppl
 	var err error
 	b.Action, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetActionTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetActionTaggedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataLoopActionBuilder) Build() (BACnetConstructedDataLoopAction, error) {
 	if b.Action == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'action' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'action' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLoopAction.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataLoopActionBuilder) buildForBACnetConstructedData(
 
 func (b *_BACnetConstructedDataLoopActionBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLoopActionBuilder().(*_BACnetConstructedDataLoopActionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataLoopAction(structType any) BACnetConstructedDataLo
 	return nil
 }
 
-func (m *_BACnetConstructedDataLoopAction) GetTypeName() string {
+func (m *_BACnetConstructedDataLoopAction) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLoopAction"
 }
 

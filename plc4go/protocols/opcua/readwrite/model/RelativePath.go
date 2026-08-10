@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _RelativePathBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RelativePathBuilder) = (*_RelativePathBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_RelativePathBuilder) WithElements(elements ...RelativePathElement) Rel
 }
 
 func (b *_RelativePathBuilder) Build() (RelativePath, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RelativePath.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_RelativePathBuilder) buildForExtensionObjectDefinition() (ExtensionObj
 
 func (b *_RelativePathBuilder) DeepCopy() any {
 	_copy := b.CreateRelativePathBuilder().(*_RelativePathBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastRelativePath(structType any) RelativePath {
 	return nil
 }
 
-func (m *_RelativePath) GetTypeName() string {
+func (m *_RelativePath) GetPlx4xTypeName() string {
 	return "RelativePath"
 }
 
@@ -220,9 +222,7 @@ func (m *_RelativePath) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Elements) > 0 {
 		for _curItem, element := range m.Elements {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Elements), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -244,13 +244,13 @@ func (m *_RelativePath) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfElements, err := ReadImplicitField[int32](ctx, "noOfElements", ReadSignedInt(readBuffer, uint8(32)))
+	noOfElements, err := ReadImplicitField[int32](ctx, "noOfElements", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfElements' field"))
 	}
 	_ = noOfElements
 
-	elements, err := ReadCountArrayField[RelativePathElement](ctx, "elements", ReadComplex[RelativePathElement](ExtensionObjectDefinitionParseWithBufferProducer[RelativePathElement]((int32)(int32(539))), readBuffer), uint64(noOfElements))
+	elements, err := ReadCountArrayField[RelativePathElement](ctx, "elements", ReadComplex[RelativePathElement](ExtensionObjectDefinitionParseWithBufferProducer[RelativePathElement]((int32)(int32(539))), readBuffer), uint64(noOfElements), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'elements' field"))
 	}
@@ -281,11 +281,11 @@ func (m *_RelativePath) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for RelativePath")
 		}
 		noOfElements := int32(utils.InlineIf(bool((m.GetElements()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetElements()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfElements", noOfElements, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfElements", noOfElements, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfElements' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "elements", m.GetElements(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "elements", m.GetElements(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'elements' field")
 		}
 

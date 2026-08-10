@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -167,7 +169,7 @@ type _DataSetWriterDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DataSetWriterDataTypeBuilder) = (*_DataSetWriterDataTypeBuilder)(nil)
@@ -191,10 +193,7 @@ func (b *_DataSetWriterDataTypeBuilder) WithNameBuilder(builderSupplier func(Pas
 	var err error
 	b.Name, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -229,10 +228,7 @@ func (b *_DataSetWriterDataTypeBuilder) WithDataSetNameBuilder(builderSupplier f
 	var err error
 	b.DataSetName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -252,10 +248,7 @@ func (b *_DataSetWriterDataTypeBuilder) WithTransportSettingsBuilder(builderSupp
 	var err error
 	b.TransportSettings, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -270,41 +263,26 @@ func (b *_DataSetWriterDataTypeBuilder) WithMessageSettingsBuilder(builderSuppli
 	var err error
 	b.MessageSettings, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
 
 func (b *_DataSetWriterDataTypeBuilder) Build() (DataSetWriterDataType, error) {
 	if b.Name == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'name' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'name' not set"))
 	}
 	if b.DataSetName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'dataSetName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'dataSetName' not set"))
 	}
 	if b.TransportSettings == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'transportSettings' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'transportSettings' not set"))
 	}
 	if b.MessageSettings == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'messageSettings' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'messageSettings' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DataSetWriterDataType.deepCopy(), nil
 }
@@ -330,8 +308,8 @@ func (b *_DataSetWriterDataTypeBuilder) buildForExtensionObjectDefinition() (Ext
 
 func (b *_DataSetWriterDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateDataSetWriterDataTypeBuilder().(*_DataSetWriterDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -424,7 +402,7 @@ func CastDataSetWriterDataType(structType any) DataSetWriterDataType {
 	return nil
 }
 
-func (m *_DataSetWriterDataType) GetTypeName() string {
+func (m *_DataSetWriterDataType) GetPlx4xTypeName() string {
 	return "DataSetWriterDataType"
 }
 
@@ -459,9 +437,7 @@ func (m *_DataSetWriterDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.DataSetWriterProperties) > 0 {
 		for _curItem, element := range m.DataSetWriterProperties {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DataSetWriterProperties), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -489,67 +465,67 @@ func (m *_DataSetWriterDataType) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	name, err := ReadSimpleField[PascalString](ctx, "name", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'name' field"))
 	}
 	m.Name = name
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	enabled, err := ReadSimpleField(ctx, "enabled", ReadBoolean(readBuffer))
+	enabled, err := ReadSimpleField(ctx, "enabled", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'enabled' field"))
 	}
 	m.Enabled = enabled
 
-	dataSetWriterId, err := ReadSimpleField(ctx, "dataSetWriterId", ReadUnsignedShort(readBuffer, uint8(16)))
+	dataSetWriterId, err := ReadSimpleField(ctx, "dataSetWriterId", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetWriterId' field"))
 	}
 	m.DataSetWriterId = dataSetWriterId
 
-	dataSetFieldContentMask, err := ReadEnumField[DataSetFieldContentMask](ctx, "dataSetFieldContentMask", "DataSetFieldContentMask", ReadEnum(DataSetFieldContentMaskByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	dataSetFieldContentMask, err := ReadEnumField[DataSetFieldContentMask](ctx, "dataSetFieldContentMask", "DataSetFieldContentMask", ReadEnum(DataSetFieldContentMaskByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetFieldContentMask' field"))
 	}
 	m.DataSetFieldContentMask = dataSetFieldContentMask
 
-	keyFrameCount, err := ReadSimpleField(ctx, "keyFrameCount", ReadUnsignedInt(readBuffer, uint8(32)))
+	keyFrameCount, err := ReadSimpleField(ctx, "keyFrameCount", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'keyFrameCount' field"))
 	}
 	m.KeyFrameCount = keyFrameCount
 
-	dataSetName, err := ReadSimpleField[PascalString](ctx, "dataSetName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	dataSetName, err := ReadSimpleField[PascalString](ctx, "dataSetName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetName' field"))
 	}
 	m.DataSetName = dataSetName
 
-	noOfDataSetWriterProperties, err := ReadImplicitField[int32](ctx, "noOfDataSetWriterProperties", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDataSetWriterProperties, err := ReadImplicitField[int32](ctx, "noOfDataSetWriterProperties", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDataSetWriterProperties' field"))
 	}
 	_ = noOfDataSetWriterProperties
 
-	dataSetWriterProperties, err := ReadCountArrayField[KeyValuePair](ctx, "dataSetWriterProperties", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfDataSetWriterProperties))
+	dataSetWriterProperties, err := ReadCountArrayField[KeyValuePair](ctx, "dataSetWriterProperties", ReadComplex[KeyValuePair](ExtensionObjectDefinitionParseWithBufferProducer[KeyValuePair]((int32)(int32(14535))), readBuffer), uint64(noOfDataSetWriterProperties), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataSetWriterProperties' field"))
 	}
 	m.DataSetWriterProperties = dataSetWriterProperties
 
-	transportSettings, err := ReadSimpleField[ExtensionObject](ctx, "transportSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	transportSettings, err := ReadSimpleField[ExtensionObject](ctx, "transportSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'transportSettings' field"))
 	}
 	m.TransportSettings = transportSettings
 
-	messageSettings, err := ReadSimpleField[ExtensionObject](ctx, "messageSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	messageSettings, err := ReadSimpleField[ExtensionObject](ctx, "messageSettings", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageSettings' field"))
 	}
@@ -580,47 +556,47 @@ func (m *_DataSetWriterDataType) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for DataSetWriterDataType")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "name", m.GetName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'name' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "enabled", m.GetEnabled(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "enabled", m.GetEnabled(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'enabled' field")
 		}
 
-		if err := WriteSimpleField[uint16](ctx, "dataSetWriterId", m.GetDataSetWriterId(), WriteUnsignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteSimpleField[uint16](ctx, "dataSetWriterId", m.GetDataSetWriterId(), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetWriterId' field")
 		}
 
-		if err := WriteSimpleEnumField[DataSetFieldContentMask](ctx, "dataSetFieldContentMask", "DataSetFieldContentMask", m.GetDataSetFieldContentMask(), WriteEnum[DataSetFieldContentMask, uint32](DataSetFieldContentMask.GetValue, DataSetFieldContentMask.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[DataSetFieldContentMask](ctx, "dataSetFieldContentMask", "DataSetFieldContentMask", m.GetDataSetFieldContentMask(), WriteEnum[DataSetFieldContentMask, uint32](DataSetFieldContentMask.GetValue, DataSetFieldContentMask.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetFieldContentMask' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "keyFrameCount", m.GetKeyFrameCount(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "keyFrameCount", m.GetKeyFrameCount(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'keyFrameCount' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "dataSetName", m.GetDataSetName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "dataSetName", m.GetDataSetName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetName' field")
 		}
 		noOfDataSetWriterProperties := int32(utils.InlineIf(bool((m.GetDataSetWriterProperties()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDataSetWriterProperties()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDataSetWriterProperties", noOfDataSetWriterProperties, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDataSetWriterProperties", noOfDataSetWriterProperties, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDataSetWriterProperties' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "dataSetWriterProperties", m.GetDataSetWriterProperties(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "dataSetWriterProperties", m.GetDataSetWriterProperties(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataSetWriterProperties' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "transportSettings", m.GetTransportSettings(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "transportSettings", m.GetTransportSettings(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'transportSettings' field")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "messageSettings", m.GetMessageSettings(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "messageSettings", m.GetMessageSettings(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageSettings' field")
 		}
 

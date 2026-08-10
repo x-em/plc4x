@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _BrowsePathResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BrowsePathResultBuilder) = (*_BrowsePathResultBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_BrowsePathResultBuilder) WithStatusCodeBuilder(builderSupplier func(St
 	var err error
 	b.StatusCode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_BrowsePathResultBuilder) WithTargets(targets ...BrowsePathTarget) Brow
 
 func (b *_BrowsePathResultBuilder) Build() (BrowsePathResult, error) {
 	if b.StatusCode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'statusCode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'statusCode' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BrowsePathResult.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_BrowsePathResultBuilder) buildForExtensionObjectDefinition() (Extensio
 
 func (b *_BrowsePathResultBuilder) DeepCopy() any {
 	_copy := b.CreateBrowsePathResultBuilder().(*_BrowsePathResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastBrowsePathResult(structType any) BrowsePathResult {
 	return nil
 }
 
-func (m *_BrowsePathResult) GetTypeName() string {
+func (m *_BrowsePathResult) GetPlx4xTypeName() string {
 	return "BrowsePathResult"
 }
 
@@ -262,9 +258,7 @@ func (m *_BrowsePathResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Targets) > 0 {
 		for _curItem, element := range m.Targets {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Targets), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_BrowsePathResult) parse(ctx context.Context, readBuffer utils.ReadBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'statusCode' field"))
 	}
 	m.StatusCode = statusCode
 
-	noOfTargets, err := ReadImplicitField[int32](ctx, "noOfTargets", ReadSignedInt(readBuffer, uint8(32)))
+	noOfTargets, err := ReadImplicitField[int32](ctx, "noOfTargets", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfTargets' field"))
 	}
 	_ = noOfTargets
 
-	targets, err := ReadCountArrayField[BrowsePathTarget](ctx, "targets", ReadComplex[BrowsePathTarget](ExtensionObjectDefinitionParseWithBufferProducer[BrowsePathTarget]((int32)(int32(548))), readBuffer), uint64(noOfTargets))
+	targets, err := ReadCountArrayField[BrowsePathTarget](ctx, "targets", ReadComplex[BrowsePathTarget](ExtensionObjectDefinitionParseWithBufferProducer[BrowsePathTarget]((int32)(int32(548))), readBuffer), uint64(noOfTargets), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targets' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_BrowsePathResult) SerializeWithWriteBuffer(ctx context.Context, writeB
 			return errors.Wrap(pushErr, "Error pushing for BrowsePathResult")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'statusCode' field")
 		}
 		noOfTargets := int32(utils.InlineIf(bool((m.GetTargets()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetTargets()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfTargets", noOfTargets, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfTargets", noOfTargets, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfTargets' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "targets", m.GetTargets(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "targets", m.GetTargets(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targets' field")
 		}
 

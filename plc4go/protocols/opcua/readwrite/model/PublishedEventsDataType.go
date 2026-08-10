@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -119,7 +121,7 @@ type _PublishedEventsDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PublishedEventsDataTypeBuilder) = (*_PublishedEventsDataTypeBuilder)(nil)
@@ -143,10 +145,7 @@ func (b *_PublishedEventsDataTypeBuilder) WithEventNotifierBuilder(builderSuppli
 	var err error
 	b.EventNotifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -166,29 +165,20 @@ func (b *_PublishedEventsDataTypeBuilder) WithFilterBuilder(builderSupplier func
 	var err error
 	b.Filter, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ContentFilterBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ContentFilterBuilder failed"))
 	}
 	return b
 }
 
 func (b *_PublishedEventsDataTypeBuilder) Build() (PublishedEventsDataType, error) {
 	if b.EventNotifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'eventNotifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'eventNotifier' not set"))
 	}
 	if b.Filter == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'filter' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'filter' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PublishedEventsDataType.deepCopy(), nil
 }
@@ -214,8 +204,8 @@ func (b *_PublishedEventsDataTypeBuilder) buildForExtensionObjectDefinition() (E
 
 func (b *_PublishedEventsDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreatePublishedEventsDataTypeBuilder().(*_PublishedEventsDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -284,7 +274,7 @@ func CastPublishedEventsDataType(structType any) PublishedEventsDataType {
 	return nil
 }
 
-func (m *_PublishedEventsDataType) GetTypeName() string {
+func (m *_PublishedEventsDataType) GetPlx4xTypeName() string {
 	return "PublishedEventsDataType"
 }
 
@@ -301,9 +291,7 @@ func (m *_PublishedEventsDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.SelectedFields) > 0 {
 		for _curItem, element := range m.SelectedFields {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.SelectedFields), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -328,25 +316,25 @@ func (m *_PublishedEventsDataType) parse(ctx context.Context, readBuffer utils.R
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	eventNotifier, err := ReadSimpleField[NodeId](ctx, "eventNotifier", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	eventNotifier, err := ReadSimpleField[NodeId](ctx, "eventNotifier", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'eventNotifier' field"))
 	}
 	m.EventNotifier = eventNotifier
 
-	noOfSelectedFields, err := ReadImplicitField[int32](ctx, "noOfSelectedFields", ReadSignedInt(readBuffer, uint8(32)))
+	noOfSelectedFields, err := ReadImplicitField[int32](ctx, "noOfSelectedFields", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfSelectedFields' field"))
 	}
 	_ = noOfSelectedFields
 
-	selectedFields, err := ReadCountArrayField[SimpleAttributeOperand](ctx, "selectedFields", ReadComplex[SimpleAttributeOperand](ExtensionObjectDefinitionParseWithBufferProducer[SimpleAttributeOperand]((int32)(int32(603))), readBuffer), uint64(noOfSelectedFields))
+	selectedFields, err := ReadCountArrayField[SimpleAttributeOperand](ctx, "selectedFields", ReadComplex[SimpleAttributeOperand](ExtensionObjectDefinitionParseWithBufferProducer[SimpleAttributeOperand]((int32)(int32(603))), readBuffer), uint64(noOfSelectedFields), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'selectedFields' field"))
 	}
 	m.SelectedFields = selectedFields
 
-	filter, err := ReadSimpleField[ContentFilter](ctx, "filter", ReadComplex[ContentFilter](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilter]((int32)(int32(588))), readBuffer))
+	filter, err := ReadSimpleField[ContentFilter](ctx, "filter", ReadComplex[ContentFilter](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilter]((int32)(int32(588))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'filter' field"))
 	}
@@ -377,19 +365,19 @@ func (m *_PublishedEventsDataType) SerializeWithWriteBuffer(ctx context.Context,
 			return errors.Wrap(pushErr, "Error pushing for PublishedEventsDataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "eventNotifier", m.GetEventNotifier(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "eventNotifier", m.GetEventNotifier(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'eventNotifier' field")
 		}
 		noOfSelectedFields := int32(utils.InlineIf(bool((m.GetSelectedFields()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetSelectedFields()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfSelectedFields", noOfSelectedFields, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfSelectedFields", noOfSelectedFields, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfSelectedFields' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "selectedFields", m.GetSelectedFields(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "selectedFields", m.GetSelectedFields(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'selectedFields' field")
 		}
 
-		if err := WriteSimpleField[ContentFilter](ctx, "filter", m.GetFilter(), WriteComplex[ContentFilter](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ContentFilter](ctx, "filter", m.GetFilter(), WriteComplex[ContentFilter](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'filter' field")
 		}
 

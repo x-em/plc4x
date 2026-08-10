@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +103,7 @@ type _BACnetApplicationTagDateBuilder struct {
 
 	parentBuilder *_BACnetApplicationTagBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetApplicationTagDateBuilder) = (*_BACnetApplicationTagDateBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_BACnetApplicationTagDateBuilder) WithPayloadBuilder(builderSupplier fu
 	var err error
 	b.Payload, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetTagPayloadDateBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetTagPayloadDateBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetApplicationTagDateBuilder) Build() (BACnetApplicationTagDate, error) {
 	if b.Payload == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'payload' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'payload' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetApplicationTagDate.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_BACnetApplicationTagDateBuilder) buildForBACnetApplicationTag() (BACne
 
 func (b *_BACnetApplicationTagDateBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetApplicationTagDateBuilder().(*_BACnetApplicationTagDateBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +221,7 @@ func CastBACnetApplicationTagDate(structType any) BACnetApplicationTagDate {
 	return nil
 }
 
-func (m *_BACnetApplicationTagDate) GetTypeName() string {
+func (m *_BACnetApplicationTagDate) GetPlx4xTypeName() string {
 	return "BACnetApplicationTagDate"
 }
 

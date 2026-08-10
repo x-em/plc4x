@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -46,6 +49,7 @@ type CBusCommandDeviceManagement interface {
 	// GetParamNo returns ParamNo (property field)
 	GetParamNo() Parameter
 	// GetParameterValue returns ParameterValue (property field)
+	// TODO: check if this is one byte or many bytes
 	GetParameterValue() byte
 	// IsCBusCommandDeviceManagement is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsCBusCommandDeviceManagement()
@@ -64,9 +68,9 @@ var _ CBusCommandDeviceManagement = (*_CBusCommandDeviceManagement)(nil)
 var _ CBusCommandRequirements = (*_CBusCommandDeviceManagement)(nil)
 
 // NewCBusCommandDeviceManagement factory function for _CBusCommandDeviceManagement
-func NewCBusCommandDeviceManagement(header CBusHeader, paramNo Parameter, parameterValue byte, cBusOptions CBusOptions) *_CBusCommandDeviceManagement {
+func NewCBusCommandDeviceManagement(header CBusHeader, paramNo Parameter, parameterValue byte) *_CBusCommandDeviceManagement {
 	_result := &_CBusCommandDeviceManagement{
-		CBusCommandContract: NewCBusCommand(header, cBusOptions),
+		CBusCommandContract: NewCBusCommand(header),
 		ParamNo:             paramNo,
 		ParameterValue:      parameterValue,
 	}
@@ -106,7 +110,7 @@ type _CBusCommandDeviceManagementBuilder struct {
 
 	parentBuilder *_CBusCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CBusCommandDeviceManagementBuilder) = (*_CBusCommandDeviceManagementBuilder)(nil)
@@ -131,8 +135,8 @@ func (b *_CBusCommandDeviceManagementBuilder) WithParameterValue(parameterValue 
 }
 
 func (b *_CBusCommandDeviceManagementBuilder) Build() (CBusCommandDeviceManagement, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CBusCommandDeviceManagement.deepCopy(), nil
 }
@@ -158,8 +162,8 @@ func (b *_CBusCommandDeviceManagementBuilder) buildForCBusCommand() (CBusCommand
 
 func (b *_CBusCommandDeviceManagementBuilder) DeepCopy() any {
 	_copy := b.CreateCBusCommandDeviceManagementBuilder().(*_CBusCommandDeviceManagementBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -233,7 +237,7 @@ func CastCBusCommandDeviceManagement(structType any) CBusCommandDeviceManagement
 	return nil
 }
 
-func (m *_CBusCommandDeviceManagement) GetTypeName() string {
+func (m *_CBusCommandDeviceManagement) GetPlx4xTypeName() string {
 	return "CBusCommandDeviceManagement"
 }
 
@@ -267,19 +271,19 @@ func (m *_CBusCommandDeviceManagement) parse(ctx context.Context, readBuffer uti
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	paramNo, err := ReadEnumField[Parameter](ctx, "paramNo", "Parameter", ReadEnum(ParameterByValue, ReadUnsignedByte(readBuffer, uint8(8))))
+	paramNo, err := ReadEnumField[Parameter](ctx, "paramNo", "Parameter", ReadEnum(ParameterByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'paramNo' field"))
 	}
 	m.ParamNo = paramNo
 
-	delimiter, err := ReadConstField[byte](ctx, "delimiter", ReadByte(readBuffer, 8), CBusCommandDeviceManagement_DELIMITER)
+	delimiter, err := ReadConstField[byte](ctx, "delimiter", ReadByte(readBuffer, 8), CBusCommandDeviceManagement_DELIMITER, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'delimiter' field"))
 	}
 	_ = delimiter
 
-	parameterValue, err := ReadSimpleField(ctx, "parameterValue", ReadByte(readBuffer, 8))
+	parameterValue, err := ReadSimpleField(ctx, "parameterValue", ReadByte(readBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'parameterValue' field"))
 	}
@@ -293,7 +297,7 @@ func (m *_CBusCommandDeviceManagement) parse(ctx context.Context, readBuffer uti
 }
 
 func (m *_CBusCommandDeviceManagement) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -310,15 +314,15 @@ func (m *_CBusCommandDeviceManagement) SerializeWithWriteBuffer(ctx context.Cont
 			return errors.Wrap(pushErr, "Error pushing for CBusCommandDeviceManagement")
 		}
 
-		if err := WriteSimpleEnumField[Parameter](ctx, "paramNo", "Parameter", m.GetParamNo(), WriteEnum[Parameter, uint8](Parameter.GetValue, Parameter.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8))); err != nil {
+		if err := WriteSimpleEnumField[Parameter](ctx, "paramNo", "Parameter", m.GetParamNo(), WriteEnum[Parameter, uint8](Parameter.GetValue, Parameter.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'paramNo' field")
 		}
 
-		if err := WriteConstField(ctx, "delimiter", CBusCommandDeviceManagement_DELIMITER, WriteByte(writeBuffer, 8)); err != nil {
+		if err := WriteConstField(ctx, "delimiter", CBusCommandDeviceManagement_DELIMITER, WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'delimiter' field")
 		}
 
-		if err := WriteSimpleField[byte](ctx, "parameterValue", m.GetParameterValue(), WriteByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[byte](ctx, "parameterValue", m.GetParameterValue(), WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'parameterValue' field")
 		}
 

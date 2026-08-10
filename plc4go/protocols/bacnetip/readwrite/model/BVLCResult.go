@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -99,7 +100,7 @@ type _BVLCResultBuilder struct {
 
 	parentBuilder *_BVLCBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BVLCResultBuilder) = (*_BVLCResultBuilder)(nil)
@@ -119,8 +120,8 @@ func (b *_BVLCResultBuilder) WithCode(code BVLCResultCode) BVLCResultBuilder {
 }
 
 func (b *_BVLCResultBuilder) Build() (BVLCResult, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BVLCResult.deepCopy(), nil
 }
@@ -146,8 +147,8 @@ func (b *_BVLCResultBuilder) buildForBVLC() (BVLC, error) {
 
 func (b *_BVLCResultBuilder) DeepCopy() any {
 	_copy := b.CreateBVLCResultBuilder().(*_BVLCResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -208,7 +209,7 @@ func CastBVLCResult(structType any) BVLCResult {
 	return nil
 }
 
-func (m *_BVLCResult) GetTypeName() string {
+func (m *_BVLCResult) GetPlx4xTypeName() string {
 	return "BVLCResult"
 }
 
@@ -236,7 +237,7 @@ func (m *_BVLCResult) parse(ctx context.Context, readBuffer utils.ReadBuffer, pa
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	code, err := ReadEnumField[BVLCResultCode](ctx, "code", "BVLCResultCode", ReadEnum(BVLCResultCodeByValue, ReadUnsignedShort(readBuffer, uint8(16))), codegen.WithByteOrder(binary.BigEndian))
+	code, err := ReadEnumField[BVLCResultCode](ctx, "code", "BVLCResultCode", ReadEnum(BVLCResultCodeByValue, ReadUnsignedShort(readBuffer, uint8(16))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'code' field"))
 	}
@@ -267,7 +268,7 @@ func (m *_BVLCResult) SerializeWithWriteBuffer(ctx context.Context, writeBuffer 
 			return errors.Wrap(pushErr, "Error pushing for BVLCResult")
 		}
 
-		if err := WriteSimpleEnumField[BVLCResultCode](ctx, "code", "BVLCResultCode", m.GetCode(), WriteEnum[BVLCResultCode, uint16](BVLCResultCode.GetValue, BVLCResultCode.PLC4XEnumName, WriteUnsignedShort(writeBuffer, 16)), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleEnumField[BVLCResultCode](ctx, "code", "BVLCResultCode", m.GetCode(), WriteEnum[BVLCResultCode, uint16](BVLCResultCode.GetValue, BVLCResultCode.PLC4XEnumName, WriteUnsignedShort(writeBuffer, 16)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'code' field")
 		}
 

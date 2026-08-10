@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +98,7 @@ type _MediaTransportControlDataCategoryNameBuilder struct {
 
 	parentBuilder *_MediaTransportControlDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MediaTransportControlDataCategoryNameBuilder) = (*_MediaTransportControlDataCategoryNameBuilder)(nil)
@@ -117,8 +118,8 @@ func (b *_MediaTransportControlDataCategoryNameBuilder) WithCategoryName(categor
 }
 
 func (b *_MediaTransportControlDataCategoryNameBuilder) Build() (MediaTransportControlDataCategoryName, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MediaTransportControlDataCategoryName.deepCopy(), nil
 }
@@ -144,8 +145,8 @@ func (b *_MediaTransportControlDataCategoryNameBuilder) buildForMediaTransportCo
 
 func (b *_MediaTransportControlDataCategoryNameBuilder) DeepCopy() any {
 	_copy := b.CreateMediaTransportControlDataCategoryNameBuilder().(*_MediaTransportControlDataCategoryNameBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -202,7 +203,7 @@ func CastMediaTransportControlDataCategoryName(structType any) MediaTransportCon
 	return nil
 }
 
-func (m *_MediaTransportControlDataCategoryName) GetTypeName() string {
+func (m *_MediaTransportControlDataCategoryName) GetPlx4xTypeName() string {
 	return "MediaTransportControlDataCategoryName"
 }
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,9 +62,9 @@ var _ NLMInitializeRoutingTable = (*_NLMInitializeRoutingTable)(nil)
 var _ NLMRequirements = (*_NLMInitializeRoutingTable)(nil)
 
 // NewNLMInitializeRoutingTable factory function for _NLMInitializeRoutingTable
-func NewNLMInitializeRoutingTable(numberOfPorts uint8, portMappings []NLMInitializeRoutingTablePortMapping, apduLength uint16) *_NLMInitializeRoutingTable {
+func NewNLMInitializeRoutingTable(numberOfPorts uint8, portMappings []NLMInitializeRoutingTablePortMapping) *_NLMInitializeRoutingTable {
 	_result := &_NLMInitializeRoutingTable{
-		NLMContract:   NewNLM(apduLength),
+		NLMContract:   NewNLM(),
 		NumberOfPorts: numberOfPorts,
 		PortMappings:  portMappings,
 	}
@@ -103,7 +104,7 @@ type _NLMInitializeRoutingTableBuilder struct {
 
 	parentBuilder *_NLMBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NLMInitializeRoutingTableBuilder) = (*_NLMInitializeRoutingTableBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_NLMInitializeRoutingTableBuilder) WithPortMappings(portMappings ...NLM
 }
 
 func (b *_NLMInitializeRoutingTableBuilder) Build() (NLMInitializeRoutingTable, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NLMInitializeRoutingTable.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_NLMInitializeRoutingTableBuilder) buildForNLM() (NLM, error) {
 
 func (b *_NLMInitializeRoutingTableBuilder) DeepCopy() any {
 	_copy := b.CreateNLMInitializeRoutingTableBuilder().(*_NLMInitializeRoutingTableBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastNLMInitializeRoutingTable(structType any) NLMInitializeRoutingTable {
 	return nil
 }
 
-func (m *_NLMInitializeRoutingTable) GetTypeName() string {
+func (m *_NLMInitializeRoutingTable) GetPlx4xTypeName() string {
 	return "NLMInitializeRoutingTable"
 }
 
@@ -235,9 +236,7 @@ func (m *_NLMInitializeRoutingTable) GetLengthInBits(ctx context.Context) uint16
 	if len(m.PortMappings) > 0 {
 		for _curItem, element := range m.PortMappings {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.PortMappings), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

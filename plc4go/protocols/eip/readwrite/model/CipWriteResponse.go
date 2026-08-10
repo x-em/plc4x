@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -63,9 +64,9 @@ var _ CipWriteResponse = (*_CipWriteResponse)(nil)
 var _ CipServiceRequirements = (*_CipWriteResponse)(nil)
 
 // NewCipWriteResponse factory function for _CipWriteResponse
-func NewCipWriteResponse(status uint8, extStatus uint8, serviceLen uint16) *_CipWriteResponse {
+func NewCipWriteResponse(status uint8, extStatus uint8) *_CipWriteResponse {
 	_result := &_CipWriteResponse{
-		CipServiceContract: NewCipService(serviceLen),
+		CipServiceContract: NewCipService(),
 		Status:             status,
 		ExtStatus:          extStatus,
 	}
@@ -105,7 +106,7 @@ type _CipWriteResponseBuilder struct {
 
 	parentBuilder *_CipServiceBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CipWriteResponseBuilder) = (*_CipWriteResponseBuilder)(nil)
@@ -130,8 +131,8 @@ func (b *_CipWriteResponseBuilder) WithExtStatus(extStatus uint8) CipWriteRespon
 }
 
 func (b *_CipWriteResponseBuilder) Build() (CipWriteResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CipWriteResponse.deepCopy(), nil
 }
@@ -157,8 +158,8 @@ func (b *_CipWriteResponseBuilder) buildForCipService() (CipService, error) {
 
 func (b *_CipWriteResponseBuilder) DeepCopy() any {
 	_copy := b.CreateCipWriteResponseBuilder().(*_CipWriteResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -231,7 +232,7 @@ func CastCipWriteResponse(structType any) CipWriteResponse {
 	return nil
 }
 
-func (m *_CipWriteResponse) GetTypeName() string {
+func (m *_CipWriteResponse) GetPlx4xTypeName() string {
 	return "CipWriteResponse"
 }
 

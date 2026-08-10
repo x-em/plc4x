@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataLightingCommand = (*_BACnetConstructedDataLightingCom
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLightingCommand)(nil)
 
 // NewBACnetConstructedDataLightingCommand factory function for _BACnetConstructedDataLightingCommand
-func NewBACnetConstructedDataLightingCommand(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lightingCommand BACnetLightingCommand, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLightingCommand {
+func NewBACnetConstructedDataLightingCommand(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, lightingCommand BACnetLightingCommand) *_BACnetConstructedDataLightingCommand {
 	if lightingCommand == nil {
 		panic("lightingCommand of type BACnetLightingCommand for BACnetConstructedDataLightingCommand must not be nil")
 	}
 	_result := &_BACnetConstructedDataLightingCommand{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		LightingCommand:               lightingCommand,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataLightingCommandBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLightingCommandBuilder) = (*_BACnetConstructedDataLightingCommandBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataLightingCommandBuilder) WithLightingCommandBuilde
 	var err error
 	b.LightingCommand, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetLightingCommandBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetLightingCommandBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataLightingCommandBuilder) Build() (BACnetConstructedDataLightingCommand, error) {
 	if b.LightingCommand == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'lightingCommand' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'lightingCommand' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLightingCommand.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataLightingCommandBuilder) buildForBACnetConstructed
 
 func (b *_BACnetConstructedDataLightingCommandBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLightingCommandBuilder().(*_BACnetConstructedDataLightingCommandBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataLightingCommand(structType any) BACnetConstructedD
 	return nil
 }
 
-func (m *_BACnetConstructedDataLightingCommand) GetTypeName() string {
+func (m *_BACnetConstructedDataLightingCommand) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLightingCommand"
 }
 

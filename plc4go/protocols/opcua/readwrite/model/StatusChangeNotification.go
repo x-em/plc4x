@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _StatusChangeNotificationBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (StatusChangeNotificationBuilder) = (*_StatusChangeNotificationBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_StatusChangeNotificationBuilder) WithStatusBuilder(builderSupplier fun
 	var err error
 	b.Status, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_StatusChangeNotificationBuilder) WithDiagnosticInfoBuilder(builderSupp
 	var err error
 	b.DiagnosticInfo, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "DiagnosticInfoBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "DiagnosticInfoBuilder failed"))
 	}
 	return b
 }
 
 func (b *_StatusChangeNotificationBuilder) Build() (StatusChangeNotification, error) {
 	if b.Status == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'status' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'status' not set"))
 	}
 	if b.DiagnosticInfo == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'diagnosticInfo' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'diagnosticInfo' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._StatusChangeNotification.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_StatusChangeNotificationBuilder) buildForExtensionObjectDefinition() (
 
 func (b *_StatusChangeNotificationBuilder) DeepCopy() any {
 	_copy := b.CreateStatusChangeNotificationBuilder().(*_StatusChangeNotificationBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastStatusChangeNotification(structType any) StatusChangeNotification {
 	return nil
 }
 
-func (m *_StatusChangeNotification) GetTypeName() string {
+func (m *_StatusChangeNotification) GetPlx4xTypeName() string {
 	return "StatusChangeNotification"
 }
 
@@ -300,13 +290,13 @@ func (m *_StatusChangeNotification) parse(ctx context.Context, readBuffer utils.
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	status, err := ReadSimpleField[StatusCode](ctx, "status", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	status, err := ReadSimpleField[StatusCode](ctx, "status", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'status' field"))
 	}
 	m.Status = status
 
-	diagnosticInfo, err := ReadSimpleField[DiagnosticInfo](ctx, "diagnosticInfo", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer))
+	diagnosticInfo, err := ReadSimpleField[DiagnosticInfo](ctx, "diagnosticInfo", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'diagnosticInfo' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_StatusChangeNotification) SerializeWithWriteBuffer(ctx context.Context
 			return errors.Wrap(pushErr, "Error pushing for StatusChangeNotification")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "status", m.GetStatus(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "status", m.GetStatus(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'status' field")
 		}
 
-		if err := WriteSimpleField[DiagnosticInfo](ctx, "diagnosticInfo", m.GetDiagnosticInfo(), WriteComplex[DiagnosticInfo](writeBuffer)); err != nil {
+		if err := WriteSimpleField[DiagnosticInfo](ctx, "diagnosticInfo", m.GetDiagnosticInfo(), WriteComplex[DiagnosticInfo](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'diagnosticInfo' field")
 		}
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -120,7 +122,7 @@ type _LldpManagementAddressTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (LldpManagementAddressTypeBuilder) = (*_LldpManagementAddressTypeBuilder)(nil)
@@ -149,10 +151,7 @@ func (b *_LldpManagementAddressTypeBuilder) WithAddressBuilder(builderSupplier f
 	var err error
 	b.Address, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -169,13 +168,10 @@ func (b *_LldpManagementAddressTypeBuilder) WithIfId(ifId uint32) LldpManagement
 
 func (b *_LldpManagementAddressTypeBuilder) Build() (LldpManagementAddressType, error) {
 	if b.Address == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'address' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'address' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._LldpManagementAddressType.deepCopy(), nil
 }
@@ -201,8 +197,8 @@ func (b *_LldpManagementAddressTypeBuilder) buildForExtensionObjectDefinition() 
 
 func (b *_LldpManagementAddressTypeBuilder) DeepCopy() any {
 	_copy := b.CreateLldpManagementAddressTypeBuilder().(*_LldpManagementAddressTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -275,7 +271,7 @@ func CastLldpManagementAddressType(structType any) LldpManagementAddressType {
 	return nil
 }
 
-func (m *_LldpManagementAddressType) GetTypeName() string {
+func (m *_LldpManagementAddressType) GetPlx4xTypeName() string {
 	return "LldpManagementAddressType"
 }
 
@@ -312,25 +308,25 @@ func (m *_LldpManagementAddressType) parse(ctx context.Context, readBuffer utils
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	addressSubtype, err := ReadSimpleField(ctx, "addressSubtype", ReadUnsignedInt(readBuffer, uint8(32)))
+	addressSubtype, err := ReadSimpleField(ctx, "addressSubtype", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'addressSubtype' field"))
 	}
 	m.AddressSubtype = addressSubtype
 
-	address, err := ReadSimpleField[PascalString](ctx, "address", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	address, err := ReadSimpleField[PascalString](ctx, "address", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'address' field"))
 	}
 	m.Address = address
 
-	ifSubtype, err := ReadEnumField[ManAddrIfSubtype](ctx, "ifSubtype", "ManAddrIfSubtype", ReadEnum(ManAddrIfSubtypeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	ifSubtype, err := ReadEnumField[ManAddrIfSubtype](ctx, "ifSubtype", "ManAddrIfSubtype", ReadEnum(ManAddrIfSubtypeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'ifSubtype' field"))
 	}
 	m.IfSubtype = ifSubtype
 
-	ifId, err := ReadSimpleField(ctx, "ifId", ReadUnsignedInt(readBuffer, uint8(32)))
+	ifId, err := ReadSimpleField(ctx, "ifId", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'ifId' field"))
 	}
@@ -361,19 +357,19 @@ func (m *_LldpManagementAddressType) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(pushErr, "Error pushing for LldpManagementAddressType")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "addressSubtype", m.GetAddressSubtype(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "addressSubtype", m.GetAddressSubtype(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'addressSubtype' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "address", m.GetAddress(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "address", m.GetAddress(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'address' field")
 		}
 
-		if err := WriteSimpleEnumField[ManAddrIfSubtype](ctx, "ifSubtype", "ManAddrIfSubtype", m.GetIfSubtype(), WriteEnum[ManAddrIfSubtype, uint32](ManAddrIfSubtype.GetValue, ManAddrIfSubtype.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[ManAddrIfSubtype](ctx, "ifSubtype", "ManAddrIfSubtype", m.GetIfSubtype(), WriteEnum[ManAddrIfSubtype, uint32](ManAddrIfSubtype.GetValue, ManAddrIfSubtype.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'ifSubtype' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "ifId", m.GetIfId(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "ifId", m.GetIfId(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'ifId' field")
 		}
 

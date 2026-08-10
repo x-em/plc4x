@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ func NewExtensionObjectEncodingMaskBuilder() ExtensionObjectEncodingMaskBuilder 
 type _ExtensionObjectEncodingMaskBuilder struct {
 	*_ExtensionObjectEncodingMask
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ExtensionObjectEncodingMaskBuilder) = (*_ExtensionObjectEncodingMaskBuilder)(nil)
@@ -122,8 +124,8 @@ func (b *_ExtensionObjectEncodingMaskBuilder) WithBinaryBody(binaryBody bool) Ex
 }
 
 func (b *_ExtensionObjectEncodingMaskBuilder) Build() (ExtensionObjectEncodingMask, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ExtensionObjectEncodingMask.deepCopy(), nil
 }
@@ -138,8 +140,8 @@ func (b *_ExtensionObjectEncodingMaskBuilder) MustBuild() ExtensionObjectEncodin
 
 func (b *_ExtensionObjectEncodingMaskBuilder) DeepCopy() any {
 	_copy := b.CreateExtensionObjectEncodingMaskBuilder().(*_ExtensionObjectEncodingMaskBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -190,7 +192,7 @@ func CastExtensionObjectEncodingMask(structType any) ExtensionObjectEncodingMask
 	return nil
 }
 
-func (m *_ExtensionObjectEncodingMask) GetTypeName() string {
+func (m *_ExtensionObjectEncodingMask) GetPlx4xTypeName() string {
 	return "ExtensionObjectEncodingMask"
 }
 
@@ -227,7 +229,7 @@ func ExtensionObjectEncodingMaskParseWithBufferProducer() func(ctx context.Conte
 }
 
 func ExtensionObjectEncodingMaskParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (ExtensionObjectEncodingMask, error) {
-	v, err := (&_ExtensionObjectEncodingMask{}).parse(ctx, readBuffer)
+	v, err := (new(_ExtensionObjectEncodingMask)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -243,25 +245,25 @@ func (m *_ExtensionObjectEncodingMask) parse(ctx context.Context, readBuffer uti
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadSignedByte(readBuffer, uint8(5)), int8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadSignedByte(readBuffer, uint8(5)), int8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	typeIdSpecified, err := ReadSimpleField(ctx, "typeIdSpecified", ReadBoolean(readBuffer))
+	typeIdSpecified, err := ReadSimpleField(ctx, "typeIdSpecified", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'typeIdSpecified' field"))
 	}
 	m.TypeIdSpecified = typeIdSpecified
 
-	xmlBody, err := ReadSimpleField(ctx, "xmlBody", ReadBoolean(readBuffer))
+	xmlBody, err := ReadSimpleField(ctx, "xmlBody", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'xmlBody' field"))
 	}
 	m.XmlBody = xmlBody
 
-	binaryBody, err := ReadSimpleField(ctx, "binaryBody", ReadBoolean(readBuffer))
+	binaryBody, err := ReadSimpleField(ctx, "binaryBody", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'binaryBody' field"))
 	}
@@ -291,19 +293,19 @@ func (m *_ExtensionObjectEncodingMask) SerializeWithWriteBuffer(ctx context.Cont
 		return errors.Wrap(pushErr, "Error pushing for ExtensionObjectEncodingMask")
 	}
 
-	if err := WriteReservedField[int8](ctx, "reserved", int8(0x00), WriteSignedByte(writeBuffer, 5)); err != nil {
+	if err := WriteReservedField[int8](ctx, "reserved", int8(0x00), WriteSignedByte(writeBuffer, 5), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "typeIdSpecified", m.GetTypeIdSpecified(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "typeIdSpecified", m.GetTypeIdSpecified(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'typeIdSpecified' field")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "xmlBody", m.GetXmlBody(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "xmlBody", m.GetXmlBody(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'xmlBody' field")
 	}
 
-	if err := WriteSimpleField[bool](ctx, "binaryBody", m.GetBinaryBody(), WriteBoolean(writeBuffer)); err != nil {
+	if err := WriteSimpleField[bool](ctx, "binaryBody", m.GetBinaryBody(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 		return errors.Wrap(err, "Error serializing 'binaryBody' field")
 	}
 

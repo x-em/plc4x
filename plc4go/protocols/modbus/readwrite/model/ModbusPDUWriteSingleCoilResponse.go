@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +104,7 @@ type _ModbusPDUWriteSingleCoilResponseBuilder struct {
 
 	parentBuilder *_ModbusPDUBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ModbusPDUWriteSingleCoilResponseBuilder) = (*_ModbusPDUWriteSingleCoilResponseBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_ModbusPDUWriteSingleCoilResponseBuilder) WithValue(value uint16) Modbu
 }
 
 func (b *_ModbusPDUWriteSingleCoilResponseBuilder) Build() (ModbusPDUWriteSingleCoilResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ModbusPDUWriteSingleCoilResponse.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_ModbusPDUWriteSingleCoilResponseBuilder) buildForModbusPDU() (ModbusPD
 
 func (b *_ModbusPDUWriteSingleCoilResponseBuilder) DeepCopy() any {
 	_copy := b.CreateModbusPDUWriteSingleCoilResponseBuilder().(*_ModbusPDUWriteSingleCoilResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -229,7 +230,7 @@ func CastModbusPDUWriteSingleCoilResponse(structType any) ModbusPDUWriteSingleCo
 	return nil
 }
 
-func (m *_ModbusPDUWriteSingleCoilResponse) GetTypeName() string {
+func (m *_ModbusPDUWriteSingleCoilResponse) GetPlx4xTypeName() string {
 	return "ModbusPDUWriteSingleCoilResponse"
 }
 

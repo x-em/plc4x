@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _RolePermissionTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RolePermissionTypeBuilder) = (*_RolePermissionTypeBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_RolePermissionTypeBuilder) WithRoleIdBuilder(builderSupplier func(Node
 	var err error
 	b.RoleId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_RolePermissionTypeBuilder) WithPermissions(permissions PermissionType)
 
 func (b *_RolePermissionTypeBuilder) Build() (RolePermissionType, error) {
 	if b.RoleId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'roleId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'roleId' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RolePermissionType.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_RolePermissionTypeBuilder) buildForExtensionObjectDefinition() (Extens
 
 func (b *_RolePermissionTypeBuilder) DeepCopy() any {
 	_copy := b.CreateRolePermissionTypeBuilder().(*_RolePermissionTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastRolePermissionType(structType any) RolePermissionType {
 	return nil
 }
 
-func (m *_RolePermissionType) GetTypeName() string {
+func (m *_RolePermissionType) GetPlx4xTypeName() string {
 	return "RolePermissionType"
 }
 
@@ -276,13 +272,13 @@ func (m *_RolePermissionType) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	roleId, err := ReadSimpleField[NodeId](ctx, "roleId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	roleId, err := ReadSimpleField[NodeId](ctx, "roleId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'roleId' field"))
 	}
 	m.RoleId = roleId
 
-	permissions, err := ReadEnumField[PermissionType](ctx, "permissions", "PermissionType", ReadEnum(PermissionTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	permissions, err := ReadEnumField[PermissionType](ctx, "permissions", "PermissionType", ReadEnum(PermissionTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'permissions' field"))
 	}
@@ -313,11 +309,11 @@ func (m *_RolePermissionType) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for RolePermissionType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "roleId", m.GetRoleId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "roleId", m.GetRoleId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'roleId' field")
 		}
 
-		if err := WriteSimpleEnumField[PermissionType](ctx, "permissions", "PermissionType", m.GetPermissions(), WriteEnum[PermissionType, uint32](PermissionType.GetValue, PermissionType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[PermissionType](ctx, "permissions", "PermissionType", m.GetPermissions(), WriteEnum[PermissionType, uint32](PermissionType.GetValue, PermissionType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'permissions' field")
 		}
 

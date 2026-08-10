@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -121,7 +123,7 @@ type _TrustListDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TrustListDataTypeBuilder) = (*_TrustListDataTypeBuilder)(nil)
@@ -161,8 +163,8 @@ func (b *_TrustListDataTypeBuilder) WithIssuerCrls(issuerCrls ...PascalByteStrin
 }
 
 func (b *_TrustListDataTypeBuilder) Build() (TrustListDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TrustListDataType.deepCopy(), nil
 }
@@ -188,8 +190,8 @@ func (b *_TrustListDataTypeBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_TrustListDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateTrustListDataTypeBuilder().(*_TrustListDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -266,7 +268,7 @@ func CastTrustListDataType(structType any) TrustListDataType {
 	return nil
 }
 
-func (m *_TrustListDataType) GetTypeName() string {
+func (m *_TrustListDataType) GetPlx4xTypeName() string {
 	return "TrustListDataType"
 }
 
@@ -283,9 +285,7 @@ func (m *_TrustListDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.TrustedCertificates) > 0 {
 		for _curItem, element := range m.TrustedCertificates {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.TrustedCertificates), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -296,9 +296,7 @@ func (m *_TrustListDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.TrustedCrls) > 0 {
 		for _curItem, element := range m.TrustedCrls {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.TrustedCrls), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -309,9 +307,7 @@ func (m *_TrustListDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.IssuerCertificates) > 0 {
 		for _curItem, element := range m.IssuerCertificates {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.IssuerCertificates), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -322,9 +318,7 @@ func (m *_TrustListDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.IssuerCrls) > 0 {
 		for _curItem, element := range m.IssuerCrls {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.IssuerCrls), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -346,55 +340,55 @@ func (m *_TrustListDataType) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	specifiedLists, err := ReadSimpleField(ctx, "specifiedLists", ReadUnsignedInt(readBuffer, uint8(32)))
+	specifiedLists, err := ReadSimpleField(ctx, "specifiedLists", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'specifiedLists' field"))
 	}
 	m.SpecifiedLists = specifiedLists
 
-	noOfTrustedCertificates, err := ReadImplicitField[int32](ctx, "noOfTrustedCertificates", ReadSignedInt(readBuffer, uint8(32)))
+	noOfTrustedCertificates, err := ReadImplicitField[int32](ctx, "noOfTrustedCertificates", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfTrustedCertificates' field"))
 	}
 	_ = noOfTrustedCertificates
 
-	trustedCertificates, err := ReadCountArrayField[PascalByteString](ctx, "trustedCertificates", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfTrustedCertificates))
+	trustedCertificates, err := ReadCountArrayField[PascalByteString](ctx, "trustedCertificates", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfTrustedCertificates), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'trustedCertificates' field"))
 	}
 	m.TrustedCertificates = trustedCertificates
 
-	noOfTrustedCrls, err := ReadImplicitField[int32](ctx, "noOfTrustedCrls", ReadSignedInt(readBuffer, uint8(32)))
+	noOfTrustedCrls, err := ReadImplicitField[int32](ctx, "noOfTrustedCrls", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfTrustedCrls' field"))
 	}
 	_ = noOfTrustedCrls
 
-	trustedCrls, err := ReadCountArrayField[PascalByteString](ctx, "trustedCrls", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfTrustedCrls))
+	trustedCrls, err := ReadCountArrayField[PascalByteString](ctx, "trustedCrls", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfTrustedCrls), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'trustedCrls' field"))
 	}
 	m.TrustedCrls = trustedCrls
 
-	noOfIssuerCertificates, err := ReadImplicitField[int32](ctx, "noOfIssuerCertificates", ReadSignedInt(readBuffer, uint8(32)))
+	noOfIssuerCertificates, err := ReadImplicitField[int32](ctx, "noOfIssuerCertificates", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfIssuerCertificates' field"))
 	}
 	_ = noOfIssuerCertificates
 
-	issuerCertificates, err := ReadCountArrayField[PascalByteString](ctx, "issuerCertificates", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfIssuerCertificates))
+	issuerCertificates, err := ReadCountArrayField[PascalByteString](ctx, "issuerCertificates", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfIssuerCertificates), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'issuerCertificates' field"))
 	}
 	m.IssuerCertificates = issuerCertificates
 
-	noOfIssuerCrls, err := ReadImplicitField[int32](ctx, "noOfIssuerCrls", ReadSignedInt(readBuffer, uint8(32)))
+	noOfIssuerCrls, err := ReadImplicitField[int32](ctx, "noOfIssuerCrls", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfIssuerCrls' field"))
 	}
 	_ = noOfIssuerCrls
 
-	issuerCrls, err := ReadCountArrayField[PascalByteString](ctx, "issuerCrls", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfIssuerCrls))
+	issuerCrls, err := ReadCountArrayField[PascalByteString](ctx, "issuerCrls", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), uint64(noOfIssuerCrls), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'issuerCrls' field"))
 	}
@@ -425,39 +419,39 @@ func (m *_TrustListDataType) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for TrustListDataType")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "specifiedLists", m.GetSpecifiedLists(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "specifiedLists", m.GetSpecifiedLists(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'specifiedLists' field")
 		}
 		noOfTrustedCertificates := int32(utils.InlineIf(bool((m.GetTrustedCertificates()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetTrustedCertificates()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfTrustedCertificates", noOfTrustedCertificates, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfTrustedCertificates", noOfTrustedCertificates, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfTrustedCertificates' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "trustedCertificates", m.GetTrustedCertificates(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "trustedCertificates", m.GetTrustedCertificates(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'trustedCertificates' field")
 		}
 		noOfTrustedCrls := int32(utils.InlineIf(bool((m.GetTrustedCrls()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetTrustedCrls()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfTrustedCrls", noOfTrustedCrls, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfTrustedCrls", noOfTrustedCrls, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfTrustedCrls' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "trustedCrls", m.GetTrustedCrls(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "trustedCrls", m.GetTrustedCrls(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'trustedCrls' field")
 		}
 		noOfIssuerCertificates := int32(utils.InlineIf(bool((m.GetIssuerCertificates()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetIssuerCertificates()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfIssuerCertificates", noOfIssuerCertificates, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfIssuerCertificates", noOfIssuerCertificates, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfIssuerCertificates' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "issuerCertificates", m.GetIssuerCertificates(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "issuerCertificates", m.GetIssuerCertificates(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'issuerCertificates' field")
 		}
 		noOfIssuerCrls := int32(utils.InlineIf(bool((m.GetIssuerCrls()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetIssuerCrls()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfIssuerCrls", noOfIssuerCrls, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfIssuerCrls", noOfIssuerCrls, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfIssuerCrls' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "issuerCrls", m.GetIssuerCrls(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "issuerCrls", m.GetIssuerCrls(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'issuerCrls' field")
 		}
 

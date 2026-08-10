@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -63,12 +66,12 @@ var _ CBusPointToMultiPointCommandNormal = (*_CBusPointToMultiPointCommandNormal
 var _ CBusPointToMultiPointCommandRequirements = (*_CBusPointToMultiPointCommandNormal)(nil)
 
 // NewCBusPointToMultiPointCommandNormal factory function for _CBusPointToMultiPointCommandNormal
-func NewCBusPointToMultiPointCommandNormal(peekedApplication byte, application ApplicationIdContainer, salData SALData, cBusOptions CBusOptions) *_CBusPointToMultiPointCommandNormal {
+func NewCBusPointToMultiPointCommandNormal(peekedApplication byte, application ApplicationIdContainer, salData SALData) *_CBusPointToMultiPointCommandNormal {
 	if salData == nil {
 		panic("salData of type SALData for CBusPointToMultiPointCommandNormal must not be nil")
 	}
 	_result := &_CBusPointToMultiPointCommandNormal{
-		CBusPointToMultiPointCommandContract: NewCBusPointToMultiPointCommand(peekedApplication, cBusOptions),
+		CBusPointToMultiPointCommandContract: NewCBusPointToMultiPointCommand(peekedApplication),
 		Application:                          application,
 		SalData:                              salData,
 	}
@@ -110,7 +113,7 @@ type _CBusPointToMultiPointCommandNormalBuilder struct {
 
 	parentBuilder *_CBusPointToMultiPointCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CBusPointToMultiPointCommandNormalBuilder) = (*_CBusPointToMultiPointCommandNormalBuilder)(nil)
@@ -139,23 +142,17 @@ func (b *_CBusPointToMultiPointCommandNormalBuilder) WithSalDataBuilder(builderS
 	var err error
 	b.SalData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "SALDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "SALDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_CBusPointToMultiPointCommandNormalBuilder) Build() (CBusPointToMultiPointCommandNormal, error) {
 	if b.SalData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'salData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'salData' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CBusPointToMultiPointCommandNormal.deepCopy(), nil
 }
@@ -181,8 +178,8 @@ func (b *_CBusPointToMultiPointCommandNormalBuilder) buildForCBusPointToMultiPoi
 
 func (b *_CBusPointToMultiPointCommandNormalBuilder) DeepCopy() any {
 	_copy := b.CreateCBusPointToMultiPointCommandNormalBuilder().(*_CBusPointToMultiPointCommandNormalBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -243,7 +240,7 @@ func CastCBusPointToMultiPointCommandNormal(structType any) CBusPointToMultiPoin
 	return nil
 }
 
-func (m *_CBusPointToMultiPointCommandNormal) GetTypeName() string {
+func (m *_CBusPointToMultiPointCommandNormal) GetPlx4xTypeName() string {
 	return "CBusPointToMultiPointCommandNormal"
 }
 
@@ -277,19 +274,19 @@ func (m *_CBusPointToMultiPointCommandNormal) parse(ctx context.Context, readBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	application, err := ReadEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", ReadEnum(ApplicationIdContainerByValue, ReadUnsignedByte(readBuffer, uint8(8))))
+	application, err := ReadEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", ReadEnum(ApplicationIdContainerByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'application' field"))
 	}
 	m.Application = application
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadByte(readBuffer, 8), byte(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadByte(readBuffer, 8), byte(0x00), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	salData, err := ReadSimpleField[SALData](ctx, "salData", ReadComplex[SALData](SALDataParseWithBufferProducer[SALData]((ApplicationId)(application.ApplicationId())), readBuffer))
+	salData, err := ReadSimpleField[SALData](ctx, "salData", ReadComplex[SALData](SALDataParseWithBufferProducer[SALData]((ApplicationId)(application.ApplicationId())), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'salData' field"))
 	}
@@ -303,7 +300,7 @@ func (m *_CBusPointToMultiPointCommandNormal) parse(ctx context.Context, readBuf
 }
 
 func (m *_CBusPointToMultiPointCommandNormal) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -320,15 +317,15 @@ func (m *_CBusPointToMultiPointCommandNormal) SerializeWithWriteBuffer(ctx conte
 			return errors.Wrap(pushErr, "Error pushing for CBusPointToMultiPointCommandNormal")
 		}
 
-		if err := WriteSimpleEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", m.GetApplication(), WriteEnum[ApplicationIdContainer, uint8](ApplicationIdContainer.GetValue, ApplicationIdContainer.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8))); err != nil {
+		if err := WriteSimpleEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", m.GetApplication(), WriteEnum[ApplicationIdContainer, uint8](ApplicationIdContainer.GetValue, ApplicationIdContainer.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'application' field")
 		}
 
-		if err := WriteReservedField[byte](ctx, "reserved", byte(0x00), WriteByte(writeBuffer, 8)); err != nil {
+		if err := WriteReservedField[byte](ctx, "reserved", byte(0x00), WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[SALData](ctx, "salData", m.GetSalData(), WriteComplex[SALData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[SALData](ctx, "salData", m.GetSalData(), WriteComplex[SALData](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'salData' field")
 		}
 

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,7 +54,7 @@ var _ AdsDeviceNotificationResponse = (*_AdsDeviceNotificationResponse)(nil)
 var _ AmsPacketRequirements = (*_AdsDeviceNotificationResponse)(nil)
 
 // NewAdsDeviceNotificationResponse factory function for _AdsDeviceNotificationResponse
-func NewAdsDeviceNotificationResponse(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32) *_AdsDeviceNotificationResponse {
+func NewAdsDeviceNotificationResponse(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32) *_AdsDeviceNotificationResponse {
 	_result := &_AdsDeviceNotificationResponse{
 		AmsPacketContract: NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 	}
@@ -89,7 +90,7 @@ type _AdsDeviceNotificationResponseBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDeviceNotificationResponseBuilder) = (*_AdsDeviceNotificationResponseBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_AdsDeviceNotificationResponseBuilder) WithMandatoryFields() AdsDeviceN
 }
 
 func (b *_AdsDeviceNotificationResponseBuilder) Build() (AdsDeviceNotificationResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDeviceNotificationResponse.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_AdsDeviceNotificationResponseBuilder) buildForAmsPacket() (AmsPacket, 
 
 func (b *_AdsDeviceNotificationResponseBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDeviceNotificationResponseBuilder().(*_AdsDeviceNotificationResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastAdsDeviceNotificationResponse(structType any) AdsDeviceNotificationResp
 	return nil
 }
 
-func (m *_AdsDeviceNotificationResponse) GetTypeName() string {
+func (m *_AdsDeviceNotificationResponse) GetPlx4xTypeName() string {
 	return "AdsDeviceNotificationResponse"
 }
 

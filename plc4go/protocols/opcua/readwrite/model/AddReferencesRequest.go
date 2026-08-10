@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _AddReferencesRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AddReferencesRequestBuilder) = (*_AddReferencesRequestBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_AddReferencesRequestBuilder) WithRequestHeaderBuilder(builderSupplier 
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_AddReferencesRequestBuilder) WithReferencesToAdd(referencesToAdd ...Ad
 
 func (b *_AddReferencesRequestBuilder) Build() (AddReferencesRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AddReferencesRequest.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_AddReferencesRequestBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_AddReferencesRequestBuilder) DeepCopy() any {
 	_copy := b.CreateAddReferencesRequestBuilder().(*_AddReferencesRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastAddReferencesRequest(structType any) AddReferencesRequest {
 	return nil
 }
 
-func (m *_AddReferencesRequest) GetTypeName() string {
+func (m *_AddReferencesRequest) GetPlx4xTypeName() string {
 	return "AddReferencesRequest"
 }
 
@@ -262,9 +258,7 @@ func (m *_AddReferencesRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.ReferencesToAdd) > 0 {
 		for _curItem, element := range m.ReferencesToAdd {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ReferencesToAdd), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_AddReferencesRequest) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	noOfReferencesToAdd, err := ReadImplicitField[int32](ctx, "noOfReferencesToAdd", ReadSignedInt(readBuffer, uint8(32)))
+	noOfReferencesToAdd, err := ReadImplicitField[int32](ctx, "noOfReferencesToAdd", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfReferencesToAdd' field"))
 	}
 	_ = noOfReferencesToAdd
 
-	referencesToAdd, err := ReadCountArrayField[AddReferencesItem](ctx, "referencesToAdd", ReadComplex[AddReferencesItem](ExtensionObjectDefinitionParseWithBufferProducer[AddReferencesItem]((int32)(int32(381))), readBuffer), uint64(noOfReferencesToAdd))
+	referencesToAdd, err := ReadCountArrayField[AddReferencesItem](ctx, "referencesToAdd", ReadComplex[AddReferencesItem](ExtensionObjectDefinitionParseWithBufferProducer[AddReferencesItem]((int32)(int32(381))), readBuffer), uint64(noOfReferencesToAdd), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'referencesToAdd' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_AddReferencesRequest) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for AddReferencesRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 		noOfReferencesToAdd := int32(utils.InlineIf(bool((m.GetReferencesToAdd()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetReferencesToAdd()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfReferencesToAdd", noOfReferencesToAdd, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfReferencesToAdd", noOfReferencesToAdd, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfReferencesToAdd' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "referencesToAdd", m.GetReferencesToAdd(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "referencesToAdd", m.GetReferencesToAdd(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'referencesToAdd' field")
 		}
 

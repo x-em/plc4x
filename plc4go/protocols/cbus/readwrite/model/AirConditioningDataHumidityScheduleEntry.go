@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -158,7 +159,7 @@ type _AirConditioningDataHumidityScheduleEntryBuilder struct {
 
 	parentBuilder *_AirConditioningDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AirConditioningDataHumidityScheduleEntryBuilder) = (*_AirConditioningDataHumidityScheduleEntryBuilder)(nil)
@@ -187,10 +188,7 @@ func (b *_AirConditioningDataHumidityScheduleEntryBuilder) WithZoneListBuilder(b
 	var err error
 	b.ZoneList, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HVACZoneListBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HVACZoneListBuilder failed"))
 	}
 	return b
 }
@@ -215,10 +213,7 @@ func (b *_AirConditioningDataHumidityScheduleEntryBuilder) WithHumidityModeAndFl
 	var err error
 	b.HumidityModeAndFlags, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HVACHumidityModeAndFlagsBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HVACHumidityModeAndFlagsBuilder failed"))
 	}
 	return b
 }
@@ -233,10 +228,7 @@ func (b *_AirConditioningDataHumidityScheduleEntryBuilder) WithStartTimeBuilder(
 	var err error
 	b.StartTime, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HVACStartTimeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HVACStartTimeBuilder failed"))
 	}
 	return b
 }
@@ -251,10 +243,7 @@ func (b *_AirConditioningDataHumidityScheduleEntryBuilder) WithOptionalLevelBuil
 	var err error
 	b.Level, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HVACHumidityBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HVACHumidityBuilder failed"))
 	}
 	return b
 }
@@ -269,35 +258,23 @@ func (b *_AirConditioningDataHumidityScheduleEntryBuilder) WithOptionalRawLevelB
 	var err error
 	b.RawLevel, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HVACRawLevelsBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HVACRawLevelsBuilder failed"))
 	}
 	return b
 }
 
 func (b *_AirConditioningDataHumidityScheduleEntryBuilder) Build() (AirConditioningDataHumidityScheduleEntry, error) {
 	if b.ZoneList == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'zoneList' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'zoneList' not set"))
 	}
 	if b.HumidityModeAndFlags == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'humidityModeAndFlags' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'humidityModeAndFlags' not set"))
 	}
 	if b.StartTime == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'startTime' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'startTime' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AirConditioningDataHumidityScheduleEntry.deepCopy(), nil
 }
@@ -323,8 +300,8 @@ func (b *_AirConditioningDataHumidityScheduleEntryBuilder) buildForAirConditioni
 
 func (b *_AirConditioningDataHumidityScheduleEntryBuilder) DeepCopy() any {
 	_copy := b.CreateAirConditioningDataHumidityScheduleEntryBuilder().(*_AirConditioningDataHumidityScheduleEntryBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -409,7 +386,7 @@ func CastAirConditioningDataHumidityScheduleEntry(structType any) AirConditionin
 	return nil
 }
 
-func (m *_AirConditioningDataHumidityScheduleEntry) GetTypeName() string {
+func (m *_AirConditioningDataHumidityScheduleEntry) GetPlx4xTypeName() string {
 	return "AirConditioningDataHumidityScheduleEntry"
 }
 
@@ -567,11 +544,11 @@ func (m *_AirConditioningDataHumidityScheduleEntry) SerializeWithWriteBuffer(ctx
 			return errors.Wrap(err, "Error serializing 'startTime' field")
 		}
 
-		if err := WriteOptionalField[HVACHumidity](ctx, "level", GetRef(m.GetLevel()), WriteComplex[HVACHumidity](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[HVACHumidity](ctx, "level", new(m.GetLevel()), WriteComplex[HVACHumidity](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'level' field")
 		}
 
-		if err := WriteOptionalField[HVACRawLevels](ctx, "rawLevel", GetRef(m.GetRawLevel()), WriteComplex[HVACRawLevels](writeBuffer), true); err != nil {
+		if err := WriteOptionalField[HVACRawLevels](ctx, "rawLevel", new(m.GetRawLevel()), WriteComplex[HVACRawLevels](writeBuffer), true); err != nil {
 			return errors.Wrap(err, "Error serializing 'rawLevel' field")
 		}
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +105,7 @@ type _DatagramWriterGroupTransportDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DatagramWriterGroupTransportDataTypeBuilder) = (*_DatagramWriterGroupTransportDataTypeBuilder)(nil)
@@ -128,8 +130,8 @@ func (b *_DatagramWriterGroupTransportDataTypeBuilder) WithMessageRepeatDelay(me
 }
 
 func (b *_DatagramWriterGroupTransportDataTypeBuilder) Build() (DatagramWriterGroupTransportDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DatagramWriterGroupTransportDataType.deepCopy(), nil
 }
@@ -155,8 +157,8 @@ func (b *_DatagramWriterGroupTransportDataTypeBuilder) buildForExtensionObjectDe
 
 func (b *_DatagramWriterGroupTransportDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateDatagramWriterGroupTransportDataTypeBuilder().(*_DatagramWriterGroupTransportDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +223,7 @@ func CastDatagramWriterGroupTransportDataType(structType any) DatagramWriterGrou
 	return nil
 }
 
-func (m *_DatagramWriterGroupTransportDataType) GetTypeName() string {
+func (m *_DatagramWriterGroupTransportDataType) GetPlx4xTypeName() string {
 	return "DatagramWriterGroupTransportDataType"
 }
 
@@ -252,13 +254,13 @@ func (m *_DatagramWriterGroupTransportDataType) parse(ctx context.Context, readB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	messageRepeatCount, err := ReadSimpleField(ctx, "messageRepeatCount", ReadUnsignedByte(readBuffer, uint8(8)))
+	messageRepeatCount, err := ReadSimpleField(ctx, "messageRepeatCount", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageRepeatCount' field"))
 	}
 	m.MessageRepeatCount = messageRepeatCount
 
-	messageRepeatDelay, err := ReadSimpleField(ctx, "messageRepeatDelay", ReadDouble(readBuffer, uint8(64)))
+	messageRepeatDelay, err := ReadSimpleField(ctx, "messageRepeatDelay", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'messageRepeatDelay' field"))
 	}
@@ -289,11 +291,11 @@ func (m *_DatagramWriterGroupTransportDataType) SerializeWithWriteBuffer(ctx con
 			return errors.Wrap(pushErr, "Error pushing for DatagramWriterGroupTransportDataType")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "messageRepeatCount", m.GetMessageRepeatCount(), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "messageRepeatCount", m.GetMessageRepeatCount(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageRepeatCount' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "messageRepeatDelay", m.GetMessageRepeatDelay(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "messageRepeatDelay", m.GetMessageRepeatDelay(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'messageRepeatDelay' field")
 		}
 

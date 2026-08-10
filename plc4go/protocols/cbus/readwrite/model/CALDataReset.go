@@ -21,11 +21,13 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +55,9 @@ var _ CALDataReset = (*_CALDataReset)(nil)
 var _ CALDataRequirements = (*_CALDataReset)(nil)
 
 // NewCALDataReset factory function for _CALDataReset
-func NewCALDataReset(commandTypeContainer CALCommandTypeContainer, additionalData CALData, requestContext RequestContext) *_CALDataReset {
+func NewCALDataReset(requestContext RequestContext, commandTypeContainer CALCommandTypeContainer, additionalData CALData) *_CALDataReset {
 	_result := &_CALDataReset{
-		CALDataContract: NewCALData(commandTypeContainer, additionalData, requestContext),
+		CALDataContract: NewCALData(requestContext, commandTypeContainer, additionalData),
 	}
 	_result.CALDataContract.(*_CALData)._SubType = _result
 	return _result
@@ -89,7 +91,7 @@ type _CALDataResetBuilder struct {
 
 	parentBuilder *_CALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CALDataResetBuilder) = (*_CALDataResetBuilder)(nil)
@@ -104,8 +106,8 @@ func (b *_CALDataResetBuilder) WithMandatoryFields() CALDataResetBuilder {
 }
 
 func (b *_CALDataResetBuilder) Build() (CALDataReset, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CALDataReset.deepCopy(), nil
 }
@@ -131,8 +133,8 @@ func (b *_CALDataResetBuilder) buildForCALData() (CALData, error) {
 
 func (b *_CALDataResetBuilder) DeepCopy() any {
 	_copy := b.CreateCALDataResetBuilder().(*_CALDataResetBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -175,7 +177,7 @@ func CastCALDataReset(structType any) CALDataReset {
 	return nil
 }
 
-func (m *_CALDataReset) GetTypeName() string {
+func (m *_CALDataReset) GetPlx4xTypeName() string {
 	return "CALDataReset"
 }
 
@@ -208,7 +210,7 @@ func (m *_CALDataReset) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 }
 
 func (m *_CALDataReset) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}

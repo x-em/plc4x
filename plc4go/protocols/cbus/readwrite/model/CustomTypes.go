@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -39,6 +42,9 @@ type CustomTypes interface {
 	utils.LengthAware
 	utils.Serializable
 	utils.Copyable
+	// GetNumBytes returns NumBytes (property field)
+	// Note 9
+	GetNumBytes() uint8
 	// GetCustomString returns CustomString (property field)
 	GetCustomString() string
 	// IsCustomTypes is a marker method to prevent unintentional type checks (interfaces of same signature)
@@ -49,17 +55,15 @@ type CustomTypes interface {
 
 // _CustomTypes is the data-structure of this message
 type _CustomTypes struct {
+	NumBytes     uint8
 	CustomString string
-
-	// Arguments.
-	NumBytes uint8
 }
 
 var _ CustomTypes = (*_CustomTypes)(nil)
 
 // NewCustomTypes factory function for _CustomTypes
-func NewCustomTypes(customString string, numBytes uint8) *_CustomTypes {
-	return &_CustomTypes{CustomString: customString, NumBytes: numBytes}
+func NewCustomTypes(numBytes uint8, customString string) *_CustomTypes {
+	return &_CustomTypes{NumBytes: numBytes, CustomString: customString}
 }
 
 ///////////////////////////////////////////////////////////
@@ -71,11 +75,11 @@ func NewCustomTypes(customString string, numBytes uint8) *_CustomTypes {
 type CustomTypesBuilder interface {
 	utils.Copyable
 	// WithMandatoryFields adds all mandatory fields (convenience for using multiple builder calls)
-	WithMandatoryFields(customString string) CustomTypesBuilder
+	WithMandatoryFields(numBytes uint8, customString string) CustomTypesBuilder
+	// WithNumBytes adds NumBytes (property field)
+	WithNumBytes(uint8) CustomTypesBuilder
 	// WithCustomString adds CustomString (property field)
 	WithCustomString(string) CustomTypesBuilder
-	// WithArgNumBytes sets a parser argument
-	WithArgNumBytes(uint8) CustomTypesBuilder
 	// Build builds the CustomTypes or returns an error if something is wrong
 	Build() (CustomTypes, error)
 	// MustBuild does the same as Build but panics on error
@@ -90,13 +94,18 @@ func NewCustomTypesBuilder() CustomTypesBuilder {
 type _CustomTypesBuilder struct {
 	*_CustomTypes
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CustomTypesBuilder) = (*_CustomTypesBuilder)(nil)
 
-func (b *_CustomTypesBuilder) WithMandatoryFields(customString string) CustomTypesBuilder {
-	return b.WithCustomString(customString)
+func (b *_CustomTypesBuilder) WithMandatoryFields(numBytes uint8, customString string) CustomTypesBuilder {
+	return b.WithNumBytes(numBytes).WithCustomString(customString)
+}
+
+func (b *_CustomTypesBuilder) WithNumBytes(numBytes uint8) CustomTypesBuilder {
+	b.NumBytes = numBytes
+	return b
 }
 
 func (b *_CustomTypesBuilder) WithCustomString(customString string) CustomTypesBuilder {
@@ -104,14 +113,9 @@ func (b *_CustomTypesBuilder) WithCustomString(customString string) CustomTypesB
 	return b
 }
 
-func (b *_CustomTypesBuilder) WithArgNumBytes(numBytes uint8) CustomTypesBuilder {
-	b.NumBytes = numBytes
-	return b
-}
-
 func (b *_CustomTypesBuilder) Build() (CustomTypes, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CustomTypes.deepCopy(), nil
 }
@@ -126,8 +130,8 @@ func (b *_CustomTypesBuilder) MustBuild() CustomTypes {
 
 func (b *_CustomTypesBuilder) DeepCopy() any {
 	_copy := b.CreateCustomTypesBuilder().(*_CustomTypesBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -150,6 +154,10 @@ func (b *_CustomTypes) CreateCustomTypesBuilder() CustomTypesBuilder {
 /////////////////////// Accessors for property fields.
 ///////////////////////
 
+func (m *_CustomTypes) GetNumBytes() uint8 {
+	return m.NumBytes
+}
+
 func (m *_CustomTypes) GetCustomString() string {
 	return m.CustomString
 }
@@ -170,7 +178,7 @@ func CastCustomTypes(structType any) CustomTypes {
 	return nil
 }
 
-func (m *_CustomTypes) GetTypeName() string {
+func (m *_CustomTypes) GetPlx4xTypeName() string {
 	return "CustomTypes"
 }
 
@@ -188,7 +196,7 @@ func (m *_CustomTypes) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func CustomTypesParse(ctx context.Context, theBytes []byte, numBytes uint8) (CustomTypes, error) {
-	return CustomTypesParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes), numBytes)
+	return CustomTypesParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)), numBytes)
 }
 
 func CustomTypesParseWithBufferProducer(numBytes uint8) func(ctx context.Context, readBuffer utils.ReadBuffer) (CustomTypes, error) {
@@ -198,7 +206,7 @@ func CustomTypesParseWithBufferProducer(numBytes uint8) func(ctx context.Context
 }
 
 func CustomTypesParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer, numBytes uint8) (CustomTypes, error) {
-	v, err := (&_CustomTypes{NumBytes: numBytes}).parse(ctx, readBuffer, numBytes)
+	v, err := (new(_CustomTypes)).parse(ctx, readBuffer, numBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -213,8 +221,9 @@ func (m *_CustomTypes) parse(ctx context.Context, readBuffer utils.ReadBuffer, n
 	}
 	currentPos := positionAware.GetPos()
 	_ = currentPos
+	m.NumBytes = numBytes
 
-	customString, err := ReadSimpleField(ctx, "customString", ReadString(readBuffer, uint32(int32(int32(8))*int32(numBytes))))
+	customString, err := ReadSimpleField(ctx, "customString", ReadString(readBuffer, uint32(int32(int32(8))*int32(numBytes))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'customString' field"))
 	}
@@ -228,7 +237,7 @@ func (m *_CustomTypes) parse(ctx context.Context, readBuffer utils.ReadBuffer, n
 }
 
 func (m *_CustomTypes) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -244,7 +253,7 @@ func (m *_CustomTypes) SerializeWithWriteBuffer(ctx context.Context, writeBuffer
 		return errors.Wrap(pushErr, "Error pushing for CustomTypes")
 	}
 
-	if err := WriteSimpleField[string](ctx, "customString", m.GetCustomString(), WriteString(writeBuffer, int32(int32(int32(8))*int32(m.GetNumBytes())))); err != nil {
+	if err := WriteSimpleField[string](ctx, "customString", m.GetCustomString(), WriteString(writeBuffer, int32(int32(int32(8))*int32(m.GetNumBytes()))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'customString' field")
 	}
 
@@ -253,16 +262,6 @@ func (m *_CustomTypes) SerializeWithWriteBuffer(ctx context.Context, writeBuffer
 	}
 	return nil
 }
-
-////
-// Arguments Getter
-
-func (m *_CustomTypes) GetNumBytes() uint8 {
-	return m.NumBytes
-}
-
-//
-////
 
 func (m *_CustomTypes) IsCustomTypes() {}
 
@@ -275,8 +274,8 @@ func (m *_CustomTypes) deepCopy() *_CustomTypes {
 		return nil
 	}
 	_CustomTypesCopy := &_CustomTypes{
-		m.CustomString,
 		m.NumBytes,
+		m.CustomString,
 	}
 	return _CustomTypesCopy
 }

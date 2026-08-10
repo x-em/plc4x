@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,7 +62,7 @@ var _ VariantUInt32 = (*_VariantUInt32)(nil)
 var _ VariantRequirements = (*_VariantUInt32)(nil)
 
 // NewVariantUInt32 factory function for _VariantUInt32
-func NewVariantUInt32(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool, arrayLength *int32, value []uint32) *_VariantUInt32 {
+func NewVariantUInt32(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32, arrayLength *int32, value []uint32) *_VariantUInt32 {
 	_result := &_VariantUInt32{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 		ArrayLength:     arrayLength,
@@ -103,7 +104,7 @@ type _VariantUInt32Builder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantUInt32Builder) = (*_VariantUInt32Builder)(nil)
@@ -128,8 +129,8 @@ func (b *_VariantUInt32Builder) WithValue(value ...uint32) VariantUInt32Builder 
 }
 
 func (b *_VariantUInt32Builder) Build() (VariantUInt32, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantUInt32.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_VariantUInt32Builder) buildForVariant() (Variant, error) {
 
 func (b *_VariantUInt32Builder) DeepCopy() any {
 	_copy := b.CreateVariantUInt32Builder().(*_VariantUInt32Builder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastVariantUInt32(structType any) VariantUInt32 {
 	return nil
 }
 
-func (m *_VariantUInt32) GetTypeName() string {
+func (m *_VariantUInt32) GetPlx4xTypeName() string {
 	return "VariantUInt32"
 }
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -114,7 +116,7 @@ type _ParsingResultBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ParsingResultBuilder) = (*_ParsingResultBuilder)(nil)
@@ -138,10 +140,7 @@ func (b *_ParsingResultBuilder) WithStatusCodeBuilder(builderSupplier func(Statu
 	var err error
 	b.StatusCode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "StatusCodeBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "StatusCodeBuilder failed"))
 	}
 	return b
 }
@@ -158,13 +157,10 @@ func (b *_ParsingResultBuilder) WithDataDiagnosticInfos(dataDiagnosticInfos ...D
 
 func (b *_ParsingResultBuilder) Build() (ParsingResult, error) {
 	if b.StatusCode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'statusCode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'statusCode' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ParsingResult.deepCopy(), nil
 }
@@ -190,8 +186,8 @@ func (b *_ParsingResultBuilder) buildForExtensionObjectDefinition() (ExtensionOb
 
 func (b *_ParsingResultBuilder) DeepCopy() any {
 	_copy := b.CreateParsingResultBuilder().(*_ParsingResultBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -260,7 +256,7 @@ func CastParsingResult(structType any) ParsingResult {
 	return nil
 }
 
-func (m *_ParsingResult) GetTypeName() string {
+func (m *_ParsingResult) GetPlx4xTypeName() string {
 	return "ParsingResult"
 }
 
@@ -277,9 +273,7 @@ func (m *_ParsingResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.DataStatusCodes) > 0 {
 		for _curItem, element := range m.DataStatusCodes {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DataStatusCodes), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -290,9 +284,7 @@ func (m *_ParsingResult) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.DataDiagnosticInfos) > 0 {
 		for _curItem, element := range m.DataDiagnosticInfos {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DataDiagnosticInfos), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -314,31 +306,31 @@ func (m *_ParsingResult) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer))
+	statusCode, err := ReadSimpleField[StatusCode](ctx, "statusCode", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'statusCode' field"))
 	}
 	m.StatusCode = statusCode
 
-	noOfDataStatusCodes, err := ReadImplicitField[int32](ctx, "noOfDataStatusCodes", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDataStatusCodes, err := ReadImplicitField[int32](ctx, "noOfDataStatusCodes", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDataStatusCodes' field"))
 	}
 	_ = noOfDataStatusCodes
 
-	dataStatusCodes, err := ReadCountArrayField[StatusCode](ctx, "dataStatusCodes", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfDataStatusCodes))
+	dataStatusCodes, err := ReadCountArrayField[StatusCode](ctx, "dataStatusCodes", ReadComplex[StatusCode](StatusCodeParseWithBuffer, readBuffer), uint64(noOfDataStatusCodes), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataStatusCodes' field"))
 	}
 	m.DataStatusCodes = dataStatusCodes
 
-	noOfDataDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfDataDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDataDiagnosticInfos, err := ReadImplicitField[int32](ctx, "noOfDataDiagnosticInfos", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDataDiagnosticInfos' field"))
 	}
 	_ = noOfDataDiagnosticInfos
 
-	dataDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "dataDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfDataDiagnosticInfos))
+	dataDiagnosticInfos, err := ReadCountArrayField[DiagnosticInfo](ctx, "dataDiagnosticInfos", ReadComplex[DiagnosticInfo](DiagnosticInfoParseWithBuffer, readBuffer), uint64(noOfDataDiagnosticInfos), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dataDiagnosticInfos' field"))
 	}
@@ -369,23 +361,23 @@ func (m *_ParsingResult) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 			return errors.Wrap(pushErr, "Error pushing for ParsingResult")
 		}
 
-		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer)); err != nil {
+		if err := WriteSimpleField[StatusCode](ctx, "statusCode", m.GetStatusCode(), WriteComplex[StatusCode](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'statusCode' field")
 		}
 		noOfDataStatusCodes := int32(utils.InlineIf(bool((m.GetDataStatusCodes()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDataStatusCodes()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDataStatusCodes", noOfDataStatusCodes, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDataStatusCodes", noOfDataStatusCodes, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDataStatusCodes' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "dataStatusCodes", m.GetDataStatusCodes(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "dataStatusCodes", m.GetDataStatusCodes(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataStatusCodes' field")
 		}
 		noOfDataDiagnosticInfos := int32(utils.InlineIf(bool((m.GetDataDiagnosticInfos()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDataDiagnosticInfos()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDataDiagnosticInfos", noOfDataDiagnosticInfos, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDataDiagnosticInfos", noOfDataDiagnosticInfos, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDataDiagnosticInfos' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "dataDiagnosticInfos", m.GetDataDiagnosticInfos(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "dataDiagnosticInfos", m.GetDataDiagnosticInfos(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'dataDiagnosticInfos' field")
 		}
 

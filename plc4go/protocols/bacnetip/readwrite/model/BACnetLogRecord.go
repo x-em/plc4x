@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -107,7 +108,7 @@ func NewBACnetLogRecordBuilder() BACnetLogRecordBuilder {
 type _BACnetLogRecordBuilder struct {
 	*_BACnetLogRecord
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetLogRecordBuilder) = (*_BACnetLogRecordBuilder)(nil)
@@ -126,10 +127,7 @@ func (b *_BACnetLogRecordBuilder) WithTimestampBuilder(builderSupplier func(BACn
 	var err error
 	b.Timestamp, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDateTimeEnclosedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDateTimeEnclosedBuilder failed"))
 	}
 	return b
 }
@@ -144,10 +142,7 @@ func (b *_BACnetLogRecordBuilder) WithLogDatumBuilder(builderSupplier func(BACne
 	var err error
 	b.LogDatum, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetLogRecordLogDatumBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetLogRecordLogDatumBuilder failed"))
 	}
 	return b
 }
@@ -162,29 +157,20 @@ func (b *_BACnetLogRecordBuilder) WithOptionalStatusFlagsBuilder(builderSupplier
 	var err error
 	b.StatusFlags, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetStatusFlagsTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetStatusFlagsTaggedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetLogRecordBuilder) Build() (BACnetLogRecord, error) {
 	if b.Timestamp == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'timestamp' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'timestamp' not set"))
 	}
 	if b.LogDatum == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'logDatum' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'logDatum' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetLogRecord.deepCopy(), nil
 }
@@ -199,8 +185,8 @@ func (b *_BACnetLogRecordBuilder) MustBuild() BACnetLogRecord {
 
 func (b *_BACnetLogRecordBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetLogRecordBuilder().(*_BACnetLogRecordBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +237,7 @@ func CastBACnetLogRecord(structType any) BACnetLogRecord {
 	return nil
 }
 
-func (m *_BACnetLogRecord) GetTypeName() string {
+func (m *_BACnetLogRecord) GetPlx4xTypeName() string {
 	return "BACnetLogRecord"
 }
 
@@ -287,7 +273,7 @@ func BACnetLogRecordParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func BACnetLogRecordParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetLogRecord, error) {
-	v, err := (&_BACnetLogRecord{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetLogRecord)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +343,7 @@ func (m *_BACnetLogRecord) SerializeWithWriteBuffer(ctx context.Context, writeBu
 		return errors.Wrap(err, "Error serializing 'logDatum' field")
 	}
 
-	if err := WriteOptionalField[BACnetStatusFlagsTagged](ctx, "statusFlags", GetRef(m.GetStatusFlags()), WriteComplex[BACnetStatusFlagsTagged](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetStatusFlagsTagged](ctx, "statusFlags", new(m.GetStatusFlags()), WriteComplex[BACnetStatusFlagsTagged](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'statusFlags' field")
 	}
 

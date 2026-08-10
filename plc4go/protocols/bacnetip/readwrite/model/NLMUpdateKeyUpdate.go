@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -88,12 +89,12 @@ var _ NLMUpdateKeyUpdate = (*_NLMUpdateKeyUpdate)(nil)
 var _ NLMRequirements = (*_NLMUpdateKeyUpdate)(nil)
 
 // NewNLMUpdateKeyUpdate factory function for _NLMUpdateKeyUpdate
-func NewNLMUpdateKeyUpdate(controlFlags NLMUpdateKeyUpdateControlFlags, set1KeyRevision *byte, set1ActivationTime *uint32, set1ExpirationTime *uint32, set1KeyCount *uint8, set1Keys []NLMUpdateKeyUpdateKeyEntry, set2KeyRevision *byte, set2ActivationTime *uint32, set2ExpirationTime *uint32, set2KeyCount *uint8, set2Keys []NLMUpdateKeyUpdateKeyEntry, apduLength uint16) *_NLMUpdateKeyUpdate {
+func NewNLMUpdateKeyUpdate(controlFlags NLMUpdateKeyUpdateControlFlags, set1KeyRevision *byte, set1ActivationTime *uint32, set1ExpirationTime *uint32, set1KeyCount *uint8, set1Keys []NLMUpdateKeyUpdateKeyEntry, set2KeyRevision *byte, set2ActivationTime *uint32, set2ExpirationTime *uint32, set2KeyCount *uint8, set2Keys []NLMUpdateKeyUpdateKeyEntry) *_NLMUpdateKeyUpdate {
 	if controlFlags == nil {
 		panic("controlFlags of type NLMUpdateKeyUpdateControlFlags for NLMUpdateKeyUpdate must not be nil")
 	}
 	_result := &_NLMUpdateKeyUpdate{
-		NLMContract:        NewNLM(apduLength),
+		NLMContract:        NewNLM(),
 		ControlFlags:       controlFlags,
 		Set1KeyRevision:    set1KeyRevision,
 		Set1ActivationTime: set1ActivationTime,
@@ -162,7 +163,7 @@ type _NLMUpdateKeyUpdateBuilder struct {
 
 	parentBuilder *_NLMBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NLMUpdateKeyUpdateBuilder) = (*_NLMUpdateKeyUpdateBuilder)(nil)
@@ -186,10 +187,7 @@ func (b *_NLMUpdateKeyUpdateBuilder) WithControlFlagsBuilder(builderSupplier fun
 	var err error
 	b.ControlFlags, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NLMUpdateKeyUpdateControlFlagsBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NLMUpdateKeyUpdateControlFlagsBuilder failed"))
 	}
 	return b
 }
@@ -246,13 +244,10 @@ func (b *_NLMUpdateKeyUpdateBuilder) WithSet2Keys(set2Keys ...NLMUpdateKeyUpdate
 
 func (b *_NLMUpdateKeyUpdateBuilder) Build() (NLMUpdateKeyUpdate, error) {
 	if b.ControlFlags == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'controlFlags' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'controlFlags' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NLMUpdateKeyUpdate.deepCopy(), nil
 }
@@ -278,8 +273,8 @@ func (b *_NLMUpdateKeyUpdateBuilder) buildForNLM() (NLM, error) {
 
 func (b *_NLMUpdateKeyUpdateBuilder) DeepCopy() any {
 	_copy := b.CreateNLMUpdateKeyUpdateBuilder().(*_NLMUpdateKeyUpdateBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -380,7 +375,7 @@ func CastNLMUpdateKeyUpdate(structType any) NLMUpdateKeyUpdate {
 	return nil
 }
 
-func (m *_NLMUpdateKeyUpdate) GetTypeName() string {
+func (m *_NLMUpdateKeyUpdate) GetPlx4xTypeName() string {
 	return "NLMUpdateKeyUpdate"
 }
 
@@ -414,9 +409,7 @@ func (m *_NLMUpdateKeyUpdate) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Set1Keys) > 0 {
 		for _curItem, element := range m.Set1Keys {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Set1Keys), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -444,9 +437,7 @@ func (m *_NLMUpdateKeyUpdate) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Set2Keys) > 0 {
 		for _curItem, element := range m.Set2Keys {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Set2Keys), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

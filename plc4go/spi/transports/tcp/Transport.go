@@ -26,9 +26,9 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/transports"
 	"github.com/apache/plc4x/plc4go/spi/utils"
@@ -37,6 +37,8 @@ import (
 type Transport struct {
 	log zerolog.Logger
 }
+
+var _ transports.Transport = (*Transport)(nil)
 
 func NewTransport(_options ...options.WithOption) *Transport {
 	customLogger := options.ExtractCustomLoggerOrDefaultToGlobal(_options...)

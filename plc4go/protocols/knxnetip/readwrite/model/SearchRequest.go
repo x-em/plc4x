@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -104,7 +105,7 @@ type _SearchRequestBuilder struct {
 
 	parentBuilder *_KnxNetIpMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SearchRequestBuilder) = (*_SearchRequestBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_SearchRequestBuilder) WithHpaiIDiscoveryEndpointBuilder(builderSupplie
 	var err error
 	b.HpaiIDiscoveryEndpoint, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "HPAIDiscoveryEndpointBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "HPAIDiscoveryEndpointBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SearchRequestBuilder) Build() (SearchRequest, error) {
 	if b.HpaiIDiscoveryEndpoint == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'hpaiIDiscoveryEndpoint' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'hpaiIDiscoveryEndpoint' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SearchRequest.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_SearchRequestBuilder) buildForKnxNetIpMessage() (KnxNetIpMessage, erro
 
 func (b *_SearchRequestBuilder) DeepCopy() any {
 	_copy := b.CreateSearchRequestBuilder().(*_SearchRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -232,7 +227,7 @@ func CastSearchRequest(structType any) SearchRequest {
 	return nil
 }
 
-func (m *_SearchRequest) GetTypeName() string {
+func (m *_SearchRequest) GetPlx4xTypeName() string {
 	return "SearchRequest"
 }
 
@@ -260,7 +255,7 @@ func (m *_SearchRequest) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	hpaiIDiscoveryEndpoint, err := ReadSimpleField[HPAIDiscoveryEndpoint](ctx, "hpaiIDiscoveryEndpoint", ReadComplex[HPAIDiscoveryEndpoint](HPAIDiscoveryEndpointParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	hpaiIDiscoveryEndpoint, err := ReadSimpleField[HPAIDiscoveryEndpoint](ctx, "hpaiIDiscoveryEndpoint", ReadComplex[HPAIDiscoveryEndpoint](HPAIDiscoveryEndpointParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'hpaiIDiscoveryEndpoint' field"))
 	}
@@ -291,7 +286,7 @@ func (m *_SearchRequest) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 			return errors.Wrap(pushErr, "Error pushing for SearchRequest")
 		}
 
-		if err := WriteSimpleField[HPAIDiscoveryEndpoint](ctx, "hpaiIDiscoveryEndpoint", m.GetHpaiIDiscoveryEndpoint(), WriteComplex[HPAIDiscoveryEndpoint](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[HPAIDiscoveryEndpoint](ctx, "hpaiIDiscoveryEndpoint", m.GetHpaiIDiscoveryEndpoint(), WriteComplex[HPAIDiscoveryEndpoint](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'hpaiIDiscoveryEndpoint' field")
 		}
 

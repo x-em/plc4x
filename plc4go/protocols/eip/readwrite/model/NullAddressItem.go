@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -93,7 +94,7 @@ type _NullAddressItemBuilder struct {
 
 	parentBuilder *_TypeIdBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (NullAddressItemBuilder) = (*_NullAddressItemBuilder)(nil)
@@ -108,8 +109,8 @@ func (b *_NullAddressItemBuilder) WithMandatoryFields() NullAddressItemBuilder {
 }
 
 func (b *_NullAddressItemBuilder) Build() (NullAddressItem, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._NullAddressItem.deepCopy(), nil
 }
@@ -135,8 +136,8 @@ func (b *_NullAddressItemBuilder) buildForTypeId() (TypeId, error) {
 
 func (b *_NullAddressItemBuilder) DeepCopy() any {
 	_copy := b.CreateNullAddressItemBuilder().(*_NullAddressItemBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastNullAddressItem(structType any) NullAddressItem {
 	return nil
 }
 
-func (m *_NullAddressItem) GetTypeName() string {
+func (m *_NullAddressItem) GetPlx4xTypeName() string {
 	return "NullAddressItem"
 }
 

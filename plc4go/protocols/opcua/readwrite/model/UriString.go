@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewUriStringBuilder() UriStringBuilder {
 type _UriStringBuilder struct {
 	*_UriString
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (UriStringBuilder) = (*_UriStringBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_UriStringBuilder) WithMandatoryFields() UriStringBuilder {
 }
 
 func (b *_UriStringBuilder) Build() (UriString, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._UriString.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_UriStringBuilder) MustBuild() UriString {
 
 func (b *_UriStringBuilder) DeepCopy() any {
 	_copy := b.CreateUriStringBuilder().(*_UriStringBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastUriString(structType any) UriString {
 	return nil
 }
 
-func (m *_UriString) GetTypeName() string {
+func (m *_UriString) GetPlx4xTypeName() string {
 	return "UriString"
 }
 
@@ -159,7 +160,7 @@ func UriStringParseWithBufferProducer() func(ctx context.Context, readBuffer uti
 }
 
 func UriStringParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (UriString, error) {
-	v, err := (&_UriString{}).parse(ctx, readBuffer)
+	v, err := (new(_UriString)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

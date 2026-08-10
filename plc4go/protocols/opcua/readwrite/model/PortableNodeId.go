@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _PortableNodeIdBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PortableNodeIdBuilder) = (*_PortableNodeIdBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_PortableNodeIdBuilder) WithNamespaceUriBuilder(builderSupplier func(Pa
 	var err error
 	b.NamespaceUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_PortableNodeIdBuilder) WithIdentifierBuilder(builderSupplier func(Node
 	var err error
 	b.Identifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
 
 func (b *_PortableNodeIdBuilder) Build() (PortableNodeId, error) {
 	if b.NamespaceUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'namespaceUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'namespaceUri' not set"))
 	}
 	if b.Identifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'identifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'identifier' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PortableNodeId.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_PortableNodeIdBuilder) buildForExtensionObjectDefinition() (ExtensionO
 
 func (b *_PortableNodeIdBuilder) DeepCopy() any {
 	_copy := b.CreatePortableNodeIdBuilder().(*_PortableNodeIdBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastPortableNodeId(structType any) PortableNodeId {
 	return nil
 }
 
-func (m *_PortableNodeId) GetTypeName() string {
+func (m *_PortableNodeId) GetPlx4xTypeName() string {
 	return "PortableNodeId"
 }
 
@@ -300,13 +290,13 @@ func (m *_PortableNodeId) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	namespaceUri, err := ReadSimpleField[PascalString](ctx, "namespaceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	namespaceUri, err := ReadSimpleField[PascalString](ctx, "namespaceUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'namespaceUri' field"))
 	}
 	m.NamespaceUri = namespaceUri
 
-	identifier, err := ReadSimpleField[NodeId](ctx, "identifier", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	identifier, err := ReadSimpleField[NodeId](ctx, "identifier", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'identifier' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_PortableNodeId) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for PortableNodeId")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "namespaceUri", m.GetNamespaceUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "namespaceUri", m.GetNamespaceUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'namespaceUri' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "identifier", m.GetIdentifier(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "identifier", m.GetIdentifier(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'identifier' field")
 		}
 

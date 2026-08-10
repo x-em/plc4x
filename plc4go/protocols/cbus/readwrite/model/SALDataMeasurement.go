@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +105,7 @@ type _SALDataMeasurementBuilder struct {
 
 	parentBuilder *_SALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SALDataMeasurementBuilder) = (*_SALDataMeasurementBuilder)(nil)
@@ -126,23 +129,17 @@ func (b *_SALDataMeasurementBuilder) WithMeasurementDataBuilder(builderSupplier 
 	var err error
 	b.MeasurementData, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "MeasurementDataBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "MeasurementDataBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SALDataMeasurementBuilder) Build() (SALDataMeasurement, error) {
 	if b.MeasurementData == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'measurementData' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'measurementData' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SALDataMeasurement.deepCopy(), nil
 }
@@ -168,8 +165,8 @@ func (b *_SALDataMeasurementBuilder) buildForSALData() (SALData, error) {
 
 func (b *_SALDataMeasurementBuilder) DeepCopy() any {
 	_copy := b.CreateSALDataMeasurementBuilder().(*_SALDataMeasurementBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +227,7 @@ func CastSALDataMeasurement(structType any) SALDataMeasurement {
 	return nil
 }
 
-func (m *_SALDataMeasurement) GetTypeName() string {
+func (m *_SALDataMeasurement) GetPlx4xTypeName() string {
 	return "SALDataMeasurement"
 }
 
@@ -258,7 +255,7 @@ func (m *_SALDataMeasurement) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	measurementData, err := ReadSimpleField[MeasurementData](ctx, "measurementData", ReadComplex[MeasurementData](MeasurementDataParseWithBuffer, readBuffer))
+	measurementData, err := ReadSimpleField[MeasurementData](ctx, "measurementData", ReadComplex[MeasurementData](MeasurementDataParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'measurementData' field"))
 	}
@@ -272,7 +269,7 @@ func (m *_SALDataMeasurement) parse(ctx context.Context, readBuffer utils.ReadBu
 }
 
 func (m *_SALDataMeasurement) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -289,7 +286,7 @@ func (m *_SALDataMeasurement) SerializeWithWriteBuffer(ctx context.Context, writ
 			return errors.Wrap(pushErr, "Error pushing for SALDataMeasurement")
 		}
 
-		if err := WriteSimpleField[MeasurementData](ctx, "measurementData", m.GetMeasurementData(), WriteComplex[MeasurementData](writeBuffer)); err != nil {
+		if err := WriteSimpleField[MeasurementData](ctx, "measurementData", m.GetMeasurementData(), WriteComplex[MeasurementData](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'measurementData' field")
 		}
 

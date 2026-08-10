@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,6 +44,7 @@ type CALDataIdentifyReply interface {
 	utils.Copyable
 	CALData
 	// GetAttribute returns Attribute (property field)
+	// Reply
 	GetAttribute() Attribute
 	// GetIdentifyReplyCommand returns IdentifyReplyCommand (property field)
 	GetIdentifyReplyCommand() IdentifyReplyCommand
@@ -61,12 +65,12 @@ var _ CALDataIdentifyReply = (*_CALDataIdentifyReply)(nil)
 var _ CALDataRequirements = (*_CALDataIdentifyReply)(nil)
 
 // NewCALDataIdentifyReply factory function for _CALDataIdentifyReply
-func NewCALDataIdentifyReply(commandTypeContainer CALCommandTypeContainer, additionalData CALData, attribute Attribute, identifyReplyCommand IdentifyReplyCommand, requestContext RequestContext) *_CALDataIdentifyReply {
+func NewCALDataIdentifyReply(requestContext RequestContext, commandTypeContainer CALCommandTypeContainer, additionalData CALData, attribute Attribute, identifyReplyCommand IdentifyReplyCommand) *_CALDataIdentifyReply {
 	if identifyReplyCommand == nil {
 		panic("identifyReplyCommand of type IdentifyReplyCommand for CALDataIdentifyReply must not be nil")
 	}
 	_result := &_CALDataIdentifyReply{
-		CALDataContract:      NewCALData(commandTypeContainer, additionalData, requestContext),
+		CALDataContract:      NewCALData(requestContext, commandTypeContainer, additionalData),
 		Attribute:            attribute,
 		IdentifyReplyCommand: identifyReplyCommand,
 	}
@@ -108,7 +112,7 @@ type _CALDataIdentifyReplyBuilder struct {
 
 	parentBuilder *_CALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CALDataIdentifyReplyBuilder) = (*_CALDataIdentifyReplyBuilder)(nil)
@@ -137,23 +141,17 @@ func (b *_CALDataIdentifyReplyBuilder) WithIdentifyReplyCommandBuilder(builderSu
 	var err error
 	b.IdentifyReplyCommand, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "IdentifyReplyCommandBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "IdentifyReplyCommandBuilder failed"))
 	}
 	return b
 }
 
 func (b *_CALDataIdentifyReplyBuilder) Build() (CALDataIdentifyReply, error) {
 	if b.IdentifyReplyCommand == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'identifyReplyCommand' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'identifyReplyCommand' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CALDataIdentifyReply.deepCopy(), nil
 }
@@ -179,8 +177,8 @@ func (b *_CALDataIdentifyReplyBuilder) buildForCALData() (CALData, error) {
 
 func (b *_CALDataIdentifyReplyBuilder) DeepCopy() any {
 	_copy := b.CreateCALDataIdentifyReplyBuilder().(*_CALDataIdentifyReplyBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -241,7 +239,7 @@ func CastCALDataIdentifyReply(structType any) CALDataIdentifyReply {
 	return nil
 }
 
-func (m *_CALDataIdentifyReply) GetTypeName() string {
+func (m *_CALDataIdentifyReply) GetPlx4xTypeName() string {
 	return "CALDataIdentifyReply"
 }
 
@@ -272,13 +270,13 @@ func (m *_CALDataIdentifyReply) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	attribute, err := ReadEnumField[Attribute](ctx, "attribute", "Attribute", ReadEnum(AttributeByValue, ReadUnsignedByte(readBuffer, uint8(8))))
+	attribute, err := ReadEnumField[Attribute](ctx, "attribute", "Attribute", ReadEnum(AttributeByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'attribute' field"))
 	}
 	m.Attribute = attribute
 
-	identifyReplyCommand, err := ReadSimpleField[IdentifyReplyCommand](ctx, "identifyReplyCommand", ReadComplex[IdentifyReplyCommand](IdentifyReplyCommandParseWithBufferProducer[IdentifyReplyCommand]((Attribute)(attribute), (uint8)(uint8(commandTypeContainer.NumBytes())-uint8(uint8(1)))), readBuffer))
+	identifyReplyCommand, err := ReadSimpleField[IdentifyReplyCommand](ctx, "identifyReplyCommand", ReadComplex[IdentifyReplyCommand](IdentifyReplyCommandParseWithBufferProducer[IdentifyReplyCommand]((Attribute)(attribute), (uint8)(uint8(commandTypeContainer.NumBytes())-uint8(uint8(1)))), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'identifyReplyCommand' field"))
 	}
@@ -292,7 +290,7 @@ func (m *_CALDataIdentifyReply) parse(ctx context.Context, readBuffer utils.Read
 }
 
 func (m *_CALDataIdentifyReply) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -309,11 +307,11 @@ func (m *_CALDataIdentifyReply) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for CALDataIdentifyReply")
 		}
 
-		if err := WriteSimpleEnumField[Attribute](ctx, "attribute", "Attribute", m.GetAttribute(), WriteEnum[Attribute, uint8](Attribute.GetValue, Attribute.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8))); err != nil {
+		if err := WriteSimpleEnumField[Attribute](ctx, "attribute", "Attribute", m.GetAttribute(), WriteEnum[Attribute, uint8](Attribute.GetValue, Attribute.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'attribute' field")
 		}
 
-		if err := WriteSimpleField[IdentifyReplyCommand](ctx, "identifyReplyCommand", m.GetIdentifyReplyCommand(), WriteComplex[IdentifyReplyCommand](writeBuffer)); err != nil {
+		if err := WriteSimpleField[IdentifyReplyCommand](ctx, "identifyReplyCommand", m.GetIdentifyReplyCommand(), WriteComplex[IdentifyReplyCommand](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'identifyReplyCommand' field")
 		}
 

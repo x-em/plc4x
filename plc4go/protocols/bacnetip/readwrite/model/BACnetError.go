@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -128,7 +129,7 @@ type _BACnetErrorBuilder struct {
 
 	childBuilder _BACnetErrorChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetErrorBuilder) = (*_BACnetErrorBuilder)(nil)
@@ -138,8 +139,8 @@ func (b *_BACnetErrorBuilder) WithMandatoryFields() BACnetErrorBuilder {
 }
 
 func (b *_BACnetErrorBuilder) PartialBuild() (BACnetErrorContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetError.deepCopy(), nil
 }
@@ -256,8 +257,8 @@ func (b *_BACnetErrorBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetErrorBuilder().(*_BACnetErrorBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_BACnetErrorChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -286,7 +287,7 @@ func CastBACnetError(structType any) BACnetError {
 	return nil
 }
 
-func (m *_BACnetError) GetTypeName() string {
+func (m *_BACnetError) GetPlx4xTypeName() string {
 	return "BACnetError"
 }
 
@@ -320,7 +321,7 @@ func BACnetErrorParseWithBufferProducer[T BACnetError](errorChoice BACnetConfirm
 }
 
 func BACnetErrorParseWithBuffer[T BACnetError](ctx context.Context, readBuffer utils.ReadBuffer, errorChoice BACnetConfirmedServiceChoice) (T, error) {
-	v, err := (&_BACnetError{}).parse(ctx, readBuffer, errorChoice)
+	v, err := (new(_BACnetError)).parse(ctx, readBuffer, errorChoice)
 	if err != nil {
 		var zero T
 		return zero, err

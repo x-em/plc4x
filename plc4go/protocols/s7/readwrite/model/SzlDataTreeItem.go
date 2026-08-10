@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -105,7 +106,7 @@ func NewSzlDataTreeItemBuilder() SzlDataTreeItemBuilder {
 type _SzlDataTreeItemBuilder struct {
 	*_SzlDataTreeItem
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SzlDataTreeItemBuilder) = (*_SzlDataTreeItemBuilder)(nil)
@@ -140,8 +141,8 @@ func (b *_SzlDataTreeItemBuilder) WithAusbe(ausbe uint16) SzlDataTreeItemBuilder
 }
 
 func (b *_SzlDataTreeItemBuilder) Build() (SzlDataTreeItem, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SzlDataTreeItem.deepCopy(), nil
 }
@@ -156,8 +157,8 @@ func (b *_SzlDataTreeItemBuilder) MustBuild() SzlDataTreeItem {
 
 func (b *_SzlDataTreeItemBuilder) DeepCopy() any {
 	_copy := b.CreateSzlDataTreeItemBuilder().(*_SzlDataTreeItemBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -216,7 +217,7 @@ func CastSzlDataTreeItem(structType any) SzlDataTreeItem {
 	return nil
 }
 
-func (m *_SzlDataTreeItem) GetTypeName() string {
+func (m *_SzlDataTreeItem) GetPlx4xTypeName() string {
 	return "SzlDataTreeItem"
 }
 
@@ -258,7 +259,7 @@ func SzlDataTreeItemParseWithBufferProducer() func(ctx context.Context, readBuff
 }
 
 func SzlDataTreeItemParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (SzlDataTreeItem, error) {
-	v, err := (&_SzlDataTreeItem{}).parse(ctx, readBuffer)
+	v, err := (new(_SzlDataTreeItem)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

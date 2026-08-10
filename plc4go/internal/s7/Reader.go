@@ -25,16 +25,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	apiValues "github.com/apache/plc4x/plc4go/pkg/api/values"
 	readWriteModel "github.com/apache/plc4x/plc4go/protocols/s7/readwrite/model"
 	"github.com/apache/plc4x/plc4go/spi"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/transactions"
+	"github.com/apache/plc4x/plc4go/spi/utils"
 	spiValues "github.com/apache/plc4x/plc4go/spi/values"
 )
 
@@ -65,12 +66,10 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 	// TODO: handle ctx
 	m.log.Trace().Msg("Reading")
 	result := make(chan apiModel.PlcReadRequestResult, 1)
-	m.wg.Add(1)
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		defer func() {
 			if err := recover(); err != nil {
-				result <- spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack()))
+				utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack())))
 			}
 		}()
 
@@ -79,11 +78,11 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 			tag := readRequest.GetTag(tagName)
 			address, err := encodeS7Address(tag)
 			if err != nil {
-				result <- spiModel.NewDefaultPlcReadRequestResult(
+				utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 					readRequest,
 					nil,
 					errors.Wrapf(err, "Error encoding s7 address for tag %s", tagName),
-				)
+				))
 				return
 			}
 			requestItems[i] = readWriteModel.NewS7VarRequestParameterItemAddress(address)
@@ -112,16 +111,17 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 				s7MessageRequest,
 				true,
 				uint8(tpduId),
-				0,
 			),
 		)
 		// Start a new request-transaction (Is ended in the response-handler)
-		transaction := m.tm.StartTransaction()
-		transaction.Submit(func(transaction transactions.RequestTransaction) {
+		transaction := m.tm.StartTransaction("read")
+		transaction.Submit("readOperation", func(transactionContext context.Context, transaction transactions.RequestTransaction) {
+			ctx, cancel := context.WithCancel(ctx)
+			context.AfterFunc(transactionContext, cancel)
 
 			// Send the  over the wire
 			m.log.Trace().Msg("Send ")
-			if err := m.messageCodec.SendRequest(ctx, tpktPacket, func(message spi.Message) bool {
+			if err := m.messageCodec.SendRequest(ctx, "read", tpktPacket, func(message spi.Message) bool {
 				tpktPacket, ok := message.(readWriteModel.TPKTPacket)
 				if !ok {
 					return false
@@ -146,42 +146,43 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 				readResponse, err := m.ToPlc4xReadResponse(payload, readRequest)
 
 				if err != nil {
-					result <- spiModel.NewDefaultPlcReadRequestResult(
+					utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 						readRequest,
 						nil,
 						errors.Wrap(err, "Error decoding response"),
-					)
+					))
 					return transaction.EndRequest()
 				}
-				result <- spiModel.NewDefaultPlcReadRequestResult(
+				utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 					readRequest,
 					readResponse,
 					nil,
-				)
+				))
 				return transaction.EndRequest()
 			}, func(err error) error {
-				result <- spiModel.NewDefaultPlcReadRequestResult(
+				utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 					readRequest,
 					nil,
 					errors.Wrap(err, "got timeout while waiting for response"),
-				)
+				))
 				return transaction.EndRequest()
-			}, time.Second*1); err != nil {
-				result <- spiModel.NewDefaultPlcReadRequestResult(
+			}); err != nil {
+				utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 					readRequest,
 					nil,
 					errors.Wrap(err, "error sending message"),
-				)
+				))
 				if err := transaction.FailRequest(errors.Errorf("timeout after %s", 1*time.Second)); err != nil {
 					m.log.Debug().Err(err).Msg("Error failing request")
 				}
 			}
 		})
-	}()
+	})
 	return result
 }
 
 func (m *Reader) ToPlc4xReadResponse(response readWriteModel.S7Message, readRequest apiModel.PlcReadRequest) (apiModel.PlcReadResponse, error) {
+	ctx := context.TODO()
 	var errorClass uint8
 	var errorCode uint8
 	switch messageResponseData := response.(type) {
@@ -245,7 +246,7 @@ func (m *Reader) ToPlc4xReadResponse(response readWriteModel.S7Message, readRequ
 		m.log.Trace().Msg("decode data")
 		responseCodes[tagName] = responseCode
 		if responseCode == apiModel.PlcResponseCode_OK {
-			ctxForModel := options.GetLoggerContextForModel(context.TODO(), m.log, options.WithPassLoggerToModel(m.passLogToModel))
+			ctxForModel := options.GetLoggerContextForModel(ctx, m.log, options.WithPassLoggerToModel(m.passLogToModel))
 			plcValue, err := parsePlcValue(ctxForModel, tag, payloadItem.GetData())
 			if err != nil {
 				return nil, errors.Wrap(err, "Error parsing data item")

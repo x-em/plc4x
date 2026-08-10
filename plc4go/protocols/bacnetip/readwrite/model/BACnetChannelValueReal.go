@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +103,7 @@ type _BACnetChannelValueRealBuilder struct {
 
 	parentBuilder *_BACnetChannelValueBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetChannelValueRealBuilder) = (*_BACnetChannelValueRealBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_BACnetChannelValueRealBuilder) WithRealValueBuilder(builderSupplier fu
 	var err error
 	b.RealValue, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagRealBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagRealBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetChannelValueRealBuilder) Build() (BACnetChannelValueReal, error) {
 	if b.RealValue == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'realValue' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'realValue' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetChannelValueReal.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_BACnetChannelValueRealBuilder) buildForBACnetChannelValue() (BACnetCha
 
 func (b *_BACnetChannelValueRealBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetChannelValueRealBuilder().(*_BACnetChannelValueRealBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -226,7 +221,7 @@ func CastBACnetChannelValueReal(structType any) BACnetChannelValueReal {
 	return nil
 }
 
-func (m *_BACnetChannelValueReal) GetTypeName() string {
+func (m *_BACnetChannelValueReal) GetPlx4xTypeName() string {
 	return "BACnetChannelValueReal"
 }
 

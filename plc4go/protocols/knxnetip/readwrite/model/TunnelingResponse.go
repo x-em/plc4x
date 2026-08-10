@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -104,7 +105,7 @@ type _TunnelingResponseBuilder struct {
 
 	parentBuilder *_KnxNetIpMessageBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TunnelingResponseBuilder) = (*_TunnelingResponseBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_TunnelingResponseBuilder) WithTunnelingResponseDataBlockBuilder(builde
 	var err error
 	b.TunnelingResponseDataBlock, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "TunnelingResponseDataBlockBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "TunnelingResponseDataBlockBuilder failed"))
 	}
 	return b
 }
 
 func (b *_TunnelingResponseBuilder) Build() (TunnelingResponse, error) {
 	if b.TunnelingResponseDataBlock == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'tunnelingResponseDataBlock' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'tunnelingResponseDataBlock' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TunnelingResponse.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_TunnelingResponseBuilder) buildForKnxNetIpMessage() (KnxNetIpMessage, 
 
 func (b *_TunnelingResponseBuilder) DeepCopy() any {
 	_copy := b.CreateTunnelingResponseBuilder().(*_TunnelingResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -232,7 +227,7 @@ func CastTunnelingResponse(structType any) TunnelingResponse {
 	return nil
 }
 
-func (m *_TunnelingResponse) GetTypeName() string {
+func (m *_TunnelingResponse) GetPlx4xTypeName() string {
 	return "TunnelingResponse"
 }
 
@@ -260,7 +255,7 @@ func (m *_TunnelingResponse) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	tunnelingResponseDataBlock, err := ReadSimpleField[TunnelingResponseDataBlock](ctx, "tunnelingResponseDataBlock", ReadComplex[TunnelingResponseDataBlock](TunnelingResponseDataBlockParseWithBuffer, readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	tunnelingResponseDataBlock, err := ReadSimpleField[TunnelingResponseDataBlock](ctx, "tunnelingResponseDataBlock", ReadComplex[TunnelingResponseDataBlock](TunnelingResponseDataBlockParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'tunnelingResponseDataBlock' field"))
 	}
@@ -291,7 +286,7 @@ func (m *_TunnelingResponse) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for TunnelingResponse")
 		}
 
-		if err := WriteSimpleField[TunnelingResponseDataBlock](ctx, "tunnelingResponseDataBlock", m.GetTunnelingResponseDataBlock(), WriteComplex[TunnelingResponseDataBlock](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[TunnelingResponseDataBlock](ctx, "tunnelingResponseDataBlock", m.GetTunnelingResponseDataBlock(), WriteComplex[TunnelingResponseDataBlock](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'tunnelingResponseDataBlock' field")
 		}
 

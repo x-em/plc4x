@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -132,7 +134,7 @@ type _ReferenceDescriptionDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ReferenceDescriptionDataTypeBuilder) = (*_ReferenceDescriptionDataTypeBuilder)(nil)
@@ -156,10 +158,7 @@ func (b *_ReferenceDescriptionDataTypeBuilder) WithSourceNodeBuilder(builderSupp
 	var err error
 	b.SourceNode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -174,10 +173,7 @@ func (b *_ReferenceDescriptionDataTypeBuilder) WithReferenceTypeBuilder(builderS
 	var err error
 	b.ReferenceType, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -197,35 +193,23 @@ func (b *_ReferenceDescriptionDataTypeBuilder) WithTargetNodeBuilder(builderSupp
 	var err error
 	b.TargetNode, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExpandedNodeIdBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ReferenceDescriptionDataTypeBuilder) Build() (ReferenceDescriptionDataType, error) {
 	if b.SourceNode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'sourceNode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'sourceNode' not set"))
 	}
 	if b.ReferenceType == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'referenceType' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'referenceType' not set"))
 	}
 	if b.TargetNode == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'targetNode' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'targetNode' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ReferenceDescriptionDataType.deepCopy(), nil
 }
@@ -251,8 +235,8 @@ func (b *_ReferenceDescriptionDataTypeBuilder) buildForExtensionObjectDefinition
 
 func (b *_ReferenceDescriptionDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateReferenceDescriptionDataTypeBuilder().(*_ReferenceDescriptionDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -325,7 +309,7 @@ func CastReferenceDescriptionDataType(structType any) ReferenceDescriptionDataTy
 	return nil
 }
 
-func (m *_ReferenceDescriptionDataType) GetTypeName() string {
+func (m *_ReferenceDescriptionDataType) GetPlx4xTypeName() string {
 	return "ReferenceDescriptionDataType"
 }
 
@@ -365,31 +349,31 @@ func (m *_ReferenceDescriptionDataType) parse(ctx context.Context, readBuffer ut
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	sourceNode, err := ReadSimpleField[NodeId](ctx, "sourceNode", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	sourceNode, err := ReadSimpleField[NodeId](ctx, "sourceNode", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'sourceNode' field"))
 	}
 	m.SourceNode = sourceNode
 
-	referenceType, err := ReadSimpleField[NodeId](ctx, "referenceType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	referenceType, err := ReadSimpleField[NodeId](ctx, "referenceType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'referenceType' field"))
 	}
 	m.ReferenceType = referenceType
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(7)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	isForward, err := ReadSimpleField(ctx, "isForward", ReadBoolean(readBuffer))
+	isForward, err := ReadSimpleField(ctx, "isForward", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'isForward' field"))
 	}
 	m.IsForward = isForward
 
-	targetNode, err := ReadSimpleField[ExpandedNodeId](ctx, "targetNode", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer))
+	targetNode, err := ReadSimpleField[ExpandedNodeId](ctx, "targetNode", ReadComplex[ExpandedNodeId](ExpandedNodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetNode' field"))
 	}
@@ -420,23 +404,23 @@ func (m *_ReferenceDescriptionDataType) SerializeWithWriteBuffer(ctx context.Con
 			return errors.Wrap(pushErr, "Error pushing for ReferenceDescriptionDataType")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "sourceNode", m.GetSourceNode(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "sourceNode", m.GetSourceNode(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'sourceNode' field")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "referenceType", m.GetReferenceType(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "referenceType", m.GetReferenceType(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'referenceType' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 7), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "isForward", m.GetIsForward(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "isForward", m.GetIsForward(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'isForward' field")
 		}
 
-		if err := WriteSimpleField[ExpandedNodeId](ctx, "targetNode", m.GetTargetNode(), WriteComplex[ExpandedNodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExpandedNodeId](ctx, "targetNode", m.GetTargetNode(), WriteComplex[ExpandedNodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetNode' field")
 		}
 

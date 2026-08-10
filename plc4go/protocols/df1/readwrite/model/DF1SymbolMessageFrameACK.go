@@ -22,11 +22,12 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -90,7 +91,7 @@ type _DF1SymbolMessageFrameACKBuilder struct {
 
 	parentBuilder *_DF1SymbolBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DF1SymbolMessageFrameACKBuilder) = (*_DF1SymbolMessageFrameACKBuilder)(nil)
@@ -105,8 +106,8 @@ func (b *_DF1SymbolMessageFrameACKBuilder) WithMandatoryFields() DF1SymbolMessag
 }
 
 func (b *_DF1SymbolMessageFrameACKBuilder) Build() (DF1SymbolMessageFrameACK, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DF1SymbolMessageFrameACK.deepCopy(), nil
 }
@@ -132,8 +133,8 @@ func (b *_DF1SymbolMessageFrameACKBuilder) buildForDF1Symbol() (DF1Symbol, error
 
 func (b *_DF1SymbolMessageFrameACKBuilder) DeepCopy() any {
 	_copy := b.CreateDF1SymbolMessageFrameACKBuilder().(*_DF1SymbolMessageFrameACKBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -180,7 +181,7 @@ func CastDF1SymbolMessageFrameACK(structType any) DF1SymbolMessageFrameACK {
 	return nil
 }
 
-func (m *_DF1SymbolMessageFrameACK) GetTypeName() string {
+func (m *_DF1SymbolMessageFrameACK) GetPlx4xTypeName() string {
 	return "DF1SymbolMessageFrameACK"
 }
 

@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -45,6 +46,7 @@ type ModbusRtuADU interface {
 	// GetAddress returns Address (property field)
 	GetAddress() uint8
 	// GetPdu returns Pdu (property field)
+	// The actual modbus payload
 	GetPdu() ModbusPDU
 	// IsModbusRtuADU is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsModbusRtuADU()
@@ -63,12 +65,12 @@ var _ ModbusRtuADU = (*_ModbusRtuADU)(nil)
 var _ ModbusADURequirements = (*_ModbusRtuADU)(nil)
 
 // NewModbusRtuADU factory function for _ModbusRtuADU
-func NewModbusRtuADU(address uint8, pdu ModbusPDU, response bool) *_ModbusRtuADU {
+func NewModbusRtuADU(address uint8, pdu ModbusPDU) *_ModbusRtuADU {
 	if pdu == nil {
 		panic("pdu of type ModbusPDU for ModbusRtuADU must not be nil")
 	}
 	_result := &_ModbusRtuADU{
-		ModbusADUContract: NewModbusADU(response),
+		ModbusADUContract: NewModbusADU(),
 		Address:           address,
 		Pdu:               pdu,
 	}
@@ -110,7 +112,7 @@ type _ModbusRtuADUBuilder struct {
 
 	parentBuilder *_ModbusADUBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ModbusRtuADUBuilder) = (*_ModbusRtuADUBuilder)(nil)
@@ -139,23 +141,17 @@ func (b *_ModbusRtuADUBuilder) WithPduBuilder(builderSupplier func(ModbusPDUBuil
 	var err error
 	b.Pdu, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ModbusPDUBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ModbusPDUBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ModbusRtuADUBuilder) Build() (ModbusRtuADU, error) {
 	if b.Pdu == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'pdu' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'pdu' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ModbusRtuADU.deepCopy(), nil
 }
@@ -181,8 +177,8 @@ func (b *_ModbusRtuADUBuilder) buildForModbusADU() (ModbusADU, error) {
 
 func (b *_ModbusRtuADUBuilder) DeepCopy() any {
 	_copy := b.CreateModbusRtuADUBuilder().(*_ModbusRtuADUBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -247,7 +243,7 @@ func CastModbusRtuADU(structType any) ModbusRtuADU {
 	return nil
 }
 
-func (m *_ModbusRtuADU) GetTypeName() string {
+func (m *_ModbusRtuADU) GetPlx4xTypeName() string {
 	return "ModbusRtuADU"
 }
 
@@ -281,19 +277,19 @@ func (m *_ModbusRtuADU) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	address, err := ReadSimpleField(ctx, "address", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithByteOrder(binary.BigEndian))
+	address, err := ReadSimpleField(ctx, "address", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'address' field"))
 	}
 	m.Address = address
 
-	pdu, err := ReadSimpleField[ModbusPDU](ctx, "pdu", ReadComplex[ModbusPDU](ModbusPDUParseWithBufferProducer[ModbusPDU]((bool)(response)), readBuffer), codegen.WithByteOrder(binary.BigEndian))
+	pdu, err := ReadSimpleField[ModbusPDU](ctx, "pdu", ReadComplex[ModbusPDU](ModbusPDUParseWithBufferProducer[ModbusPDU]((bool)(response)), readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'pdu' field"))
 	}
 	m.Pdu = pdu
 
-	crc, err := ReadChecksumField[uint16](ctx, "crc", ReadUnsignedShort(readBuffer, uint8(16)), RtuCrcCheck(ctx, address, pdu), codegen.WithByteOrder(binary.BigEndian))
+	crc, err := ReadChecksumField[uint16](ctx, "crc", ReadUnsignedShort(readBuffer, uint8(16)), RtuCrcCheck(ctx, address, pdu), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'crc' field"))
 	}
@@ -324,15 +320,15 @@ func (m *_ModbusRtuADU) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for ModbusRtuADU")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "address", m.GetAddress(), WriteUnsignedByte(writeBuffer, 8), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "address", m.GetAddress(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'address' field")
 		}
 
-		if err := WriteSimpleField[ModbusPDU](ctx, "pdu", m.GetPdu(), WriteComplex[ModbusPDU](writeBuffer), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[ModbusPDU](ctx, "pdu", m.GetPdu(), WriteComplex[ModbusPDU](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'pdu' field")
 		}
 
-		if err := WriteChecksumField[uint16](ctx, "crc", RtuCrcCheck(ctx, m.GetAddress(), m.GetPdu()), WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteChecksumField[uint16](ctx, "crc", RtuCrcCheck(ctx, m.GetAddress(), m.GetPdu()), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'crc' field")
 		}
 

@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -87,7 +88,7 @@ func NewBACnetSetpointReferenceBuilder() BACnetSetpointReferenceBuilder {
 type _BACnetSetpointReferenceBuilder struct {
 	*_BACnetSetpointReference
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetSetpointReferenceBuilder) = (*_BACnetSetpointReferenceBuilder)(nil)
@@ -106,17 +107,14 @@ func (b *_BACnetSetpointReferenceBuilder) WithOptionalSetPointReferenceBuilder(b
 	var err error
 	b.SetPointReference, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetObjectPropertyReferenceEnclosedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetObjectPropertyReferenceEnclosedBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetSetpointReferenceBuilder) Build() (BACnetSetpointReference, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetSetpointReference.deepCopy(), nil
 }
@@ -131,8 +129,8 @@ func (b *_BACnetSetpointReferenceBuilder) MustBuild() BACnetSetpointReference {
 
 func (b *_BACnetSetpointReferenceBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetSetpointReferenceBuilder().(*_BACnetSetpointReferenceBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -175,7 +173,7 @@ func CastBACnetSetpointReference(structType any) BACnetSetpointReference {
 	return nil
 }
 
-func (m *_BACnetSetpointReference) GetTypeName() string {
+func (m *_BACnetSetpointReference) GetPlx4xTypeName() string {
 	return "BACnetSetpointReference"
 }
 
@@ -205,7 +203,7 @@ func BACnetSetpointReferenceParseWithBufferProducer() func(ctx context.Context, 
 }
 
 func BACnetSetpointReferenceParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetSetpointReference, error) {
-	v, err := (&_BACnetSetpointReference{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetSetpointReference)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +253,7 @@ func (m *_BACnetSetpointReference) SerializeWithWriteBuffer(ctx context.Context,
 		return errors.Wrap(pushErr, "Error pushing for BACnetSetpointReference")
 	}
 
-	if err := WriteOptionalField[BACnetObjectPropertyReferenceEnclosed](ctx, "setPointReference", GetRef(m.GetSetPointReference()), WriteComplex[BACnetObjectPropertyReferenceEnclosed](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetObjectPropertyReferenceEnclosed](ctx, "setPointReference", new(m.GetSetPointReference()), WriteComplex[BACnetObjectPropertyReferenceEnclosed](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'setPointReference' field")
 	}
 

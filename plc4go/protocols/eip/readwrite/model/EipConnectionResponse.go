@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -95,7 +97,7 @@ type _EipConnectionResponseBuilder struct {
 
 	parentBuilder *_EipPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EipConnectionResponseBuilder) = (*_EipConnectionResponseBuilder)(nil)
@@ -110,8 +112,8 @@ func (b *_EipConnectionResponseBuilder) WithMandatoryFields() EipConnectionRespo
 }
 
 func (b *_EipConnectionResponseBuilder) Build() (EipConnectionResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EipConnectionResponse.deepCopy(), nil
 }
@@ -137,8 +139,8 @@ func (b *_EipConnectionResponseBuilder) buildForEipPacket() (EipPacket, error) {
 
 func (b *_EipConnectionResponseBuilder) DeepCopy() any {
 	_copy := b.CreateEipConnectionResponseBuilder().(*_EipConnectionResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -211,7 +213,7 @@ func CastEipConnectionResponse(structType any) EipConnectionResponse {
 	return nil
 }
 
-func (m *_EipConnectionResponse) GetTypeName() string {
+func (m *_EipConnectionResponse) GetPlx4xTypeName() string {
 	return "EipConnectionResponse"
 }
 
@@ -242,13 +244,13 @@ func (m *_EipConnectionResponse) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	protocolVersion, err := ReadConstField[uint16](ctx, "protocolVersion", ReadUnsignedShort(readBuffer, uint8(16)), EipConnectionResponse_PROTOCOLVERSION)
+	protocolVersion, err := ReadConstField[uint16](ctx, "protocolVersion", ReadUnsignedShort(readBuffer, uint8(16)), EipConnectionResponse_PROTOCOLVERSION, codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'protocolVersion' field"))
 	}
 	_ = protocolVersion
 
-	flags, err := ReadConstField[uint16](ctx, "flags", ReadUnsignedShort(readBuffer, uint8(16)), EipConnectionResponse_FLAGS)
+	flags, err := ReadConstField[uint16](ctx, "flags", ReadUnsignedShort(readBuffer, uint8(16)), EipConnectionResponse_FLAGS, codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'flags' field"))
 	}
@@ -279,11 +281,11 @@ func (m *_EipConnectionResponse) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for EipConnectionResponse")
 		}
 
-		if err := WriteConstField(ctx, "protocolVersion", EipConnectionResponse_PROTOCOLVERSION, WriteUnsignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteConstField(ctx, "protocolVersion", EipConnectionResponse_PROTOCOLVERSION, WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'protocolVersion' field")
 		}
 
-		if err := WriteConstField(ctx, "flags", EipConnectionResponse_FLAGS, WriteUnsignedShort(writeBuffer, 16)); err != nil {
+		if err := WriteConstField(ctx, "flags", EipConnectionResponse_FLAGS, WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'flags' field")
 		}
 

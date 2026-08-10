@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _MdnsDiscoveryConfigurationBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MdnsDiscoveryConfigurationBuilder) = (*_MdnsDiscoveryConfigurationBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_MdnsDiscoveryConfigurationBuilder) WithMdnsServerNameBuilder(builderSu
 	var err error
 	b.MdnsServerName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_MdnsDiscoveryConfigurationBuilder) WithServerCapabilities(serverCapabi
 
 func (b *_MdnsDiscoveryConfigurationBuilder) Build() (MdnsDiscoveryConfiguration, error) {
 	if b.MdnsServerName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'mdnsServerName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'mdnsServerName' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MdnsDiscoveryConfiguration.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_MdnsDiscoveryConfigurationBuilder) buildForExtensionObjectDefinition()
 
 func (b *_MdnsDiscoveryConfigurationBuilder) DeepCopy() any {
 	_copy := b.CreateMdnsDiscoveryConfigurationBuilder().(*_MdnsDiscoveryConfigurationBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastMdnsDiscoveryConfiguration(structType any) MdnsDiscoveryConfiguration {
 	return nil
 }
 
-func (m *_MdnsDiscoveryConfiguration) GetTypeName() string {
+func (m *_MdnsDiscoveryConfiguration) GetPlx4xTypeName() string {
 	return "MdnsDiscoveryConfiguration"
 }
 
@@ -262,9 +258,7 @@ func (m *_MdnsDiscoveryConfiguration) GetLengthInBits(ctx context.Context) uint1
 	if len(m.ServerCapabilities) > 0 {
 		for _curItem, element := range m.ServerCapabilities {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.ServerCapabilities), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_MdnsDiscoveryConfiguration) parse(ctx context.Context, readBuffer util
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	mdnsServerName, err := ReadSimpleField[PascalString](ctx, "mdnsServerName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	mdnsServerName, err := ReadSimpleField[PascalString](ctx, "mdnsServerName", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'mdnsServerName' field"))
 	}
 	m.MdnsServerName = mdnsServerName
 
-	noOfServerCapabilities, err := ReadImplicitField[int32](ctx, "noOfServerCapabilities", ReadSignedInt(readBuffer, uint8(32)))
+	noOfServerCapabilities, err := ReadImplicitField[int32](ctx, "noOfServerCapabilities", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfServerCapabilities' field"))
 	}
 	_ = noOfServerCapabilities
 
-	serverCapabilities, err := ReadCountArrayField[PascalString](ctx, "serverCapabilities", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfServerCapabilities))
+	serverCapabilities, err := ReadCountArrayField[PascalString](ctx, "serverCapabilities", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfServerCapabilities), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'serverCapabilities' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_MdnsDiscoveryConfiguration) SerializeWithWriteBuffer(ctx context.Conte
 			return errors.Wrap(pushErr, "Error pushing for MdnsDiscoveryConfiguration")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "mdnsServerName", m.GetMdnsServerName(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "mdnsServerName", m.GetMdnsServerName(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'mdnsServerName' field")
 		}
 		noOfServerCapabilities := int32(utils.InlineIf(bool((m.GetServerCapabilities()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetServerCapabilities()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfServerCapabilities", noOfServerCapabilities, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfServerCapabilities", noOfServerCapabilities, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfServerCapabilities' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "serverCapabilities", m.GetServerCapabilities(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "serverCapabilities", m.GetServerCapabilities(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'serverCapabilities' field")
 		}
 

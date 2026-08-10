@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataLargeAnalogValueFaultHighLimit = (*_BACnetConstructed
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataLargeAnalogValueFaultHighLimit)(nil)
 
 // NewBACnetConstructedDataLargeAnalogValueFaultHighLimit factory function for _BACnetConstructedDataLargeAnalogValueFaultHighLimit
-func NewBACnetConstructedDataLargeAnalogValueFaultHighLimit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, faultHighLimit BACnetApplicationTagDouble, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataLargeAnalogValueFaultHighLimit {
+func NewBACnetConstructedDataLargeAnalogValueFaultHighLimit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, faultHighLimit BACnetApplicationTagDouble) *_BACnetConstructedDataLargeAnalogValueFaultHighLimit {
 	if faultHighLimit == nil {
 		panic("faultHighLimit of type BACnetApplicationTagDouble for BACnetConstructedDataLargeAnalogValueFaultHighLimit must not be nil")
 	}
 	_result := &_BACnetConstructedDataLargeAnalogValueFaultHighLimit{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		FaultHighLimit:                faultHighLimit,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder) = (*_BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder) WithFaultH
 	var err error
 	b.FaultHighLimit, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagDoubleBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagDoubleBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder) Build() (BACnetConstructedDataLargeAnalogValueFaultHighLimit, error) {
 	if b.FaultHighLimit == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'faultHighLimit' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'faultHighLimit' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataLargeAnalogValueFaultHighLimit.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder) buildForBA
 
 func (b *_BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder().(*_BACnetConstructedDataLargeAnalogValueFaultHighLimitBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataLargeAnalogValueFaultHighLimit(structType any) BAC
 	return nil
 }
 
-func (m *_BACnetConstructedDataLargeAnalogValueFaultHighLimit) GetTypeName() string {
+func (m *_BACnetConstructedDataLargeAnalogValueFaultHighLimit) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataLargeAnalogValueFaultHighLimit"
 }
 

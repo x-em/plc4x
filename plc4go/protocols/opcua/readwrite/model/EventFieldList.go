@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +105,7 @@ type _EventFieldListBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (EventFieldListBuilder) = (*_EventFieldListBuilder)(nil)
@@ -128,8 +130,8 @@ func (b *_EventFieldListBuilder) WithEventFields(eventFields ...Variant) EventFi
 }
 
 func (b *_EventFieldListBuilder) Build() (EventFieldList, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._EventFieldList.deepCopy(), nil
 }
@@ -155,8 +157,8 @@ func (b *_EventFieldListBuilder) buildForExtensionObjectDefinition() (ExtensionO
 
 func (b *_EventFieldListBuilder) DeepCopy() any {
 	_copy := b.CreateEventFieldListBuilder().(*_EventFieldListBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +223,7 @@ func CastEventFieldList(structType any) EventFieldList {
 	return nil
 }
 
-func (m *_EventFieldList) GetTypeName() string {
+func (m *_EventFieldList) GetPlx4xTypeName() string {
 	return "EventFieldList"
 }
 
@@ -238,9 +240,7 @@ func (m *_EventFieldList) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.EventFields) > 0 {
 		for _curItem, element := range m.EventFields {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.EventFields), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -262,19 +262,19 @@ func (m *_EventFieldList) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	clientHandle, err := ReadSimpleField(ctx, "clientHandle", ReadUnsignedInt(readBuffer, uint8(32)))
+	clientHandle, err := ReadSimpleField(ctx, "clientHandle", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'clientHandle' field"))
 	}
 	m.ClientHandle = clientHandle
 
-	noOfEventFields, err := ReadImplicitField[int32](ctx, "noOfEventFields", ReadSignedInt(readBuffer, uint8(32)))
+	noOfEventFields, err := ReadImplicitField[int32](ctx, "noOfEventFields", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfEventFields' field"))
 	}
 	_ = noOfEventFields
 
-	eventFields, err := ReadCountArrayField[Variant](ctx, "eventFields", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfEventFields))
+	eventFields, err := ReadCountArrayField[Variant](ctx, "eventFields", ReadComplex[Variant](VariantParseWithBuffer, readBuffer), uint64(noOfEventFields), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'eventFields' field"))
 	}
@@ -305,15 +305,15 @@ func (m *_EventFieldList) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for EventFieldList")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "clientHandle", m.GetClientHandle(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "clientHandle", m.GetClientHandle(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'clientHandle' field")
 		}
 		noOfEventFields := int32(utils.InlineIf(bool((m.GetEventFields()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetEventFields()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfEventFields", noOfEventFields, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfEventFields", noOfEventFields, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfEventFields' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "eventFields", m.GetEventFields(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "eventFields", m.GetEventFields(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'eventFields' field")
 		}
 

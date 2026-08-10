@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -95,7 +96,7 @@ func NewTunnelingResponseDataBlockBuilder() TunnelingResponseDataBlockBuilder {
 type _TunnelingResponseDataBlockBuilder struct {
 	*_TunnelingResponseDataBlock
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TunnelingResponseDataBlockBuilder) = (*_TunnelingResponseDataBlockBuilder)(nil)
@@ -120,8 +121,8 @@ func (b *_TunnelingResponseDataBlockBuilder) WithStatus(status Status) Tunneling
 }
 
 func (b *_TunnelingResponseDataBlockBuilder) Build() (TunnelingResponseDataBlock, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TunnelingResponseDataBlock.deepCopy(), nil
 }
@@ -136,8 +137,8 @@ func (b *_TunnelingResponseDataBlockBuilder) MustBuild() TunnelingResponseDataBl
 
 func (b *_TunnelingResponseDataBlockBuilder) DeepCopy() any {
 	_copy := b.CreateTunnelingResponseDataBlockBuilder().(*_TunnelingResponseDataBlockBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -188,7 +189,7 @@ func CastTunnelingResponseDataBlock(structType any) TunnelingResponseDataBlock {
 	return nil
 }
 
-func (m *_TunnelingResponseDataBlock) GetTypeName() string {
+func (m *_TunnelingResponseDataBlock) GetPlx4xTypeName() string {
 	return "TunnelingResponseDataBlock"
 }
 
@@ -225,7 +226,7 @@ func TunnelingResponseDataBlockParseWithBufferProducer() func(ctx context.Contex
 }
 
 func TunnelingResponseDataBlockParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (TunnelingResponseDataBlock, error) {
-	v, err := (&_TunnelingResponseDataBlock{}).parse(ctx, readBuffer)
+	v, err := (new(_TunnelingResponseDataBlock)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

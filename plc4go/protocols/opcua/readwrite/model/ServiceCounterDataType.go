@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +105,7 @@ type _ServiceCounterDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ServiceCounterDataTypeBuilder) = (*_ServiceCounterDataTypeBuilder)(nil)
@@ -128,8 +130,8 @@ func (b *_ServiceCounterDataTypeBuilder) WithErrorCount(errorCount uint32) Servi
 }
 
 func (b *_ServiceCounterDataTypeBuilder) Build() (ServiceCounterDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ServiceCounterDataType.deepCopy(), nil
 }
@@ -155,8 +157,8 @@ func (b *_ServiceCounterDataTypeBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_ServiceCounterDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateServiceCounterDataTypeBuilder().(*_ServiceCounterDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +223,7 @@ func CastServiceCounterDataType(structType any) ServiceCounterDataType {
 	return nil
 }
 
-func (m *_ServiceCounterDataType) GetTypeName() string {
+func (m *_ServiceCounterDataType) GetPlx4xTypeName() string {
 	return "ServiceCounterDataType"
 }
 
@@ -252,13 +254,13 @@ func (m *_ServiceCounterDataType) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	totalCount, err := ReadSimpleField(ctx, "totalCount", ReadUnsignedInt(readBuffer, uint8(32)))
+	totalCount, err := ReadSimpleField(ctx, "totalCount", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'totalCount' field"))
 	}
 	m.TotalCount = totalCount
 
-	errorCount, err := ReadSimpleField(ctx, "errorCount", ReadUnsignedInt(readBuffer, uint8(32)))
+	errorCount, err := ReadSimpleField(ctx, "errorCount", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'errorCount' field"))
 	}
@@ -289,11 +291,11 @@ func (m *_ServiceCounterDataType) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for ServiceCounterDataType")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "totalCount", m.GetTotalCount(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "totalCount", m.GetTotalCount(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'totalCount' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "errorCount", m.GetErrorCount(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "errorCount", m.GetErrorCount(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'errorCount' field")
 		}
 

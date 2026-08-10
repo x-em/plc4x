@@ -24,11 +24,10 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/pkg/errors"
-
 	dirverModel "github.com/apache/plc4x/plc4go/internal/ads/model"
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	"github.com/apache/plc4x/plc4go/protocols/ads/readwrite/model"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
 	"github.com/apache/plc4x/plc4go/spi/utils"
@@ -100,9 +99,7 @@ func (m *Connection) Subscribe(ctx context.Context, subscriptionRequest apiModel
 
 	// Create a new result-channel, which completes as soon as all sub-result-channels have returned
 	globalResultChannel := make(chan apiModel.PlcSubscriptionRequestResult, 1)
-	m.wg.Add(1)
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		defer func() {
 			if err := recover(); err != nil {
 				m.log.Error().
@@ -115,7 +112,7 @@ func (m *Connection) Subscribe(ctx context.Context, subscriptionRequest apiModel
 		for _, subResultChannel := range subResultChannels {
 			select {
 			case <-ctx.Done():
-				globalResultChannel <- spiModel.NewDefaultPlcSubscriptionRequestResult(subscriptionRequest, nil, ctx.Err())
+				utils.DeliverResult(m.log, globalResultChannel, spiModel.NewDefaultPlcSubscriptionRequestResult(subscriptionRequest, nil, ctx.Err()))
 				return
 			case subResult := <-subResultChannel:
 				// These are all single value requests ... so it's safe to assume this shortcut.
@@ -126,20 +123,18 @@ func (m *Connection) Subscribe(ctx context.Context, subscriptionRequest apiModel
 		// As soon as all are done, process the results
 		result := m.processSubscriptionResponses(ctx, subscriptionRequest, subResults)
 		// Return the final result
-		globalResultChannel <- result
-	}()
+		utils.DeliverResult(m.log, globalResultChannel, result)
+	})
 
 	return globalResultChannel
 }
 
 func (m *Connection) subscribe(ctx context.Context, subscriptionRequest apiModel.PlcSubscriptionRequest) <-chan apiModel.PlcSubscriptionRequestResult {
 	responseChan := make(chan apiModel.PlcSubscriptionRequestResult, 1)
-	m.wg.Add(1)
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		defer func() {
 			if err := recover(); err != nil {
-				responseChan <- spiModel.NewDefaultPlcSubscriptionRequestResult(subscriptionRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack()))
+				utils.DeliverResult(m.log, responseChan, spiModel.NewDefaultPlcSubscriptionRequestResult(subscriptionRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack())))
 			}
 		}()
 		// At this point we are sure to only have single item direct tag requests.
@@ -151,11 +146,11 @@ func (m *Connection) subscribe(ctx context.Context, subscriptionRequest apiModel
 
 		response, err := m.ExecuteAdsAddDeviceNotificationRequest(ctx, directTag.IndexGroup, directTag.IndexOffset, directTag.DataType.GetSize(), model.AdsTransMode_ON_CHANGE, 0, 0)
 		if err != nil {
-			responseChan <- spiModel.NewDefaultPlcSubscriptionRequestResult(
+			utils.DeliverResult(m.log, responseChan, spiModel.NewDefaultPlcSubscriptionRequestResult(
 				subscriptionRequest,
 				nil,
 				err,
-			)
+			))
 		}
 		// Create a new subscription handle.
 		subscriptionHandle := dirverModel.NewAdsSubscriptionHandle(
@@ -164,7 +159,7 @@ func (m *Connection) subscribe(ctx context.Context, subscriptionRequest apiModel
 			directTag,
 			append(m._options, options.WithCustomLogger(m.log))...,
 		)
-		responseChan <- spiModel.NewDefaultPlcSubscriptionRequestResult(
+		utils.DeliverResult(m.log, responseChan, spiModel.NewDefaultPlcSubscriptionRequestResult(
 			subscriptionRequest,
 			spiModel.NewDefaultPlcSubscriptionResponse(
 				subscriptionRequest,
@@ -173,10 +168,10 @@ func (m *Connection) subscribe(ctx context.Context, subscriptionRequest apiModel
 				append(m._options, options.WithCustomLogger(m.log))...,
 			),
 			nil,
-		)
+		))
 		// Store it together with the returned ADS handle.
 		m.subscriptions[response.GetNotificationHandle()] = subscriptionHandle
-	}()
+	})
 	return responseChan
 }
 
@@ -191,34 +186,33 @@ func (m *Connection) processSubscriptionResponses(_ context.Context, subscriptio
 	m.log.Trace().Msg("Merging requests")
 	responseCodes := map[string]apiModel.PlcResponseCode{}
 	subscriptionHandles := map[string]apiModel.PlcSubscriptionHandle{}
-	var err error = nil
+	var collectedErrors []error
 	for _, subscriptionResult := range subscriptionResults {
 		if subErr := subscriptionResult.GetErr(); subErr != nil {
 			m.log.Debug().Err(subErr).Msg("Error during subscription")
-			if subErr == nil {
-				// Lazy initialization of multi error
-				subErr = &utils.MultiError{MainError: errors.New("while aggregating results"), Errors: []error{subErr}}
-			} else {
-				var multiError *utils.MultiError
-				if ok := errors.As(subErr, &multiError); ok {
-					multiError.Append(subErr)
-					multiError.Errors = append(multiError.Errors, subErr)
-				}
+			collectedErrors = append(collectedErrors, subErr)
+		} else if response := subscriptionResult.GetResponse(); response != nil {
+			request := response.GetRequest()
+			tagNames := request.GetTagNames()
+			if len(tagNames) > 1 {
+				m.log.Error().Int("numberOfTags", len(tagNames)).Msg("We should only get 1")
 			}
-		} else if subscriptionResult.GetResponse() != nil {
-			if len(subscriptionResult.GetResponse().GetRequest().GetTagNames()) > 1 {
-				m.log.Error().Int("numberOfTags", len(subscriptionResult.GetResponse().GetRequest().GetTagNames())).Msg("We should only get 1")
-			}
-			for _, tagName := range subscriptionResult.GetResponse().GetRequest().GetTagNames() {
-				handle, err := subscriptionResult.GetResponse().GetSubscriptionHandle(tagName)
+			for _, tagName := range tagNames {
+				handle, err := response.GetSubscriptionHandle(tagName)
 				if err != nil {
+					collectedErrors = append(collectedErrors, err)
 					responseCodes[tagName] = apiModel.PlcResponseCode_REMOTE_ERROR
+					subscriptionHandles[tagName] = nil
 				} else {
-					responseCodes[tagName] = subscriptionResult.GetResponse().GetResponseCode(tagName)
+					responseCodes[tagName] = response.GetResponseCode(tagName)
 					subscriptionHandles[tagName] = handle
 				}
 			}
 		}
+	}
+	var errResult error
+	if err := errors.Join(collectedErrors...); err != nil {
+		errResult = errors.Wrap(err, "while aggregating results")
 	}
 	return spiModel.NewDefaultPlcSubscriptionRequestResult(
 		subscriptionRequest,
@@ -228,7 +222,7 @@ func (m *Connection) processSubscriptionResponses(_ context.Context, subscriptio
 			subscriptionHandles,
 			append(m._options, options.WithCustomLogger(m.log))...,
 		),
-		err,
+		errResult,
 	)
 }
 

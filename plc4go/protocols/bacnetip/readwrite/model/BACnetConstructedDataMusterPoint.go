@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataMusterPoint = (*_BACnetConstructedDataMusterPoint)(ni
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataMusterPoint)(nil)
 
 // NewBACnetConstructedDataMusterPoint factory function for _BACnetConstructedDataMusterPoint
-func NewBACnetConstructedDataMusterPoint(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, musterPoint BACnetApplicationTagBoolean, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataMusterPoint {
+func NewBACnetConstructedDataMusterPoint(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, musterPoint BACnetApplicationTagBoolean) *_BACnetConstructedDataMusterPoint {
 	if musterPoint == nil {
 		panic("musterPoint of type BACnetApplicationTagBoolean for BACnetConstructedDataMusterPoint must not be nil")
 	}
 	_result := &_BACnetConstructedDataMusterPoint{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		MusterPoint:                   musterPoint,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataMusterPointBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataMusterPointBuilder) = (*_BACnetConstructedDataMusterPointBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataMusterPointBuilder) WithMusterPointBuilder(builde
 	var err error
 	b.MusterPoint, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataMusterPointBuilder) Build() (BACnetConstructedDataMusterPoint, error) {
 	if b.MusterPoint == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'musterPoint' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'musterPoint' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataMusterPoint.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataMusterPointBuilder) buildForBACnetConstructedData
 
 func (b *_BACnetConstructedDataMusterPointBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataMusterPointBuilder().(*_BACnetConstructedDataMusterPointBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataMusterPoint(structType any) BACnetConstructedDataM
 	return nil
 }
 
-func (m *_BACnetConstructedDataMusterPoint) GetTypeName() string {
+func (m *_BACnetConstructedDataMusterPoint) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataMusterPoint"
 }
 

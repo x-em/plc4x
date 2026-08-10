@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -99,7 +100,7 @@ type _BVLCRegisterForeignDeviceBuilder struct {
 
 	parentBuilder *_BVLCBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BVLCRegisterForeignDeviceBuilder) = (*_BVLCRegisterForeignDeviceBuilder)(nil)
@@ -119,8 +120,8 @@ func (b *_BVLCRegisterForeignDeviceBuilder) WithTtl(ttl uint16) BVLCRegisterFore
 }
 
 func (b *_BVLCRegisterForeignDeviceBuilder) Build() (BVLCRegisterForeignDevice, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BVLCRegisterForeignDevice.deepCopy(), nil
 }
@@ -146,8 +147,8 @@ func (b *_BVLCRegisterForeignDeviceBuilder) buildForBVLC() (BVLC, error) {
 
 func (b *_BVLCRegisterForeignDeviceBuilder) DeepCopy() any {
 	_copy := b.CreateBVLCRegisterForeignDeviceBuilder().(*_BVLCRegisterForeignDeviceBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -208,7 +209,7 @@ func CastBVLCRegisterForeignDevice(structType any) BVLCRegisterForeignDevice {
 	return nil
 }
 
-func (m *_BVLCRegisterForeignDevice) GetTypeName() string {
+func (m *_BVLCRegisterForeignDevice) GetPlx4xTypeName() string {
 	return "BVLCRegisterForeignDevice"
 }
 
@@ -236,7 +237,7 @@ func (m *_BVLCRegisterForeignDevice) parse(ctx context.Context, readBuffer utils
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	ttl, err := ReadSimpleField(ctx, "ttl", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithByteOrder(binary.BigEndian))
+	ttl, err := ReadSimpleField(ctx, "ttl", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'ttl' field"))
 	}
@@ -267,7 +268,7 @@ func (m *_BVLCRegisterForeignDevice) SerializeWithWriteBuffer(ctx context.Contex
 			return errors.Wrap(pushErr, "Error pushing for BVLCRegisterForeignDevice")
 		}
 
-		if err := WriteSimpleField[uint16](ctx, "ttl", m.GetTtl(), WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+		if err := WriteSimpleField[uint16](ctx, "ttl", m.GetTtl(), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'ttl' field")
 		}
 

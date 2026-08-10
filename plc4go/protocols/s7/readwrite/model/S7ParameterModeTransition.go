@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -123,7 +124,7 @@ type _S7ParameterModeTransitionBuilder struct {
 
 	parentBuilder *_S7ParameterBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7ParameterModeTransitionBuilder) = (*_S7ParameterModeTransitionBuilder)(nil)
@@ -163,8 +164,8 @@ func (b *_S7ParameterModeTransitionBuilder) WithSequenceNumber(sequenceNumber ui
 }
 
 func (b *_S7ParameterModeTransitionBuilder) Build() (S7ParameterModeTransition, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7ParameterModeTransition.deepCopy(), nil
 }
@@ -190,8 +191,8 @@ func (b *_S7ParameterModeTransitionBuilder) buildForS7Parameter() (S7Parameter, 
 
 func (b *_S7ParameterModeTransitionBuilder) DeepCopy() any {
 	_copy := b.CreateS7ParameterModeTransitionBuilder().(*_S7ParameterModeTransitionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -272,7 +273,7 @@ func CastS7ParameterModeTransition(structType any) S7ParameterModeTransition {
 	return nil
 }
 
-func (m *_S7ParameterModeTransition) GetTypeName() string {
+func (m *_S7ParameterModeTransition) GetPlx4xTypeName() string {
 	return "S7ParameterModeTransition"
 }
 

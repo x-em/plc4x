@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -61,7 +62,7 @@ var _ VariantExtensionObject = (*_VariantExtensionObject)(nil)
 var _ VariantRequirements = (*_VariantExtensionObject)(nil)
 
 // NewVariantExtensionObject factory function for _VariantExtensionObject
-func NewVariantExtensionObject(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []bool, arrayLength *int32, value []ExtensionObject) *_VariantExtensionObject {
+func NewVariantExtensionObject(arrayLengthSpecified bool, arrayDimensionsSpecified bool, noOfArrayDimensions *int32, arrayDimensions []int32, arrayLength *int32, value []ExtensionObject) *_VariantExtensionObject {
 	_result := &_VariantExtensionObject{
 		VariantContract: NewVariant(arrayLengthSpecified, arrayDimensionsSpecified, noOfArrayDimensions, arrayDimensions),
 		ArrayLength:     arrayLength,
@@ -103,7 +104,7 @@ type _VariantExtensionObjectBuilder struct {
 
 	parentBuilder *_VariantBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (VariantExtensionObjectBuilder) = (*_VariantExtensionObjectBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_VariantExtensionObjectBuilder) WithValue(value ...ExtensionObject) Var
 }
 
 func (b *_VariantExtensionObjectBuilder) Build() (VariantExtensionObject, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._VariantExtensionObject.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_VariantExtensionObjectBuilder) buildForVariant() (Variant, error) {
 
 func (b *_VariantExtensionObjectBuilder) DeepCopy() any {
 	_copy := b.CreateVariantExtensionObjectBuilder().(*_VariantExtensionObjectBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +222,7 @@ func CastVariantExtensionObject(structType any) VariantExtensionObject {
 	return nil
 }
 
-func (m *_VariantExtensionObject) GetTypeName() string {
+func (m *_VariantExtensionObject) GetPlx4xTypeName() string {
 	return "VariantExtensionObject"
 }
 
@@ -237,9 +238,7 @@ func (m *_VariantExtensionObject) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.Value) > 0 {
 		for _curItem, element := range m.Value {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Value), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _RegisterNodesResponseBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RegisterNodesResponseBuilder) = (*_RegisterNodesResponseBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_RegisterNodesResponseBuilder) WithResponseHeaderBuilder(builderSupplie
 	var err error
 	b.ResponseHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ResponseHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ResponseHeaderBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_RegisterNodesResponseBuilder) WithRegisteredNodeIds(registeredNodeIds 
 
 func (b *_RegisterNodesResponseBuilder) Build() (RegisterNodesResponse, error) {
 	if b.ResponseHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'responseHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'responseHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RegisterNodesResponse.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_RegisterNodesResponseBuilder) buildForExtensionObjectDefinition() (Ext
 
 func (b *_RegisterNodesResponseBuilder) DeepCopy() any {
 	_copy := b.CreateRegisterNodesResponseBuilder().(*_RegisterNodesResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastRegisterNodesResponse(structType any) RegisterNodesResponse {
 	return nil
 }
 
-func (m *_RegisterNodesResponse) GetTypeName() string {
+func (m *_RegisterNodesResponse) GetPlx4xTypeName() string {
 	return "RegisterNodesResponse"
 }
 
@@ -262,9 +258,7 @@ func (m *_RegisterNodesResponse) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.RegisteredNodeIds) > 0 {
 		for _curItem, element := range m.RegisteredNodeIds {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.RegisteredNodeIds), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_RegisterNodesResponse) parse(ctx context.Context, readBuffer utils.Rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer))
+	responseHeader, err := ReadSimpleField[ResponseHeader](ctx, "responseHeader", ReadComplex[ResponseHeader](ExtensionObjectDefinitionParseWithBufferProducer[ResponseHeader]((int32)(int32(394))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'responseHeader' field"))
 	}
 	m.ResponseHeader = responseHeader
 
-	noOfRegisteredNodeIds, err := ReadImplicitField[int32](ctx, "noOfRegisteredNodeIds", ReadSignedInt(readBuffer, uint8(32)))
+	noOfRegisteredNodeIds, err := ReadImplicitField[int32](ctx, "noOfRegisteredNodeIds", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfRegisteredNodeIds' field"))
 	}
 	_ = noOfRegisteredNodeIds
 
-	registeredNodeIds, err := ReadCountArrayField[NodeId](ctx, "registeredNodeIds", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), uint64(noOfRegisteredNodeIds))
+	registeredNodeIds, err := ReadCountArrayField[NodeId](ctx, "registeredNodeIds", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), uint64(noOfRegisteredNodeIds), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'registeredNodeIds' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_RegisterNodesResponse) SerializeWithWriteBuffer(ctx context.Context, w
 			return errors.Wrap(pushErr, "Error pushing for RegisterNodesResponse")
 		}
 
-		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ResponseHeader](ctx, "responseHeader", m.GetResponseHeader(), WriteComplex[ResponseHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'responseHeader' field")
 		}
 		noOfRegisteredNodeIds := int32(utils.InlineIf(bool((m.GetRegisteredNodeIds()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetRegisteredNodeIds()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfRegisteredNodeIds", noOfRegisteredNodeIds, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfRegisteredNodeIds", noOfRegisteredNodeIds, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfRegisteredNodeIds' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "registeredNodeIds", m.GetRegisteredNodeIds(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "registeredNodeIds", m.GetRegisteredNodeIds(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'registeredNodeIds' field")
 		}
 

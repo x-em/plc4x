@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,6 +44,7 @@ type CALDataStatus interface {
 	utils.Copyable
 	CALData
 	// GetApplication returns Application (property field)
+	// Reply
 	GetApplication() ApplicationIdContainer
 	// GetBlockStart returns BlockStart (property field)
 	GetBlockStart() uint8
@@ -64,9 +68,9 @@ var _ CALDataStatus = (*_CALDataStatus)(nil)
 var _ CALDataRequirements = (*_CALDataStatus)(nil)
 
 // NewCALDataStatus factory function for _CALDataStatus
-func NewCALDataStatus(commandTypeContainer CALCommandTypeContainer, additionalData CALData, application ApplicationIdContainer, blockStart uint8, statusBytes []StatusByte, requestContext RequestContext) *_CALDataStatus {
+func NewCALDataStatus(requestContext RequestContext, commandTypeContainer CALCommandTypeContainer, additionalData CALData, application ApplicationIdContainer, blockStart uint8, statusBytes []StatusByte) *_CALDataStatus {
 	_result := &_CALDataStatus{
-		CALDataContract: NewCALData(commandTypeContainer, additionalData, requestContext),
+		CALDataContract: NewCALData(requestContext, commandTypeContainer, additionalData),
 		Application:     application,
 		BlockStart:      blockStart,
 		StatusBytes:     statusBytes,
@@ -109,7 +113,7 @@ type _CALDataStatusBuilder struct {
 
 	parentBuilder *_CALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (CALDataStatusBuilder) = (*_CALDataStatusBuilder)(nil)
@@ -139,8 +143,8 @@ func (b *_CALDataStatusBuilder) WithStatusBytes(statusBytes ...StatusByte) CALDa
 }
 
 func (b *_CALDataStatusBuilder) Build() (CALDataStatus, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._CALDataStatus.deepCopy(), nil
 }
@@ -166,8 +170,8 @@ func (b *_CALDataStatusBuilder) buildForCALData() (CALData, error) {
 
 func (b *_CALDataStatusBuilder) DeepCopy() any {
 	_copy := b.CreateCALDataStatusBuilder().(*_CALDataStatusBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -232,7 +236,7 @@ func CastCALDataStatus(structType any) CALDataStatus {
 	return nil
 }
 
-func (m *_CALDataStatus) GetTypeName() string {
+func (m *_CALDataStatus) GetPlx4xTypeName() string {
 	return "CALDataStatus"
 }
 
@@ -249,9 +253,7 @@ func (m *_CALDataStatus) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.StatusBytes) > 0 {
 		for _curItem, element := range m.StatusBytes {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.StatusBytes), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -273,19 +275,19 @@ func (m *_CALDataStatus) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	application, err := ReadEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", ReadEnum(ApplicationIdContainerByValue, ReadUnsignedByte(readBuffer, uint8(8))))
+	application, err := ReadEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", ReadEnum(ApplicationIdContainerByValue, ReadUnsignedByte(readBuffer, uint8(8))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'application' field"))
 	}
 	m.Application = application
 
-	blockStart, err := ReadSimpleField(ctx, "blockStart", ReadUnsignedByte(readBuffer, uint8(8)))
+	blockStart, err := ReadSimpleField(ctx, "blockStart", ReadUnsignedByte(readBuffer, uint8(8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'blockStart' field"))
 	}
 	m.BlockStart = blockStart
 
-	statusBytes, err := ReadCountArrayField[StatusByte](ctx, "statusBytes", ReadComplex[StatusByte](StatusByteParseWithBuffer, readBuffer), uint64(int32(commandTypeContainer.NumBytes())-int32(int32(2))))
+	statusBytes, err := ReadCountArrayField[StatusByte](ctx, "statusBytes", ReadComplex[StatusByte](StatusByteParseWithBuffer, readBuffer), uint64(int32(commandTypeContainer.NumBytes())-int32(int32(2))), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'statusBytes' field"))
 	}
@@ -299,7 +301,7 @@ func (m *_CALDataStatus) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 }
 
 func (m *_CALDataStatus) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -316,15 +318,15 @@ func (m *_CALDataStatus) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 			return errors.Wrap(pushErr, "Error pushing for CALDataStatus")
 		}
 
-		if err := WriteSimpleEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", m.GetApplication(), WriteEnum[ApplicationIdContainer, uint8](ApplicationIdContainer.GetValue, ApplicationIdContainer.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8))); err != nil {
+		if err := WriteSimpleEnumField[ApplicationIdContainer](ctx, "application", "ApplicationIdContainer", m.GetApplication(), WriteEnum[ApplicationIdContainer, uint8](ApplicationIdContainer.GetValue, ApplicationIdContainer.PLC4XEnumName, WriteUnsignedByte(writeBuffer, 8)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'application' field")
 		}
 
-		if err := WriteSimpleField[uint8](ctx, "blockStart", m.GetBlockStart(), WriteUnsignedByte(writeBuffer, 8)); err != nil {
+		if err := WriteSimpleField[uint8](ctx, "blockStart", m.GetBlockStart(), WriteUnsignedByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'blockStart' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "statusBytes", m.GetStatusBytes(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "statusBytes", m.GetStatusBytes(), writeBuffer, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'statusBytes' field")
 		}
 

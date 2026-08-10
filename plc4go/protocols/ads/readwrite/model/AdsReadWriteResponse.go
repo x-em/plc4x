@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -41,8 +42,10 @@ type AdsReadWriteResponse interface {
 	utils.Copyable
 	AmsPacket
 	// GetResult returns Result (property field)
+	// 4 bytes	ADS error number
 	GetResult() ReturnCode
 	// GetData returns Data (property field)
+	// n bytes Additional data which are sent to the ADS device
 	GetData() []byte
 	// IsAdsReadWriteResponse is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsAdsReadWriteResponse()
@@ -61,7 +64,7 @@ var _ AdsReadWriteResponse = (*_AdsReadWriteResponse)(nil)
 var _ AmsPacketRequirements = (*_AdsReadWriteResponse)(nil)
 
 // NewAdsReadWriteResponse factory function for _AdsReadWriteResponse
-func NewAdsReadWriteResponse(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32, result ReturnCode, data []byte) *_AdsReadWriteResponse {
+func NewAdsReadWriteResponse(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32, result ReturnCode, data []byte) *_AdsReadWriteResponse {
 	_result := &_AdsReadWriteResponse{
 		AmsPacketContract: NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 		Result:            result,
@@ -103,7 +106,7 @@ type _AdsReadWriteResponseBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsReadWriteResponseBuilder) = (*_AdsReadWriteResponseBuilder)(nil)
@@ -128,8 +131,8 @@ func (b *_AdsReadWriteResponseBuilder) WithData(data ...byte) AdsReadWriteRespon
 }
 
 func (b *_AdsReadWriteResponseBuilder) Build() (AdsReadWriteResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsReadWriteResponse.deepCopy(), nil
 }
@@ -155,8 +158,8 @@ func (b *_AdsReadWriteResponseBuilder) buildForAmsPacket() (AmsPacket, error) {
 
 func (b *_AdsReadWriteResponseBuilder) DeepCopy() any {
 	_copy := b.CreateAdsReadWriteResponseBuilder().(*_AdsReadWriteResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -225,7 +228,7 @@ func CastAdsReadWriteResponse(structType any) AdsReadWriteResponse {
 	return nil
 }
 
-func (m *_AdsReadWriteResponse) GetTypeName() string {
+func (m *_AdsReadWriteResponse) GetPlx4xTypeName() string {
 	return "AdsReadWriteResponse"
 }
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _TargetVariablesDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (TargetVariablesDataTypeBuilder) = (*_TargetVariablesDataTypeBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_TargetVariablesDataTypeBuilder) WithTargetVariables(targetVariables ..
 }
 
 func (b *_TargetVariablesDataTypeBuilder) Build() (TargetVariablesDataType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._TargetVariablesDataType.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_TargetVariablesDataTypeBuilder) buildForExtensionObjectDefinition() (E
 
 func (b *_TargetVariablesDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateTargetVariablesDataTypeBuilder().(*_TargetVariablesDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastTargetVariablesDataType(structType any) TargetVariablesDataType {
 	return nil
 }
 
-func (m *_TargetVariablesDataType) GetTypeName() string {
+func (m *_TargetVariablesDataType) GetPlx4xTypeName() string {
 	return "TargetVariablesDataType"
 }
 
@@ -220,9 +222,7 @@ func (m *_TargetVariablesDataType) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.TargetVariables) > 0 {
 		for _curItem, element := range m.TargetVariables {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.TargetVariables), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -244,13 +244,13 @@ func (m *_TargetVariablesDataType) parse(ctx context.Context, readBuffer utils.R
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	noOfTargetVariables, err := ReadImplicitField[int32](ctx, "noOfTargetVariables", ReadSignedInt(readBuffer, uint8(32)))
+	noOfTargetVariables, err := ReadImplicitField[int32](ctx, "noOfTargetVariables", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfTargetVariables' field"))
 	}
 	_ = noOfTargetVariables
 
-	targetVariables, err := ReadCountArrayField[FieldTargetDataType](ctx, "targetVariables", ReadComplex[FieldTargetDataType](ExtensionObjectDefinitionParseWithBufferProducer[FieldTargetDataType]((int32)(int32(14746))), readBuffer), uint64(noOfTargetVariables))
+	targetVariables, err := ReadCountArrayField[FieldTargetDataType](ctx, "targetVariables", ReadComplex[FieldTargetDataType](ExtensionObjectDefinitionParseWithBufferProducer[FieldTargetDataType]((int32)(int32(14746))), readBuffer), uint64(noOfTargetVariables), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetVariables' field"))
 	}
@@ -281,11 +281,11 @@ func (m *_TargetVariablesDataType) SerializeWithWriteBuffer(ctx context.Context,
 			return errors.Wrap(pushErr, "Error pushing for TargetVariablesDataType")
 		}
 		noOfTargetVariables := int32(utils.InlineIf(bool((m.GetTargetVariables()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetTargetVariables()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfTargetVariables", noOfTargetVariables, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfTargetVariables", noOfTargetVariables, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfTargetVariables' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "targetVariables", m.GetTargetVariables(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "targetVariables", m.GetTargetVariables(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetVariables' field")
 		}
 

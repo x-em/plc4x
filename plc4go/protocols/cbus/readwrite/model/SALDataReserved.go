@@ -21,11 +21,13 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +91,7 @@ type _SALDataReservedBuilder struct {
 
 	parentBuilder *_SALDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SALDataReservedBuilder) = (*_SALDataReservedBuilder)(nil)
@@ -104,8 +106,8 @@ func (b *_SALDataReservedBuilder) WithMandatoryFields() SALDataReservedBuilder {
 }
 
 func (b *_SALDataReservedBuilder) Build() (SALDataReserved, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SALDataReserved.deepCopy(), nil
 }
@@ -131,8 +133,8 @@ func (b *_SALDataReservedBuilder) buildForSALData() (SALData, error) {
 
 func (b *_SALDataReservedBuilder) DeepCopy() any {
 	_copy := b.CreateSALDataReservedBuilder().(*_SALDataReservedBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +181,7 @@ func CastSALDataReserved(structType any) SALDataReserved {
 	return nil
 }
 
-func (m *_SALDataReserved) GetTypeName() string {
+func (m *_SALDataReserved) GetPlx4xTypeName() string {
 	return "SALDataReserved"
 }
 
@@ -217,7 +219,7 @@ func (m *_SALDataReserved) parse(ctx context.Context, readBuffer utils.ReadBuffe
 }
 
 func (m *_SALDataReserved) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}

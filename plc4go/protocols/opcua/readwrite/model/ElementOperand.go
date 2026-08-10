@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -97,7 +99,7 @@ type _ElementOperandBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ElementOperandBuilder) = (*_ElementOperandBuilder)(nil)
@@ -117,8 +119,8 @@ func (b *_ElementOperandBuilder) WithIndex(index uint32) ElementOperandBuilder {
 }
 
 func (b *_ElementOperandBuilder) Build() (ElementOperand, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ElementOperand.deepCopy(), nil
 }
@@ -144,8 +146,8 @@ func (b *_ElementOperandBuilder) buildForExtensionObjectDefinition() (ExtensionO
 
 func (b *_ElementOperandBuilder) DeepCopy() any {
 	_copy := b.CreateElementOperandBuilder().(*_ElementOperandBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +208,7 @@ func CastElementOperand(structType any) ElementOperand {
 	return nil
 }
 
-func (m *_ElementOperand) GetTypeName() string {
+func (m *_ElementOperand) GetPlx4xTypeName() string {
 	return "ElementOperand"
 }
 
@@ -234,7 +236,7 @@ func (m *_ElementOperand) parse(ctx context.Context, readBuffer utils.ReadBuffer
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	index, err := ReadSimpleField(ctx, "index", ReadUnsignedInt(readBuffer, uint8(32)))
+	index, err := ReadSimpleField(ctx, "index", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'index' field"))
 	}
@@ -265,7 +267,7 @@ func (m *_ElementOperand) SerializeWithWriteBuffer(ctx context.Context, writeBuf
 			return errors.Wrap(pushErr, "Error pushing for ElementOperand")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "index", m.GetIndex(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "index", m.GetIndex(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'index' field")
 		}
 

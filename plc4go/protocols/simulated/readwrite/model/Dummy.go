@@ -22,14 +22,15 @@ package model
 import (
 	"context"
 	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -87,7 +88,7 @@ func NewDummyBuilder() DummyBuilder {
 type _DummyBuilder struct {
 	*_Dummy
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DummyBuilder) = (*_DummyBuilder)(nil)
@@ -102,8 +103,8 @@ func (b *_DummyBuilder) WithDummy(dummy uint16) DummyBuilder {
 }
 
 func (b *_DummyBuilder) Build() (Dummy, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._Dummy.deepCopy(), nil
 }
@@ -118,8 +119,8 @@ func (b *_DummyBuilder) MustBuild() Dummy {
 
 func (b *_DummyBuilder) DeepCopy() any {
 	_copy := b.CreateDummyBuilder().(*_DummyBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -162,7 +163,7 @@ func CastDummy(structType any) Dummy {
 	return nil
 }
 
-func (m *_Dummy) GetTypeName() string {
+func (m *_Dummy) GetPlx4xTypeName() string {
 	return "Dummy"
 }
 
@@ -190,7 +191,7 @@ func DummyParseWithBufferProducer() func(ctx context.Context, readBuffer utils.R
 }
 
 func DummyParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (Dummy, error) {
-	v, err := (&_Dummy{}).parse(ctx, readBuffer)
+	v, err := (new(_Dummy)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +207,7 @@ func (m *_Dummy) parse(ctx context.Context, readBuffer utils.ReadBuffer) (__dumm
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	dummy, err := ReadSimpleField(ctx, "dummy", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithByteOrder(binary.BigEndian))
+	dummy, err := ReadSimpleField(ctx, "dummy", ReadUnsignedShort(readBuffer, uint8(16)), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'dummy' field"))
 	}
@@ -236,7 +237,7 @@ func (m *_Dummy) SerializeWithWriteBuffer(ctx context.Context, writeBuffer utils
 		return errors.Wrap(pushErr, "Error pushing for Dummy")
 	}
 
-	if err := WriteSimpleField[uint16](ctx, "dummy", m.GetDummy(), WriteUnsignedShort(writeBuffer, 16), codegen.WithByteOrder(binary.BigEndian)); err != nil {
+	if err := WriteSimpleField[uint16](ctx, "dummy", m.GetDummy(), WriteUnsignedShort(writeBuffer, 16), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'dummy' field")
 	}
 

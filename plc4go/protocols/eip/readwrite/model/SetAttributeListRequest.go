@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,9 +54,9 @@ var _ SetAttributeListRequest = (*_SetAttributeListRequest)(nil)
 var _ CipServiceRequirements = (*_SetAttributeListRequest)(nil)
 
 // NewSetAttributeListRequest factory function for _SetAttributeListRequest
-func NewSetAttributeListRequest(serviceLen uint16) *_SetAttributeListRequest {
+func NewSetAttributeListRequest() *_SetAttributeListRequest {
 	_result := &_SetAttributeListRequest{
-		CipServiceContract: NewCipService(serviceLen),
+		CipServiceContract: NewCipService(),
 	}
 	_result.CipServiceContract.(*_CipService)._SubType = _result
 	return _result
@@ -89,7 +90,7 @@ type _SetAttributeListRequestBuilder struct {
 
 	parentBuilder *_CipServiceBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SetAttributeListRequestBuilder) = (*_SetAttributeListRequestBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_SetAttributeListRequestBuilder) WithMandatoryFields() SetAttributeList
 }
 
 func (b *_SetAttributeListRequestBuilder) Build() (SetAttributeListRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SetAttributeListRequest.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_SetAttributeListRequestBuilder) buildForCipService() (CipService, erro
 
 func (b *_SetAttributeListRequestBuilder) DeepCopy() any {
 	_copy := b.CreateSetAttributeListRequestBuilder().(*_SetAttributeListRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -187,7 +188,7 @@ func CastSetAttributeListRequest(structType any) SetAttributeListRequest {
 	return nil
 }
 
-func (m *_SetAttributeListRequest) GetTypeName() string {
+func (m *_SetAttributeListRequest) GetPlx4xTypeName() string {
 	return "SetAttributeListRequest"
 }
 

@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -127,7 +129,7 @@ type _RelativePathElementBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RelativePathElementBuilder) = (*_RelativePathElementBuilder)(nil)
@@ -151,10 +153,7 @@ func (b *_RelativePathElementBuilder) WithReferenceTypeIdBuilder(builderSupplier
 	var err error
 	b.ReferenceTypeId, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "NodeIdBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "NodeIdBuilder failed"))
 	}
 	return b
 }
@@ -179,29 +178,20 @@ func (b *_RelativePathElementBuilder) WithTargetNameBuilder(builderSupplier func
 	var err error
 	b.TargetName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "QualifiedNameBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "QualifiedNameBuilder failed"))
 	}
 	return b
 }
 
 func (b *_RelativePathElementBuilder) Build() (RelativePathElement, error) {
 	if b.ReferenceTypeId == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'referenceTypeId' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'referenceTypeId' not set"))
 	}
 	if b.TargetName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'targetName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'targetName' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RelativePathElement.deepCopy(), nil
 }
@@ -227,8 +217,8 @@ func (b *_RelativePathElementBuilder) buildForExtensionObjectDefinition() (Exten
 
 func (b *_RelativePathElementBuilder) DeepCopy() any {
 	_copy := b.CreateRelativePathElementBuilder().(*_RelativePathElementBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -301,7 +291,7 @@ func CastRelativePathElement(structType any) RelativePathElement {
 	return nil
 }
 
-func (m *_RelativePathElement) GetTypeName() string {
+func (m *_RelativePathElement) GetPlx4xTypeName() string {
 	return "RelativePathElement"
 }
 
@@ -341,31 +331,31 @@ func (m *_RelativePathElement) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	referenceTypeId, err := ReadSimpleField[NodeId](ctx, "referenceTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer))
+	referenceTypeId, err := ReadSimpleField[NodeId](ctx, "referenceTypeId", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'referenceTypeId' field"))
 	}
 	m.ReferenceTypeId = referenceTypeId
 
-	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(6)), uint8(0x00))
+	reservedField0, err := ReadReservedField(ctx, "reserved", ReadUnsignedByte(readBuffer, uint8(6)), uint8(0x00), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing reserved field"))
 	}
 	m.reservedField0 = reservedField0
 
-	includeSubtypes, err := ReadSimpleField(ctx, "includeSubtypes", ReadBoolean(readBuffer))
+	includeSubtypes, err := ReadSimpleField(ctx, "includeSubtypes", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'includeSubtypes' field"))
 	}
 	m.IncludeSubtypes = includeSubtypes
 
-	isInverse, err := ReadSimpleField(ctx, "isInverse", ReadBoolean(readBuffer))
+	isInverse, err := ReadSimpleField(ctx, "isInverse", ReadBoolean(readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'isInverse' field"))
 	}
 	m.IsInverse = isInverse
 
-	targetName, err := ReadSimpleField[QualifiedName](ctx, "targetName", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer))
+	targetName, err := ReadSimpleField[QualifiedName](ctx, "targetName", ReadComplex[QualifiedName](QualifiedNameParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'targetName' field"))
 	}
@@ -396,23 +386,23 @@ func (m *_RelativePathElement) SerializeWithWriteBuffer(ctx context.Context, wri
 			return errors.Wrap(pushErr, "Error pushing for RelativePathElement")
 		}
 
-		if err := WriteSimpleField[NodeId](ctx, "referenceTypeId", m.GetReferenceTypeId(), WriteComplex[NodeId](writeBuffer)); err != nil {
+		if err := WriteSimpleField[NodeId](ctx, "referenceTypeId", m.GetReferenceTypeId(), WriteComplex[NodeId](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'referenceTypeId' field")
 		}
 
-		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 6)); err != nil {
+		if err := WriteReservedField[uint8](ctx, "reserved", uint8(0x00), WriteUnsignedByte(writeBuffer, 6), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'reserved' field number 1")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "includeSubtypes", m.GetIncludeSubtypes(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "includeSubtypes", m.GetIncludeSubtypes(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'includeSubtypes' field")
 		}
 
-		if err := WriteSimpleField[bool](ctx, "isInverse", m.GetIsInverse(), WriteBoolean(writeBuffer)); err != nil {
+		if err := WriteSimpleField[bool](ctx, "isInverse", m.GetIsInverse(), WriteBoolean(writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'isInverse' field")
 		}
 
-		if err := WriteSimpleField[QualifiedName](ctx, "targetName", m.GetTargetName(), WriteComplex[QualifiedName](writeBuffer)); err != nil {
+		if err := WriteSimpleField[QualifiedName](ctx, "targetName", m.GetTargetName(), WriteComplex[QualifiedName](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'targetName' field")
 		}
 

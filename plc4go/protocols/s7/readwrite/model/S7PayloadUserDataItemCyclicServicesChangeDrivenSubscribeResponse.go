@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +104,7 @@ type _S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilder st
 
 	parentBuilder *_S7PayloadUserDataItemBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilder) = (*_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilder)(nil)
@@ -128,8 +129,8 @@ func (b *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilde
 }
 
 func (b *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilder) Build() (S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse.deepCopy(), nil
 }
@@ -155,8 +156,8 @@ func (b *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilde
 
 func (b *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilder) DeepCopy() any {
 	_copy := b.CreateS7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilder().(*_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponseBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -229,7 +230,7 @@ func CastS7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse(struct
 	return nil
 }
 
-func (m *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse) GetTypeName() string {
+func (m *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse) GetPlx4xTypeName() string {
 	return "S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse"
 }
 
@@ -243,9 +244,7 @@ func (m *_S7PayloadUserDataItemCyclicServicesChangeDrivenSubscribeResponse) GetL
 	if len(m.Items) > 0 {
 		for _curItem, element := range m.Items {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.Items), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 

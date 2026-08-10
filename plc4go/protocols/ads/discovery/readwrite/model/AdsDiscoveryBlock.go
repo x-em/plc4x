@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -132,7 +133,7 @@ type _AdsDiscoveryBlockBuilder struct {
 
 	childBuilder _AdsDiscoveryBlockChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDiscoveryBlockBuilder) = (*_AdsDiscoveryBlockBuilder)(nil)
@@ -142,8 +143,8 @@ func (b *_AdsDiscoveryBlockBuilder) WithMandatoryFields() AdsDiscoveryBlockBuild
 }
 
 func (b *_AdsDiscoveryBlockBuilder) PartialBuild() (AdsDiscoveryBlockContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDiscoveryBlock.deepCopy(), nil
 }
@@ -270,8 +271,8 @@ func (b *_AdsDiscoveryBlockBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDiscoveryBlockBuilder().(*_AdsDiscoveryBlockBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_AdsDiscoveryBlockChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -300,7 +301,7 @@ func CastAdsDiscoveryBlock(structType any) AdsDiscoveryBlock {
 	return nil
 }
 
-func (m *_AdsDiscoveryBlock) GetTypeName() string {
+func (m *_AdsDiscoveryBlock) GetPlx4xTypeName() string {
 	return "AdsDiscoveryBlock"
 }
 
@@ -336,7 +337,7 @@ func AdsDiscoveryBlockParseWithBufferProducer[T AdsDiscoveryBlock]() func(ctx co
 }
 
 func AdsDiscoveryBlockParseWithBuffer[T AdsDiscoveryBlock](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_AdsDiscoveryBlock{}).parse(ctx, readBuffer)
+	v, err := (new(_AdsDiscoveryBlock)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

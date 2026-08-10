@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,7 +54,7 @@ var _ AdsReadStateRequest = (*_AdsReadStateRequest)(nil)
 var _ AmsPacketRequirements = (*_AdsReadStateRequest)(nil)
 
 // NewAdsReadStateRequest factory function for _AdsReadStateRequest
-func NewAdsReadStateRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32) *_AdsReadStateRequest {
+func NewAdsReadStateRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32) *_AdsReadStateRequest {
 	_result := &_AdsReadStateRequest{
 		AmsPacketContract: NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 	}
@@ -89,7 +90,7 @@ type _AdsReadStateRequestBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsReadStateRequestBuilder) = (*_AdsReadStateRequestBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_AdsReadStateRequestBuilder) WithMandatoryFields() AdsReadStateRequestB
 }
 
 func (b *_AdsReadStateRequestBuilder) Build() (AdsReadStateRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsReadStateRequest.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_AdsReadStateRequestBuilder) buildForAmsPacket() (AmsPacket, error) {
 
 func (b *_AdsReadStateRequestBuilder) DeepCopy() any {
 	_copy := b.CreateAdsReadStateRequestBuilder().(*_AdsReadStateRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastAdsReadStateRequest(structType any) AdsReadStateRequest {
 	return nil
 }
 
-func (m *_AdsReadStateRequest) GetTypeName() string {
+func (m *_AdsReadStateRequest) GetPlx4xTypeName() string {
 	return "AdsReadStateRequest"
 }
 

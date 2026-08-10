@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -142,7 +144,7 @@ type _QueryFirstRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (QueryFirstRequestBuilder) = (*_QueryFirstRequestBuilder)(nil)
@@ -166,10 +168,7 @@ func (b *_QueryFirstRequestBuilder) WithRequestHeaderBuilder(builderSupplier fun
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -184,10 +183,7 @@ func (b *_QueryFirstRequestBuilder) WithViewBuilder(builderSupplier func(ViewDes
 	var err error
 	b.View, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ViewDescriptionBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ViewDescriptionBuilder failed"))
 	}
 	return b
 }
@@ -207,10 +203,7 @@ func (b *_QueryFirstRequestBuilder) WithFilterBuilder(builderSupplier func(Conte
 	var err error
 	b.Filter, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ContentFilterBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ContentFilterBuilder failed"))
 	}
 	return b
 }
@@ -227,25 +220,16 @@ func (b *_QueryFirstRequestBuilder) WithMaxReferencesToReturn(maxReferencesToRet
 
 func (b *_QueryFirstRequestBuilder) Build() (QueryFirstRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
 	if b.View == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'view' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'view' not set"))
 	}
 	if b.Filter == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'filter' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'filter' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._QueryFirstRequest.deepCopy(), nil
 }
@@ -271,8 +255,8 @@ func (b *_QueryFirstRequestBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_QueryFirstRequestBuilder) DeepCopy() any {
 	_copy := b.CreateQueryFirstRequestBuilder().(*_QueryFirstRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -353,7 +337,7 @@ func CastQueryFirstRequest(structType any) QueryFirstRequest {
 	return nil
 }
 
-func (m *_QueryFirstRequest) GetTypeName() string {
+func (m *_QueryFirstRequest) GetPlx4xTypeName() string {
 	return "QueryFirstRequest"
 }
 
@@ -373,9 +357,7 @@ func (m *_QueryFirstRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.NodeTypes) > 0 {
 		for _curItem, element := range m.NodeTypes {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.NodeTypes), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -406,43 +388,43 @@ func (m *_QueryFirstRequest) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	view, err := ReadSimpleField[ViewDescription](ctx, "view", ReadComplex[ViewDescription](ExtensionObjectDefinitionParseWithBufferProducer[ViewDescription]((int32)(int32(513))), readBuffer))
+	view, err := ReadSimpleField[ViewDescription](ctx, "view", ReadComplex[ViewDescription](ExtensionObjectDefinitionParseWithBufferProducer[ViewDescription]((int32)(int32(513))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'view' field"))
 	}
 	m.View = view
 
-	noOfNodeTypes, err := ReadImplicitField[int32](ctx, "noOfNodeTypes", ReadSignedInt(readBuffer, uint8(32)))
+	noOfNodeTypes, err := ReadImplicitField[int32](ctx, "noOfNodeTypes", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfNodeTypes' field"))
 	}
 	_ = noOfNodeTypes
 
-	nodeTypes, err := ReadCountArrayField[NodeTypeDescription](ctx, "nodeTypes", ReadComplex[NodeTypeDescription](ExtensionObjectDefinitionParseWithBufferProducer[NodeTypeDescription]((int32)(int32(575))), readBuffer), uint64(noOfNodeTypes))
+	nodeTypes, err := ReadCountArrayField[NodeTypeDescription](ctx, "nodeTypes", ReadComplex[NodeTypeDescription](ExtensionObjectDefinitionParseWithBufferProducer[NodeTypeDescription]((int32)(int32(575))), readBuffer), uint64(noOfNodeTypes), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodeTypes' field"))
 	}
 	m.NodeTypes = nodeTypes
 
-	filter, err := ReadSimpleField[ContentFilter](ctx, "filter", ReadComplex[ContentFilter](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilter]((int32)(int32(588))), readBuffer))
+	filter, err := ReadSimpleField[ContentFilter](ctx, "filter", ReadComplex[ContentFilter](ExtensionObjectDefinitionParseWithBufferProducer[ContentFilter]((int32)(int32(588))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'filter' field"))
 	}
 	m.Filter = filter
 
-	maxDataSetsToReturn, err := ReadSimpleField(ctx, "maxDataSetsToReturn", ReadUnsignedInt(readBuffer, uint8(32)))
+	maxDataSetsToReturn, err := ReadSimpleField(ctx, "maxDataSetsToReturn", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'maxDataSetsToReturn' field"))
 	}
 	m.MaxDataSetsToReturn = maxDataSetsToReturn
 
-	maxReferencesToReturn, err := ReadSimpleField(ctx, "maxReferencesToReturn", ReadUnsignedInt(readBuffer, uint8(32)))
+	maxReferencesToReturn, err := ReadSimpleField(ctx, "maxReferencesToReturn", ReadUnsignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'maxReferencesToReturn' field"))
 	}
@@ -473,31 +455,31 @@ func (m *_QueryFirstRequest) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for QueryFirstRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 
-		if err := WriteSimpleField[ViewDescription](ctx, "view", m.GetView(), WriteComplex[ViewDescription](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ViewDescription](ctx, "view", m.GetView(), WriteComplex[ViewDescription](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'view' field")
 		}
 		noOfNodeTypes := int32(utils.InlineIf(bool((m.GetNodeTypes()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetNodeTypes()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfNodeTypes", noOfNodeTypes, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfNodeTypes", noOfNodeTypes, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfNodeTypes' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "nodeTypes", m.GetNodeTypes(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "nodeTypes", m.GetNodeTypes(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodeTypes' field")
 		}
 
-		if err := WriteSimpleField[ContentFilter](ctx, "filter", m.GetFilter(), WriteComplex[ContentFilter](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ContentFilter](ctx, "filter", m.GetFilter(), WriteComplex[ContentFilter](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'filter' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "maxDataSetsToReturn", m.GetMaxDataSetsToReturn(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "maxDataSetsToReturn", m.GetMaxDataSetsToReturn(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'maxDataSetsToReturn' field")
 		}
 
-		if err := WriteSimpleField[uint32](ctx, "maxReferencesToReturn", m.GetMaxReferencesToReturn(), WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[uint32](ctx, "maxReferencesToReturn", m.GetMaxReferencesToReturn(), WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'maxReferencesToReturn' field")
 		}
 

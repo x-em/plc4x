@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -130,7 +132,7 @@ type _DatagramDataSetReaderTransportDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DatagramDataSetReaderTransportDataTypeBuilder) = (*_DatagramDataSetReaderTransportDataTypeBuilder)(nil)
@@ -154,10 +156,7 @@ func (b *_DatagramDataSetReaderTransportDataTypeBuilder) WithAddressBuilder(buil
 	var err error
 	b.Address, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
@@ -172,10 +171,7 @@ func (b *_DatagramDataSetReaderTransportDataTypeBuilder) WithQosCategoryBuilder(
 	var err error
 	b.QosCategory, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -195,35 +191,23 @@ func (b *_DatagramDataSetReaderTransportDataTypeBuilder) WithTopicBuilder(builde
 	var err error
 	b.Topic, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_DatagramDataSetReaderTransportDataTypeBuilder) Build() (DatagramDataSetReaderTransportDataType, error) {
 	if b.Address == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'address' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'address' not set"))
 	}
 	if b.QosCategory == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'qosCategory' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'qosCategory' not set"))
 	}
 	if b.Topic == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'topic' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'topic' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DatagramDataSetReaderTransportDataType.deepCopy(), nil
 }
@@ -249,8 +233,8 @@ func (b *_DatagramDataSetReaderTransportDataTypeBuilder) buildForExtensionObject
 
 func (b *_DatagramDataSetReaderTransportDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateDatagramDataSetReaderTransportDataTypeBuilder().(*_DatagramDataSetReaderTransportDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -323,7 +307,7 @@ func CastDatagramDataSetReaderTransportDataType(structType any) DatagramDataSetR
 	return nil
 }
 
-func (m *_DatagramDataSetReaderTransportDataType) GetTypeName() string {
+func (m *_DatagramDataSetReaderTransportDataType) GetPlx4xTypeName() string {
 	return "DatagramDataSetReaderTransportDataType"
 }
 
@@ -343,9 +327,7 @@ func (m *_DatagramDataSetReaderTransportDataType) GetLengthInBits(ctx context.Co
 	if len(m.DatagramQos) > 0 {
 		for _curItem, element := range m.DatagramQos {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DatagramQos), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -370,31 +352,31 @@ func (m *_DatagramDataSetReaderTransportDataType) parse(ctx context.Context, rea
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	address, err := ReadSimpleField[ExtensionObject](ctx, "address", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	address, err := ReadSimpleField[ExtensionObject](ctx, "address", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'address' field"))
 	}
 	m.Address = address
 
-	qosCategory, err := ReadSimpleField[PascalString](ctx, "qosCategory", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	qosCategory, err := ReadSimpleField[PascalString](ctx, "qosCategory", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'qosCategory' field"))
 	}
 	m.QosCategory = qosCategory
 
-	noOfDatagramQos, err := ReadImplicitField[int32](ctx, "noOfDatagramQos", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDatagramQos, err := ReadImplicitField[int32](ctx, "noOfDatagramQos", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDatagramQos' field"))
 	}
 	_ = noOfDatagramQos
 
-	datagramQos, err := ReadCountArrayField[ExtensionObject](ctx, "datagramQos", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfDatagramQos))
+	datagramQos, err := ReadCountArrayField[ExtensionObject](ctx, "datagramQos", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), uint64(noOfDatagramQos), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'datagramQos' field"))
 	}
 	m.DatagramQos = datagramQos
 
-	topic, err := ReadSimpleField[PascalString](ctx, "topic", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	topic, err := ReadSimpleField[PascalString](ctx, "topic", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'topic' field"))
 	}
@@ -425,23 +407,23 @@ func (m *_DatagramDataSetReaderTransportDataType) SerializeWithWriteBuffer(ctx c
 			return errors.Wrap(pushErr, "Error pushing for DatagramDataSetReaderTransportDataType")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "address", m.GetAddress(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "address", m.GetAddress(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'address' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "qosCategory", m.GetQosCategory(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "qosCategory", m.GetQosCategory(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'qosCategory' field")
 		}
 		noOfDatagramQos := int32(utils.InlineIf(bool((m.GetDatagramQos()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDatagramQos()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDatagramQos", noOfDatagramQos, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDatagramQos", noOfDatagramQos, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDatagramQos' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "datagramQos", m.GetDatagramQos(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "datagramQos", m.GetDatagramQos(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'datagramQos' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "topic", m.GetTopic(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "topic", m.GetTopic(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'topic' field")
 		}
 

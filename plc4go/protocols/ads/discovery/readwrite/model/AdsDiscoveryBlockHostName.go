@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +103,7 @@ type _AdsDiscoveryBlockHostNameBuilder struct {
 
 	parentBuilder *_AdsDiscoveryBlockBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsDiscoveryBlockHostNameBuilder) = (*_AdsDiscoveryBlockHostNameBuilder)(nil)
@@ -126,23 +127,17 @@ func (b *_AdsDiscoveryBlockHostNameBuilder) WithHostNameBuilder(builderSupplier 
 	var err error
 	b.HostName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "AmsStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "AmsStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_AdsDiscoveryBlockHostNameBuilder) Build() (AdsDiscoveryBlockHostName, error) {
 	if b.HostName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'hostName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'hostName' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsDiscoveryBlockHostName.deepCopy(), nil
 }
@@ -168,8 +163,8 @@ func (b *_AdsDiscoveryBlockHostNameBuilder) buildForAdsDiscoveryBlock() (AdsDisc
 
 func (b *_AdsDiscoveryBlockHostNameBuilder) DeepCopy() any {
 	_copy := b.CreateAdsDiscoveryBlockHostNameBuilder().(*_AdsDiscoveryBlockHostNameBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +225,7 @@ func CastAdsDiscoveryBlockHostName(structType any) AdsDiscoveryBlockHostName {
 	return nil
 }
 
-func (m *_AdsDiscoveryBlockHostName) GetTypeName() string {
+func (m *_AdsDiscoveryBlockHostName) GetPlx4xTypeName() string {
 	return "AdsDiscoveryBlockHostName"
 }
 

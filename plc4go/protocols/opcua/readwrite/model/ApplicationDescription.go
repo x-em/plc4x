@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -158,7 +160,7 @@ type _ApplicationDescriptionBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ApplicationDescriptionBuilder) = (*_ApplicationDescriptionBuilder)(nil)
@@ -182,10 +184,7 @@ func (b *_ApplicationDescriptionBuilder) WithApplicationUriBuilder(builderSuppli
 	var err error
 	b.ApplicationUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -200,10 +199,7 @@ func (b *_ApplicationDescriptionBuilder) WithProductUriBuilder(builderSupplier f
 	var err error
 	b.ProductUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -218,10 +214,7 @@ func (b *_ApplicationDescriptionBuilder) WithApplicationNameBuilder(builderSuppl
 	var err error
 	b.ApplicationName, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "LocalizedTextBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "LocalizedTextBuilder failed"))
 	}
 	return b
 }
@@ -241,10 +234,7 @@ func (b *_ApplicationDescriptionBuilder) WithGatewayServerUriBuilder(builderSupp
 	var err error
 	b.GatewayServerUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -259,10 +249,7 @@ func (b *_ApplicationDescriptionBuilder) WithDiscoveryProfileUriBuilder(builderS
 	var err error
 	b.DiscoveryProfileUri, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -274,37 +261,22 @@ func (b *_ApplicationDescriptionBuilder) WithDiscoveryUrls(discoveryUrls ...Pasc
 
 func (b *_ApplicationDescriptionBuilder) Build() (ApplicationDescription, error) {
 	if b.ApplicationUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'applicationUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'applicationUri' not set"))
 	}
 	if b.ProductUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'productUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'productUri' not set"))
 	}
 	if b.ApplicationName == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'applicationName' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'applicationName' not set"))
 	}
 	if b.GatewayServerUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'gatewayServerUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'gatewayServerUri' not set"))
 	}
 	if b.DiscoveryProfileUri == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'discoveryProfileUri' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'discoveryProfileUri' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ApplicationDescription.deepCopy(), nil
 }
@@ -330,8 +302,8 @@ func (b *_ApplicationDescriptionBuilder) buildForExtensionObjectDefinition() (Ex
 
 func (b *_ApplicationDescriptionBuilder) DeepCopy() any {
 	_copy := b.CreateApplicationDescriptionBuilder().(*_ApplicationDescriptionBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -416,7 +388,7 @@ func CastApplicationDescription(structType any) ApplicationDescription {
 	return nil
 }
 
-func (m *_ApplicationDescription) GetTypeName() string {
+func (m *_ApplicationDescription) GetPlx4xTypeName() string {
 	return "ApplicationDescription"
 }
 
@@ -448,9 +420,7 @@ func (m *_ApplicationDescription) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.DiscoveryUrls) > 0 {
 		for _curItem, element := range m.DiscoveryUrls {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.DiscoveryUrls), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -472,49 +442,49 @@ func (m *_ApplicationDescription) parse(ctx context.Context, readBuffer utils.Re
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	applicationUri, err := ReadSimpleField[PascalString](ctx, "applicationUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	applicationUri, err := ReadSimpleField[PascalString](ctx, "applicationUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'applicationUri' field"))
 	}
 	m.ApplicationUri = applicationUri
 
-	productUri, err := ReadSimpleField[PascalString](ctx, "productUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	productUri, err := ReadSimpleField[PascalString](ctx, "productUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'productUri' field"))
 	}
 	m.ProductUri = productUri
 
-	applicationName, err := ReadSimpleField[LocalizedText](ctx, "applicationName", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer))
+	applicationName, err := ReadSimpleField[LocalizedText](ctx, "applicationName", ReadComplex[LocalizedText](LocalizedTextParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'applicationName' field"))
 	}
 	m.ApplicationName = applicationName
 
-	applicationType, err := ReadEnumField[ApplicationType](ctx, "applicationType", "ApplicationType", ReadEnum(ApplicationTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))))
+	applicationType, err := ReadEnumField[ApplicationType](ctx, "applicationType", "ApplicationType", ReadEnum(ApplicationTypeByValue, ReadUnsignedInt(readBuffer, uint8(32))), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'applicationType' field"))
 	}
 	m.ApplicationType = applicationType
 
-	gatewayServerUri, err := ReadSimpleField[PascalString](ctx, "gatewayServerUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	gatewayServerUri, err := ReadSimpleField[PascalString](ctx, "gatewayServerUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'gatewayServerUri' field"))
 	}
 	m.GatewayServerUri = gatewayServerUri
 
-	discoveryProfileUri, err := ReadSimpleField[PascalString](ctx, "discoveryProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	discoveryProfileUri, err := ReadSimpleField[PascalString](ctx, "discoveryProfileUri", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discoveryProfileUri' field"))
 	}
 	m.DiscoveryProfileUri = discoveryProfileUri
 
-	noOfDiscoveryUrls, err := ReadImplicitField[int32](ctx, "noOfDiscoveryUrls", ReadSignedInt(readBuffer, uint8(32)))
+	noOfDiscoveryUrls, err := ReadImplicitField[int32](ctx, "noOfDiscoveryUrls", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfDiscoveryUrls' field"))
 	}
 	_ = noOfDiscoveryUrls
 
-	discoveryUrls, err := ReadCountArrayField[PascalString](ctx, "discoveryUrls", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfDiscoveryUrls))
+	discoveryUrls, err := ReadCountArrayField[PascalString](ctx, "discoveryUrls", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), uint64(noOfDiscoveryUrls), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discoveryUrls' field"))
 	}
@@ -545,35 +515,35 @@ func (m *_ApplicationDescription) SerializeWithWriteBuffer(ctx context.Context, 
 			return errors.Wrap(pushErr, "Error pushing for ApplicationDescription")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "applicationUri", m.GetApplicationUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "applicationUri", m.GetApplicationUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'applicationUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "productUri", m.GetProductUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "productUri", m.GetProductUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'productUri' field")
 		}
 
-		if err := WriteSimpleField[LocalizedText](ctx, "applicationName", m.GetApplicationName(), WriteComplex[LocalizedText](writeBuffer)); err != nil {
+		if err := WriteSimpleField[LocalizedText](ctx, "applicationName", m.GetApplicationName(), WriteComplex[LocalizedText](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'applicationName' field")
 		}
 
-		if err := WriteSimpleEnumField[ApplicationType](ctx, "applicationType", "ApplicationType", m.GetApplicationType(), WriteEnum[ApplicationType, uint32](ApplicationType.GetValue, ApplicationType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32))); err != nil {
+		if err := WriteSimpleEnumField[ApplicationType](ctx, "applicationType", "ApplicationType", m.GetApplicationType(), WriteEnum[ApplicationType, uint32](ApplicationType.GetValue, ApplicationType.PLC4XEnumName, WriteUnsignedInt(writeBuffer, 32)), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'applicationType' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "gatewayServerUri", m.GetGatewayServerUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "gatewayServerUri", m.GetGatewayServerUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'gatewayServerUri' field")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "discoveryProfileUri", m.GetDiscoveryProfileUri(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "discoveryProfileUri", m.GetDiscoveryProfileUri(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discoveryProfileUri' field")
 		}
 		noOfDiscoveryUrls := int32(utils.InlineIf(bool((m.GetDiscoveryUrls()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetDiscoveryUrls()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfDiscoveryUrls", noOfDiscoveryUrls, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfDiscoveryUrls", noOfDiscoveryUrls, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfDiscoveryUrls' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "discoveryUrls", m.GetDiscoveryUrls(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "discoveryUrls", m.GetDiscoveryUrls(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discoveryUrls' field")
 		}
 

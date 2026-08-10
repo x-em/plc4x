@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -103,7 +105,7 @@ type _ComplexNumberTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ComplexNumberTypeBuilder) = (*_ComplexNumberTypeBuilder)(nil)
@@ -128,8 +130,8 @@ func (b *_ComplexNumberTypeBuilder) WithImaginary(imaginary float32) ComplexNumb
 }
 
 func (b *_ComplexNumberTypeBuilder) Build() (ComplexNumberType, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ComplexNumberType.deepCopy(), nil
 }
@@ -155,8 +157,8 @@ func (b *_ComplexNumberTypeBuilder) buildForExtensionObjectDefinition() (Extensi
 
 func (b *_ComplexNumberTypeBuilder) DeepCopy() any {
 	_copy := b.CreateComplexNumberTypeBuilder().(*_ComplexNumberTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -221,7 +223,7 @@ func CastComplexNumberType(structType any) ComplexNumberType {
 	return nil
 }
 
-func (m *_ComplexNumberType) GetTypeName() string {
+func (m *_ComplexNumberType) GetPlx4xTypeName() string {
 	return "ComplexNumberType"
 }
 
@@ -252,13 +254,13 @@ func (m *_ComplexNumberType) parse(ctx context.Context, readBuffer utils.ReadBuf
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	real, err := ReadSimpleField(ctx, "real", ReadFloat(readBuffer, uint8(32)))
+	real, err := ReadSimpleField(ctx, "real", ReadFloat(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'real' field"))
 	}
 	m.Real = real
 
-	imaginary, err := ReadSimpleField(ctx, "imaginary", ReadFloat(readBuffer, uint8(32)))
+	imaginary, err := ReadSimpleField(ctx, "imaginary", ReadFloat(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'imaginary' field"))
 	}
@@ -289,11 +291,11 @@ func (m *_ComplexNumberType) SerializeWithWriteBuffer(ctx context.Context, write
 			return errors.Wrap(pushErr, "Error pushing for ComplexNumberType")
 		}
 
-		if err := WriteSimpleField[float32](ctx, "real", m.GetReal(), WriteFloat(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[float32](ctx, "real", m.GetReal(), WriteFloat(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'real' field")
 		}
 
-		if err := WriteSimpleField[float32](ctx, "imaginary", m.GetImaginary(), WriteFloat(writeBuffer, 32)); err != nil {
+		if err := WriteSimpleField[float32](ctx, "imaginary", m.GetImaginary(), WriteFloat(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'imaginary' field")
 		}
 

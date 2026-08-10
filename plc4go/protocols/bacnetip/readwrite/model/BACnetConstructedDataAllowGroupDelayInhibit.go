@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -60,12 +61,12 @@ var _ BACnetConstructedDataAllowGroupDelayInhibit = (*_BACnetConstructedDataAllo
 var _ BACnetConstructedDataRequirements = (*_BACnetConstructedDataAllowGroupDelayInhibit)(nil)
 
 // NewBACnetConstructedDataAllowGroupDelayInhibit factory function for _BACnetConstructedDataAllowGroupDelayInhibit
-func NewBACnetConstructedDataAllowGroupDelayInhibit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, allowGroupDelayInhibit BACnetApplicationTagBoolean, tagNumber uint8, arrayIndexArgument BACnetTagPayloadUnsignedInteger) *_BACnetConstructedDataAllowGroupDelayInhibit {
+func NewBACnetConstructedDataAllowGroupDelayInhibit(openingTag BACnetOpeningTag, peekedTagHeader BACnetTagHeader, closingTag BACnetClosingTag, allowGroupDelayInhibit BACnetApplicationTagBoolean) *_BACnetConstructedDataAllowGroupDelayInhibit {
 	if allowGroupDelayInhibit == nil {
 		panic("allowGroupDelayInhibit of type BACnetApplicationTagBoolean for BACnetConstructedDataAllowGroupDelayInhibit must not be nil")
 	}
 	_result := &_BACnetConstructedDataAllowGroupDelayInhibit{
-		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag, tagNumber, arrayIndexArgument),
+		BACnetConstructedDataContract: NewBACnetConstructedData(openingTag, peekedTagHeader, closingTag),
 		AllowGroupDelayInhibit:        allowGroupDelayInhibit,
 	}
 	_result.BACnetConstructedDataContract.(*_BACnetConstructedData)._SubType = _result
@@ -104,7 +105,7 @@ type _BACnetConstructedDataAllowGroupDelayInhibitBuilder struct {
 
 	parentBuilder *_BACnetConstructedDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetConstructedDataAllowGroupDelayInhibitBuilder) = (*_BACnetConstructedDataAllowGroupDelayInhibitBuilder)(nil)
@@ -128,23 +129,17 @@ func (b *_BACnetConstructedDataAllowGroupDelayInhibitBuilder) WithAllowGroupDela
 	var err error
 	b.AllowGroupDelayInhibit, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetApplicationTagBooleanBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetConstructedDataAllowGroupDelayInhibitBuilder) Build() (BACnetConstructedDataAllowGroupDelayInhibit, error) {
 	if b.AllowGroupDelayInhibit == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'allowGroupDelayInhibit' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'allowGroupDelayInhibit' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetConstructedDataAllowGroupDelayInhibit.deepCopy(), nil
 }
@@ -170,8 +165,8 @@ func (b *_BACnetConstructedDataAllowGroupDelayInhibitBuilder) buildForBACnetCons
 
 func (b *_BACnetConstructedDataAllowGroupDelayInhibitBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetConstructedDataAllowGroupDelayInhibitBuilder().(*_BACnetConstructedDataAllowGroupDelayInhibitBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -251,7 +246,7 @@ func CastBACnetConstructedDataAllowGroupDelayInhibit(structType any) BACnetConst
 	return nil
 }
 
-func (m *_BACnetConstructedDataAllowGroupDelayInhibit) GetTypeName() string {
+func (m *_BACnetConstructedDataAllowGroupDelayInhibit) GetPlx4xTypeName() string {
 	return "BACnetConstructedDataAllowGroupDelayInhibit"
 }
 

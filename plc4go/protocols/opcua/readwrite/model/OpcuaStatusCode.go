@@ -23,9 +23,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -115,6 +115,8 @@ const (
 	OpcuaStatusCode_BadNotReadable                                                  OpcuaStatusCode = 0x803A0000
 	OpcuaStatusCode_BadNotWritable                                                  OpcuaStatusCode = 0x803B0000
 	OpcuaStatusCode_BadOutOfRange                                                   OpcuaStatusCode = 0x803C0000
+	OpcuaStatusCode_UncertainOverRange                                              OpcuaStatusCode = 0x40F20000
+	OpcuaStatusCode_UncertainUnderRange                                             OpcuaStatusCode = 0x40F30000
 	OpcuaStatusCode_BadNotSupported                                                 OpcuaStatusCode = 0x803D0000
 	OpcuaStatusCode_BadNotFound                                                     OpcuaStatusCode = 0x803E0000
 	OpcuaStatusCode_BadObjectDeleted                                                OpcuaStatusCode = 0x803F0000
@@ -263,6 +265,7 @@ const (
 	OpcuaStatusCode_BadRequestNotAllowed                                            OpcuaStatusCode = 0x80E40000
 	OpcuaStatusCode_BadRequestNotComplete                                           OpcuaStatusCode = 0x81130000
 	OpcuaStatusCode_BadTransactionPending                                           OpcuaStatusCode = 0x80E80000
+	OpcuaStatusCode_BadTransactionFailed                                            OpcuaStatusCode = 0x80F10000
 	OpcuaStatusCode_BadTicketRequired                                               OpcuaStatusCode = 0x811F0000
 	OpcuaStatusCode_BadTicketInvalid                                                OpcuaStatusCode = 0x81200000
 	OpcuaStatusCode_BadLocked                                                       OpcuaStatusCode = 0x80E90000
@@ -393,6 +396,8 @@ func init() {
 		OpcuaStatusCode_BadNotReadable,
 		OpcuaStatusCode_BadNotWritable,
 		OpcuaStatusCode_BadOutOfRange,
+		OpcuaStatusCode_UncertainOverRange,
+		OpcuaStatusCode_UncertainUnderRange,
 		OpcuaStatusCode_BadNotSupported,
 		OpcuaStatusCode_BadNotFound,
 		OpcuaStatusCode_BadObjectDeleted,
@@ -541,6 +546,7 @@ func init() {
 		OpcuaStatusCode_BadRequestNotAllowed,
 		OpcuaStatusCode_BadRequestNotComplete,
 		OpcuaStatusCode_BadTransactionPending,
+		OpcuaStatusCode_BadTransactionFailed,
 		OpcuaStatusCode_BadTicketRequired,
 		OpcuaStatusCode_BadTicketInvalid,
 		OpcuaStatusCode_BadLocked,
@@ -687,6 +693,10 @@ func OpcuaStatusCodeByValue(value uint32) (enum OpcuaStatusCode, ok bool) {
 		return OpcuaStatusCode_UncertainDominantValueChanged, true
 	case 0x40E20000:
 		return OpcuaStatusCode_UncertainDependentValueChanged, true
+	case 0x40F20000:
+		return OpcuaStatusCode_UncertainOverRange, true
+	case 0x40F30000:
+		return OpcuaStatusCode_UncertainUnderRange, true
 	case 0x42080000:
 		return OpcuaStatusCode_UncertainTransducerInManual, true
 	case 0x42090000:
@@ -1103,6 +1113,8 @@ func OpcuaStatusCodeByValue(value uint32) (enum OpcuaStatusCode, ok bool) {
 		return OpcuaStatusCode_BadServerTooBusy, true
 	case 0x80F00000:
 		return OpcuaStatusCode_BadNoValue, true
+	case 0x80F10000:
+		return OpcuaStatusCode_BadTransactionFailed, true
 	case 0x810D0000:
 		return OpcuaStatusCode_BadCertificateChainIncomplete, true
 	case 0x810E0000:
@@ -1235,6 +1247,10 @@ func OpcuaStatusCodeByName(value string) (enum OpcuaStatusCode, ok bool) {
 		return OpcuaStatusCode_UncertainDominantValueChanged, true
 	case "UncertainDependentValueChanged":
 		return OpcuaStatusCode_UncertainDependentValueChanged, true
+	case "UncertainOverRange":
+		return OpcuaStatusCode_UncertainOverRange, true
+	case "UncertainUnderRange":
+		return OpcuaStatusCode_UncertainUnderRange, true
 	case "UncertainTransducerInManual":
 		return OpcuaStatusCode_UncertainTransducerInManual, true
 	case "UncertainSimulatedValue":
@@ -1651,6 +1667,8 @@ func OpcuaStatusCodeByName(value string) (enum OpcuaStatusCode, ok bool) {
 		return OpcuaStatusCode_BadServerTooBusy, true
 	case "BadNoValue":
 		return OpcuaStatusCode_BadNoValue, true
+	case "BadTransactionFailed":
+		return OpcuaStatusCode_BadTransactionFailed, true
 	case "BadCertificateChainIncomplete":
 		return OpcuaStatusCode_BadCertificateChainIncomplete, true
 	case "BadLicenseExpired":
@@ -1848,6 +1866,10 @@ func (e OpcuaStatusCode) PLC4XEnumName() string {
 		return "UncertainDominantValueChanged"
 	case OpcuaStatusCode_UncertainDependentValueChanged:
 		return "UncertainDependentValueChanged"
+	case OpcuaStatusCode_UncertainOverRange:
+		return "UncertainOverRange"
+	case OpcuaStatusCode_UncertainUnderRange:
+		return "UncertainUnderRange"
 	case OpcuaStatusCode_UncertainTransducerInManual:
 		return "UncertainTransducerInManual"
 	case OpcuaStatusCode_UncertainSimulatedValue:
@@ -2264,6 +2286,8 @@ func (e OpcuaStatusCode) PLC4XEnumName() string {
 		return "BadServerTooBusy"
 	case OpcuaStatusCode_BadNoValue:
 		return "BadNoValue"
+	case OpcuaStatusCode_BadTransactionFailed:
+		return "BadTransactionFailed"
 	case OpcuaStatusCode_BadCertificateChainIncomplete:
 		return "BadCertificateChainIncomplete"
 	case OpcuaStatusCode_BadLicenseExpired:

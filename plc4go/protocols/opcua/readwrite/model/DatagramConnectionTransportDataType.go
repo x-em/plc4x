@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -102,7 +104,7 @@ type _DatagramConnectionTransportDataTypeBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DatagramConnectionTransportDataTypeBuilder) = (*_DatagramConnectionTransportDataTypeBuilder)(nil)
@@ -126,23 +128,17 @@ func (b *_DatagramConnectionTransportDataTypeBuilder) WithDiscoveryAddressBuilde
 	var err error
 	b.DiscoveryAddress, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ExtensionObjectBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ExtensionObjectBuilder failed"))
 	}
 	return b
 }
 
 func (b *_DatagramConnectionTransportDataTypeBuilder) Build() (DatagramConnectionTransportDataType, error) {
 	if b.DiscoveryAddress == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'discoveryAddress' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'discoveryAddress' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DatagramConnectionTransportDataType.deepCopy(), nil
 }
@@ -168,8 +164,8 @@ func (b *_DatagramConnectionTransportDataTypeBuilder) buildForExtensionObjectDef
 
 func (b *_DatagramConnectionTransportDataTypeBuilder) DeepCopy() any {
 	_copy := b.CreateDatagramConnectionTransportDataTypeBuilder().(*_DatagramConnectionTransportDataTypeBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -230,7 +226,7 @@ func CastDatagramConnectionTransportDataType(structType any) DatagramConnectionT
 	return nil
 }
 
-func (m *_DatagramConnectionTransportDataType) GetTypeName() string {
+func (m *_DatagramConnectionTransportDataType) GetPlx4xTypeName() string {
 	return "DatagramConnectionTransportDataType"
 }
 
@@ -258,7 +254,7 @@ func (m *_DatagramConnectionTransportDataType) parse(ctx context.Context, readBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	discoveryAddress, err := ReadSimpleField[ExtensionObject](ctx, "discoveryAddress", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer))
+	discoveryAddress, err := ReadSimpleField[ExtensionObject](ctx, "discoveryAddress", ReadComplex[ExtensionObject](ExtensionObjectParseWithBufferProducer[ExtensionObject]((bool)(bool(true))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'discoveryAddress' field"))
 	}
@@ -289,7 +285,7 @@ func (m *_DatagramConnectionTransportDataType) SerializeWithWriteBuffer(ctx cont
 			return errors.Wrap(pushErr, "Error pushing for DatagramConnectionTransportDataType")
 		}
 
-		if err := WriteSimpleField[ExtensionObject](ctx, "discoveryAddress", m.GetDiscoveryAddress(), WriteComplex[ExtensionObject](writeBuffer)); err != nil {
+		if err := WriteSimpleField[ExtensionObject](ctx, "discoveryAddress", m.GetDiscoveryAddress(), WriteComplex[ExtensionObject](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'discoveryAddress' field")
 		}
 

@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ IdentifyReplyCommandMinimumLevels = (*_IdentifyReplyCommandMinimumLevels)(
 var _ IdentifyReplyCommandRequirements = (*_IdentifyReplyCommandMinimumLevels)(nil)
 
 // NewIdentifyReplyCommandMinimumLevels factory function for _IdentifyReplyCommandMinimumLevels
-func NewIdentifyReplyCommandMinimumLevels(minimumLevels []byte, numBytes uint8) *_IdentifyReplyCommandMinimumLevels {
+func NewIdentifyReplyCommandMinimumLevels(minimumLevels []byte) *_IdentifyReplyCommandMinimumLevels {
 	_result := &_IdentifyReplyCommandMinimumLevels{
-		IdentifyReplyCommandContract: NewIdentifyReplyCommand(numBytes),
+		IdentifyReplyCommandContract: NewIdentifyReplyCommand(),
 		MinimumLevels:                minimumLevels,
 	}
 	_result.IdentifyReplyCommandContract.(*_IdentifyReplyCommand)._SubType = _result
@@ -97,7 +100,7 @@ type _IdentifyReplyCommandMinimumLevelsBuilder struct {
 
 	parentBuilder *_IdentifyReplyCommandBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (IdentifyReplyCommandMinimumLevelsBuilder) = (*_IdentifyReplyCommandMinimumLevelsBuilder)(nil)
@@ -117,8 +120,8 @@ func (b *_IdentifyReplyCommandMinimumLevelsBuilder) WithMinimumLevels(minimumLev
 }
 
 func (b *_IdentifyReplyCommandMinimumLevelsBuilder) Build() (IdentifyReplyCommandMinimumLevels, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._IdentifyReplyCommandMinimumLevels.deepCopy(), nil
 }
@@ -144,8 +147,8 @@ func (b *_IdentifyReplyCommandMinimumLevelsBuilder) buildForIdentifyReplyCommand
 
 func (b *_IdentifyReplyCommandMinimumLevelsBuilder) DeepCopy() any {
 	_copy := b.CreateIdentifyReplyCommandMinimumLevelsBuilder().(*_IdentifyReplyCommandMinimumLevelsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -206,7 +209,7 @@ func CastIdentifyReplyCommandMinimumLevels(structType any) IdentifyReplyCommandM
 	return nil
 }
 
-func (m *_IdentifyReplyCommandMinimumLevels) GetTypeName() string {
+func (m *_IdentifyReplyCommandMinimumLevels) GetPlx4xTypeName() string {
 	return "IdentifyReplyCommandMinimumLevels"
 }
 
@@ -236,7 +239,7 @@ func (m *_IdentifyReplyCommandMinimumLevels) parse(ctx context.Context, readBuff
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	minimumLevels, err := readBuffer.ReadByteArray("minimumLevels", int(numBytes))
+	minimumLevels, err := readBuffer.ReadByteArray("minimumLevels", int(numBytes), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'minimumLevels' field"))
 	}
@@ -250,7 +253,7 @@ func (m *_IdentifyReplyCommandMinimumLevels) parse(ctx context.Context, readBuff
 }
 
 func (m *_IdentifyReplyCommandMinimumLevels) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -267,7 +270,7 @@ func (m *_IdentifyReplyCommandMinimumLevels) SerializeWithWriteBuffer(ctx contex
 			return errors.Wrap(pushErr, "Error pushing for IdentifyReplyCommandMinimumLevels")
 		}
 
-		if err := WriteByteArrayField(ctx, "minimumLevels", m.GetMinimumLevels(), WriteByteArray(writeBuffer, 8)); err != nil {
+		if err := WriteByteArrayField(ctx, "minimumLevels", m.GetMinimumLevels(), WriteByteArray(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'minimumLevels' field")
 		}
 

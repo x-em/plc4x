@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -124,7 +125,7 @@ func NewBACnetAccessRuleBuilder() BACnetAccessRuleBuilder {
 type _BACnetAccessRuleBuilder struct {
 	*_BACnetAccessRule
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetAccessRuleBuilder) = (*_BACnetAccessRuleBuilder)(nil)
@@ -143,10 +144,7 @@ func (b *_BACnetAccessRuleBuilder) WithTimeRangeSpecifierBuilder(builderSupplier
 	var err error
 	b.TimeRangeSpecifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetAccessRuleTimeRangeSpecifierTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetAccessRuleTimeRangeSpecifierTaggedBuilder failed"))
 	}
 	return b
 }
@@ -161,10 +159,7 @@ func (b *_BACnetAccessRuleBuilder) WithOptionalTimeRangeBuilder(builderSupplier 
 	var err error
 	b.TimeRange, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDeviceObjectPropertyReferenceEnclosedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDeviceObjectPropertyReferenceEnclosedBuilder failed"))
 	}
 	return b
 }
@@ -179,10 +174,7 @@ func (b *_BACnetAccessRuleBuilder) WithLocationSpecifierBuilder(builderSupplier 
 	var err error
 	b.LocationSpecifier, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetAccessRuleLocationSpecifierTaggedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetAccessRuleLocationSpecifierTaggedBuilder failed"))
 	}
 	return b
 }
@@ -197,10 +189,7 @@ func (b *_BACnetAccessRuleBuilder) WithOptionalLocationBuilder(builderSupplier f
 	var err error
 	b.Location, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetDeviceObjectReferenceEnclosedBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetDeviceObjectReferenceEnclosedBuilder failed"))
 	}
 	return b
 }
@@ -215,35 +204,23 @@ func (b *_BACnetAccessRuleBuilder) WithEnableBuilder(builderSupplier func(BACnet
 	var err error
 	b.Enable, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetContextTagBooleanBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetAccessRuleBuilder) Build() (BACnetAccessRule, error) {
 	if b.TimeRangeSpecifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'timeRangeSpecifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'timeRangeSpecifier' not set"))
 	}
 	if b.LocationSpecifier == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'locationSpecifier' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'locationSpecifier' not set"))
 	}
 	if b.Enable == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'enable' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'enable' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetAccessRule.deepCopy(), nil
 }
@@ -258,8 +235,8 @@ func (b *_BACnetAccessRuleBuilder) MustBuild() BACnetAccessRule {
 
 func (b *_BACnetAccessRuleBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetAccessRuleBuilder().(*_BACnetAccessRuleBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -318,7 +295,7 @@ func CastBACnetAccessRule(structType any) BACnetAccessRule {
 	return nil
 }
 
-func (m *_BACnetAccessRule) GetTypeName() string {
+func (m *_BACnetAccessRule) GetPlx4xTypeName() string {
 	return "BACnetAccessRule"
 }
 
@@ -362,7 +339,7 @@ func BACnetAccessRuleParseWithBufferProducer() func(ctx context.Context, readBuf
 }
 
 func BACnetAccessRuleParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (BACnetAccessRule, error) {
-	v, err := (&_BACnetAccessRule{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetAccessRule)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -444,7 +421,7 @@ func (m *_BACnetAccessRule) SerializeWithWriteBuffer(ctx context.Context, writeB
 		return errors.Wrap(err, "Error serializing 'timeRangeSpecifier' field")
 	}
 
-	if err := WriteOptionalField[BACnetDeviceObjectPropertyReferenceEnclosed](ctx, "timeRange", GetRef(m.GetTimeRange()), WriteComplex[BACnetDeviceObjectPropertyReferenceEnclosed](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetDeviceObjectPropertyReferenceEnclosed](ctx, "timeRange", new(m.GetTimeRange()), WriteComplex[BACnetDeviceObjectPropertyReferenceEnclosed](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'timeRange' field")
 	}
 
@@ -452,7 +429,7 @@ func (m *_BACnetAccessRule) SerializeWithWriteBuffer(ctx context.Context, writeB
 		return errors.Wrap(err, "Error serializing 'locationSpecifier' field")
 	}
 
-	if err := WriteOptionalField[BACnetDeviceObjectReferenceEnclosed](ctx, "location", GetRef(m.GetLocation()), WriteComplex[BACnetDeviceObjectReferenceEnclosed](writeBuffer), true); err != nil {
+	if err := WriteOptionalField[BACnetDeviceObjectReferenceEnclosed](ctx, "location", new(m.GetLocation()), WriteComplex[BACnetDeviceObjectReferenceEnclosed](writeBuffer), true); err != nil {
 		return errors.Wrap(err, "Error serializing 'location' field")
 	}
 

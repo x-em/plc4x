@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,7 +54,7 @@ var _ AdsInvalidRequest = (*_AdsInvalidRequest)(nil)
 var _ AmsPacketRequirements = (*_AdsInvalidRequest)(nil)
 
 // NewAdsInvalidRequest factory function for _AdsInvalidRequest
-func NewAdsInvalidRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode uint32, invokeId uint32) *_AdsInvalidRequest {
+func NewAdsInvalidRequest(targetAmsNetId AmsNetId, targetAmsPort uint16, sourceAmsNetId AmsNetId, sourceAmsPort uint16, errorCode ReturnCode, invokeId uint32) *_AdsInvalidRequest {
 	_result := &_AdsInvalidRequest{
 		AmsPacketContract: NewAmsPacket(targetAmsNetId, targetAmsPort, sourceAmsNetId, sourceAmsPort, errorCode, invokeId),
 	}
@@ -89,7 +90,7 @@ type _AdsInvalidRequestBuilder struct {
 
 	parentBuilder *_AmsPacketBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (AdsInvalidRequestBuilder) = (*_AdsInvalidRequestBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_AdsInvalidRequestBuilder) WithMandatoryFields() AdsInvalidRequestBuild
 }
 
 func (b *_AdsInvalidRequestBuilder) Build() (AdsInvalidRequest, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._AdsInvalidRequest.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_AdsInvalidRequestBuilder) buildForAmsPacket() (AmsPacket, error) {
 
 func (b *_AdsInvalidRequestBuilder) DeepCopy() any {
 	_copy := b.CreateAdsInvalidRequestBuilder().(*_AdsInvalidRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -183,7 +184,7 @@ func CastAdsInvalidRequest(structType any) AdsInvalidRequest {
 	return nil
 }
 
-func (m *_AdsInvalidRequest) GetTypeName() string {
+func (m *_AdsInvalidRequest) GetPlx4xTypeName() string {
 	return "AdsInvalidRequest"
 }
 

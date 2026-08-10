@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +115,7 @@ type _SignatureDataBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SignatureDataBuilder) = (*_SignatureDataBuilder)(nil)
@@ -137,10 +139,7 @@ func (b *_SignatureDataBuilder) WithAlgorithmBuilder(builderSupplier func(Pascal
 	var err error
 	b.Algorithm, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalStringBuilder failed"))
 	}
 	return b
 }
@@ -155,29 +154,20 @@ func (b *_SignatureDataBuilder) WithSignatureBuilder(builderSupplier func(Pascal
 	var err error
 	b.Signature, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "PascalByteStringBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "PascalByteStringBuilder failed"))
 	}
 	return b
 }
 
 func (b *_SignatureDataBuilder) Build() (SignatureData, error) {
 	if b.Algorithm == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'algorithm' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'algorithm' not set"))
 	}
 	if b.Signature == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'signature' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'signature' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SignatureData.deepCopy(), nil
 }
@@ -203,8 +193,8 @@ func (b *_SignatureDataBuilder) buildForExtensionObjectDefinition() (ExtensionOb
 
 func (b *_SignatureDataBuilder) DeepCopy() any {
 	_copy := b.CreateSignatureDataBuilder().(*_SignatureDataBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -269,7 +259,7 @@ func CastSignatureData(structType any) SignatureData {
 	return nil
 }
 
-func (m *_SignatureData) GetTypeName() string {
+func (m *_SignatureData) GetPlx4xTypeName() string {
 	return "SignatureData"
 }
 
@@ -300,13 +290,13 @@ func (m *_SignatureData) parse(ctx context.Context, readBuffer utils.ReadBuffer,
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	algorithm, err := ReadSimpleField[PascalString](ctx, "algorithm", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer))
+	algorithm, err := ReadSimpleField[PascalString](ctx, "algorithm", ReadComplex[PascalString](PascalStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'algorithm' field"))
 	}
 	m.Algorithm = algorithm
 
-	signature, err := ReadSimpleField[PascalByteString](ctx, "signature", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer))
+	signature, err := ReadSimpleField[PascalByteString](ctx, "signature", ReadComplex[PascalByteString](PascalByteStringParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'signature' field"))
 	}
@@ -337,11 +327,11 @@ func (m *_SignatureData) SerializeWithWriteBuffer(ctx context.Context, writeBuff
 			return errors.Wrap(pushErr, "Error pushing for SignatureData")
 		}
 
-		if err := WriteSimpleField[PascalString](ctx, "algorithm", m.GetAlgorithm(), WriteComplex[PascalString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalString](ctx, "algorithm", m.GetAlgorithm(), WriteComplex[PascalString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'algorithm' field")
 		}
 
-		if err := WriteSimpleField[PascalByteString](ctx, "signature", m.GetSignature(), WriteComplex[PascalByteString](writeBuffer)); err != nil {
+		if err := WriteSimpleField[PascalByteString](ctx, "signature", m.GetSignature(), WriteComplex[PascalByteString](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'signature' field")
 		}
 

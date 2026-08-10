@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -130,7 +131,7 @@ type _BACnetOptionalUnsignedBuilder struct {
 
 	childBuilder _BACnetOptionalUnsignedChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (BACnetOptionalUnsignedBuilder) = (*_BACnetOptionalUnsignedBuilder)(nil)
@@ -149,23 +150,17 @@ func (b *_BACnetOptionalUnsignedBuilder) WithPeekedTagHeaderBuilder(builderSuppl
 	var err error
 	b.PeekedTagHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "BACnetTagHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "BACnetTagHeaderBuilder failed"))
 	}
 	return b
 }
 
 func (b *_BACnetOptionalUnsignedBuilder) PartialBuild() (BACnetOptionalUnsignedContract, error) {
 	if b.PeekedTagHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'peekedTagHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'peekedTagHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._BACnetOptionalUnsigned.deepCopy(), nil
 }
@@ -222,8 +217,8 @@ func (b *_BACnetOptionalUnsignedBuilder) DeepCopy() any {
 	_copy := b.CreateBACnetOptionalUnsignedBuilder().(*_BACnetOptionalUnsignedBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_BACnetOptionalUnsignedChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -282,7 +277,7 @@ func CastBACnetOptionalUnsigned(structType any) BACnetOptionalUnsigned {
 	return nil
 }
 
-func (m *_BACnetOptionalUnsigned) GetTypeName() string {
+func (m *_BACnetOptionalUnsigned) GetPlx4xTypeName() string {
 	return "BACnetOptionalUnsigned"
 }
 
@@ -318,7 +313,7 @@ func BACnetOptionalUnsignedParseWithBufferProducer[T BACnetOptionalUnsigned]() f
 }
 
 func BACnetOptionalUnsignedParseWithBuffer[T BACnetOptionalUnsigned](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_BACnetOptionalUnsigned{}).parse(ctx, readBuffer)
+	v, err := (new(_BACnetOptionalUnsigned)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

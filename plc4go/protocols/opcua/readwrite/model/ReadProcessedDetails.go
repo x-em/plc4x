@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -126,7 +128,7 @@ type _ReadProcessedDetailsBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ReadProcessedDetailsBuilder) = (*_ReadProcessedDetailsBuilder)(nil)
@@ -170,23 +172,17 @@ func (b *_ReadProcessedDetailsBuilder) WithAggregateConfigurationBuilder(builder
 	var err error
 	b.AggregateConfiguration, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "AggregateConfigurationBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "AggregateConfigurationBuilder failed"))
 	}
 	return b
 }
 
 func (b *_ReadProcessedDetailsBuilder) Build() (ReadProcessedDetails, error) {
 	if b.AggregateConfiguration == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'aggregateConfiguration' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'aggregateConfiguration' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ReadProcessedDetails.deepCopy(), nil
 }
@@ -212,8 +208,8 @@ func (b *_ReadProcessedDetailsBuilder) buildForExtensionObjectDefinition() (Exte
 
 func (b *_ReadProcessedDetailsBuilder) DeepCopy() any {
 	_copy := b.CreateReadProcessedDetailsBuilder().(*_ReadProcessedDetailsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -290,7 +286,7 @@ func CastReadProcessedDetails(structType any) ReadProcessedDetails {
 	return nil
 }
 
-func (m *_ReadProcessedDetails) GetTypeName() string {
+func (m *_ReadProcessedDetails) GetPlx4xTypeName() string {
 	return "ReadProcessedDetails"
 }
 
@@ -313,9 +309,7 @@ func (m *_ReadProcessedDetails) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.AggregateType) > 0 {
 		for _curItem, element := range m.AggregateType {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.AggregateType), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -340,37 +334,37 @@ func (m *_ReadProcessedDetails) parse(ctx context.Context, readBuffer utils.Read
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	startTime, err := ReadSimpleField(ctx, "startTime", ReadSignedLong(readBuffer, uint8(64)))
+	startTime, err := ReadSimpleField(ctx, "startTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'startTime' field"))
 	}
 	m.StartTime = startTime
 
-	endTime, err := ReadSimpleField(ctx, "endTime", ReadSignedLong(readBuffer, uint8(64)))
+	endTime, err := ReadSimpleField(ctx, "endTime", ReadSignedLong(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'endTime' field"))
 	}
 	m.EndTime = endTime
 
-	processingInterval, err := ReadSimpleField(ctx, "processingInterval", ReadDouble(readBuffer, uint8(64)))
+	processingInterval, err := ReadSimpleField(ctx, "processingInterval", ReadDouble(readBuffer, uint8(64)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'processingInterval' field"))
 	}
 	m.ProcessingInterval = processingInterval
 
-	noOfAggregateType, err := ReadImplicitField[int32](ctx, "noOfAggregateType", ReadSignedInt(readBuffer, uint8(32)))
+	noOfAggregateType, err := ReadImplicitField[int32](ctx, "noOfAggregateType", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfAggregateType' field"))
 	}
 	_ = noOfAggregateType
 
-	aggregateType, err := ReadCountArrayField[NodeId](ctx, "aggregateType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), uint64(noOfAggregateType))
+	aggregateType, err := ReadCountArrayField[NodeId](ctx, "aggregateType", ReadComplex[NodeId](NodeIdParseWithBuffer, readBuffer), uint64(noOfAggregateType), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'aggregateType' field"))
 	}
 	m.AggregateType = aggregateType
 
-	aggregateConfiguration, err := ReadSimpleField[AggregateConfiguration](ctx, "aggregateConfiguration", ReadComplex[AggregateConfiguration](ExtensionObjectDefinitionParseWithBufferProducer[AggregateConfiguration]((int32)(int32(950))), readBuffer))
+	aggregateConfiguration, err := ReadSimpleField[AggregateConfiguration](ctx, "aggregateConfiguration", ReadComplex[AggregateConfiguration](ExtensionObjectDefinitionParseWithBufferProducer[AggregateConfiguration]((int32)(int32(950))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'aggregateConfiguration' field"))
 	}
@@ -401,27 +395,27 @@ func (m *_ReadProcessedDetails) SerializeWithWriteBuffer(ctx context.Context, wr
 			return errors.Wrap(pushErr, "Error pushing for ReadProcessedDetails")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "startTime", m.GetStartTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "startTime", m.GetStartTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'startTime' field")
 		}
 
-		if err := WriteSimpleField[int64](ctx, "endTime", m.GetEndTime(), WriteSignedLong(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[int64](ctx, "endTime", m.GetEndTime(), WriteSignedLong(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'endTime' field")
 		}
 
-		if err := WriteSimpleField[float64](ctx, "processingInterval", m.GetProcessingInterval(), WriteDouble(writeBuffer, 64)); err != nil {
+		if err := WriteSimpleField[float64](ctx, "processingInterval", m.GetProcessingInterval(), WriteDouble(writeBuffer, 64), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'processingInterval' field")
 		}
 		noOfAggregateType := int32(utils.InlineIf(bool((m.GetAggregateType()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetAggregateType()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfAggregateType", noOfAggregateType, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfAggregateType", noOfAggregateType, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfAggregateType' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "aggregateType", m.GetAggregateType(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "aggregateType", m.GetAggregateType(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'aggregateType' field")
 		}
 
-		if err := WriteSimpleField[AggregateConfiguration](ctx, "aggregateConfiguration", m.GetAggregateConfiguration(), WriteComplex[AggregateConfiguration](writeBuffer)); err != nil {
+		if err := WriteSimpleField[AggregateConfiguration](ctx, "aggregateConfiguration", m.GetAggregateConfiguration(), WriteComplex[AggregateConfiguration](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'aggregateConfiguration' field")
 		}
 

@@ -25,17 +25,17 @@ import (
 	"runtime/debug"
 	"sync"
 	"sync/atomic"
-	"time"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
 	apiValues "github.com/apache/plc4x/plc4go/pkg/api/values"
 	readWriteModel "github.com/apache/plc4x/plc4go/protocols/modbus/readwrite/model"
 	"github.com/apache/plc4x/plc4go/spi"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	spiModel "github.com/apache/plc4x/plc4go/spi/model"
 	"github.com/apache/plc4x/plc4go/spi/options"
+	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
 type Reader struct {
@@ -65,16 +65,14 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 	// TODO: handle ctx
 	m.log.Trace().Msg("Reading")
 	result := make(chan apiModel.PlcReadRequestResult, 1)
-	m.wg.Add(1)
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		defer func() {
 			if err := recover(); err != nil {
-				result <- spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack()))
+				utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.Errorf("panic-ed %v. Stack: %s", err, debug.Stack())))
 			}
 		}()
 		if len(readRequest.GetTagNames()) != 1 {
-			result <- spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.New("modbus only supports single-item requests"))
+			utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(readRequest, nil, errors.New("modbus only supports single-item requests")))
 			m.log.Debug().Int("nTags", len(readRequest.GetTagNames())).Msg("modbus only supports single-item requests. Got nTags tags")
 			return
 		}
@@ -83,11 +81,11 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 		tag := readRequest.GetTag(tagName)
 		modbusTagVar, err := castToModbusTagFromPlcTag(tag)
 		if err != nil {
-			result <- spiModel.NewDefaultPlcReadRequestResult(
+			utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 				readRequest,
 				nil,
 				errors.Wrap(err, "invalid tag item type"),
-			)
+			))
 			m.log.Debug().Type("tagType", tag).Msg("Invalid tag item type")
 			return
 		}
@@ -104,18 +102,18 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 		case HoldingRegister:
 			pdu = readWriteModel.NewModbusPDUReadHoldingRegistersRequest(modbusTagVar.Address, numWords)
 		case ExtendedRegister:
-			result <- spiModel.NewDefaultPlcReadRequestResult(
+			utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 				readRequest,
 				nil,
 				errors.New("modbus currently doesn't support extended register requests"),
-			)
+			))
 			return
 		default:
-			result <- spiModel.NewDefaultPlcReadRequestResult(
+			utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 				readRequest,
 				nil,
 				errors.Errorf("unsupported tag type %x", modbusTagVar.TagType),
-			)
+			))
 			m.log.Debug().Stringer("tagType", modbusTagVar.TagType).Msg("Unsupported tag type")
 			return
 		}
@@ -130,11 +128,11 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 
 		// Assemble the finished ADU
 		m.log.Trace().Msg("Assemble ADU")
-		requestAdu := readWriteModel.NewModbusTcpADU(uint16(transactionIdentifier), m.unitIdentifier, pdu, false)
+		requestAdu := readWriteModel.NewModbusTcpADU(uint16(transactionIdentifier), m.unitIdentifier, pdu)
 
 		// Send the ADU over the wire
 		m.log.Trace().Msg("Send ADU")
-		if err = m.messageCodec.SendRequest(ctx, requestAdu, func(message spi.Message) bool {
+		if err = m.messageCodec.SendRequest(ctx, "read", requestAdu, func(message spi.Message) bool {
 			responseAdu := message.(readWriteModel.ModbusTcpADU)
 			return responseAdu.GetTransactionIdentifier() == uint16(transactionIdentifier) &&
 				responseAdu.GetUnitIdentifier() == requestAdu.UnitIdentifier
@@ -147,39 +145,40 @@ func (m *Reader) Read(ctx context.Context, readRequest apiModel.PlcReadRequest) 
 			readResponse, err := m.ToPlc4xReadResponse(responseAdu, readRequest)
 
 			if err != nil {
-				result <- spiModel.NewDefaultPlcReadRequestResult(
+				utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 					readRequest,
 					nil,
 					errors.Wrap(err, "Error decoding response"),
-				)
+				))
 				// TODO: should we return the error here?
 				return nil
 			}
-			result <- spiModel.NewDefaultPlcReadRequestResult(
+			utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 				readRequest,
 				readResponse,
 				nil,
-			)
+			))
 			return nil
 		}, func(err error) error {
-			result <- spiModel.NewDefaultPlcReadRequestResult(
+			utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 				readRequest,
 				nil,
 				errors.Wrap(err, "got timeout while waiting for response"),
-			)
+			))
 			return nil
-		}, time.Second*1); err != nil {
-			result <- spiModel.NewDefaultPlcReadRequestResult(
+		}); err != nil {
+			utils.DeliverResult(m.log, result, spiModel.NewDefaultPlcReadRequestResult(
 				readRequest,
 				nil,
 				errors.Wrap(err, "error sending message"),
-			)
+			))
 		}
-	}()
+	})
 	return result
 }
 
 func (m *Reader) ToPlc4xReadResponse(responseAdu readWriteModel.ModbusTcpADU, readRequest apiModel.PlcReadRequest) (apiModel.PlcReadResponse, error) {
+	ctx := context.TODO()
 	var data []uint8
 	switch pdu := responseAdu.GetPdu().(type) {
 	case readWriteModel.ModbusPDUReadDiscreteInputsResponse:
@@ -209,7 +208,7 @@ func (m *Reader) ToPlc4xReadResponse(responseAdu readWriteModel.ModbusTcpADU, re
 
 	// Decode the data according to the information from the request
 	m.log.Trace().Msg("decode data")
-	ctxForModel := options.GetLoggerContextForModel(context.TODO(), m.log, options.WithPassLoggerToModel(m.passLogToModel))
+	ctxForModel := options.GetLoggerContextForModel(ctx, m.log, options.WithPassLoggerToModel(m.passLogToModel))
 	value, err := readWriteModel.DataItemParse(ctxForModel, data, tag.Datatype, tag.Quantity, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error parsing data item")

@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -78,7 +79,7 @@ func NewDateStringBuilder() DateStringBuilder {
 type _DateStringBuilder struct {
 	*_DateString
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (DateStringBuilder) = (*_DateStringBuilder)(nil)
@@ -88,8 +89,8 @@ func (b *_DateStringBuilder) WithMandatoryFields() DateStringBuilder {
 }
 
 func (b *_DateStringBuilder) Build() (DateString, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._DateString.deepCopy(), nil
 }
@@ -104,8 +105,8 @@ func (b *_DateStringBuilder) MustBuild() DateString {
 
 func (b *_DateStringBuilder) DeepCopy() any {
 	_copy := b.CreateDateStringBuilder().(*_DateStringBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -134,7 +135,7 @@ func CastDateString(structType any) DateString {
 	return nil
 }
 
-func (m *_DateString) GetTypeName() string {
+func (m *_DateString) GetPlx4xTypeName() string {
 	return "DateString"
 }
 
@@ -159,7 +160,7 @@ func DateStringParseWithBufferProducer() func(ctx context.Context, readBuffer ut
 }
 
 func DateStringParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (DateString, error) {
-	v, err := (&_DateString{}).parse(ctx, readBuffer)
+	v, err := (new(_DateString)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}

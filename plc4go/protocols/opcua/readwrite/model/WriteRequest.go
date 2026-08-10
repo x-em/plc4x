@@ -21,13 +21,15 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -108,7 +110,7 @@ type _WriteRequestBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (WriteRequestBuilder) = (*_WriteRequestBuilder)(nil)
@@ -132,10 +134,7 @@ func (b *_WriteRequestBuilder) WithRequestHeaderBuilder(builderSupplier func(Req
 	var err error
 	b.RequestHeader, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "RequestHeaderBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "RequestHeaderBuilder failed"))
 	}
 	return b
 }
@@ -147,13 +146,10 @@ func (b *_WriteRequestBuilder) WithNodesToWrite(nodesToWrite ...WriteValue) Writ
 
 func (b *_WriteRequestBuilder) Build() (WriteRequest, error) {
 	if b.RequestHeader == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'requestHeader' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'requestHeader' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._WriteRequest.deepCopy(), nil
 }
@@ -179,8 +175,8 @@ func (b *_WriteRequestBuilder) buildForExtensionObjectDefinition() (ExtensionObj
 
 func (b *_WriteRequestBuilder) DeepCopy() any {
 	_copy := b.CreateWriteRequestBuilder().(*_WriteRequestBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -245,7 +241,7 @@ func CastWriteRequest(structType any) WriteRequest {
 	return nil
 }
 
-func (m *_WriteRequest) GetTypeName() string {
+func (m *_WriteRequest) GetPlx4xTypeName() string {
 	return "WriteRequest"
 }
 
@@ -262,9 +258,7 @@ func (m *_WriteRequest) GetLengthInBits(ctx context.Context) uint16 {
 	if len(m.NodesToWrite) > 0 {
 		for _curItem, element := range m.NodesToWrite {
 			arrayCtx := utils.CreateArrayContext(ctx, len(m.NodesToWrite), _curItem)
-			_ = arrayCtx
-			_ = _curItem
-			lengthInBits += element.(interface{ GetLengthInBits(context.Context) uint16 }).GetLengthInBits(arrayCtx)
+			lengthInBits += element.GetLengthInBits(arrayCtx)
 		}
 	}
 
@@ -286,19 +280,19 @@ func (m *_WriteRequest) parse(ctx context.Context, readBuffer utils.ReadBuffer, 
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer))
+	requestHeader, err := ReadSimpleField[RequestHeader](ctx, "requestHeader", ReadComplex[RequestHeader](ExtensionObjectDefinitionParseWithBufferProducer[RequestHeader]((int32)(int32(391))), readBuffer), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'requestHeader' field"))
 	}
 	m.RequestHeader = requestHeader
 
-	noOfNodesToWrite, err := ReadImplicitField[int32](ctx, "noOfNodesToWrite", ReadSignedInt(readBuffer, uint8(32)))
+	noOfNodesToWrite, err := ReadImplicitField[int32](ctx, "noOfNodesToWrite", ReadSignedInt(readBuffer, uint8(32)), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'noOfNodesToWrite' field"))
 	}
 	_ = noOfNodesToWrite
 
-	nodesToWrite, err := ReadCountArrayField[WriteValue](ctx, "nodesToWrite", ReadComplex[WriteValue](ExtensionObjectDefinitionParseWithBufferProducer[WriteValue]((int32)(int32(670))), readBuffer), uint64(noOfNodesToWrite))
+	nodesToWrite, err := ReadCountArrayField[WriteValue](ctx, "nodesToWrite", ReadComplex[WriteValue](ExtensionObjectDefinitionParseWithBufferProducer[WriteValue]((int32)(int32(670))), readBuffer), uint64(noOfNodesToWrite), codegen.WithEncoding("UTF8"))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nodesToWrite' field"))
 	}
@@ -329,15 +323,15 @@ func (m *_WriteRequest) SerializeWithWriteBuffer(ctx context.Context, writeBuffe
 			return errors.Wrap(pushErr, "Error pushing for WriteRequest")
 		}
 
-		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer)); err != nil {
+		if err := WriteSimpleField[RequestHeader](ctx, "requestHeader", m.GetRequestHeader(), WriteComplex[RequestHeader](writeBuffer), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'requestHeader' field")
 		}
 		noOfNodesToWrite := int32(utils.InlineIf(bool((m.GetNodesToWrite()) == (nil)), func() any { return int32(-(int32(1))) }, func() any { return int32(int32(len(m.GetNodesToWrite()))) }).(int32))
-		if err := WriteImplicitField(ctx, "noOfNodesToWrite", noOfNodesToWrite, WriteSignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteImplicitField(ctx, "noOfNodesToWrite", noOfNodesToWrite, WriteSignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'noOfNodesToWrite' field")
 		}
 
-		if err := WriteComplexTypeArrayField(ctx, "nodesToWrite", m.GetNodesToWrite(), writeBuffer); err != nil {
+		if err := WriteComplexTypeArrayField(ctx, "nodesToWrite", m.GetNodesToWrite(), writeBuffer, codegen.WithEncoding("UTF8")); err != nil {
 			return errors.Wrap(err, "Error serializing 'nodesToWrite' field")
 		}
 

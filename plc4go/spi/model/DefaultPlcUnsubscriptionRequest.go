@@ -23,10 +23,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/pkg/errors"
-
 	apiModel "github.com/apache/plc4x/plc4go/pkg/api/model"
-	"github.com/apache/plc4x/plc4go/spi/utils"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 )
 
 var _ apiModel.PlcUnsubscriptionRequestBuilder = &DefaultPlcUnsubscriptionRequestBuilder{}
@@ -41,7 +39,7 @@ func NewDefaultPlcUnsubscriptionRequestBuilder() *DefaultPlcUnsubscriptionReques
 }
 
 func (d *DefaultPlcUnsubscriptionRequestBuilder) AddHandles(subscriptionHandles ...apiModel.PlcSubscriptionHandle) apiModel.PlcUnsubscriptionRequestBuilder {
-	subscriptionHandles = append(subscriptionHandles, subscriptionHandles...)
+	d.subscriptionHandles = append(d.subscriptionHandles, subscriptionHandles...)
 	return d
 }
 
@@ -64,15 +62,9 @@ func NewDefaultPlcUnsubscriptionRequest(subscriptionHandles []apiModel.PlcSubscr
 	}
 }
 
-func (d *DefaultPlcUnsubscriptionRequest) Execute() <-chan apiModel.PlcUnsubscriptionRequestResult {
-	return d.ExecuteWithContext(context.Background())
-}
-
-func (d *DefaultPlcUnsubscriptionRequest) ExecuteWithContext(ctx context.Context) <-chan apiModel.PlcUnsubscriptionRequestResult {
+func (d *DefaultPlcUnsubscriptionRequest) Execute(ctx context.Context) <-chan apiModel.PlcUnsubscriptionRequestResult {
 	results := make(chan apiModel.PlcUnsubscriptionRequestResult, 1)
-	d.wg.Add(1)
-	go func() {
-		defer d.wg.Done()
+	d.wg.Go(func() {
 		var collectedErrors []error
 		for _, handle := range d.subscriptionHandles {
 			select {
@@ -85,12 +77,12 @@ func (d *DefaultPlcUnsubscriptionRequest) ExecuteWithContext(ctx context.Context
 				collectedErrors = append(collectedErrors, ctx.Err())
 			}
 		}
-		var err error
-		if len(collectedErrors) > 0 {
-			err = &utils.MultiError{MainError: errors.New("error unsubscribing from all"), Errors: collectedErrors}
+		var finalErr error
+		if err := errors.Join(collectedErrors...); err != nil {
+			finalErr = errors.Wrap(err, "error unsubscribing from all")
 		}
-		results <- NewDefaultPlcUnsubscriptionRequestResult(d, NewDefaultPlcUnsubscriptionResponse(d), err)
-	}()
+		results <- NewDefaultPlcUnsubscriptionRequestResult(d, NewDefaultPlcUnsubscriptionResponse(d), finalErr)
+	})
 	return results
 }
 

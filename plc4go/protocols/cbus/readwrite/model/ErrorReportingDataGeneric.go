@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -53,6 +54,7 @@ type ErrorReportingDataGeneric interface {
 	// GetDeviceId returns DeviceId (property field)
 	GetDeviceId() uint8
 	// GetErrorData1 returns ErrorData1 (property field)
+	// TODO: maybe split them up according to appendix A
 	GetErrorData1() uint8
 	// GetErrorData2 returns ErrorData2 (property field)
 	GetErrorData2() uint8
@@ -150,7 +152,7 @@ type _ErrorReportingDataGenericBuilder struct {
 
 	parentBuilder *_ErrorReportingDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ErrorReportingDataGenericBuilder) = (*_ErrorReportingDataGenericBuilder)(nil)
@@ -174,10 +176,7 @@ func (b *_ErrorReportingDataGenericBuilder) WithSystemCategoryBuilder(builderSup
 	var err error
 	b.SystemCategory, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "ErrorReportingSystemCategoryBuilder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "ErrorReportingSystemCategoryBuilder failed"))
 	}
 	return b
 }
@@ -219,13 +218,10 @@ func (b *_ErrorReportingDataGenericBuilder) WithErrorData2(errorData2 uint8) Err
 
 func (b *_ErrorReportingDataGenericBuilder) Build() (ErrorReportingDataGeneric, error) {
 	if b.SystemCategory == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'systemCategory' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'systemCategory' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ErrorReportingDataGeneric.deepCopy(), nil
 }
@@ -251,8 +247,8 @@ func (b *_ErrorReportingDataGenericBuilder) buildForErrorReportingData() (ErrorR
 
 func (b *_ErrorReportingDataGenericBuilder) DeepCopy() any {
 	_copy := b.CreateErrorReportingDataGenericBuilder().(*_ErrorReportingDataGenericBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -364,7 +360,7 @@ func CastErrorReportingDataGeneric(structType any) ErrorReportingDataGeneric {
 	return nil
 }
 
-func (m *_ErrorReportingDataGeneric) GetTypeName() string {
+func (m *_ErrorReportingDataGeneric) GetPlx4xTypeName() string {
 	return "ErrorReportingDataGeneric"
 }
 

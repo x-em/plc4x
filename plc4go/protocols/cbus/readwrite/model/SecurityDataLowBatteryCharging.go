@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -101,7 +102,7 @@ type _SecurityDataLowBatteryChargingBuilder struct {
 
 	parentBuilder *_SecurityDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (SecurityDataLowBatteryChargingBuilder) = (*_SecurityDataLowBatteryChargingBuilder)(nil)
@@ -121,8 +122,8 @@ func (b *_SecurityDataLowBatteryChargingBuilder) WithStartStop(startStop byte) S
 }
 
 func (b *_SecurityDataLowBatteryChargingBuilder) Build() (SecurityDataLowBatteryCharging, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._SecurityDataLowBatteryCharging.deepCopy(), nil
 }
@@ -148,8 +149,8 @@ func (b *_SecurityDataLowBatteryChargingBuilder) buildForSecurityData() (Securit
 
 func (b *_SecurityDataLowBatteryChargingBuilder) DeepCopy() any {
 	_copy := b.CreateSecurityDataLowBatteryChargingBuilder().(*_SecurityDataLowBatteryChargingBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -227,7 +228,7 @@ func CastSecurityDataLowBatteryCharging(structType any) SecurityDataLowBatteryCh
 	return nil
 }
 
-func (m *_SecurityDataLowBatteryCharging) GetTypeName() string {
+func (m *_SecurityDataLowBatteryCharging) GetPlx4xTypeName() string {
 	return "SecurityDataLowBatteryCharging"
 }
 

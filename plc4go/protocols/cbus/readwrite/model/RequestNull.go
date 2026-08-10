@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -58,9 +61,9 @@ var _ RequestNull = (*_RequestNull)(nil)
 var _ RequestRequirements = (*_RequestNull)(nil)
 
 // NewRequestNull factory function for _RequestNull
-func NewRequestNull(peekedByte RequestType, startingCR *RequestType, resetMode *RequestType, secondPeek RequestType, termination RequestTermination, cBusOptions CBusOptions) *_RequestNull {
+func NewRequestNull(peekedByte RequestType, startingCR *RequestType, resetMode *RequestType, secondPeek RequestType, termination RequestTermination) *_RequestNull {
 	_result := &_RequestNull{
-		RequestContract: NewRequest(peekedByte, startingCR, resetMode, secondPeek, termination, cBusOptions),
+		RequestContract: NewRequest(peekedByte, startingCR, resetMode, secondPeek, termination),
 	}
 	_result.RequestContract.(*_Request)._SubType = _result
 	return _result
@@ -94,7 +97,7 @@ type _RequestNullBuilder struct {
 
 	parentBuilder *_RequestBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RequestNullBuilder) = (*_RequestNullBuilder)(nil)
@@ -109,8 +112,8 @@ func (b *_RequestNullBuilder) WithMandatoryFields() RequestNullBuilder {
 }
 
 func (b *_RequestNullBuilder) Build() (RequestNull, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RequestNull.deepCopy(), nil
 }
@@ -136,8 +139,8 @@ func (b *_RequestNullBuilder) buildForRequest() (Request, error) {
 
 func (b *_RequestNullBuilder) DeepCopy() any {
 	_copy := b.CreateRequestNullBuilder().(*_RequestNullBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -194,7 +197,7 @@ func CastRequestNull(structType any) RequestNull {
 	return nil
 }
 
-func (m *_RequestNull) GetTypeName() string {
+func (m *_RequestNull) GetPlx4xTypeName() string {
 	return "RequestNull"
 }
 
@@ -222,7 +225,7 @@ func (m *_RequestNull) parse(ctx context.Context, readBuffer utils.ReadBuffer, p
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	nullIndicator, err := ReadConstField[uint32](ctx, "nullIndicator", ReadUnsignedInt(readBuffer, uint8(32)), RequestNull_NULLINDICATOR)
+	nullIndicator, err := ReadConstField[uint32](ctx, "nullIndicator", ReadUnsignedInt(readBuffer, uint8(32)), RequestNull_NULLINDICATOR, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'nullIndicator' field"))
 	}
@@ -236,7 +239,7 @@ func (m *_RequestNull) parse(ctx context.Context, readBuffer utils.ReadBuffer, p
 }
 
 func (m *_RequestNull) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -253,7 +256,7 @@ func (m *_RequestNull) SerializeWithWriteBuffer(ctx context.Context, writeBuffer
 			return errors.Wrap(pushErr, "Error pushing for RequestNull")
 		}
 
-		if err := WriteConstField(ctx, "nullIndicator", RequestNull_NULLINDICATOR, WriteUnsignedInt(writeBuffer, 32)); err != nil {
+		if err := WriteConstField(ctx, "nullIndicator", RequestNull_NULLINDICATOR, WriteUnsignedInt(writeBuffer, 32), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 			return errors.Wrap(err, "Error serializing 'nullIndicator' field")
 		}
 

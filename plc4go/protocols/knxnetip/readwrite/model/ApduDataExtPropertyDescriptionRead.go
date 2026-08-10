@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -64,9 +65,9 @@ var _ ApduDataExtPropertyDescriptionRead = (*_ApduDataExtPropertyDescriptionRead
 var _ ApduDataExtRequirements = (*_ApduDataExtPropertyDescriptionRead)(nil)
 
 // NewApduDataExtPropertyDescriptionRead factory function for _ApduDataExtPropertyDescriptionRead
-func NewApduDataExtPropertyDescriptionRead(objectIndex uint8, propertyId uint8, index uint8, length uint8) *_ApduDataExtPropertyDescriptionRead {
+func NewApduDataExtPropertyDescriptionRead(objectIndex uint8, propertyId uint8, index uint8) *_ApduDataExtPropertyDescriptionRead {
 	_result := &_ApduDataExtPropertyDescriptionRead{
-		ApduDataExtContract: NewApduDataExt(length),
+		ApduDataExtContract: NewApduDataExt(),
 		ObjectIndex:         objectIndex,
 		PropertyId:          propertyId,
 		Index:               index,
@@ -109,7 +110,7 @@ type _ApduDataExtPropertyDescriptionReadBuilder struct {
 
 	parentBuilder *_ApduDataExtBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ApduDataExtPropertyDescriptionReadBuilder) = (*_ApduDataExtPropertyDescriptionReadBuilder)(nil)
@@ -139,8 +140,8 @@ func (b *_ApduDataExtPropertyDescriptionReadBuilder) WithIndex(index uint8) Apdu
 }
 
 func (b *_ApduDataExtPropertyDescriptionReadBuilder) Build() (ApduDataExtPropertyDescriptionRead, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ApduDataExtPropertyDescriptionRead.deepCopy(), nil
 }
@@ -166,8 +167,8 @@ func (b *_ApduDataExtPropertyDescriptionReadBuilder) buildForApduDataExt() (Apdu
 
 func (b *_ApduDataExtPropertyDescriptionReadBuilder) DeepCopy() any {
 	_copy := b.CreateApduDataExtPropertyDescriptionReadBuilder().(*_ApduDataExtPropertyDescriptionReadBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -236,7 +237,7 @@ func CastApduDataExtPropertyDescriptionRead(structType any) ApduDataExtPropertyD
 	return nil
 }
 
-func (m *_ApduDataExtPropertyDescriptionRead) GetTypeName() string {
+func (m *_ApduDataExtPropertyDescriptionRead) GetPlx4xTypeName() string {
 	return "ApduDataExtPropertyDescriptionRead"
 }
 

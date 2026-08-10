@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -84,7 +87,7 @@ func NewResponseTerminationBuilder() ResponseTerminationBuilder {
 type _ResponseTerminationBuilder struct {
 	*_ResponseTermination
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (ResponseTerminationBuilder) = (*_ResponseTerminationBuilder)(nil)
@@ -94,8 +97,8 @@ func (b *_ResponseTerminationBuilder) WithMandatoryFields() ResponseTerminationB
 }
 
 func (b *_ResponseTerminationBuilder) Build() (ResponseTermination, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._ResponseTermination.deepCopy(), nil
 }
@@ -110,8 +113,8 @@ func (b *_ResponseTerminationBuilder) MustBuild() ResponseTermination {
 
 func (b *_ResponseTerminationBuilder) DeepCopy() any {
 	_copy := b.CreateResponseTerminationBuilder().(*_ResponseTerminationBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -158,7 +161,7 @@ func CastResponseTermination(structType any) ResponseTermination {
 	return nil
 }
 
-func (m *_ResponseTermination) GetTypeName() string {
+func (m *_ResponseTermination) GetPlx4xTypeName() string {
 	return "ResponseTermination"
 }
 
@@ -179,7 +182,7 @@ func (m *_ResponseTermination) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func ResponseTerminationParse(ctx context.Context, theBytes []byte) (ResponseTermination, error) {
-	return ResponseTerminationParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return ResponseTerminationParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func ResponseTerminationParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (ResponseTermination, error) {
@@ -189,7 +192,7 @@ func ResponseTerminationParseWithBufferProducer() func(ctx context.Context, read
 }
 
 func ResponseTerminationParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (ResponseTermination, error) {
-	v, err := (&_ResponseTermination{}).parse(ctx, readBuffer)
+	v, err := (new(_ResponseTermination)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -205,13 +208,13 @@ func (m *_ResponseTermination) parse(ctx context.Context, readBuffer utils.ReadB
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	cr, err := ReadConstField[byte](ctx, "cr", ReadByte(readBuffer, 8), ResponseTermination_CR)
+	cr, err := ReadConstField[byte](ctx, "cr", ReadByte(readBuffer, 8), ResponseTermination_CR, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'cr' field"))
 	}
 	_ = cr
 
-	lf, err := ReadConstField[byte](ctx, "lf", ReadByte(readBuffer, 8), ResponseTermination_LF)
+	lf, err := ReadConstField[byte](ctx, "lf", ReadByte(readBuffer, 8), ResponseTermination_LF, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'lf' field"))
 	}
@@ -225,7 +228,7 @@ func (m *_ResponseTermination) parse(ctx context.Context, readBuffer utils.ReadB
 }
 
 func (m *_ResponseTermination) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -241,11 +244,11 @@ func (m *_ResponseTermination) SerializeWithWriteBuffer(ctx context.Context, wri
 		return errors.Wrap(pushErr, "Error pushing for ResponseTermination")
 	}
 
-	if err := WriteConstField(ctx, "cr", ResponseTermination_CR, WriteByte(writeBuffer, 8)); err != nil {
+	if err := WriteConstField(ctx, "cr", ResponseTermination_CR, WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'cr' field")
 	}
 
-	if err := WriteConstField(ctx, "lf", ResponseTermination_LF, WriteByte(writeBuffer, 8)); err != nil {
+	if err := WriteConstField(ctx, "lf", ResponseTermination_LF, WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'lf' field")
 	}
 

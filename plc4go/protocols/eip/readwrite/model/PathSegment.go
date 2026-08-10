@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -120,7 +121,7 @@ type _PathSegmentBuilder struct {
 
 	childBuilder _PathSegmentChildBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (PathSegmentBuilder) = (*_PathSegmentBuilder)(nil)
@@ -130,8 +131,8 @@ func (b *_PathSegmentBuilder) WithMandatoryFields() PathSegmentBuilder {
 }
 
 func (b *_PathSegmentBuilder) PartialBuild() (PathSegmentContract, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._PathSegment.deepCopy(), nil
 }
@@ -198,8 +199,8 @@ func (b *_PathSegmentBuilder) DeepCopy() any {
 	_copy := b.CreatePathSegmentBuilder().(*_PathSegmentBuilder)
 	_copy.childBuilder = b.childBuilder.DeepCopy().(_PathSegmentChildBuilder)
 	_copy.childBuilder.setParent(_copy)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -228,7 +229,7 @@ func CastPathSegment(structType any) PathSegment {
 	return nil
 }
 
-func (m *_PathSegment) GetTypeName() string {
+func (m *_PathSegment) GetPlx4xTypeName() string {
 	return "PathSegment"
 }
 
@@ -264,7 +265,7 @@ func PathSegmentParseWithBufferProducer[T PathSegment]() func(ctx context.Contex
 }
 
 func PathSegmentParseWithBuffer[T PathSegment](ctx context.Context, readBuffer utils.ReadBuffer) (T, error) {
-	v, err := (&_PathSegment{}).parse(ctx, readBuffer)
+	v, err := (new(_PathSegment)).parse(ctx, readBuffer)
 	if err != nil {
 		var zero T
 		return zero, err

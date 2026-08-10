@@ -21,13 +21,14 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -113,7 +114,7 @@ type _MediaTransportControlDataFastForwardBuilder struct {
 
 	parentBuilder *_MediaTransportControlDataBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (MediaTransportControlDataFastForwardBuilder) = (*_MediaTransportControlDataFastForwardBuilder)(nil)
@@ -133,8 +134,8 @@ func (b *_MediaTransportControlDataFastForwardBuilder) WithOperation(operation b
 }
 
 func (b *_MediaTransportControlDataFastForwardBuilder) Build() (MediaTransportControlDataFastForward, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._MediaTransportControlDataFastForward.deepCopy(), nil
 }
@@ -160,8 +161,8 @@ func (b *_MediaTransportControlDataFastForwardBuilder) buildForMediaTransportCon
 
 func (b *_MediaTransportControlDataFastForwardBuilder) DeepCopy() any {
 	_copy := b.CreateMediaTransportControlDataFastForwardBuilder().(*_MediaTransportControlDataFastForwardBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -275,7 +276,7 @@ func CastMediaTransportControlDataFastForward(structType any) MediaTransportCont
 	return nil
 }
 
-func (m *_MediaTransportControlDataFastForward) GetTypeName() string {
+func (m *_MediaTransportControlDataFastForward) GetPlx4xTypeName() string {
 	return "MediaTransportControlDataFastForward"
 }
 

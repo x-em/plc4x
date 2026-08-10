@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -83,7 +86,7 @@ func NewRequestTerminationBuilder() RequestTerminationBuilder {
 type _RequestTerminationBuilder struct {
 	*_RequestTermination
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (RequestTerminationBuilder) = (*_RequestTerminationBuilder)(nil)
@@ -93,8 +96,8 @@ func (b *_RequestTerminationBuilder) WithMandatoryFields() RequestTerminationBui
 }
 
 func (b *_RequestTerminationBuilder) Build() (RequestTermination, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._RequestTermination.deepCopy(), nil
 }
@@ -109,8 +112,8 @@ func (b *_RequestTerminationBuilder) MustBuild() RequestTermination {
 
 func (b *_RequestTerminationBuilder) DeepCopy() any {
 	_copy := b.CreateRequestTerminationBuilder().(*_RequestTerminationBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -153,7 +156,7 @@ func CastRequestTermination(structType any) RequestTermination {
 	return nil
 }
 
-func (m *_RequestTermination) GetTypeName() string {
+func (m *_RequestTermination) GetPlx4xTypeName() string {
 	return "RequestTermination"
 }
 
@@ -171,7 +174,7 @@ func (m *_RequestTermination) GetLengthInBytes(ctx context.Context) uint16 {
 }
 
 func RequestTerminationParse(ctx context.Context, theBytes []byte) (RequestTermination, error) {
-	return RequestTerminationParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return RequestTerminationParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func RequestTerminationParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (RequestTermination, error) {
@@ -181,7 +184,7 @@ func RequestTerminationParseWithBufferProducer() func(ctx context.Context, readB
 }
 
 func RequestTerminationParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (RequestTermination, error) {
-	v, err := (&_RequestTermination{}).parse(ctx, readBuffer)
+	v, err := (new(_RequestTermination)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +200,7 @@ func (m *_RequestTermination) parse(ctx context.Context, readBuffer utils.ReadBu
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	cr, err := ReadConstField[byte](ctx, "cr", ReadByte(readBuffer, 8), RequestTermination_CR)
+	cr, err := ReadConstField[byte](ctx, "cr", ReadByte(readBuffer, 8), RequestTermination_CR, codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'cr' field"))
 	}
@@ -211,7 +214,7 @@ func (m *_RequestTermination) parse(ctx context.Context, readBuffer utils.ReadBu
 }
 
 func (m *_RequestTermination) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -227,7 +230,7 @@ func (m *_RequestTermination) SerializeWithWriteBuffer(ctx context.Context, writ
 		return errors.Wrap(pushErr, "Error pushing for RequestTermination")
 	}
 
-	if err := WriteConstField(ctx, "cr", RequestTermination_CR, WriteByte(writeBuffer, 8)); err != nil {
+	if err := WriteConstField(ctx, "cr", RequestTermination_CR, WriteByte(writeBuffer, 8), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'cr' field")
 	}
 

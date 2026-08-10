@@ -21,11 +21,12 @@ package model
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -89,7 +90,7 @@ type _FilterOperandBuilder struct {
 
 	parentBuilder *_ExtensionObjectDefinitionBuilder
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (FilterOperandBuilder) = (*_FilterOperandBuilder)(nil)
@@ -104,8 +105,8 @@ func (b *_FilterOperandBuilder) WithMandatoryFields() FilterOperandBuilder {
 }
 
 func (b *_FilterOperandBuilder) Build() (FilterOperand, error) {
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._FilterOperand.deepCopy(), nil
 }
@@ -131,8 +132,8 @@ func (b *_FilterOperandBuilder) buildForExtensionObjectDefinition() (ExtensionOb
 
 func (b *_FilterOperandBuilder) DeepCopy() any {
 	_copy := b.CreateFilterOperandBuilder().(*_FilterOperandBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -179,7 +180,7 @@ func CastFilterOperand(structType any) FilterOperand {
 	return nil
 }
 
-func (m *_FilterOperand) GetTypeName() string {
+func (m *_FilterOperand) GetPlx4xTypeName() string {
 	return "FilterOperand"
 }
 

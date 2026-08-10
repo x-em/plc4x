@@ -21,13 +21,16 @@ package model
 
 import (
 	"context"
+	"encoding/binary"
+	stdErrors "errors"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 
+	"github.com/apache/plc4x/plc4go/spi/codegen"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/fields"
 	. "github.com/apache/plc4x/plc4go/spi/codegen/io"
+	"github.com/apache/plc4x/plc4go/spi/errors"
 	"github.com/apache/plc4x/plc4go/spi/utils"
 )
 
@@ -40,6 +43,7 @@ type InterfaceOptions1PowerUpSettings interface {
 	utils.Serializable
 	utils.Copyable
 	// GetInterfaceOptions1 returns InterfaceOptions1 (property field)
+	// Note 5
 	GetInterfaceOptions1() InterfaceOptions1
 	// IsInterfaceOptions1PowerUpSettings is a marker method to prevent unintentional type checks (interfaces of same signature)
 	IsInterfaceOptions1PowerUpSettings()
@@ -90,7 +94,7 @@ func NewInterfaceOptions1PowerUpSettingsBuilder() InterfaceOptions1PowerUpSettin
 type _InterfaceOptions1PowerUpSettingsBuilder struct {
 	*_InterfaceOptions1PowerUpSettings
 
-	err *utils.MultiError
+	collectedErr []error
 }
 
 var _ (InterfaceOptions1PowerUpSettingsBuilder) = (*_InterfaceOptions1PowerUpSettingsBuilder)(nil)
@@ -109,23 +113,17 @@ func (b *_InterfaceOptions1PowerUpSettingsBuilder) WithInterfaceOptions1Builder(
 	var err error
 	b.InterfaceOptions1, err = builder.Build()
 	if err != nil {
-		if b.err == nil {
-			b.err = &utils.MultiError{MainError: errors.New("sub builder failed")}
-		}
-		b.err.Append(errors.Wrap(err, "InterfaceOptions1Builder failed"))
+		b.collectedErr = append(b.collectedErr, errors.Wrap(err, "InterfaceOptions1Builder failed"))
 	}
 	return b
 }
 
 func (b *_InterfaceOptions1PowerUpSettingsBuilder) Build() (InterfaceOptions1PowerUpSettings, error) {
 	if b.InterfaceOptions1 == nil {
-		if b.err == nil {
-			b.err = new(utils.MultiError)
-		}
-		b.err.Append(errors.New("mandatory field 'interfaceOptions1' not set"))
+		b.collectedErr = append(b.collectedErr, errors.New("mandatory field 'interfaceOptions1' not set"))
 	}
-	if b.err != nil {
-		return nil, errors.Wrap(b.err, "error occurred during build")
+	if err := stdErrors.Join(b.collectedErr...); err != nil {
+		return nil, errors.Wrap(err, "error occurred during build")
 	}
 	return b._InterfaceOptions1PowerUpSettings.deepCopy(), nil
 }
@@ -140,8 +138,8 @@ func (b *_InterfaceOptions1PowerUpSettingsBuilder) MustBuild() InterfaceOptions1
 
 func (b *_InterfaceOptions1PowerUpSettingsBuilder) DeepCopy() any {
 	_copy := b.CreateInterfaceOptions1PowerUpSettingsBuilder().(*_InterfaceOptions1PowerUpSettingsBuilder)
-	if b.err != nil {
-		_copy.err = b.err.DeepCopy().(*utils.MultiError)
+	if b.collectedErr != nil {
+		copy(_copy.collectedErr, b.collectedErr)
 	}
 	return _copy
 }
@@ -184,7 +182,7 @@ func CastInterfaceOptions1PowerUpSettings(structType any) InterfaceOptions1Power
 	return nil
 }
 
-func (m *_InterfaceOptions1PowerUpSettings) GetTypeName() string {
+func (m *_InterfaceOptions1PowerUpSettings) GetPlx4xTypeName() string {
 	return "InterfaceOptions1PowerUpSettings"
 }
 
@@ -202,7 +200,7 @@ func (m *_InterfaceOptions1PowerUpSettings) GetLengthInBytes(ctx context.Context
 }
 
 func InterfaceOptions1PowerUpSettingsParse(ctx context.Context, theBytes []byte) (InterfaceOptions1PowerUpSettings, error) {
-	return InterfaceOptions1PowerUpSettingsParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes))
+	return InterfaceOptions1PowerUpSettingsParseWithBuffer(ctx, utils.NewReadBufferByteBased(theBytes, utils.WithByteOrderForReadBufferByteBased(binary.BigEndian)))
 }
 
 func InterfaceOptions1PowerUpSettingsParseWithBufferProducer() func(ctx context.Context, readBuffer utils.ReadBuffer) (InterfaceOptions1PowerUpSettings, error) {
@@ -212,7 +210,7 @@ func InterfaceOptions1PowerUpSettingsParseWithBufferProducer() func(ctx context.
 }
 
 func InterfaceOptions1PowerUpSettingsParseWithBuffer(ctx context.Context, readBuffer utils.ReadBuffer) (InterfaceOptions1PowerUpSettings, error) {
-	v, err := (&_InterfaceOptions1PowerUpSettings{}).parse(ctx, readBuffer)
+	v, err := (new(_InterfaceOptions1PowerUpSettings)).parse(ctx, readBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +226,7 @@ func (m *_InterfaceOptions1PowerUpSettings) parse(ctx context.Context, readBuffe
 	currentPos := positionAware.GetPos()
 	_ = currentPos
 
-	interfaceOptions1, err := ReadSimpleField[InterfaceOptions1](ctx, "interfaceOptions1", ReadComplex[InterfaceOptions1](InterfaceOptions1ParseWithBuffer, readBuffer))
+	interfaceOptions1, err := ReadSimpleField[InterfaceOptions1](ctx, "interfaceOptions1", ReadComplex[InterfaceOptions1](InterfaceOptions1ParseWithBuffer, readBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian))
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Error parsing 'interfaceOptions1' field"))
 	}
@@ -242,7 +240,7 @@ func (m *_InterfaceOptions1PowerUpSettings) parse(ctx context.Context, readBuffe
 }
 
 func (m *_InterfaceOptions1PowerUpSettings) Serialize() ([]byte, error) {
-	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))))
+	wb := utils.NewWriteBufferByteBased(utils.WithInitialSizeForByteBasedBuffer(int(m.GetLengthInBytes(context.Background()))), utils.WithByteOrderForByteBasedBuffer(binary.BigEndian))
 	if err := m.SerializeWithWriteBuffer(context.Background(), wb); err != nil {
 		return nil, err
 	}
@@ -258,7 +256,7 @@ func (m *_InterfaceOptions1PowerUpSettings) SerializeWithWriteBuffer(ctx context
 		return errors.Wrap(pushErr, "Error pushing for InterfaceOptions1PowerUpSettings")
 	}
 
-	if err := WriteSimpleField[InterfaceOptions1](ctx, "interfaceOptions1", m.GetInterfaceOptions1(), WriteComplex[InterfaceOptions1](writeBuffer)); err != nil {
+	if err := WriteSimpleField[InterfaceOptions1](ctx, "interfaceOptions1", m.GetInterfaceOptions1(), WriteComplex[InterfaceOptions1](writeBuffer), codegen.WithEncoding("UTF8"), codegen.WithByteOrder(binary.BigEndian)); err != nil {
 		return errors.Wrap(err, "Error serializing 'interfaceOptions1' field")
 	}
 
